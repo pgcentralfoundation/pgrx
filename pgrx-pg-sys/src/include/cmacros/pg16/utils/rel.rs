@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
@@ -139,8 +150,26 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
 /// ```text
 /// #define IndexRelationGetNumberOfAttributes( relation ) ( ( relation ) -> rd_index -> indnatts )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IndexRelationGetNumberOfAttributes {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IndexRelationGetNumberOfAttributes!(@__pgrx_emit_value; $relation)
@@ -151,7 +180,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2405,
+                        $crate::__pgrx_c_generated::Field_indnatts,
                         _,
                         _
                     >(
@@ -159,7 +188,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4326,
+                                        $crate::__pgrx_c_generated::Field_rd_index,
                                         _,
                                         _
                                     >(
@@ -194,7 +223,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2405,
+                $crate::__pgrx_c_generated::Field_indnatts,
                 _,
                 _
             >(
@@ -202,7 +231,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4326,
+                                $crate::__pgrx_c_generated::Field_rd_index,
                                 _,
                                 _
                             >(
@@ -230,7 +259,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2405,
+                $crate::__pgrx_c_generated::Field_indnatts,
                 _,
                 _
             >(
@@ -238,7 +267,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4326,
+                                $crate::__pgrx_c_generated::Field_rd_index,
                                 _,
                                 _
                             >(
@@ -266,10 +295,15 @@ macro_rules! IndexRelationGetNumberOfAttributes {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2405,
+                            $crate::__pgrx_c_generated::Field_indnatts,
                             _,
                             _
                         >(
@@ -277,7 +311,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4326,
+                                            $crate::__pgrx_c_generated::Field_rd_index,
                                             _,
                                             _
                                         >(
@@ -317,7 +351,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2405,
+                        $crate::__pgrx_c_generated::Field_indnatts,
                         _,
                         _
                     >(
@@ -325,7 +359,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4326,
+                                        $crate::__pgrx_c_generated::Field_rd_index,
                                         _,
                                         _
                                     >(
@@ -373,6 +407,17 @@ macro_rules! IndexRelationGetNumberOfAttributes {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
@@ -503,8 +548,26 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
 /// ```text
 /// #define IndexRelationGetNumberOfKeyAttributes( relation ) ( ( relation ) -> rd_index -> indnkeyatts )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IndexRelationGetNumberOfKeyAttributes {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IndexRelationGetNumberOfKeyAttributes!(@__pgrx_emit_value; $relation)
@@ -515,7 +578,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2406,
+                        $crate::__pgrx_c_generated::Field_indnkeyatts,
                         _,
                         _
                     >(
@@ -523,7 +586,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4326,
+                                        $crate::__pgrx_c_generated::Field_rd_index,
                                         _,
                                         _
                                     >(
@@ -558,7 +621,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2406,
+                $crate::__pgrx_c_generated::Field_indnkeyatts,
                 _,
                 _
             >(
@@ -566,7 +629,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4326,
+                                $crate::__pgrx_c_generated::Field_rd_index,
                                 _,
                                 _
                             >(
@@ -594,7 +657,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2406,
+                $crate::__pgrx_c_generated::Field_indnkeyatts,
                 _,
                 _
             >(
@@ -602,7 +665,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4326,
+                                $crate::__pgrx_c_generated::Field_rd_index,
                                 _,
                                 _
                             >(
@@ -630,10 +693,15 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2406,
+                            $crate::__pgrx_c_generated::Field_indnkeyatts,
                             _,
                             _
                         >(
@@ -641,7 +709,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4326,
+                                            $crate::__pgrx_c_generated::Field_rd_index,
                                             _,
                                             _
                                         >(
@@ -681,7 +749,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2406,
+                        $crate::__pgrx_c_generated::Field_indnkeyatts,
                         _,
                         _
                     >(
@@ -689,7 +757,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4326,
+                                        $crate::__pgrx_c_generated::Field_rd_index,
                                         _,
                                         _
                                     >(
@@ -737,6 +805,17 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
@@ -846,8 +925,23 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
 /// ```text
 /// #define RELATION_IS_LOCAL( relation ) ( ( relation ) -> rd_islocaltemp || ( relation ) -> rd_createSubid != InvalidSubTransactionId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RELATION_IS_LOCAL {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RELATION_IS_LOCAL!(@__pgrx_emit_value; $relation)
@@ -861,7 +955,7 @@ macro_rules! RELATION_IS_LOCAL {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4334,
+                                    $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                     _,
                                     _
                                 >(
@@ -882,7 +976,7 @@ macro_rules! RELATION_IS_LOCAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4312,
+                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                             _,
                                             _
                                         >(
@@ -939,6 +1033,11 @@ macro_rules! RELATION_IS_LOCAL {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -947,7 +1046,7 @@ macro_rules! RELATION_IS_LOCAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4334,
+                                                $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                                 _,
                                                 _
                                             >(
@@ -976,7 +1075,7 @@ macro_rules! RELATION_IS_LOCAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4312,
+                                                        $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                         _,
                                                         _
                                                     >(
@@ -1034,7 +1133,7 @@ macro_rules! RELATION_IS_LOCAL {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4334,
+                                    $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                     _,
                                     _
                                 >(
@@ -1055,7 +1154,7 @@ macro_rules! RELATION_IS_LOCAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4312,
+                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                             _,
                                             _
                                         >(
@@ -1110,6 +1209,17 @@ macro_rules! RELATION_IS_LOCAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
@@ -1228,8 +1338,26 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
 /// ```text
 /// #define RELATION_IS_OTHER_TEMP( relation ) ( ( relation ) -> rd_rel -> relpersistence == RELPERSISTENCE_TEMP && ! ( relation ) -> rd_islocaltemp )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RELATION_IS_OTHER_TEMP {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RELATION_IS_OTHER_TEMP!(@__pgrx_emit_value; $relation)
@@ -1245,7 +1373,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4495,
+                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                             _,
                                             _
                                         >(
@@ -1256,7 +1384,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4359,
+                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                             _,
                                                             _
                                                         >(
@@ -1293,7 +1421,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4334,
+                                            $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                             _,
                                             _
                                         >(
@@ -1342,6 +1470,11 @@ macro_rules! RELATION_IS_OTHER_TEMP {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1355,7 +1488,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4495,
+                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                         _,
                                                         _
                                                     >(
@@ -1366,7 +1499,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1411,7 +1544,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4334,
+                                                        $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                                         _,
                                                         _
                                                     >(
@@ -1460,7 +1593,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4495,
+                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                             _,
                                             _
                                         >(
@@ -1471,7 +1604,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4359,
+                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                             _,
                                                             _
                                                         >(
@@ -1508,7 +1641,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4334,
+                                            $crate::__pgrx_c_generated::Field_rd_islocaltemp,
                                             _,
                                             _
                                         >(
@@ -1555,6 +1688,17 @@ macro_rules! RELATION_IS_OTHER_TEMP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetDescr {
@@ -1664,8 +1808,23 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
 /// ```text
 /// #define RelationGetDescr( relation ) ( ( relation ) -> rd_att )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetDescr {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetDescr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetDescr!(@__pgrx_emit_value; $relation)
@@ -1676,7 +1835,7 @@ macro_rules! RelationGetDescr {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4309,
+                        $crate::__pgrx_c_generated::Field_rd_att,
                         _,
                         _
                     >(
@@ -1698,7 +1857,7 @@ macro_rules! RelationGetDescr {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4309,
+                $crate::__pgrx_c_generated::Field_rd_att,
                 _,
                 _
             >(
@@ -1718,7 +1877,7 @@ macro_rules! RelationGetDescr {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4309,
+                $crate::__pgrx_c_generated::Field_rd_att,
                 _,
                 _
             >(
@@ -1738,10 +1897,15 @@ macro_rules! RelationGetDescr {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4309,
+                            $crate::__pgrx_c_generated::Field_rd_att,
                             _,
                             _
                         >(
@@ -1768,7 +1932,7 @@ macro_rules! RelationGetDescr {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4309,
+                        $crate::__pgrx_c_generated::Field_rd_att,
                         _,
                         _
                     >(
@@ -1800,6 +1964,17 @@ macro_rules! RelationGetDescr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetFillFactor {
@@ -1968,8 +2143,28 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
 /// ```text
 /// #define RelationGetFillFactor( relation , defaultff ) ( ( relation ) -> rd_options ? ( ( StdRdOptions * ) ( relation ) -> rd_options ) -> fillfactor : ( defaultff ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetFillFactor {
+    (@__pgrx_emit_check_safety; $relation:tt, $defaultff:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetFillFactor!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt, $defaultff:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetFillFactor!(@__pgrx_emit_value; $relation, $defaultff)
@@ -1983,7 +2178,7 @@ macro_rules! RelationGetFillFactor {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -2003,7 +2198,7 @@ macro_rules! RelationGetFillFactor {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1754,
+                                        $crate::__pgrx_c_generated::Field_fillfactor,
                                         _,
                                         _
                                     >(
@@ -2029,7 +2224,7 @@ macro_rules! RelationGetFillFactor {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -2088,6 +2283,12 @@ macro_rules! RelationGetFillFactor {
     (@__pgrx_emit_size; $relation:tt, $defaultff:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                        $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2096,7 +2297,7 @@ macro_rules! RelationGetFillFactor {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4344,
+                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                 _,
                                                 _
                                             >(
@@ -2124,7 +2325,7 @@ macro_rules! RelationGetFillFactor {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field1754,
+                                                    $crate::__pgrx_c_generated::Field_fillfactor,
                                                     _,
                                                     _
                                                 >(
@@ -2150,7 +2351,7 @@ macro_rules! RelationGetFillFactor {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -2210,7 +2411,7 @@ macro_rules! RelationGetFillFactor {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -2230,7 +2431,7 @@ macro_rules! RelationGetFillFactor {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1754,
+                                        $crate::__pgrx_c_generated::Field_fillfactor,
                                         _,
                                         _
                                     >(
@@ -2256,7 +2457,7 @@ macro_rules! RelationGetFillFactor {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -2313,6 +2514,17 @@ macro_rules! RelationGetFillFactor {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetForm {
@@ -2422,8 +2634,23 @@ macro_rules! __pgrx_c_args_RelationGetForm {
 /// ```text
 /// #define RelationGetForm( relation ) ( ( relation ) -> rd_rel )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetForm {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetForm!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetForm!(@__pgrx_emit_value; $relation)
@@ -2434,7 +2661,7 @@ macro_rules! RelationGetForm {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4359,
+                        $crate::__pgrx_c_generated::Field_rd_rel,
                         _,
                         _
                     >(
@@ -2456,7 +2683,7 @@ macro_rules! RelationGetForm {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4359,
+                $crate::__pgrx_c_generated::Field_rd_rel,
                 _,
                 _
             >(
@@ -2476,7 +2703,7 @@ macro_rules! RelationGetForm {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4359,
+                $crate::__pgrx_c_generated::Field_rd_rel,
                 _,
                 _
             >(
@@ -2496,10 +2723,15 @@ macro_rules! RelationGetForm {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4359,
+                            $crate::__pgrx_c_generated::Field_rd_rel,
                             _,
                             _
                         >(
@@ -2526,7 +2758,7 @@ macro_rules! RelationGetForm {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4359,
+                        $crate::__pgrx_c_generated::Field_rd_rel,
                         _,
                         _
                     >(
@@ -2558,6 +2790,17 @@ macro_rules! RelationGetForm {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetNamespace {
@@ -2672,8 +2915,23 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
 /// ```text
 /// #define RelationGetNamespace( relation ) ( ( relation ) -> rd_rel -> relnamespace )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetNamespace {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetNamespace!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetNamespace!(@__pgrx_emit_value; $relation)
@@ -2684,7 +2942,7 @@ macro_rules! RelationGetNamespace {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4488,
+                        $crate::__pgrx_c_generated::Field_relnamespace,
                         _,
                         _
                     >(
@@ -2692,7 +2950,7 @@ macro_rules! RelationGetNamespace {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -2724,7 +2982,7 @@ macro_rules! RelationGetNamespace {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4488,
+                $crate::__pgrx_c_generated::Field_relnamespace,
                 _,
                 _
             >(
@@ -2732,7 +2990,7 @@ macro_rules! RelationGetNamespace {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -2757,7 +3015,7 @@ macro_rules! RelationGetNamespace {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4488,
+                $crate::__pgrx_c_generated::Field_relnamespace,
                 _,
                 _
             >(
@@ -2765,7 +3023,7 @@ macro_rules! RelationGetNamespace {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -2790,10 +3048,15 @@ macro_rules! RelationGetNamespace {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4488,
+                            $crate::__pgrx_c_generated::Field_relnamespace,
                             _,
                             _
                         >(
@@ -2801,7 +3064,7 @@ macro_rules! RelationGetNamespace {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -2838,7 +3101,7 @@ macro_rules! RelationGetNamespace {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4488,
+                        $crate::__pgrx_c_generated::Field_relnamespace,
                         _,
                         _
                     >(
@@ -2846,7 +3109,7 @@ macro_rules! RelationGetNamespace {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -2888,6 +3151,17 @@ macro_rules! RelationGetNamespace {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
@@ -3015,8 +3289,26 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
 /// ```text
 /// #define RelationGetNumberOfAttributes( relation ) ( ( relation ) -> rd_rel -> relnatts )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetNumberOfAttributes {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetNumberOfAttributes!(@__pgrx_emit_value; $relation)
@@ -3027,7 +3319,7 @@ macro_rules! RelationGetNumberOfAttributes {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4489,
+                        $crate::__pgrx_c_generated::Field_relnatts,
                         _,
                         _
                     >(
@@ -3035,7 +3327,7 @@ macro_rules! RelationGetNumberOfAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -3070,7 +3362,7 @@ macro_rules! RelationGetNumberOfAttributes {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4489,
+                $crate::__pgrx_c_generated::Field_relnatts,
                 _,
                 _
             >(
@@ -3078,7 +3370,7 @@ macro_rules! RelationGetNumberOfAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -3106,7 +3398,7 @@ macro_rules! RelationGetNumberOfAttributes {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4489,
+                $crate::__pgrx_c_generated::Field_relnatts,
                 _,
                 _
             >(
@@ -3114,7 +3406,7 @@ macro_rules! RelationGetNumberOfAttributes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -3142,10 +3434,15 @@ macro_rules! RelationGetNumberOfAttributes {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4489,
+                            $crate::__pgrx_c_generated::Field_relnatts,
                             _,
                             _
                         >(
@@ -3153,7 +3450,7 @@ macro_rules! RelationGetNumberOfAttributes {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -3190,7 +3487,7 @@ macro_rules! RelationGetNumberOfAttributes {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4489,
+                        $crate::__pgrx_c_generated::Field_relnatts,
                         _,
                         _
                     >(
@@ -3198,7 +3495,7 @@ macro_rules! RelationGetNumberOfAttributes {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -3246,6 +3543,17 @@ macro_rules! RelationGetNumberOfAttributes {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
@@ -3424,8 +3732,31 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
 /// ```text
 /// #define RelationGetParallelWorkers( relation , defaultpw ) ( ( relation ) -> rd_options ? ( ( StdRdOptions * ) ( relation ) -> rd_options ) -> parallel_workers : ( defaultpw ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetParallelWorkers {
+    (@__pgrx_emit_check_safety; $relation:tt, $defaultpw:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $defaultpw);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetParallelWorkers!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt, $defaultpw:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetParallelWorkers!(@__pgrx_emit_value; $relation, $defaultpw)
@@ -3439,7 +3770,7 @@ macro_rules! RelationGetParallelWorkers {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -3459,7 +3790,7 @@ macro_rules! RelationGetParallelWorkers {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field3854,
+                                        $crate::__pgrx_c_generated::Field_parallel_workers,
                                         _,
                                         _
                                     >(
@@ -3485,7 +3816,7 @@ macro_rules! RelationGetParallelWorkers {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -3547,6 +3878,12 @@ macro_rules! RelationGetParallelWorkers {
     (@__pgrx_emit_size; $relation:tt, $defaultpw:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                        $crate::__pgrx_c_operand!(@check_safety; $defaultpw);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3555,7 +3892,7 @@ macro_rules! RelationGetParallelWorkers {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4344,
+                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                 _,
                                                 _
                                             >(
@@ -3583,7 +3920,7 @@ macro_rules! RelationGetParallelWorkers {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3854,
+                                                    $crate::__pgrx_c_generated::Field_parallel_workers,
                                                     _,
                                                     _
                                                 >(
@@ -3609,7 +3946,7 @@ macro_rules! RelationGetParallelWorkers {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -3669,7 +4006,7 @@ macro_rules! RelationGetParallelWorkers {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -3689,7 +4026,7 @@ macro_rules! RelationGetParallelWorkers {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field3854,
+                                        $crate::__pgrx_c_generated::Field_parallel_workers,
                                         _,
                                         _
                                     >(
@@ -3715,7 +4052,7 @@ macro_rules! RelationGetParallelWorkers {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -3772,6 +4109,17 @@ macro_rules! RelationGetParallelWorkers {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetRelationName {
@@ -3896,8 +4244,26 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
 /// ```text
 /// #define RelationGetRelationName( relation ) ( NameStr ( ( relation ) -> rd_rel -> relname ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetRelationName {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetRelationName!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetRelationName!(@__pgrx_emit_value; $relation)
@@ -3910,13 +4276,13 @@ macro_rules! RelationGetRelationName {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1261,
+                            $crate::__pgrx_c_generated::Field_data,
                             _,
                             _
                         >(
                             (
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4486,
+                                    $crate::__pgrx_c_generated::Field_relname,
                                     _,
                                     _
                                 >(
@@ -3927,7 +4293,7 @@ macro_rules! RelationGetRelationName {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4359,
+                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                     _,
                                                     _
                                                 >(
@@ -3964,13 +4330,13 @@ macro_rules! RelationGetRelationName {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field1261,
+                    $crate::__pgrx_c_generated::Field_data,
                     _,
                     _
                 >(
                     (
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4486,
+                            $crate::__pgrx_c_generated::Field_relname,
                             _,
                             _
                         >(
@@ -3978,7 +4344,7 @@ macro_rules! RelationGetRelationName {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -4013,13 +4379,13 @@ macro_rules! RelationGetRelationName {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field1261,
+                    $crate::__pgrx_c_generated::Field_data,
                     _,
                     _
                 >(
                     (
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4486,
+                            $crate::__pgrx_c_generated::Field_relname,
                             _,
                             _
                         >(
@@ -4027,7 +4393,7 @@ macro_rules! RelationGetRelationName {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -4061,16 +4427,21 @@ macro_rules! RelationGetRelationName {
         /* PGRX: RelationGetRelationName remains expanded because NameStr expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1261,
+                            $crate::__pgrx_c_generated::Field_data,
                             _,
                             _
                         >(
                             (
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4486,
+                                    $crate::__pgrx_c_generated::Field_relname,
                                     _,
                                     _
                                 >(
@@ -4081,7 +4452,7 @@ macro_rules! RelationGetRelationName {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4359,
+                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                     _,
                                                     _
                                                 >(
@@ -4121,13 +4492,13 @@ macro_rules! RelationGetRelationName {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1261,
+                        $crate::__pgrx_c_generated::Field_data,
                         _,
                         _
                     >(
                         (
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4486,
+                                $crate::__pgrx_c_generated::Field_relname,
                                 _,
                                 _
                             >(
@@ -4135,7 +4506,7 @@ macro_rules! RelationGetRelationName {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4359,
+                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                 _,
                                                 _
                                             >(
@@ -4179,6 +4550,17 @@ macro_rules! RelationGetRelationName {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetRelid {
@@ -4288,8 +4670,23 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
 /// ```text
 /// #define RelationGetRelid( relation ) ( ( relation ) -> rd_id )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationGetRelid {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetRelid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetRelid!(@__pgrx_emit_value; $relation)
@@ -4300,7 +4697,7 @@ macro_rules! RelationGetRelid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4322,
+                        $crate::__pgrx_c_generated::Field_rd_id,
                         _,
                         _
                     >(
@@ -4322,7 +4719,7 @@ macro_rules! RelationGetRelid {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4322,
+                $crate::__pgrx_c_generated::Field_rd_id,
                 _,
                 _
             >(
@@ -4342,7 +4739,7 @@ macro_rules! RelationGetRelid {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4322,
+                $crate::__pgrx_c_generated::Field_rd_id,
                 _,
                 _
             >(
@@ -4362,10 +4759,15 @@ macro_rules! RelationGetRelid {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4322,
+                            $crate::__pgrx_c_generated::Field_rd_id,
                             _,
                             _
                         >(
@@ -4392,7 +4794,7 @@ macro_rules! RelationGetRelid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4322,
+                        $crate::__pgrx_c_generated::Field_rd_id,
                         _,
                         _
                     >(
@@ -4424,6 +4826,17 @@ macro_rules! RelationGetRelid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetTargetBlock {
@@ -4542,8 +4955,30 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
 /// ```text
 /// #define RelationGetTargetBlock( relation ) ( ( relation ) -> rd_smgr != NULL ? ( relation ) -> rd_smgr -> smgr_targblock : InvalidBlockNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetTargetBlock {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetTargetBlock!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetTargetBlock!(@__pgrx_emit_value; $relation)
@@ -4560,7 +4995,7 @@ macro_rules! RelationGetTargetBlock {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4364,
+                                            $crate::__pgrx_c_generated::Field_rd_smgr,
                                             _,
                                             _
                                         >(
@@ -4611,7 +5046,7 @@ macro_rules! RelationGetTargetBlock {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5134,
+                                        $crate::__pgrx_c_generated::Field_smgr_targblock,
                                         _,
                                         _
                                     >(
@@ -4622,7 +5057,7 @@ macro_rules! RelationGetTargetBlock {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4364,
+                                                        $crate::__pgrx_c_generated::Field_rd_smgr,
                                                         _,
                                                         _
                                                     >(
@@ -4680,6 +5115,11 @@ macro_rules! RelationGetTargetBlock {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4693,7 +5133,7 @@ macro_rules! RelationGetTargetBlock {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4364,
+                                                        $crate::__pgrx_c_generated::Field_rd_smgr,
                                                         _,
                                                         _
                                                     >(
@@ -4750,7 +5190,7 @@ macro_rules! RelationGetTargetBlock {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5134,
+                                                    $crate::__pgrx_c_generated::Field_smgr_targblock,
                                                     _,
                                                     _
                                                 >(
@@ -4761,7 +5201,7 @@ macro_rules! RelationGetTargetBlock {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4364,
+                                                                    $crate::__pgrx_c_generated::Field_rd_smgr,
                                                                     _,
                                                                     _
                                                                 >(
@@ -4822,7 +5262,7 @@ macro_rules! RelationGetTargetBlock {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4364,
+                                            $crate::__pgrx_c_generated::Field_rd_smgr,
                                             _,
                                             _
                                         >(
@@ -4873,7 +5313,7 @@ macro_rules! RelationGetTargetBlock {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5134,
+                                        $crate::__pgrx_c_generated::Field_smgr_targblock,
                                         _,
                                         _
                                     >(
@@ -4884,7 +5324,7 @@ macro_rules! RelationGetTargetBlock {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4364,
+                                                        $crate::__pgrx_c_generated::Field_rd_smgr,
                                                         _,
                                                         _
                                                     >(
@@ -4939,6 +5379,17 @@ macro_rules! RelationGetTargetBlock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
@@ -5123,8 +5574,31 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
 /// ```text
 /// #define RelationGetTargetPageFreeSpace( relation , defaultff ) ( BLCKSZ * ( 100 - RelationGetFillFactor ( relation , defaultff ) ) / 100 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetTargetPageFreeSpace {
+    (@__pgrx_emit_check_safety; $relation:tt, $defaultff:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt, $defaultff:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetTargetPageFreeSpace!(@__pgrx_emit_value; $relation, $defaultff)
@@ -5174,7 +5648,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -5202,7 +5676,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1754,
+                                                                        $crate::__pgrx_c_generated::Field_fillfactor,
                                                                         _,
                                                                         _
                                                                     >(
@@ -5228,7 +5702,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -5318,6 +5792,12 @@ macro_rules! RelationGetTargetPageFreeSpace {
         /* PGRX: RelationGetFillFactor remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                        $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -5367,7 +5847,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -5397,7 +5877,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1754,
+                                                                                    $crate::__pgrx_c_generated::Field_fillfactor,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -5423,7 +5903,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -5540,7 +6020,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -5568,7 +6048,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1754,
+                                                                        $crate::__pgrx_c_generated::Field_fillfactor,
                                                                         _,
                                                                         _
                                                                     >(
@@ -5594,7 +6074,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -5678,6 +6158,17 @@ macro_rules! RelationGetTargetPageFreeSpace {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
@@ -5856,8 +6347,31 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
 /// ```text
 /// #define RelationGetTargetPageUsage( relation , defaultff ) ( BLCKSZ * RelationGetFillFactor ( relation , defaultff ) / 100 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetTargetPageUsage {
+    (@__pgrx_emit_check_safety; $relation:tt, $defaultff:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt, $defaultff:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetTargetPageUsage!(@__pgrx_emit_value; $relation, $defaultff)
@@ -5889,7 +6403,7 @@ macro_rules! RelationGetTargetPageUsage {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4344,
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                         _,
                                                         _
                                                     >(
@@ -5917,7 +6431,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1754,
+                                                            $crate::__pgrx_c_generated::Field_fillfactor,
                                                             _,
                                                             _
                                                         >(
@@ -5943,7 +6457,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4344,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -6024,6 +6538,12 @@ macro_rules! RelationGetTargetPageUsage {
         /* PGRX: RelationGetFillFactor remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                        $crate::__pgrx_c_operand!(@check_safety; $defaultff);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6055,7 +6575,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -6083,7 +6603,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1754,
+                                                                        $crate::__pgrx_c_generated::Field_fillfactor,
                                                                         _,
                                                                         _
                                                                     >(
@@ -6109,7 +6629,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -6202,7 +6722,7 @@ macro_rules! RelationGetTargetPageUsage {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4344,
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                         _,
                                                         _
                                                     >(
@@ -6230,7 +6750,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1754,
+                                                            $crate::__pgrx_c_generated::Field_fillfactor,
                                                             _,
                                                             _
                                                         >(
@@ -6256,7 +6776,7 @@ macro_rules! RelationGetTargetPageUsage {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4344,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -6331,6 +6851,17 @@ macro_rules! RelationGetTargetPageUsage {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
@@ -6509,8 +7040,31 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
 /// ```text
 /// #define RelationGetToastTupleTarget( relation , defaulttarg ) ( ( relation ) -> rd_options ? ( ( StdRdOptions * ) ( relation ) -> rd_options ) -> toast_tuple_target : ( defaulttarg ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetToastTupleTarget {
+    (@__pgrx_emit_check_safety; $relation:tt, $defaulttarg:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $defaulttarg);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt, $defaulttarg:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetToastTupleTarget!(@__pgrx_emit_value; $relation, $defaulttarg)
@@ -6524,7 +7078,7 @@ macro_rules! RelationGetToastTupleTarget {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -6544,7 +7098,7 @@ macro_rules! RelationGetToastTupleTarget {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5659,
+                                        $crate::__pgrx_c_generated::Field_toast_tuple_target,
                                         _,
                                         _
                                     >(
@@ -6570,7 +7124,7 @@ macro_rules! RelationGetToastTupleTarget {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -6632,6 +7186,12 @@ macro_rules! RelationGetToastTupleTarget {
     (@__pgrx_emit_size; $relation:tt, $defaulttarg:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                        $crate::__pgrx_c_operand!(@check_safety; $defaulttarg);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6640,7 +7200,7 @@ macro_rules! RelationGetToastTupleTarget {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4344,
+                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                 _,
                                                 _
                                             >(
@@ -6668,7 +7228,7 @@ macro_rules! RelationGetToastTupleTarget {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5659,
+                                                    $crate::__pgrx_c_generated::Field_toast_tuple_target,
                                                     _,
                                                     _
                                                 >(
@@ -6694,7 +7254,7 @@ macro_rules! RelationGetToastTupleTarget {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -6759,7 +7319,7 @@ macro_rules! RelationGetToastTupleTarget {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4344,
+                                    $crate::__pgrx_c_generated::Field_rd_options,
                                     _,
                                     _
                                 >(
@@ -6779,7 +7339,7 @@ macro_rules! RelationGetToastTupleTarget {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5659,
+                                        $crate::__pgrx_c_generated::Field_toast_tuple_target,
                                         _,
                                         _
                                     >(
@@ -6805,7 +7365,7 @@ macro_rules! RelationGetToastTupleTarget {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -6865,6 +7425,17 @@ macro_rules! RelationGetToastTupleTarget {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
@@ -6992,8 +7563,30 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
 /// ```text
 /// #define RelationHasReferenceCountZero( relation ) ( ( bool ) ( ( relation ) -> rd_refcnt == 0 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationHasReferenceCountZero {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationHasReferenceCountZero!(@__pgrx_emit_value; $relation)
@@ -7010,7 +7603,7 @@ macro_rules! RelationHasReferenceCountZero {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4358,
+                                            $crate::__pgrx_c_generated::Field_rd_refcnt,
                                             _,
                                             _
                                         >(
@@ -7072,6 +7665,11 @@ macro_rules! RelationHasReferenceCountZero {
         /* PGRX: bool remains expanded because object macro is not a supported pure integer expression: compiler and declaration keywords require a dedicated syntax contract. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7088,7 +7686,7 @@ macro_rules! RelationHasReferenceCountZero {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4358,
+                                                        $crate::__pgrx_c_generated::Field_rd_refcnt,
                                                         _,
                                                         _
                                                     >(
@@ -7144,7 +7742,7 @@ macro_rules! RelationHasReferenceCountZero {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4358,
+                                            $crate::__pgrx_c_generated::Field_rd_refcnt,
                                             _,
                                             _
                                         >(
@@ -7200,6 +7798,17 @@ macro_rules! RelationHasReferenceCountZero {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
@@ -7322,8 +7931,30 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
 /// ```text
 /// #define RelationIsAccessibleInLogicalDecoding( relation ) ( XLogLogicalInfoActive ( ) && RelationNeedsWAL ( relation ) && ( IsCatalogRelation ( relation ) || RelationIsUsedAsCatalogTable ( relation ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationIsAccessibleInLogicalDecoding {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsAccessibleInLogicalDecoding!(@__pgrx_emit_value; $relation)
@@ -7393,7 +8024,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4495,
+                                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                                             _,
                                                                             _
                                                                         >(
@@ -7404,7 +8035,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -7507,7 +8138,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4312,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -7554,7 +8185,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4318,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -7686,7 +8317,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -7729,7 +8360,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -7740,7 +8371,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -7790,7 +8421,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -7801,7 +8432,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -7862,7 +8493,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5973,
+                                                                        $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                         _,
                                                                         _
                                                                     >(
@@ -7888,7 +8519,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -7981,6 +8612,11 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
         /* PGRX: RelationIsPermanent remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsUsedAsCatalogTable remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationNeedsWAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogIsNeeded remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogLogicalInfoActive remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8046,7 +8682,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4495,
+                                                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -8057,7 +8693,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -8160,7 +8796,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4312,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -8207,7 +8843,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4318,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -8344,7 +8980,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4344,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -8387,7 +9023,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -8398,7 +9034,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -8448,7 +9084,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -8459,7 +9095,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -8520,7 +9156,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5973,
+                                                                                    $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -8546,7 +9182,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -8686,7 +9322,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4495,
+                                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                                             _,
                                                                             _
                                                                         >(
@@ -8697,7 +9333,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -8800,7 +9436,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4312,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -8847,7 +9483,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4318,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -8979,7 +9615,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -9022,7 +9658,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -9033,7 +9669,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -9083,7 +9719,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -9094,7 +9730,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -9155,7 +9791,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5973,
+                                                                        $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                         _,
                                                                         _
                                                                     >(
@@ -9181,7 +9817,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -9268,6 +9904,17 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
@@ -9387,8 +10034,30 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
 /// ```text
 /// #define RelationIsLogicallyLogged( relation ) ( XLogLogicalInfoActive ( ) && RelationNeedsWAL ( relation ) && ( relation ) -> rd_rel -> relkind != RELKIND_FOREIGN_TABLE && ! IsCatalogRelation ( relation ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationIsLogicallyLogged {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsLogicallyLogged!(@__pgrx_emit_value; $relation)
@@ -9463,7 +10132,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4495,
+                                                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -9474,7 +10143,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -9577,7 +10246,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4312,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -9624,7 +10293,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4318,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -9699,7 +10368,7 @@ macro_rules! RelationIsLogicallyLogged {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4482,
+                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                         _,
                                                         _
                                                     >(
@@ -9710,7 +10379,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                         _,
                                                                         _
                                                                     >(
@@ -9825,6 +10494,11 @@ macro_rules! RelationIsLogicallyLogged {
         /* PGRX: RelationIsPermanent remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationNeedsWAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogIsNeeded remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogLogicalInfoActive remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9898,7 +10572,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4495,
+                                                                                                    $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -9909,7 +10583,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -10012,7 +10686,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4312,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -10059,7 +10733,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4318,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -10137,7 +10811,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                     _,
                                                                     _
                                                                 >(
@@ -10148,7 +10822,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -10323,7 +10997,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4495,
+                                                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -10334,7 +11008,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -10437,7 +11111,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4312,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -10484,7 +11158,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4318,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -10559,7 +11233,7 @@ macro_rules! RelationIsLogicallyLogged {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4482,
+                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                         _,
                                                         _
                                                     >(
@@ -10570,7 +11244,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                         _,
                                                                         _
                                                                     >(
@@ -10679,6 +11353,17 @@ macro_rules! RelationIsLogicallyLogged {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsMapped {
@@ -10788,8 +11473,23 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
 /// ```text
 /// #define RelationIsMapped( relation ) ( RELKIND_HAS_STORAGE ( ( relation ) -> rd_rel -> relkind ) && ( ( relation ) -> rd_rel -> relfilenode == InvalidRelFileNumber ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationIsMapped {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsMapped!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsMapped!(@__pgrx_emit_value; $relation)
@@ -10841,7 +11541,7 @@ macro_rules! RelationIsMapped {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -10852,7 +11552,7 @@ macro_rules! RelationIsMapped {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -10904,7 +11604,7 @@ macro_rules! RelationIsMapped {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -10915,7 +11615,7 @@ macro_rules! RelationIsMapped {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -10974,7 +11674,7 @@ macro_rules! RelationIsMapped {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -10985,7 +11685,7 @@ macro_rules! RelationIsMapped {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -11044,7 +11744,7 @@ macro_rules! RelationIsMapped {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4482,
+                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                             _,
                                                                             _
                                                                         >(
@@ -11055,7 +11755,7 @@ macro_rules! RelationIsMapped {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -11114,7 +11814,7 @@ macro_rules! RelationIsMapped {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4482,
+                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                 _,
                                                                 _
                                                             >(
@@ -11125,7 +11825,7 @@ macro_rules! RelationIsMapped {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -11177,7 +11877,7 @@ macro_rules! RelationIsMapped {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4468,
+                                                $crate::__pgrx_c_generated::Field_relfilenode,
                                                 _,
                                                 _
                                             >(
@@ -11188,7 +11888,7 @@ macro_rules! RelationIsMapped {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                 _,
                                                                 _
                                                             >(
@@ -11251,6 +11951,11 @@ macro_rules! RelationIsMapped {
         /* PGRX: RELKIND_HAS_STORAGE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11301,7 +12006,7 @@ macro_rules! RelationIsMapped {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field4482,
+                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -11312,7 +12017,7 @@ macro_rules! RelationIsMapped {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -11364,7 +12069,7 @@ macro_rules! RelationIsMapped {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field4482,
+                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -11375,7 +12080,7 @@ macro_rules! RelationIsMapped {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -11434,7 +12139,7 @@ macro_rules! RelationIsMapped {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -11445,7 +12150,7 @@ macro_rules! RelationIsMapped {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -11504,7 +12209,7 @@ macro_rules! RelationIsMapped {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -11515,7 +12220,7 @@ macro_rules! RelationIsMapped {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -11574,7 +12279,7 @@ macro_rules! RelationIsMapped {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4482,
+                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                             _,
                                                                             _
                                                                         >(
@@ -11585,7 +12290,7 @@ macro_rules! RelationIsMapped {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -11645,7 +12350,7 @@ macro_rules! RelationIsMapped {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4468,
+                                                            $crate::__pgrx_c_generated::Field_relfilenode,
                                                             _,
                                                             _
                                                         >(
@@ -11656,7 +12361,7 @@ macro_rules! RelationIsMapped {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                             _,
                                                                             _
                                                                         >(
@@ -11759,7 +12464,7 @@ macro_rules! RelationIsMapped {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -11770,7 +12475,7 @@ macro_rules! RelationIsMapped {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -11822,7 +12527,7 @@ macro_rules! RelationIsMapped {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -11833,7 +12538,7 @@ macro_rules! RelationIsMapped {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -11892,7 +12597,7 @@ macro_rules! RelationIsMapped {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -11903,7 +12608,7 @@ macro_rules! RelationIsMapped {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -11962,7 +12667,7 @@ macro_rules! RelationIsMapped {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4482,
+                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                             _,
                                                                             _
                                                                         >(
@@ -11973,7 +12678,7 @@ macro_rules! RelationIsMapped {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -12032,7 +12737,7 @@ macro_rules! RelationIsMapped {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4482,
+                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                 _,
                                                                 _
                                                             >(
@@ -12043,7 +12748,7 @@ macro_rules! RelationIsMapped {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -12095,7 +12800,7 @@ macro_rules! RelationIsMapped {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4468,
+                                                $crate::__pgrx_c_generated::Field_relfilenode,
                                                 _,
                                                 _
                                             >(
@@ -12106,7 +12811,7 @@ macro_rules! RelationIsMapped {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                 _,
                                                                 _
                                                             >(
@@ -12166,6 +12871,17 @@ macro_rules! RelationIsMapped {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsPermanent {
@@ -12275,8 +12991,23 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
 /// ```text
 /// #define RelationIsPermanent( relation ) ( ( relation ) -> rd_rel -> relpersistence == RELPERSISTENCE_PERMANENT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationIsPermanent {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsPermanent!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsPermanent!(@__pgrx_emit_value; $relation)
@@ -12289,7 +13020,7 @@ macro_rules! RelationIsPermanent {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4495,
+                                $crate::__pgrx_c_generated::Field_relpersistence,
                                 _,
                                 _
                             >(
@@ -12297,7 +13028,7 @@ macro_rules! RelationIsPermanent {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4359,
+                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                 _,
                                                 _
                                             >(
@@ -12348,6 +13079,11 @@ macro_rules! RelationIsPermanent {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -12355,7 +13091,7 @@ macro_rules! RelationIsPermanent {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4495,
+                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                             _,
                                             _
                                         >(
@@ -12366,7 +13102,7 @@ macro_rules! RelationIsPermanent {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4359,
+                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                             _,
                                                             _
                                                         >(
@@ -12414,7 +13150,7 @@ macro_rules! RelationIsPermanent {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4495,
+                                $crate::__pgrx_c_generated::Field_relpersistence,
                                 _,
                                 _
                             >(
@@ -12422,7 +13158,7 @@ macro_rules! RelationIsPermanent {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4359,
+                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                 _,
                                                 _
                                             >(
@@ -12471,6 +13207,17 @@ macro_rules! RelationIsPermanent {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsPopulated {
@@ -12580,8 +13327,23 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
 /// ```text
 /// #define RelationIsPopulated( relation ) ( ( relation ) -> rd_rel -> relispopulated )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationIsPopulated {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsPopulated!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsPopulated!(@__pgrx_emit_value; $relation)
@@ -12592,7 +13354,7 @@ macro_rules! RelationIsPopulated {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4480,
+                        $crate::__pgrx_c_generated::Field_relispopulated,
                         _,
                         _
                     >(
@@ -12600,7 +13362,7 @@ macro_rules! RelationIsPopulated {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -12632,7 +13394,7 @@ macro_rules! RelationIsPopulated {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4480,
+                $crate::__pgrx_c_generated::Field_relispopulated,
                 _,
                 _
             >(
@@ -12640,7 +13402,7 @@ macro_rules! RelationIsPopulated {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -12665,7 +13427,7 @@ macro_rules! RelationIsPopulated {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4480,
+                $crate::__pgrx_c_generated::Field_relispopulated,
                 _,
                 _
             >(
@@ -12673,7 +13435,7 @@ macro_rules! RelationIsPopulated {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -12698,10 +13460,15 @@ macro_rules! RelationIsPopulated {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4480,
+                            $crate::__pgrx_c_generated::Field_relispopulated,
                             _,
                             _
                         >(
@@ -12709,7 +13476,7 @@ macro_rules! RelationIsPopulated {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -12746,7 +13513,7 @@ macro_rules! RelationIsPopulated {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4480,
+                        $crate::__pgrx_c_generated::Field_relispopulated,
                         _,
                         _
                     >(
@@ -12754,7 +13521,7 @@ macro_rules! RelationIsPopulated {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -12796,6 +13563,17 @@ macro_rules! RelationIsPopulated {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsScannable {
@@ -12905,8 +13683,23 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
 /// ```text
 /// #define RelationIsScannable( relation ) ( ( relation ) -> rd_rel -> relispopulated )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationIsScannable {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsScannable!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsScannable!(@__pgrx_emit_value; $relation)
@@ -12917,7 +13710,7 @@ macro_rules! RelationIsScannable {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4480,
+                        $crate::__pgrx_c_generated::Field_relispopulated,
                         _,
                         _
                     >(
@@ -12925,7 +13718,7 @@ macro_rules! RelationIsScannable {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -12957,7 +13750,7 @@ macro_rules! RelationIsScannable {
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4480,
+                $crate::__pgrx_c_generated::Field_relispopulated,
                 _,
                 _
             >(
@@ -12965,7 +13758,7 @@ macro_rules! RelationIsScannable {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -12990,7 +13783,7 @@ macro_rules! RelationIsScannable {
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4480,
+                $crate::__pgrx_c_generated::Field_relispopulated,
                 _,
                 _
             >(
@@ -12998,7 +13791,7 @@ macro_rules! RelationIsScannable {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4359,
+                                $crate::__pgrx_c_generated::Field_rd_rel,
                                 _,
                                 _
                             >(
@@ -13023,10 +13816,15 @@ macro_rules! RelationIsScannable {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4480,
+                            $crate::__pgrx_c_generated::Field_relispopulated,
                             _,
                             _
                         >(
@@ -13034,7 +13832,7 @@ macro_rules! RelationIsScannable {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4359,
+                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                             _,
                                             _
                                         >(
@@ -13071,7 +13869,7 @@ macro_rules! RelationIsScannable {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4480,
+                        $crate::__pgrx_c_generated::Field_relispopulated,
                         _,
                         _
                     >(
@@ -13079,7 +13877,7 @@ macro_rules! RelationIsScannable {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4359,
+                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                         _,
                                         _
                                     >(
@@ -13121,6 +13919,17 @@ macro_rules! RelationIsScannable {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
@@ -13248,8 +14057,30 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
 /// ```text
 /// #define RelationIsUsedAsCatalogTable( relation ) ( ( relation ) -> rd_options && ( ( relation ) -> rd_rel -> relkind == RELKIND_RELATION || ( relation ) -> rd_rel -> relkind == RELKIND_MATVIEW ) ? ( ( StdRdOptions * ) ( relation ) -> rd_options ) -> user_catalog_table : false )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationIsUsedAsCatalogTable {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsUsedAsCatalogTable!(@__pgrx_emit_value; $relation)
@@ -13266,7 +14097,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4344,
+                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                 _,
                                                 _
                                             >(
@@ -13307,7 +14138,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                         _,
                                                                         _
                                                                     >(
@@ -13318,7 +14149,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -13368,7 +14199,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                         _,
                                                                         _
                                                                     >(
@@ -13379,7 +14210,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -13437,7 +14268,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5973,
+                                        $crate::__pgrx_c_generated::Field_user_catalog_table,
                                         _,
                                         _
                                     >(
@@ -13463,7 +14294,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -13528,6 +14359,11 @@ macro_rules! RelationIsUsedAsCatalogTable {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13544,7 +14380,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4344,
+                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                             _,
                                                             _
                                                         >(
@@ -13585,7 +14421,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -13596,7 +14432,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -13646,7 +14482,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4482,
+                                                                                    $crate::__pgrx_c_generated::Field_relkind,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -13657,7 +14493,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4359,
+                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -13718,7 +14554,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5973,
+                                                    $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                     _,
                                                     _
                                                 >(
@@ -13744,7 +14580,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4344,
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -13812,7 +14648,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4344,
+                                                $crate::__pgrx_c_generated::Field_rd_options,
                                                 _,
                                                 _
                                             >(
@@ -13853,7 +14689,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                         _,
                                                                         _
                                                                     >(
@@ -13864,7 +14700,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -13914,7 +14750,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4482,
+                                                                        $crate::__pgrx_c_generated::Field_relkind,
                                                                         _,
                                                                         _
                                                                     >(
@@ -13925,7 +14761,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4359,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -13983,7 +14819,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5973,
+                                        $crate::__pgrx_c_generated::Field_user_catalog_table,
                                         _,
                                         _
                                     >(
@@ -14009,7 +14845,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4344,
+                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                     _,
                                                                     _
                                                                 >(
@@ -14075,6 +14911,17 @@ macro_rules! RelationIsUsedAsCatalogTable {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationIsValid {
@@ -14184,8 +15031,27 @@ macro_rules! __pgrx_c_args_RelationIsValid {
 /// ```text
 /// #define RelationIsValid( relation ) PointerIsValid ( relation )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationIsValid {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationIsValid!(@__pgrx_emit_value; $relation)
@@ -14255,6 +15121,11 @@ macro_rules! RelationIsValid {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: RelationIsValid remains expanded because PointerIsValid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14372,6 +15243,17 @@ macro_rules! RelationIsValid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationNeedsWAL {
@@ -14478,8 +15360,23 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
 /// ```text
 /// #define RelationNeedsWAL( relation ) ( RelationIsPermanent ( relation ) && ( XLogIsNeeded ( ) || ( relation -> rd_createSubid == InvalidSubTransactionId && relation -> rd_firstRelfilelocatorSubid == InvalidSubTransactionId ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationNeedsWAL {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationNeedsWAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationNeedsWAL!(@__pgrx_emit_value; $relation)
@@ -14497,7 +15394,7 @@ macro_rules! RelationNeedsWAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4495,
+                                                $crate::__pgrx_c_generated::Field_relpersistence,
                                                 _,
                                                 _
                                             >(
@@ -14508,7 +15405,7 @@ macro_rules! RelationNeedsWAL {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                 _,
                                                                 _
                                                             >(
@@ -14599,7 +15496,7 @@ macro_rules! RelationNeedsWAL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4312,
+                                                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14644,7 +15541,7 @@ macro_rules! RelationNeedsWAL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4318,
+                                                                            $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14721,6 +15618,11 @@ macro_rules! RelationNeedsWAL {
         /* PGRX: RelationIsPermanent remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogIsNeeded remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14738,7 +15640,7 @@ macro_rules! RelationNeedsWAL {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4495,
+                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                             _,
                                                             _
                                                         >(
@@ -14749,7 +15651,7 @@ macro_rules! RelationNeedsWAL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4359,
+                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14850,7 +15752,7 @@ macro_rules! RelationNeedsWAL {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4312,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -14895,7 +15797,7 @@ macro_rules! RelationNeedsWAL {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4318,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -14973,7 +15875,7 @@ macro_rules! RelationNeedsWAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4495,
+                                                $crate::__pgrx_c_generated::Field_relpersistence,
                                                 _,
                                                 _
                                             >(
@@ -14984,7 +15886,7 @@ macro_rules! RelationNeedsWAL {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4359,
+                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                 _,
                                                                 _
                                                             >(
@@ -15075,7 +15977,7 @@ macro_rules! RelationNeedsWAL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4312,
+                                                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -15120,7 +16022,7 @@ macro_rules! RelationNeedsWAL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4318,
+                                                                            $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -15194,6 +16096,17 @@ macro_rules! RelationNeedsWAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationSetTargetBlock {
@@ -15369,15 +16282,37 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationSetTargetBlock {
+    (@__pgrx_emit_check_safety; $relation:tt, $targblock:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+                $crate::__pgrx_c_operand!(@check_safety; $targblock);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationSetTargetBlock!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt, $targblock:tt $(,)?) => {
         {
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5134,
+                            $crate::__pgrx_c_generated::Field_smgr_targblock,
                             _,
                             _
                         >(
@@ -15391,7 +16326,7 @@ macro_rules! RelationSetTargetBlock {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_364231d172d83db03427470e1a70437d(
+                                        $crate::RelationGetSmgr(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -15457,6 +16392,17 @@ macro_rules! RelationSetTargetBlock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
@@ -15581,8 +16527,26 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
 /// ```text
 /// #define RelationUsesLocalBuffers( relation ) ( ( relation ) -> rd_rel -> relpersistence == RELPERSISTENCE_TEMP )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelationUsesLocalBuffers {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationUsesLocalBuffers!(@__pgrx_emit_value; $relation)
@@ -15595,7 +16559,7 @@ macro_rules! RelationUsesLocalBuffers {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4495,
+                                $crate::__pgrx_c_generated::Field_relpersistence,
                                 _,
                                 _
                             >(
@@ -15603,7 +16567,7 @@ macro_rules! RelationUsesLocalBuffers {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4359,
+                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                 _,
                                                 _
                                             >(
@@ -15657,6 +16621,11 @@ macro_rules! RelationUsesLocalBuffers {
     (@__pgrx_emit_size; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15664,7 +16633,7 @@ macro_rules! RelationUsesLocalBuffers {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4495,
+                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                             _,
                                             _
                                         >(
@@ -15675,7 +16644,7 @@ macro_rules! RelationUsesLocalBuffers {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4359,
+                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                             _,
                                                             _
                                                         >(
@@ -15723,7 +16692,7 @@ macro_rules! RelationUsesLocalBuffers {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4495,
+                                $crate::__pgrx_c_generated::Field_relpersistence,
                                 _,
                                 _
                             >(
@@ -15731,7 +16700,7 @@ macro_rules! RelationUsesLocalBuffers {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4359,
+                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                 _,
                                                 _
                                             >(

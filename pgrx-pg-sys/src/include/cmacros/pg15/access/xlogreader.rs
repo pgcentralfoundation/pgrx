@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
@@ -179,8 +190,27 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
 /// ```text
 /// #define XLogRecBlockImageApply( decoder , block_id ) ( ( decoder ) -> record -> blocks [ block_id ] . apply_image )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecBlockImageApply {
+    (@__pgrx_emit_check_safety; $decoder:tt, $block_id:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                $crate::__pgrx_c_operand!(@check_safety; $block_id);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecBlockImageApply!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecBlockImageApply!(@__pgrx_emit_value; $decoder, $block_id)
@@ -191,7 +221,7 @@ macro_rules! XLogRecBlockImageApply {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field439,
+                        $crate::__pgrx_c_generated::Field_apply_image,
                         _,
                         _
                     >(
@@ -199,7 +229,7 @@ macro_rules! XLogRecBlockImageApply {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field679,
+                                        $crate::__pgrx_c_generated::Field_blocks,
                                         _,
                                         _
                                     >(
@@ -210,7 +240,7 @@ macro_rules! XLogRecBlockImageApply {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4316,
+                                                        $crate::__pgrx_c_generated::Field_record,
                                                         _,
                                                         _
                                                     >(
@@ -249,7 +279,7 @@ macro_rules! XLogRecBlockImageApply {
     (@__pgrx_emit_place; $decoder:tt, $block_id:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field439,
+                $crate::__pgrx_c_generated::Field_apply_image,
                 _,
                 _
             >(
@@ -257,7 +287,7 @@ macro_rules! XLogRecBlockImageApply {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field679,
+                                $crate::__pgrx_c_generated::Field_blocks,
                                 _,
                                 _
                             >(
@@ -265,7 +295,7 @@ macro_rules! XLogRecBlockImageApply {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -302,7 +332,7 @@ macro_rules! XLogRecBlockImageApply {
     (@__pgrx_emit_read_place; $decoder:tt, $block_id:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field439,
+                $crate::__pgrx_c_generated::Field_apply_image,
                 _,
                 _
             >(
@@ -310,7 +340,7 @@ macro_rules! XLogRecBlockImageApply {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field679,
+                                $crate::__pgrx_c_generated::Field_blocks,
                                 _,
                                 _
                             >(
@@ -318,7 +348,7 @@ macro_rules! XLogRecBlockImageApply {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -355,10 +385,16 @@ macro_rules! XLogRecBlockImageApply {
     (@__pgrx_emit_size; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                        $crate::__pgrx_c_operand!(@check_safety; $block_id);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field439,
+                            $crate::__pgrx_c_generated::Field_apply_image,
                             _,
                             _
                         >(
@@ -366,7 +402,7 @@ macro_rules! XLogRecBlockImageApply {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field679,
+                                            $crate::__pgrx_c_generated::Field_blocks,
                                             _,
                                             _
                                         >(
@@ -377,7 +413,7 @@ macro_rules! XLogRecBlockImageApply {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4316,
+                                                            $crate::__pgrx_c_generated::Field_record,
                                                             _,
                                                             _
                                                         >(
@@ -421,7 +457,7 @@ macro_rules! XLogRecBlockImageApply {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field439,
+                        $crate::__pgrx_c_generated::Field_apply_image,
                         _,
                         _
                     >(
@@ -429,7 +465,7 @@ macro_rules! XLogRecBlockImageApply {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field679,
+                                        $crate::__pgrx_c_generated::Field_blocks,
                                         _,
                                         _
                                     >(
@@ -440,7 +476,7 @@ macro_rules! XLogRecBlockImageApply {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4316,
+                                                        $crate::__pgrx_c_generated::Field_record,
                                                         _,
                                                         _
                                                     >(
@@ -489,6 +525,17 @@ macro_rules! XLogRecBlockImageApply {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetBlock {
@@ -652,8 +699,24 @@ macro_rules! __pgrx_c_args_XLogRecGetBlock {
 /// ```text
 /// #define XLogRecGetBlock( decoder , i ) ( & ( decoder ) -> record -> blocks [ ( i ) ] )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetBlock {
+    (@__pgrx_emit_check_safety; $decoder:tt, $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetBlock!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt, $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetBlock!(@__pgrx_emit_value; $decoder, $i)
@@ -667,7 +730,7 @@ macro_rules! XLogRecGetBlock {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field679,
+                                    $crate::__pgrx_c_generated::Field_blocks,
                                     _,
                                     _
                                 >(
@@ -678,7 +741,7 @@ macro_rules! XLogRecGetBlock {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4316,
+                                                    $crate::__pgrx_c_generated::Field_record,
                                                     _,
                                                     _
                                                 >(
@@ -730,6 +793,12 @@ macro_rules! XLogRecGetBlock {
     (@__pgrx_emit_size; $decoder:tt, $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -738,7 +807,7 @@ macro_rules! XLogRecGetBlock {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field679,
+                                                $crate::__pgrx_c_generated::Field_blocks,
                                                 _,
                                                 _
                                             >(
@@ -749,7 +818,7 @@ macro_rules! XLogRecGetBlock {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4316,
+                                                                $crate::__pgrx_c_generated::Field_record,
                                                                 _,
                                                                 _
                                                             >(
@@ -800,7 +869,7 @@ macro_rules! XLogRecGetBlock {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field679,
+                                    $crate::__pgrx_c_generated::Field_blocks,
                                     _,
                                     _
                                 >(
@@ -811,7 +880,7 @@ macro_rules! XLogRecGetBlock {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4316,
+                                                    $crate::__pgrx_c_generated::Field_record,
                                                     _,
                                                     _
                                                 >(
@@ -861,6 +930,17 @@ macro_rules! XLogRecGetBlock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetData {
@@ -970,8 +1050,23 @@ macro_rules! __pgrx_c_args_XLogRecGetData {
 /// ```text
 /// #define XLogRecGetData( decoder ) ( ( decoder ) -> record -> main_data )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetData {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetData!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetData!(@__pgrx_emit_value; $decoder)
@@ -982,7 +1077,7 @@ macro_rules! XLogRecGetData {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2898,
+                        $crate::__pgrx_c_generated::Field_main_data,
                         _,
                         _
                     >(
@@ -990,7 +1085,7 @@ macro_rules! XLogRecGetData {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -1022,7 +1117,7 @@ macro_rules! XLogRecGetData {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2898,
+                $crate::__pgrx_c_generated::Field_main_data,
                 _,
                 _
             >(
@@ -1030,7 +1125,7 @@ macro_rules! XLogRecGetData {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -1055,7 +1150,7 @@ macro_rules! XLogRecGetData {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2898,
+                $crate::__pgrx_c_generated::Field_main_data,
                 _,
                 _
             >(
@@ -1063,7 +1158,7 @@ macro_rules! XLogRecGetData {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -1088,10 +1183,15 @@ macro_rules! XLogRecGetData {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2898,
+                            $crate::__pgrx_c_generated::Field_main_data,
                             _,
                             _
                         >(
@@ -1099,7 +1199,7 @@ macro_rules! XLogRecGetData {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -1136,7 +1236,7 @@ macro_rules! XLogRecGetData {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2898,
+                        $crate::__pgrx_c_generated::Field_main_data,
                         _,
                         _
                     >(
@@ -1144,7 +1244,7 @@ macro_rules! XLogRecGetData {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -1186,6 +1286,17 @@ macro_rules! XLogRecGetData {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetDataLen {
@@ -1295,8 +1406,23 @@ macro_rules! __pgrx_c_args_XLogRecGetDataLen {
 /// ```text
 /// #define XLogRecGetDataLen( decoder ) ( ( decoder ) -> record -> main_data_len )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetDataLen {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetDataLen!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetDataLen!(@__pgrx_emit_value; $decoder)
@@ -1307,7 +1433,7 @@ macro_rules! XLogRecGetDataLen {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2899,
+                        $crate::__pgrx_c_generated::Field_main_data_len,
                         _,
                         _
                     >(
@@ -1315,7 +1441,7 @@ macro_rules! XLogRecGetDataLen {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -1347,7 +1473,7 @@ macro_rules! XLogRecGetDataLen {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2899,
+                $crate::__pgrx_c_generated::Field_main_data_len,
                 _,
                 _
             >(
@@ -1355,7 +1481,7 @@ macro_rules! XLogRecGetDataLen {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -1380,7 +1506,7 @@ macro_rules! XLogRecGetDataLen {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2899,
+                $crate::__pgrx_c_generated::Field_main_data_len,
                 _,
                 _
             >(
@@ -1388,7 +1514,7 @@ macro_rules! XLogRecGetDataLen {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -1413,10 +1539,15 @@ macro_rules! XLogRecGetDataLen {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2899,
+                            $crate::__pgrx_c_generated::Field_main_data_len,
                             _,
                             _
                         >(
@@ -1424,7 +1555,7 @@ macro_rules! XLogRecGetDataLen {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -1461,7 +1592,7 @@ macro_rules! XLogRecGetDataLen {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2899,
+                        $crate::__pgrx_c_generated::Field_main_data_len,
                         _,
                         _
                     >(
@@ -1469,7 +1600,7 @@ macro_rules! XLogRecGetDataLen {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -1511,6 +1642,17 @@ macro_rules! XLogRecGetDataLen {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetInfo {
@@ -1620,8 +1762,23 @@ macro_rules! __pgrx_c_args_XLogRecGetInfo {
 /// ```text
 /// #define XLogRecGetInfo( decoder ) ( ( decoder ) -> record -> header . xl_info )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetInfo {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetInfo!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetInfo!(@__pgrx_emit_value; $decoder)
@@ -1632,12 +1789,12 @@ macro_rules! XLogRecGetInfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6074,
+                        $crate::__pgrx_c_generated::Field_xl_info,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -1645,7 +1802,7 @@ macro_rules! XLogRecGetInfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -1678,12 +1835,12 @@ macro_rules! XLogRecGetInfo {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6074,
+                $crate::__pgrx_c_generated::Field_xl_info,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -1691,7 +1848,7 @@ macro_rules! XLogRecGetInfo {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -1717,12 +1874,12 @@ macro_rules! XLogRecGetInfo {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6074,
+                $crate::__pgrx_c_generated::Field_xl_info,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -1730,7 +1887,7 @@ macro_rules! XLogRecGetInfo {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -1756,15 +1913,20 @@ macro_rules! XLogRecGetInfo {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6074,
+                            $crate::__pgrx_c_generated::Field_xl_info,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2155,
+                                $crate::__pgrx_c_generated::Field_header,
                                 _,
                                 _
                             >(
@@ -1772,7 +1934,7 @@ macro_rules! XLogRecGetInfo {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -1810,12 +1972,12 @@ macro_rules! XLogRecGetInfo {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6074,
+                        $crate::__pgrx_c_generated::Field_xl_info,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -1823,7 +1985,7 @@ macro_rules! XLogRecGetInfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -1866,6 +2028,17 @@ macro_rules! XLogRecGetInfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetOrigin {
@@ -1975,8 +2148,23 @@ macro_rules! __pgrx_c_args_XLogRecGetOrigin {
 /// ```text
 /// #define XLogRecGetOrigin( decoder ) ( ( decoder ) -> record -> record_origin )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetOrigin {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetOrigin!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetOrigin!(@__pgrx_emit_value; $decoder)
@@ -1987,7 +2175,7 @@ macro_rules! XLogRecGetOrigin {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4317,
+                        $crate::__pgrx_c_generated::Field_record_origin,
                         _,
                         _
                     >(
@@ -1995,7 +2183,7 @@ macro_rules! XLogRecGetOrigin {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -2027,7 +2215,7 @@ macro_rules! XLogRecGetOrigin {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4317,
+                $crate::__pgrx_c_generated::Field_record_origin,
                 _,
                 _
             >(
@@ -2035,7 +2223,7 @@ macro_rules! XLogRecGetOrigin {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -2060,7 +2248,7 @@ macro_rules! XLogRecGetOrigin {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4317,
+                $crate::__pgrx_c_generated::Field_record_origin,
                 _,
                 _
             >(
@@ -2068,7 +2256,7 @@ macro_rules! XLogRecGetOrigin {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -2093,10 +2281,15 @@ macro_rules! XLogRecGetOrigin {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4317,
+                            $crate::__pgrx_c_generated::Field_record_origin,
                             _,
                             _
                         >(
@@ -2104,7 +2297,7 @@ macro_rules! XLogRecGetOrigin {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -2141,7 +2334,7 @@ macro_rules! XLogRecGetOrigin {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4317,
+                        $crate::__pgrx_c_generated::Field_record_origin,
                         _,
                         _
                     >(
@@ -2149,7 +2342,7 @@ macro_rules! XLogRecGetOrigin {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -2191,6 +2384,17 @@ macro_rules! XLogRecGetOrigin {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetPrev {
@@ -2300,8 +2504,23 @@ macro_rules! __pgrx_c_args_XLogRecGetPrev {
 /// ```text
 /// #define XLogRecGetPrev( decoder ) ( ( decoder ) -> record -> header . xl_prev )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetPrev {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetPrev!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetPrev!(@__pgrx_emit_value; $decoder)
@@ -2312,12 +2531,12 @@ macro_rules! XLogRecGetPrev {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6075,
+                        $crate::__pgrx_c_generated::Field_xl_prev,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -2325,7 +2544,7 @@ macro_rules! XLogRecGetPrev {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -2358,12 +2577,12 @@ macro_rules! XLogRecGetPrev {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6075,
+                $crate::__pgrx_c_generated::Field_xl_prev,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -2371,7 +2590,7 @@ macro_rules! XLogRecGetPrev {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -2397,12 +2616,12 @@ macro_rules! XLogRecGetPrev {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6075,
+                $crate::__pgrx_c_generated::Field_xl_prev,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -2410,7 +2629,7 @@ macro_rules! XLogRecGetPrev {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -2436,15 +2655,20 @@ macro_rules! XLogRecGetPrev {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6075,
+                            $crate::__pgrx_c_generated::Field_xl_prev,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2155,
+                                $crate::__pgrx_c_generated::Field_header,
                                 _,
                                 _
                             >(
@@ -2452,7 +2676,7 @@ macro_rules! XLogRecGetPrev {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -2490,12 +2714,12 @@ macro_rules! XLogRecGetPrev {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6075,
+                        $crate::__pgrx_c_generated::Field_xl_prev,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -2503,7 +2727,7 @@ macro_rules! XLogRecGetPrev {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -2546,6 +2770,17 @@ macro_rules! XLogRecGetPrev {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetRmid {
@@ -2655,8 +2890,23 @@ macro_rules! __pgrx_c_args_XLogRecGetRmid {
 /// ```text
 /// #define XLogRecGetRmid( decoder ) ( ( decoder ) -> record -> header . xl_rmid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetRmid {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetRmid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetRmid!(@__pgrx_emit_value; $decoder)
@@ -2667,12 +2917,12 @@ macro_rules! XLogRecGetRmid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6076,
+                        $crate::__pgrx_c_generated::Field_xl_rmid,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -2680,7 +2930,7 @@ macro_rules! XLogRecGetRmid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -2713,12 +2963,12 @@ macro_rules! XLogRecGetRmid {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6076,
+                $crate::__pgrx_c_generated::Field_xl_rmid,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -2726,7 +2976,7 @@ macro_rules! XLogRecGetRmid {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -2752,12 +3002,12 @@ macro_rules! XLogRecGetRmid {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6076,
+                $crate::__pgrx_c_generated::Field_xl_rmid,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -2765,7 +3015,7 @@ macro_rules! XLogRecGetRmid {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -2791,15 +3041,20 @@ macro_rules! XLogRecGetRmid {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6076,
+                            $crate::__pgrx_c_generated::Field_xl_rmid,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2155,
+                                $crate::__pgrx_c_generated::Field_header,
                                 _,
                                 _
                             >(
@@ -2807,7 +3062,7 @@ macro_rules! XLogRecGetRmid {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -2845,12 +3100,12 @@ macro_rules! XLogRecGetRmid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6076,
+                        $crate::__pgrx_c_generated::Field_xl_rmid,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -2858,7 +3113,7 @@ macro_rules! XLogRecGetRmid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -2901,6 +3156,17 @@ macro_rules! XLogRecGetRmid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetTopXid {
@@ -3010,8 +3276,23 @@ macro_rules! __pgrx_c_args_XLogRecGetTopXid {
 /// ```text
 /// #define XLogRecGetTopXid( decoder ) ( ( decoder ) -> record -> toplevel_xid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetTopXid {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetTopXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetTopXid!(@__pgrx_emit_value; $decoder)
@@ -3022,7 +3303,7 @@ macro_rules! XLogRecGetTopXid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5560,
+                        $crate::__pgrx_c_generated::Field_toplevel_xid,
                         _,
                         _
                     >(
@@ -3030,7 +3311,7 @@ macro_rules! XLogRecGetTopXid {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -3062,7 +3343,7 @@ macro_rules! XLogRecGetTopXid {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5560,
+                $crate::__pgrx_c_generated::Field_toplevel_xid,
                 _,
                 _
             >(
@@ -3070,7 +3351,7 @@ macro_rules! XLogRecGetTopXid {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -3095,7 +3376,7 @@ macro_rules! XLogRecGetTopXid {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5560,
+                $crate::__pgrx_c_generated::Field_toplevel_xid,
                 _,
                 _
             >(
@@ -3103,7 +3384,7 @@ macro_rules! XLogRecGetTopXid {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -3128,10 +3409,15 @@ macro_rules! XLogRecGetTopXid {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5560,
+                            $crate::__pgrx_c_generated::Field_toplevel_xid,
                             _,
                             _
                         >(
@@ -3139,7 +3425,7 @@ macro_rules! XLogRecGetTopXid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -3176,7 +3462,7 @@ macro_rules! XLogRecGetTopXid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5560,
+                        $crate::__pgrx_c_generated::Field_toplevel_xid,
                         _,
                         _
                     >(
@@ -3184,7 +3470,7 @@ macro_rules! XLogRecGetTopXid {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -3226,6 +3512,17 @@ macro_rules! XLogRecGetTopXid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetTotalLen {
@@ -3335,8 +3632,23 @@ macro_rules! __pgrx_c_args_XLogRecGetTotalLen {
 /// ```text
 /// #define XLogRecGetTotalLen( decoder ) ( ( decoder ) -> record -> header . xl_tot_len )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetTotalLen {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetTotalLen!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetTotalLen!(@__pgrx_emit_value; $decoder)
@@ -3347,12 +3659,12 @@ macro_rules! XLogRecGetTotalLen {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6077,
+                        $crate::__pgrx_c_generated::Field_xl_tot_len,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -3360,7 +3672,7 @@ macro_rules! XLogRecGetTotalLen {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -3393,12 +3705,12 @@ macro_rules! XLogRecGetTotalLen {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6077,
+                $crate::__pgrx_c_generated::Field_xl_tot_len,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -3406,7 +3718,7 @@ macro_rules! XLogRecGetTotalLen {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -3432,12 +3744,12 @@ macro_rules! XLogRecGetTotalLen {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6077,
+                $crate::__pgrx_c_generated::Field_xl_tot_len,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -3445,7 +3757,7 @@ macro_rules! XLogRecGetTotalLen {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -3471,15 +3783,20 @@ macro_rules! XLogRecGetTotalLen {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6077,
+                            $crate::__pgrx_c_generated::Field_xl_tot_len,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2155,
+                                $crate::__pgrx_c_generated::Field_header,
                                 _,
                                 _
                             >(
@@ -3487,7 +3804,7 @@ macro_rules! XLogRecGetTotalLen {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -3525,12 +3842,12 @@ macro_rules! XLogRecGetTotalLen {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6077,
+                        $crate::__pgrx_c_generated::Field_xl_tot_len,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -3538,7 +3855,7 @@ macro_rules! XLogRecGetTotalLen {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -3581,6 +3898,17 @@ macro_rules! XLogRecGetTotalLen {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecGetXid {
@@ -3690,8 +4018,23 @@ macro_rules! __pgrx_c_args_XLogRecGetXid {
 /// ```text
 /// #define XLogRecGetXid( decoder ) ( ( decoder ) -> record -> header . xl_xid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecGetXid {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecGetXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecGetXid!(@__pgrx_emit_value; $decoder)
@@ -3702,12 +4045,12 @@ macro_rules! XLogRecGetXid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6078,
+                        $crate::__pgrx_c_generated::Field_xl_xid,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -3715,7 +4058,7 @@ macro_rules! XLogRecGetXid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -3748,12 +4091,12 @@ macro_rules! XLogRecGetXid {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6078,
+                $crate::__pgrx_c_generated::Field_xl_xid,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -3761,7 +4104,7 @@ macro_rules! XLogRecGetXid {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -3787,12 +4130,12 @@ macro_rules! XLogRecGetXid {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6078,
+                $crate::__pgrx_c_generated::Field_xl_xid,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2155,
+                    $crate::__pgrx_c_generated::Field_header,
                     _,
                     _
                 >(
@@ -3800,7 +4143,7 @@ macro_rules! XLogRecGetXid {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field4316,
+                                    $crate::__pgrx_c_generated::Field_record,
                                     _,
                                     _
                                 >(
@@ -3826,15 +4169,20 @@ macro_rules! XLogRecGetXid {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6078,
+                            $crate::__pgrx_c_generated::Field_xl_xid,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2155,
+                                $crate::__pgrx_c_generated::Field_header,
                                 _,
                                 _
                             >(
@@ -3842,7 +4190,7 @@ macro_rules! XLogRecGetXid {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -3880,12 +4228,12 @@ macro_rules! XLogRecGetXid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6078,
+                        $crate::__pgrx_c_generated::Field_xl_xid,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2155,
+                            $crate::__pgrx_c_generated::Field_header,
                             _,
                             _
                         >(
@@ -3893,7 +4241,7 @@ macro_rules! XLogRecGetXid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -3936,6 +4284,17 @@ macro_rules! XLogRecGetXid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecHasAnyBlockRefs {
@@ -4054,8 +4413,26 @@ macro_rules! __pgrx_c_args_XLogRecHasAnyBlockRefs {
 /// ```text
 /// #define XLogRecHasAnyBlockRefs( decoder ) ( ( decoder ) -> record -> max_block_id >= 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecHasAnyBlockRefs {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecHasAnyBlockRefs!(@__pgrx_emit_value; $decoder)
@@ -4068,7 +4445,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2945,
+                                $crate::__pgrx_c_generated::Field_max_block_id,
                                 _,
                                 _
                             >(
@@ -4076,7 +4453,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -4129,6 +4506,11 @@ macro_rules! XLogRecHasAnyBlockRefs {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4136,7 +4518,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2945,
+                                            $crate::__pgrx_c_generated::Field_max_block_id,
                                             _,
                                             _
                                         >(
@@ -4147,7 +4529,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4316,
+                                                            $crate::__pgrx_c_generated::Field_record,
                                                             _,
                                                             _
                                                         >(
@@ -4197,7 +4579,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2945,
+                                $crate::__pgrx_c_generated::Field_max_block_id,
                                 _,
                                 _
                             >(
@@ -4205,7 +4587,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -4256,6 +4638,17 @@ macro_rules! XLogRecHasAnyBlockRefs {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
@@ -4419,8 +4812,24 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
 /// ```text
 /// #define XLogRecHasBlockImage( decoder , block_id ) ( ( decoder ) -> record -> blocks [ block_id ] . has_image )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecHasBlockImage {
+    (@__pgrx_emit_check_safety; $decoder:tt, $block_id:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                $crate::__pgrx_c_operand!(@check_safety; $block_id);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecHasBlockImage!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecHasBlockImage!(@__pgrx_emit_value; $decoder, $block_id)
@@ -4431,7 +4840,7 @@ macro_rules! XLogRecHasBlockImage {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2052,
+                        $crate::__pgrx_c_generated::Field_has_image,
                         _,
                         _
                     >(
@@ -4439,7 +4848,7 @@ macro_rules! XLogRecHasBlockImage {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field679,
+                                        $crate::__pgrx_c_generated::Field_blocks,
                                         _,
                                         _
                                     >(
@@ -4450,7 +4859,7 @@ macro_rules! XLogRecHasBlockImage {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4316,
+                                                        $crate::__pgrx_c_generated::Field_record,
                                                         _,
                                                         _
                                                     >(
@@ -4489,7 +4898,7 @@ macro_rules! XLogRecHasBlockImage {
     (@__pgrx_emit_place; $decoder:tt, $block_id:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2052,
+                $crate::__pgrx_c_generated::Field_has_image,
                 _,
                 _
             >(
@@ -4497,7 +4906,7 @@ macro_rules! XLogRecHasBlockImage {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field679,
+                                $crate::__pgrx_c_generated::Field_blocks,
                                 _,
                                 _
                             >(
@@ -4505,7 +4914,7 @@ macro_rules! XLogRecHasBlockImage {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -4542,7 +4951,7 @@ macro_rules! XLogRecHasBlockImage {
     (@__pgrx_emit_read_place; $decoder:tt, $block_id:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2052,
+                $crate::__pgrx_c_generated::Field_has_image,
                 _,
                 _
             >(
@@ -4550,7 +4959,7 @@ macro_rules! XLogRecHasBlockImage {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field679,
+                                $crate::__pgrx_c_generated::Field_blocks,
                                 _,
                                 _
                             >(
@@ -4558,7 +4967,7 @@ macro_rules! XLogRecHasBlockImage {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4316,
+                                                $crate::__pgrx_c_generated::Field_record,
                                                 _,
                                                 _
                                             >(
@@ -4595,10 +5004,16 @@ macro_rules! XLogRecHasBlockImage {
     (@__pgrx_emit_size; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                        $crate::__pgrx_c_operand!(@check_safety; $block_id);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2052,
+                            $crate::__pgrx_c_generated::Field_has_image,
                             _,
                             _
                         >(
@@ -4606,7 +5021,7 @@ macro_rules! XLogRecHasBlockImage {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field679,
+                                            $crate::__pgrx_c_generated::Field_blocks,
                                             _,
                                             _
                                         >(
@@ -4617,7 +5032,7 @@ macro_rules! XLogRecHasBlockImage {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4316,
+                                                            $crate::__pgrx_c_generated::Field_record,
                                                             _,
                                                             _
                                                         >(
@@ -4661,7 +5076,7 @@ macro_rules! XLogRecHasBlockImage {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2052,
+                        $crate::__pgrx_c_generated::Field_has_image,
                         _,
                         _
                     >(
@@ -4669,7 +5084,7 @@ macro_rules! XLogRecHasBlockImage {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field679,
+                                        $crate::__pgrx_c_generated::Field_blocks,
                                         _,
                                         _
                                     >(
@@ -4680,7 +5095,7 @@ macro_rules! XLogRecHasBlockImage {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4316,
+                                                        $crate::__pgrx_c_generated::Field_record,
                                                         _,
                                                         _
                                                     >(
@@ -4729,6 +5144,17 @@ macro_rules! XLogRecHasBlockImage {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
@@ -4889,8 +5315,24 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
 /// ```text
 /// #define XLogRecHasBlockRef( decoder , block_id ) ( ( ( decoder ) -> record -> max_block_id >= ( block_id ) ) && ( ( decoder ) -> record -> blocks [ block_id ] . in_use ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecHasBlockRef {
+    (@__pgrx_emit_check_safety; $decoder:tt, $block_id:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                $crate::__pgrx_c_operand!(@check_safety; $block_id);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecHasBlockRef!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecHasBlockRef!(@__pgrx_emit_value; $decoder, $block_id)
@@ -4907,7 +5349,7 @@ macro_rules! XLogRecHasBlockRef {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2945,
+                                                $crate::__pgrx_c_generated::Field_max_block_id,
                                                 _,
                                                 _
                                             >(
@@ -4918,7 +5360,7 @@ macro_rules! XLogRecHasBlockRef {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4316,
+                                                                $crate::__pgrx_c_generated::Field_record,
                                                                 _,
                                                                 _
                                                             >(
@@ -4956,7 +5398,7 @@ macro_rules! XLogRecHasBlockRef {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2270,
+                                        $crate::__pgrx_c_generated::Field_in_use,
                                         _,
                                         _
                                     >(
@@ -4967,7 +5409,7 @@ macro_rules! XLogRecHasBlockRef {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field679,
+                                                        $crate::__pgrx_c_generated::Field_blocks,
                                                         _,
                                                         _
                                                     >(
@@ -4978,7 +5420,7 @@ macro_rules! XLogRecHasBlockRef {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4316,
+                                                                        $crate::__pgrx_c_generated::Field_record,
                                                                         _,
                                                                         _
                                                                     >(
@@ -5040,6 +5482,12 @@ macro_rules! XLogRecHasBlockRef {
     (@__pgrx_emit_size; $decoder:tt, $block_id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                        $crate::__pgrx_c_operand!(@check_safety; $block_id);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5057,7 +5505,7 @@ macro_rules! XLogRecHasBlockRef {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2945,
+                                                            $crate::__pgrx_c_generated::Field_max_block_id,
                                                             _,
                                                             _
                                                         >(
@@ -5068,7 +5516,7 @@ macro_rules! XLogRecHasBlockRef {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4316,
+                                                                            $crate::__pgrx_c_generated::Field_record,
                                                                             _,
                                                                             _
                                                                         >(
@@ -5116,7 +5564,7 @@ macro_rules! XLogRecHasBlockRef {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2270,
+                                                    $crate::__pgrx_c_generated::Field_in_use,
                                                     _,
                                                     _
                                                 >(
@@ -5127,7 +5575,7 @@ macro_rules! XLogRecHasBlockRef {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field679,
+                                                                    $crate::__pgrx_c_generated::Field_blocks,
                                                                     _,
                                                                     _
                                                                 >(
@@ -5138,7 +5586,7 @@ macro_rules! XLogRecHasBlockRef {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4316,
+                                                                                    $crate::__pgrx_c_generated::Field_record,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -5206,7 +5654,7 @@ macro_rules! XLogRecHasBlockRef {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2945,
+                                                $crate::__pgrx_c_generated::Field_max_block_id,
                                                 _,
                                                 _
                                             >(
@@ -5217,7 +5665,7 @@ macro_rules! XLogRecHasBlockRef {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4316,
+                                                                $crate::__pgrx_c_generated::Field_record,
                                                                 _,
                                                                 _
                                                             >(
@@ -5255,7 +5703,7 @@ macro_rules! XLogRecHasBlockRef {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2270,
+                                        $crate::__pgrx_c_generated::Field_in_use,
                                         _,
                                         _
                                     >(
@@ -5266,7 +5714,7 @@ macro_rules! XLogRecHasBlockRef {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field679,
+                                                        $crate::__pgrx_c_generated::Field_blocks,
                                                         _,
                                                         _
                                                     >(
@@ -5277,7 +5725,7 @@ macro_rules! XLogRecHasBlockRef {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4316,
+                                                                        $crate::__pgrx_c_generated::Field_record,
                                                                         _,
                                                                         _
                                                                     >(
@@ -5337,6 +5785,17 @@ macro_rules! XLogRecHasBlockRef {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogRecMaxBlockId {
@@ -5446,8 +5905,23 @@ macro_rules! __pgrx_c_args_XLogRecMaxBlockId {
 /// ```text
 /// #define XLogRecMaxBlockId( decoder ) ( ( decoder ) -> record -> max_block_id )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! XLogRecMaxBlockId {
+    (@__pgrx_emit_check_safety; $decoder:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $decoder);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogRecMaxBlockId!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogRecMaxBlockId!(@__pgrx_emit_value; $decoder)
@@ -5458,7 +5932,7 @@ macro_rules! XLogRecMaxBlockId {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2945,
+                        $crate::__pgrx_c_generated::Field_max_block_id,
                         _,
                         _
                     >(
@@ -5466,7 +5940,7 @@ macro_rules! XLogRecMaxBlockId {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(
@@ -5498,7 +5972,7 @@ macro_rules! XLogRecMaxBlockId {
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2945,
+                $crate::__pgrx_c_generated::Field_max_block_id,
                 _,
                 _
             >(
@@ -5506,7 +5980,7 @@ macro_rules! XLogRecMaxBlockId {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -5531,7 +6005,7 @@ macro_rules! XLogRecMaxBlockId {
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2945,
+                $crate::__pgrx_c_generated::Field_max_block_id,
                 _,
                 _
             >(
@@ -5539,7 +6013,7 @@ macro_rules! XLogRecMaxBlockId {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field4316,
+                                $crate::__pgrx_c_generated::Field_record,
                                 _,
                                 _
                             >(
@@ -5564,10 +6038,15 @@ macro_rules! XLogRecMaxBlockId {
     (@__pgrx_emit_size; $decoder:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $decoder);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2945,
+                            $crate::__pgrx_c_generated::Field_max_block_id,
                             _,
                             _
                         >(
@@ -5575,7 +6054,7 @@ macro_rules! XLogRecMaxBlockId {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4316,
+                                            $crate::__pgrx_c_generated::Field_record,
                                             _,
                                             _
                                         >(
@@ -5612,7 +6091,7 @@ macro_rules! XLogRecMaxBlockId {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2945,
+                        $crate::__pgrx_c_generated::Field_max_block_id,
                         _,
                         _
                     >(
@@ -5620,7 +6099,7 @@ macro_rules! XLogRecMaxBlockId {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4316,
+                                        $crate::__pgrx_c_generated::Field_record,
                                         _,
                                         _
                                     >(

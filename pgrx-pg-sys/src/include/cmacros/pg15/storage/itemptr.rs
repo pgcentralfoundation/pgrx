@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ItemPointerGetBlockNumberNoCheck {
@@ -139,8 +150,30 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumberNoCheck {
 /// ```text
 /// #define ItemPointerGetBlockNumberNoCheck( pointer ) ( BlockIdGetBlockNumber ( & ( pointer ) -> ip_blkid ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumberNoCheck {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ItemPointerGetBlockNumberNoCheck!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ItemPointerGetBlockNumberNoCheck!(@__pgrx_emit_value; $pointer)
@@ -175,7 +208,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field648,
+                                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                                             _,
                                                             _
                                                         >(
@@ -187,7 +220,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -235,7 +268,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field649,
+                                                $crate::__pgrx_c_generated::Field_bi_lo,
                                                 _,
                                                 _
                                             >(
@@ -247,7 +280,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::address(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                     _,
                                                                     _
                                                                 >(
@@ -308,6 +341,11 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
         /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because BlockIdGetBlockNumber expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -335,7 +373,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -347,7 +385,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -401,7 +439,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -413,7 +451,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -483,7 +521,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -495,7 +533,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -543,7 +581,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -555,7 +593,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                 _,
                                                                 _
                                                             >(
@@ -609,6 +647,17 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumberNoCheck {
@@ -736,8 +785,26 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumberNoCheck {
 /// ```text
 /// #define ItemPointerGetOffsetNumberNoCheck( pointer ) ( ( pointer ) -> ip_posid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumberNoCheck {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ItemPointerGetOffsetNumberNoCheck!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ItemPointerGetOffsetNumberNoCheck!(@__pgrx_emit_value; $pointer)
@@ -748,7 +815,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2483,
+                        $crate::__pgrx_c_generated::Field_ip_posid,
                         _,
                         _
                     >(
@@ -773,7 +840,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2483,
+                $crate::__pgrx_c_generated::Field_ip_posid,
                 _,
                 _
             >(
@@ -796,7 +863,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2483,
+                $crate::__pgrx_c_generated::Field_ip_posid,
                 _,
                 _
             >(
@@ -819,10 +886,15 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
     (@__pgrx_emit_size; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2483,
+                            $crate::__pgrx_c_generated::Field_ip_posid,
                             _,
                             _
                         >(
@@ -852,7 +924,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2483,
+                        $crate::__pgrx_c_generated::Field_ip_posid,
                         _,
                         _
                     >(
@@ -890,6 +962,17 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ItemPointerIsValid {
@@ -999,8 +1082,27 @@ macro_rules! __pgrx_c_args_ItemPointerIsValid {
 /// ```text
 /// #define ItemPointerIsValid( pointer ) ( ( bool ) ( PointerIsValid ( pointer ) && ( ( pointer ) -> ip_posid != 0 ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIsValid {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ItemPointerIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ItemPointerIsValid!(@__pgrx_emit_value; $pointer)
@@ -1088,7 +1190,7 @@ macro_rules! ItemPointerIsValid {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2483,
+                                                            $crate::__pgrx_c_generated::Field_ip_posid,
                                                             _,
                                                             _
                                                         >(
@@ -1152,6 +1254,11 @@ macro_rules! ItemPointerIsValid {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: bool remains expanded because object macro is not a supported pure integer expression: compiler and declaration keywords require a dedicated syntax contract. */ /* PGRX: PointerIsValid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1238,7 +1345,7 @@ macro_rules! ItemPointerIsValid {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2483,
+                                                                        $crate::__pgrx_c_generated::Field_ip_posid,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1375,7 +1482,7 @@ macro_rules! ItemPointerIsValid {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2483,
+                                                            $crate::__pgrx_c_generated::Field_ip_posid,
                                                             _,
                                                             _
                                                         >(

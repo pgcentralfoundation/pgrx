@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
@@ -139,8 +150,29 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHook {
+    (@__pgrx_emit_check_safety; $objectId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectId:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -149,7 +181,7 @@ macro_rules! InvokeFunctionExecuteHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -204,6 +236,17 @@ macro_rules! InvokeFunctionExecuteHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
@@ -334,8 +377,29 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHookStr {
+    (@__pgrx_emit_check_safety; $objectName:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectName:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -344,7 +408,7 @@ macro_rules! InvokeFunctionExecuteHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -355,13 +419,19 @@ macro_rules! InvokeFunctionExecuteHookStr {
                         $crate::RunFunctionExecuteHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -405,6 +475,17 @@ macro_rules! InvokeFunctionExecuteHookStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
@@ -583,8 +664,31 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
 /// ```text
 /// #define InvokeNamespaceSearchHook( objectId , ereport_on_violation ) ( ! object_access_hook ? true : RunNamespaceSearchHook ( ( objectId ) , ( ereport_on_violation ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHook {
+    (@__pgrx_emit_check_safety; $objectId:tt, $ereport_on_violation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectId:tt, $ereport_on_violation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InvokeNamespaceSearchHook!(@__pgrx_emit_value; $objectId, $ereport_on_violation)
@@ -601,7 +705,7 @@ macro_rules! InvokeNamespaceSearchHook {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                                $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                             >>(
                                             ::core::ptr::addr_of_mut!($crate::object_access_hook)
                                         )
@@ -701,6 +805,12 @@ macro_rules! InvokeNamespaceSearchHook {
     (@__pgrx_emit_size; $objectId:tt, $ereport_on_violation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                        $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -715,7 +825,7 @@ macro_rules! InvokeNamespaceSearchHook {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                            $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                                            $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
                                                             $crate::object_access_hook
@@ -821,7 +931,7 @@ macro_rules! InvokeNamespaceSearchHook {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                                $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                             >>(
                                             ::core::ptr::addr_of_mut!($crate::object_access_hook)
                                         )
@@ -916,6 +1026,17 @@ macro_rules! InvokeNamespaceSearchHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
@@ -1100,8 +1221,31 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
 /// ```text
 /// #define InvokeNamespaceSearchHookStr( objectName , ereport_on_violation ) ( ! object_access_hook_str ? true : RunNamespaceSearchHookStr ( ( objectName ) , ( ereport_on_violation ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHookStr {
+    (@__pgrx_emit_check_safety; $objectName:tt, $ereport_on_violation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectName:tt, $ereport_on_violation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InvokeNamespaceSearchHookStr!(
@@ -1122,7 +1266,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                                $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                             >>(
                                             ::core::ptr::addr_of_mut!(
                                                 $crate::object_access_hook_str
@@ -1150,13 +1294,19 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::RunNamespaceSearchHookStr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::CChar,
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 >,
                                                 _
@@ -1224,6 +1374,12 @@ macro_rules! InvokeNamespaceSearchHookStr {
     (@__pgrx_emit_size; $objectName:tt, $ereport_on_violation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                        $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1238,7 +1394,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                            $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                                            $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
                                                             $crate::object_access_hook_str
@@ -1272,13 +1428,19 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                                 $crate::RunNamespaceSearchHookStr(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::into_storage(
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             >,
                                                             _
@@ -1344,7 +1506,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                                $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                             >>(
                                             ::core::ptr::addr_of_mut!(
                                                 $crate::object_access_hook_str
@@ -1372,13 +1534,19 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::RunNamespaceSearchHookStr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::CChar,
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 >,
                                                 _
@@ -1447,6 +1615,17 @@ macro_rules! InvokeNamespaceSearchHookStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectDropHook {
@@ -1672,8 +1851,28 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectDropHook {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectDropHook!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectDropHookArg remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -1683,7 +1882,7 @@ macro_rules! InvokeObjectDropHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -1804,6 +2003,17 @@ macro_rules! InvokeObjectDropHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
@@ -2093,8 +2303,32 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectDropHookArg {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectId:tt, $subId:tt, $dropflags:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $dropflags);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectId:tt, $subId:tt, $dropflags:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -2103,7 +2337,7 @@ macro_rules! InvokeObjectDropHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -2218,6 +2452,17 @@ macro_rules! InvokeObjectDropHookArg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
@@ -2507,8 +2752,32 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectDropHookArgStr {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectName:tt, $subId:tt, $dropflags:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $dropflags);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectName:tt, $subId:tt, $dropflags:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -2517,7 +2786,7 @@ macro_rules! InvokeObjectDropHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -2549,13 +2818,19 @@ macro_rules! InvokeObjectDropHookArgStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -2632,6 +2907,17 @@ macro_rules! InvokeObjectDropHookArgStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
@@ -2867,8 +3153,31 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectDropHookStr {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectDropHookArgStr remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -2878,7 +3187,7 @@ macro_rules! InvokeObjectDropHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -2912,13 +3221,19 @@ macro_rules! InvokeObjectDropHookStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -2999,6 +3314,17 @@ macro_rules! InvokeObjectDropHookStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
@@ -3234,8 +3560,31 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHook {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectPostAlterHookArg remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -3245,7 +3594,7 @@ macro_rules! InvokeObjectPostAlterHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -3395,6 +3744,17 @@ macro_rules! InvokeObjectPostAlterHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
@@ -3753,8 +4113,40 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArg {
+    (
+        @__pgrx_emit_check_safety;
+        $classId:tt,
+        $objectId:tt,
+        $subId:tt,
+        $auxiliaryId:tt,
+        $is_internal:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $auxiliaryId);
+                $crate::__pgrx_c_operand!(@check_safety; $is_internal);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (
         @__pgrx_emit_public;
         $classId:tt,
@@ -3770,7 +4162,7 @@ macro_rules! InvokeObjectPostAlterHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -3920,6 +4312,17 @@ macro_rules! InvokeObjectPostAlterHookArg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
@@ -4278,8 +4681,40 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArgStr {
+    (
+        @__pgrx_emit_check_safety;
+        $classId:tt,
+        $objectName:tt,
+        $subId:tt,
+        $auxiliaryId:tt,
+        $is_internal:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $auxiliaryId);
+                $crate::__pgrx_c_operand!(@check_safety; $is_internal);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (
         @__pgrx_emit_public;
         $classId:tt,
@@ -4295,7 +4730,7 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -4327,13 +4762,19 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -4445,6 +4886,17 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
@@ -4689,8 +5141,31 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookStr {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectPostAlterHookArgStr remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -4700,7 +5175,7 @@ macro_rules! InvokeObjectPostAlterHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -4734,13 +5209,19 @@ macro_rules! InvokeObjectPostAlterHookStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -4856,6 +5337,17 @@ macro_rules! InvokeObjectPostAlterHookStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
@@ -5091,8 +5583,31 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHook {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectId:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectPostCreateHookArg remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -5102,7 +5617,7 @@ macro_rules! InvokeObjectPostCreateHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -5224,6 +5739,17 @@ macro_rules! InvokeObjectPostCreateHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
@@ -5525,8 +6051,32 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArg {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectId:tt, $subId:tt, $is_internal:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $is_internal);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectId:tt, $subId:tt, $is_internal:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -5535,7 +6085,7 @@ macro_rules! InvokeObjectPostCreateHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -5656,6 +6206,17 @@ macro_rules! InvokeObjectPostCreateHookArg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
@@ -5957,8 +6518,32 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArgStr {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectName:tt, $subId:tt, $is_internal:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+                $crate::__pgrx_c_operand!(@check_safety; $is_internal);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectName:tt, $subId:tt, $is_internal:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -5967,7 +6552,7 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -5999,13 +6584,19 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -6088,6 +6679,17 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
@@ -6332,8 +6934,31 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookStr {
+    (@__pgrx_emit_check_safety; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $classId);
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+                $crate::__pgrx_c_operand!(@check_safety; $subId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $classId:tt, $objectName:tt, $subId:tt $(,)?) => {
         {
             /* PGRX: InvokeObjectPostCreateHookArgStr remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -6343,7 +6968,7 @@ macro_rules! InvokeObjectPostCreateHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -6377,13 +7002,19 @@ macro_rules! InvokeObjectPostCreateHookStr {
                             ),
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -6471,6 +7102,17 @@ macro_rules! InvokeObjectPostCreateHookStr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
@@ -6598,8 +7240,29 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectTruncateHook {
+    (@__pgrx_emit_check_safety; $objectId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectId:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -6608,7 +7271,7 @@ macro_rules! InvokeObjectTruncateHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_07e3891d1e8d8c91ae8ce318c764a953
+                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
                         )
                     )
@@ -6663,6 +7326,17 @@ macro_rules! InvokeObjectTruncateHook {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
@@ -6790,8 +7464,29 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! InvokeObjectTruncateHookStr {
+    (@__pgrx_emit_check_safety; $objectName:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $objectName);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $objectName:tt $(,)?) => {
         {
             if $crate::__pgrx_c_macros::expression::truth(
@@ -6800,7 +7495,7 @@ macro_rules! InvokeObjectTruncateHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_e766f2fcca5d4451cbebbeb5b532777b
+                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
                                 >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
                         )
                     )
@@ -6811,13 +7506,19 @@ macro_rules! InvokeObjectTruncateHookStr {
                         $crate::RunObjectTruncateHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _

@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_AssertTransactionIdInAllowableRange {
@@ -64,8 +75,28 @@ macro_rules! __pgrx_c_args_AssertTransactionIdInAllowableRange {
 /// ```text
 /// #define AssertTransactionIdInAllowableRange( xid ) ( ( void ) true )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertTransactionIdInAllowableRange {
+    (@__pgrx_emit_check_safety; $xid:tt $(,)?) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertTransactionIdInAllowableRange!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::AssertTransactionIdInAllowableRange!(@__pgrx_emit_value; $xid)
@@ -114,6 +145,9 @@ macro_rules! AssertTransactionIdInAllowableRange {
     (@__pgrx_emit_size; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {}
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -182,6 +216,17 @@ macro_rules! AssertTransactionIdInAllowableRange {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EpochFromFullTransactionId {
@@ -306,8 +351,30 @@ macro_rules! __pgrx_c_args_EpochFromFullTransactionId {
 /// ```text
 /// #define EpochFromFullTransactionId( x ) ( ( uint32 ) ( ( x ) . value >> 32 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! EpochFromFullTransactionId {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EpochFromFullTransactionId!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EpochFromFullTransactionId!(@__pgrx_emit_value; $x)
@@ -327,7 +394,7 @@ macro_rules! EpochFromFullTransactionId {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -366,6 +433,11 @@ macro_rules! EpochFromFullTransactionId {
     (@__pgrx_emit_size; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -383,7 +455,7 @@ macro_rules! EpochFromFullTransactionId {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -426,7 +498,7 @@ macro_rules! EpochFromFullTransactionId {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -460,6 +532,17 @@ macro_rules! EpochFromFullTransactionId {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdEquals {
@@ -638,8 +721,27 @@ macro_rules! __pgrx_c_args_FullTransactionIdEquals {
 /// ```text
 /// #define FullTransactionIdEquals( a , b ) ( ( a ) . value == ( b ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! FullTransactionIdEquals {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdEquals!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdEquals!(@__pgrx_emit_value; $a, $b)
@@ -652,7 +754,7 @@ macro_rules! FullTransactionIdEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -661,7 +763,7 @@ macro_rules! FullTransactionIdEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -689,6 +791,12 @@ macro_rules! FullTransactionIdEquals {
     (@__pgrx_emit_size; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -696,7 +804,7 @@ macro_rules! FullTransactionIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -705,7 +813,7 @@ macro_rules! FullTransactionIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -730,7 +838,7 @@ macro_rules! FullTransactionIdEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -739,7 +847,7 @@ macro_rules! FullTransactionIdEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -765,6 +873,17 @@ macro_rules! FullTransactionIdEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdFollows {
@@ -943,8 +1062,27 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollows {
 /// ```text
 /// #define FullTransactionIdFollows( a , b ) ( ( a ) . value > ( b ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! FullTransactionIdFollows {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdFollows!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdFollows!(@__pgrx_emit_value; $a, $b)
@@ -957,7 +1095,7 @@ macro_rules! FullTransactionIdFollows {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -966,7 +1104,7 @@ macro_rules! FullTransactionIdFollows {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -997,6 +1135,12 @@ macro_rules! FullTransactionIdFollows {
     (@__pgrx_emit_size; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1004,7 +1148,7 @@ macro_rules! FullTransactionIdFollows {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1013,7 +1157,7 @@ macro_rules! FullTransactionIdFollows {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1038,7 +1182,7 @@ macro_rules! FullTransactionIdFollows {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1047,7 +1191,7 @@ macro_rules! FullTransactionIdFollows {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1073,6 +1217,17 @@ macro_rules! FullTransactionIdFollows {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
@@ -1257,8 +1412,27 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
 /// ```text
 /// #define FullTransactionIdFollowsOrEquals( a , b ) ( ( a ) . value >= ( b ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! FullTransactionIdFollowsOrEquals {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdFollowsOrEquals!(@__pgrx_emit_value; $a, $b)
@@ -1271,7 +1445,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1280,7 +1454,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1317,6 +1491,12 @@ macro_rules! FullTransactionIdFollowsOrEquals {
     (@__pgrx_emit_size; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1324,7 +1504,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1333,7 +1513,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1361,7 +1541,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1370,7 +1550,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1402,6 +1582,17 @@ macro_rules! FullTransactionIdFollowsOrEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdIsNormal {
@@ -1526,8 +1717,30 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsNormal {
 /// ```text
 /// #define FullTransactionIdIsNormal( x ) FullTransactionIdFollowsOrEquals ( x , FirstNormalFullTransactionId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FullTransactionIdIsNormal {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdIsNormal!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdIsNormal!(@__pgrx_emit_value; $x)
@@ -1541,7 +1754,7 @@ macro_rules! FullTransactionIdIsNormal {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -1549,7 +1762,7 @@ macro_rules! FullTransactionIdIsNormal {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::member::<
-                            $crate::__pgrx_c_generated::Field6372,
+                            $crate::__pgrx_c_generated::Field_value,
                             _
                         >(
                             (
@@ -1559,7 +1772,7 @@ macro_rules! FullTransactionIdIsNormal {
                                             $crate::FullTransactionId
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_9b38bb619471bc2f6a308d7f8be3435c(
+                                        $crate::__pgrx_c_generated::Inline_a7c49834f9cd16b6cc356271eaa648d5(
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -1635,6 +1848,11 @@ macro_rules! FullTransactionIdIsNormal {
         /* PGRX: FirstNormalFullTransactionId remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: FullTransactionIdIsNormal remains expanded because FullTransactionIdFollowsOrEquals expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1642,7 +1860,7 @@ macro_rules! FullTransactionIdIsNormal {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -1650,7 +1868,7 @@ macro_rules! FullTransactionIdIsNormal {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::member::<
-                                        $crate::__pgrx_c_generated::Field6372,
+                                        $crate::__pgrx_c_generated::Field_value,
                                         _
                                     >(
                                         (
@@ -1663,7 +1881,7 @@ macro_rules! FullTransactionIdIsNormal {
                                                         $crate::FullTransactionId
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_9b38bb619471bc2f6a308d7f8be3435c(
+                                                    $crate::__pgrx_c_generated::Inline_a7c49834f9cd16b6cc356271eaa648d5(
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -1733,7 +1951,7 @@ macro_rules! FullTransactionIdIsNormal {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -1741,7 +1959,7 @@ macro_rules! FullTransactionIdIsNormal {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::member::<
-                            $crate::__pgrx_c_generated::Field6372,
+                            $crate::__pgrx_c_generated::Field_value,
                             _
                         >(
                             (
@@ -1751,7 +1969,7 @@ macro_rules! FullTransactionIdIsNormal {
                                             $crate::FullTransactionId
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_9b38bb619471bc2f6a308d7f8be3435c(
+                                        $crate::__pgrx_c_generated::Inline_a7c49834f9cd16b6cc356271eaa648d5(
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -1821,6 +2039,17 @@ macro_rules! FullTransactionIdIsNormal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdIsValid {
@@ -1945,8 +2174,30 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsValid {
 /// ```text
 /// #define FullTransactionIdIsValid( x ) TransactionIdIsValid ( XidFromFullTransactionId ( x ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FullTransactionIdIsValid {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdIsValid!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdIsValid!(@__pgrx_emit_value; $x)
@@ -1967,7 +2218,7 @@ macro_rules! FullTransactionIdIsValid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -1981,6 +2232,11 @@ macro_rules! FullTransactionIdIsValid {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $x);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1995,7 +2251,7 @@ macro_rules! FullTransactionIdIsValid {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2031,7 +2287,7 @@ macro_rules! FullTransactionIdIsValid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2045,6 +2301,11 @@ macro_rules! FullTransactionIdIsValid {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $x);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2059,7 +2320,7 @@ macro_rules! FullTransactionIdIsValid {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2095,7 +2356,7 @@ macro_rules! FullTransactionIdIsValid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2109,6 +2370,11 @@ macro_rules! FullTransactionIdIsValid {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $x);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2123,7 +2389,7 @@ macro_rules! FullTransactionIdIsValid {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2162,7 +2428,7 @@ macro_rules! FullTransactionIdIsValid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2176,6 +2442,11 @@ macro_rules! FullTransactionIdIsValid {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $x);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2190,7 +2461,7 @@ macro_rules! FullTransactionIdIsValid {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2226,7 +2497,7 @@ macro_rules! FullTransactionIdIsValid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2240,6 +2511,11 @@ macro_rules! FullTransactionIdIsValid {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $x);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2254,7 +2530,7 @@ macro_rules! FullTransactionIdIsValid {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6372,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -2288,6 +2564,17 @@ macro_rules! FullTransactionIdIsValid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
@@ -2466,8 +2753,27 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
 /// ```text
 /// #define FullTransactionIdPrecedes( a , b ) ( ( a ) . value < ( b ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! FullTransactionIdPrecedes {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdPrecedes!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdPrecedes!(@__pgrx_emit_value; $a, $b)
@@ -2480,7 +2786,7 @@ macro_rules! FullTransactionIdPrecedes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2489,7 +2795,7 @@ macro_rules! FullTransactionIdPrecedes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2520,6 +2826,12 @@ macro_rules! FullTransactionIdPrecedes {
     (@__pgrx_emit_size; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2527,7 +2839,7 @@ macro_rules! FullTransactionIdPrecedes {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2536,7 +2848,7 @@ macro_rules! FullTransactionIdPrecedes {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2561,7 +2873,7 @@ macro_rules! FullTransactionIdPrecedes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2570,7 +2882,7 @@ macro_rules! FullTransactionIdPrecedes {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2596,6 +2908,17 @@ macro_rules! FullTransactionIdPrecedes {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
@@ -2780,8 +3103,27 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
 /// ```text
 /// #define FullTransactionIdPrecedesOrEquals( a , b ) ( ( a ) . value <= ( b ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! FullTransactionIdPrecedesOrEquals {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FullTransactionIdPrecedesOrEquals!(@__pgrx_emit_value; $a, $b)
@@ -2794,7 +3136,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2803,7 +3145,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2840,6 +3182,12 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
     (@__pgrx_emit_size; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2847,7 +3195,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2856,7 +3204,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2884,7 +3232,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -2893,7 +3241,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -2925,6 +3273,17 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
@@ -3103,8 +3462,31 @@ macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
 /// ```text
 /// #define NormalTransactionIdFollows( id1 , id2 ) ( AssertMacro ( TransactionIdIsNormal ( id1 ) && TransactionIdIsNormal ( id2 ) ) , ( int32 ) ( ( id1 ) - ( id2 ) ) > 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! NormalTransactionIdFollows {
+    (@__pgrx_emit_check_safety; $id1:tt, $id2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $id1);
+                $crate::__pgrx_c_operand!(@check_safety; $id2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_NormalTransactionIdFollows!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $id1:tt, $id2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::NormalTransactionIdFollows!(@__pgrx_emit_value; $id1, $id2)
@@ -3212,6 +3594,12 @@ macro_rules! NormalTransactionIdFollows {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TransactionIdIsNormal remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $id1);
+                        $crate::__pgrx_c_operand!(@check_safety; $id2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3404,6 +3792,17 @@ macro_rules! NormalTransactionIdFollows {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
@@ -3582,8 +3981,31 @@ macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
 /// ```text
 /// #define NormalTransactionIdPrecedes( id1 , id2 ) ( AssertMacro ( TransactionIdIsNormal ( id1 ) && TransactionIdIsNormal ( id2 ) ) , ( int32 ) ( ( id1 ) - ( id2 ) ) < 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! NormalTransactionIdPrecedes {
+    (@__pgrx_emit_check_safety; $id1:tt, $id2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $id1);
+                $crate::__pgrx_c_operand!(@check_safety; $id2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $id1:tt, $id2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::NormalTransactionIdPrecedes!(@__pgrx_emit_value; $id1, $id2)
@@ -3691,6 +4113,12 @@ macro_rules! NormalTransactionIdPrecedes {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TransactionIdIsNormal remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $id1);
+                        $crate::__pgrx_c_operand!(@check_safety; $id2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3886,6 +4314,17 @@ macro_rules! NormalTransactionIdPrecedes {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_StoreInvalidTransactionId {
@@ -4010,8 +4449,26 @@ macro_rules! __pgrx_c_args_StoreInvalidTransactionId {
 /// ```text
 /// #define StoreInvalidTransactionId( dest ) ( * ( dest ) = InvalidTransactionId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! StoreInvalidTransactionId {
+    (@__pgrx_emit_check_safety; $dest:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $dest);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_StoreInvalidTransactionId!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::StoreInvalidTransactionId!(@__pgrx_emit_value; $dest)
@@ -4061,6 +4518,11 @@ macro_rules! StoreInvalidTransactionId {
     (@__pgrx_emit_size; $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $dest);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4132,6 +4594,17 @@ macro_rules! StoreInvalidTransactionId {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TransactionIdAdvance {
@@ -4249,8 +4722,26 @@ macro_rules! __pgrx_c_args_TransactionIdAdvance {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdAdvance {
+    (@__pgrx_emit_check_safety; $dest:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $dest);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TransactionIdAdvance!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $dest:tt $(,)?) => {
         {
             {
@@ -4324,6 +4815,17 @@ macro_rules! TransactionIdAdvance {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TransactionIdEquals {
@@ -4487,8 +4989,24 @@ macro_rules! __pgrx_c_args_TransactionIdEquals {
 /// ```text
 /// #define TransactionIdEquals( id1 , id2 ) ( ( id1 ) == ( id2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TransactionIdEquals {
+    (@__pgrx_emit_check_safety; $id1:tt, $id2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $id1);
+                $crate::__pgrx_c_operand!(@check_safety; $id2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TransactionIdEquals!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $id1:tt, $id2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TransactionIdEquals!(@__pgrx_emit_value; $id1, $id2)
@@ -4530,6 +5048,12 @@ macro_rules! TransactionIdEquals {
     (@__pgrx_emit_size; $id1:tt, $id2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $id1);
+                        $crate::__pgrx_c_operand!(@check_safety; $id2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4590,6 +5114,17 @@ macro_rules! TransactionIdEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TransactionIdIsNormal {
@@ -4704,8 +5239,23 @@ macro_rules! __pgrx_c_args_TransactionIdIsNormal {
 /// ```text
 /// #define TransactionIdIsNormal( xid ) ( ( xid ) >= FirstNormalTransactionId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TransactionIdIsNormal {
+    (@__pgrx_emit_check_safety; $xid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TransactionIdIsNormal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TransactionIdIsNormal!(@__pgrx_emit_value; $xid)
@@ -4748,6 +5298,11 @@ macro_rules! TransactionIdIsNormal {
     (@__pgrx_emit_size; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xid);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4810,6 +5365,17 @@ macro_rules! TransactionIdIsNormal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TransactionIdIsValid {
@@ -4924,8 +5490,23 @@ macro_rules! __pgrx_c_args_TransactionIdIsValid {
 /// ```text
 /// #define TransactionIdIsValid( xid ) ( ( xid ) != InvalidTransactionId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TransactionIdIsValid {
+    (@__pgrx_emit_check_safety; $xid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TransactionIdIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TransactionIdIsValid!(@__pgrx_emit_value; $xid)
@@ -4970,6 +5551,11 @@ macro_rules! TransactionIdIsValid {
     (@__pgrx_emit_size; $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xid);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5036,6 +5622,17 @@ macro_rules! TransactionIdIsValid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TransactionIdStore {
@@ -5199,8 +5796,24 @@ macro_rules! __pgrx_c_args_TransactionIdStore {
 /// ```text
 /// #define TransactionIdStore( xid , dest ) ( * ( dest ) = ( xid ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TransactionIdStore {
+    (@__pgrx_emit_check_safety; $xid:tt, $dest:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xid);
+                $crate::__pgrx_c_operand!(@check_safety; $dest);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TransactionIdStore!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xid:tt, $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TransactionIdStore!(@__pgrx_emit_value; $xid, $dest)
@@ -5244,6 +5857,12 @@ macro_rules! TransactionIdStore {
     (@__pgrx_emit_size; $xid:tt, $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xid);
+                        $crate::__pgrx_c_operand!(@check_safety; $dest);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5309,6 +5928,17 @@ macro_rules! TransactionIdStore {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_U64FromFullTransactionId {
@@ -5433,8 +6063,26 @@ macro_rules! __pgrx_c_args_U64FromFullTransactionId {
 /// ```text
 /// #define U64FromFullTransactionId( x ) ( ( x ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! U64FromFullTransactionId {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_U64FromFullTransactionId!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::U64FromFullTransactionId!(@__pgrx_emit_value; $x)
@@ -5445,7 +6093,7 @@ macro_rules! U64FromFullTransactionId {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6372,
+                        $crate::__pgrx_c_generated::Field_value,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5459,7 +6107,7 @@ macro_rules! U64FromFullTransactionId {
     (@__pgrx_emit_place; $x:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6372,
+                $crate::__pgrx_c_generated::Field_value,
                 _,
                 _
             >(($crate::__pgrx_c_operand!(@place; $x)))
@@ -5471,7 +6119,7 @@ macro_rules! U64FromFullTransactionId {
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6372,
+                $crate::__pgrx_c_generated::Field_value,
                 _,
                 _
             >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5486,10 +6134,15 @@ macro_rules! U64FromFullTransactionId {
     (@__pgrx_emit_size; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6372,
+                            $crate::__pgrx_c_generated::Field_value,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5508,7 +6161,7 @@ macro_rules! U64FromFullTransactionId {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6372,
+                        $crate::__pgrx_c_generated::Field_value,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5532,6 +6185,17 @@ macro_rules! U64FromFullTransactionId {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XidFromFullTransactionId {
@@ -5656,8 +6320,30 @@ macro_rules! __pgrx_c_args_XidFromFullTransactionId {
 /// ```text
 /// #define XidFromFullTransactionId( x ) ( ( uint32 ) ( x ) . value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XidFromFullTransactionId {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XidFromFullTransactionId!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XidFromFullTransactionId!(@__pgrx_emit_value; $x)
@@ -5674,7 +6360,7 @@ macro_rules! XidFromFullTransactionId {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5705,6 +6391,11 @@ macro_rules! XidFromFullTransactionId {
     (@__pgrx_emit_size; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5716,7 +6407,7 @@ macro_rules! XidFromFullTransactionId {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6372,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $x)))
@@ -5745,7 +6436,7 @@ macro_rules! XidFromFullTransactionId {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6372,
+                                $crate::__pgrx_c_generated::Field_value,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $x)))

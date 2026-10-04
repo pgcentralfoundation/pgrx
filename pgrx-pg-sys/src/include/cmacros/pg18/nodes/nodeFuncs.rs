@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_expression_tree_mutator {
@@ -244,8 +255,32 @@ macro_rules! __pgrx_c_args_expression_tree_mutator {
 /// ```text
 /// #define expression_tree_mutator( n , m , c ) expression_tree_mutator_impl ( n , ( tree_mutator_callback ) ( m ) , c )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! expression_tree_mutator {
+    (@__pgrx_emit_check_safety; $n:tt, $m:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_expression_tree_mutator!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $m:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::expression_tree_mutator!(@__pgrx_emit_value; $n, $m, $c)
@@ -281,12 +316,12 @@ macro_rules! expression_tree_mutator {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             >,
                             _
                         >(
@@ -294,7 +329,7 @@ macro_rules! expression_tree_mutator {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_mutator_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                     >,
                                     _
                                 >(
@@ -349,6 +384,13 @@ macro_rules! expression_tree_mutator {
         /* PGRX: expression_tree_mutator remains expanded because expression_tree_mutator_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -384,12 +426,12 @@ macro_rules! expression_tree_mutator {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                             >,
                                             _
                                         >(
@@ -400,7 +442,7 @@ macro_rules! expression_tree_mutator {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_mutator_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                                     >,
                                                     _
                                                 >(
@@ -482,12 +524,12 @@ macro_rules! expression_tree_mutator {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                    $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                 >,
                                 _
                             >(
@@ -495,7 +537,7 @@ macro_rules! expression_tree_mutator {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_mutator_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         >,
                                         _
                                     >(
@@ -548,6 +590,17 @@ macro_rules! expression_tree_mutator {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_expression_tree_walker {
@@ -774,8 +827,32 @@ macro_rules! __pgrx_c_args_expression_tree_walker {
 /// ```text
 /// #define expression_tree_walker( n , w , c ) expression_tree_walker_impl ( n , ( tree_walker_callback ) ( w ) , c )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! expression_tree_walker {
+    (@__pgrx_emit_check_safety; $n:tt, $w:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_expression_tree_walker!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $w:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::expression_tree_walker!(@__pgrx_emit_value; $n, $w, $c)
@@ -806,12 +883,12 @@ macro_rules! expression_tree_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -819,7 +896,7 @@ macro_rules! expression_tree_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -874,6 +951,13 @@ macro_rules! expression_tree_walker {
         /* PGRX: expression_tree_walker remains expanded because expression_tree_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -906,12 +990,12 @@ macro_rules! expression_tree_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -922,7 +1006,7 @@ macro_rules! expression_tree_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -999,12 +1083,12 @@ macro_rules! expression_tree_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -1012,7 +1096,7 @@ macro_rules! expression_tree_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(
@@ -1065,6 +1149,17 @@ macro_rules! expression_tree_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_planstate_tree_walker {
@@ -1287,8 +1382,29 @@ macro_rules! __pgrx_c_args_planstate_tree_walker {
 /// ```text
 /// #define planstate_tree_walker( ps , w , c ) planstate_tree_walker_impl ( ps , ( planstate_tree_walker_callback ) ( w ) , c )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! planstate_tree_walker {
+    (@__pgrx_emit_check_safety; $ps:tt, $w:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ps);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_planstate_tree_walker!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ps:tt, $w:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::planstate_tree_walker!(@__pgrx_emit_value; $ps, $w, $c)
@@ -1319,12 +1435,12 @@ macro_rules! planstate_tree_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                            $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                             >,
                             _
                         >(
@@ -1332,7 +1448,7 @@ macro_rules! planstate_tree_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::planstate_tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                        $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                     >,
                                     _
                                 >(
@@ -1387,6 +1503,13 @@ macro_rules! planstate_tree_walker {
         /* PGRX: planstate_tree_walker remains expanded because planstate_tree_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $ps);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1419,12 +1542,12 @@ macro_rules! planstate_tree_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                            $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                                $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                             >,
                                             _
                                         >(
@@ -1435,7 +1558,7 @@ macro_rules! planstate_tree_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::planstate_tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                                        $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                                     >,
                                                     _
                                                 >(
@@ -1512,12 +1635,12 @@ macro_rules! planstate_tree_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                    $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                 >,
                                 _
                             >(
@@ -1525,7 +1648,7 @@ macro_rules! planstate_tree_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::planstate_tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_24b4dca340d2af7a4e33a4768dee4f91
+                                            $crate::__pgrx_c_generated::Signature_abbcf1643f8e1208b02740ed1b299102
                                         >,
                                         _
                                     >(
@@ -1578,6 +1701,17 @@ macro_rules! planstate_tree_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_query_or_expression_tree_mutator {
@@ -1876,8 +2010,33 @@ macro_rules! __pgrx_c_args_query_or_expression_tree_mutator {
 /// ```text
 /// #define query_or_expression_tree_mutator( n , m , c , f ) query_or_expression_tree_mutator_impl ( n , ( tree_mutator_callback ) ( m ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! query_or_expression_tree_mutator {
+    (@__pgrx_emit_check_safety; $n:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_query_or_expression_tree_mutator!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::query_or_expression_tree_mutator!(@__pgrx_emit_value; $n, $m, $c, $f)
@@ -1913,12 +2072,12 @@ macro_rules! query_or_expression_tree_mutator {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             >,
                             _
                         >(
@@ -1926,7 +2085,7 @@ macro_rules! query_or_expression_tree_mutator {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_mutator_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                     >,
                                     _
                                 >(
@@ -2000,6 +2159,14 @@ macro_rules! query_or_expression_tree_mutator {
         /* PGRX: query_or_expression_tree_mutator remains expanded because query_or_expression_tree_mutator_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2035,12 +2202,12 @@ macro_rules! query_or_expression_tree_mutator {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                             >,
                                             _
                                         >(
@@ -2051,7 +2218,7 @@ macro_rules! query_or_expression_tree_mutator {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_mutator_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                                     >,
                                                     _
                                                 >(
@@ -2149,12 +2316,12 @@ macro_rules! query_or_expression_tree_mutator {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                    $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                 >,
                                 _
                             >(
@@ -2162,7 +2329,7 @@ macro_rules! query_or_expression_tree_mutator {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_mutator_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         >,
                                         _
                                     >(
@@ -2233,6 +2400,17 @@ macro_rules! query_or_expression_tree_mutator {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_query_or_expression_tree_walker {
@@ -2531,8 +2709,33 @@ macro_rules! __pgrx_c_args_query_or_expression_tree_walker {
 /// ```text
 /// #define query_or_expression_tree_walker( n , w , c , f ) query_or_expression_tree_walker_impl ( n , ( tree_walker_callback ) ( w ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! query_or_expression_tree_walker {
+    (@__pgrx_emit_check_safety; $n:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_query_or_expression_tree_walker!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::query_or_expression_tree_walker!(@__pgrx_emit_value; $n, $w, $c, $f)
@@ -2563,12 +2766,12 @@ macro_rules! query_or_expression_tree_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -2576,7 +2779,7 @@ macro_rules! query_or_expression_tree_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -2650,6 +2853,14 @@ macro_rules! query_or_expression_tree_walker {
         /* PGRX: query_or_expression_tree_walker remains expanded because query_or_expression_tree_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2682,12 +2893,12 @@ macro_rules! query_or_expression_tree_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -2698,7 +2909,7 @@ macro_rules! query_or_expression_tree_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -2791,12 +3002,12 @@ macro_rules! query_or_expression_tree_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -2804,7 +3015,7 @@ macro_rules! query_or_expression_tree_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(
@@ -2875,6 +3086,17 @@ macro_rules! query_or_expression_tree_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_query_tree_mutator {
@@ -3146,8 +3368,30 @@ macro_rules! __pgrx_c_args_query_tree_mutator {
 /// ```text
 /// #define query_tree_mutator( q , m , c , f ) query_tree_mutator_impl ( q , ( tree_mutator_callback ) ( m ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! query_tree_mutator {
+    (@__pgrx_emit_check_safety; $q:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $q);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_query_tree_mutator!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $q:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::query_tree_mutator!(@__pgrx_emit_value; $q, $m, $c, $f)
@@ -3183,12 +3427,12 @@ macro_rules! query_tree_mutator {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             >,
                             _
                         >(
@@ -3196,7 +3440,7 @@ macro_rules! query_tree_mutator {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_mutator_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                     >,
                                     _
                                 >(
@@ -3261,6 +3505,14 @@ macro_rules! query_tree_mutator {
         /* PGRX: query_tree_mutator remains expanded because query_tree_mutator_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $q);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3296,12 +3548,12 @@ macro_rules! query_tree_mutator {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                             >,
                                             _
                                         >(
@@ -3312,7 +3564,7 @@ macro_rules! query_tree_mutator {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_mutator_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                                     >,
                                                     _
                                                 >(
@@ -3407,12 +3659,12 @@ macro_rules! query_tree_mutator {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                    $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                 >,
                                 _
                             >(
@@ -3420,7 +3672,7 @@ macro_rules! query_tree_mutator {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_mutator_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         >,
                                         _
                                     >(
@@ -3485,6 +3737,17 @@ macro_rules! query_tree_mutator {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_query_tree_walker {
@@ -3756,8 +4019,30 @@ macro_rules! __pgrx_c_args_query_tree_walker {
 /// ```text
 /// #define query_tree_walker( q , w , c , f ) query_tree_walker_impl ( q , ( tree_walker_callback ) ( w ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! query_tree_walker {
+    (@__pgrx_emit_check_safety; $q:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $q);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_query_tree_walker!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $q:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::query_tree_walker!(@__pgrx_emit_value; $q, $w, $c, $f)
@@ -3788,12 +4073,12 @@ macro_rules! query_tree_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -3801,7 +4086,7 @@ macro_rules! query_tree_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -3866,6 +4151,14 @@ macro_rules! query_tree_walker {
         /* PGRX: query_tree_walker remains expanded because query_tree_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $q);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3898,12 +4191,12 @@ macro_rules! query_tree_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -3914,7 +4207,7 @@ macro_rules! query_tree_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -4004,12 +4297,12 @@ macro_rules! query_tree_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -4017,7 +4310,7 @@ macro_rules! query_tree_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(
@@ -4082,6 +4375,17 @@ macro_rules! query_tree_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_range_table_entry_walker {
@@ -4368,8 +4672,33 @@ macro_rules! __pgrx_c_args_range_table_entry_walker {
 /// ```text
 /// #define range_table_entry_walker( r , w , c , f ) range_table_entry_walker_impl ( r , ( tree_walker_callback ) ( w ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! range_table_entry_walker {
+    (@__pgrx_emit_check_safety; $r:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $r);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_range_table_entry_walker!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $r:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::range_table_entry_walker!(@__pgrx_emit_value; $r, $w, $c, $f)
@@ -4400,12 +4729,12 @@ macro_rules! range_table_entry_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -4413,7 +4742,7 @@ macro_rules! range_table_entry_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -4481,6 +4810,14 @@ macro_rules! range_table_entry_walker {
         /* PGRX: range_table_entry_walker remains expanded because range_table_entry_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $r);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4513,12 +4850,12 @@ macro_rules! range_table_entry_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -4529,7 +4866,7 @@ macro_rules! range_table_entry_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -4621,12 +4958,12 @@ macro_rules! range_table_entry_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -4634,7 +4971,7 @@ macro_rules! range_table_entry_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(
@@ -4699,6 +5036,17 @@ macro_rules! range_table_entry_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_range_table_mutator {
@@ -4970,8 +5318,30 @@ macro_rules! __pgrx_c_args_range_table_mutator {
 /// ```text
 /// #define range_table_mutator( rt , m , c , f ) range_table_mutator_impl ( rt , ( tree_mutator_callback ) ( m ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! range_table_mutator {
+    (@__pgrx_emit_check_safety; $rt:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rt);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_range_table_mutator!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rt:tt, $m:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::range_table_mutator!(@__pgrx_emit_value; $rt, $m, $c, $f)
@@ -5007,12 +5377,12 @@ macro_rules! range_table_mutator {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             >,
                             _
                         >(
@@ -5020,7 +5390,7 @@ macro_rules! range_table_mutator {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_mutator_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                     >,
                                     _
                                 >(
@@ -5085,6 +5455,14 @@ macro_rules! range_table_mutator {
         /* PGRX: range_table_mutator remains expanded because range_table_mutator_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rt);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5120,12 +5498,12 @@ macro_rules! range_table_mutator {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                             >,
                                             _
                                         >(
@@ -5136,7 +5514,7 @@ macro_rules! range_table_mutator {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_mutator_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                                        $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                                     >,
                                                     _
                                                 >(
@@ -5231,12 +5609,12 @@ macro_rules! range_table_mutator {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                    $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                 >,
                                 _
                             >(
@@ -5244,7 +5622,7 @@ macro_rules! range_table_mutator {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_mutator_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_63b7c7388a6928e4b1622dfbd3a27804
+                                            $crate::__pgrx_c_generated::Signature_c3bb280e64fb8dbe35967d3a5ae2294c
                                         >,
                                         _
                                     >(
@@ -5309,6 +5687,17 @@ macro_rules! range_table_mutator {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_range_table_walker {
@@ -5580,8 +5969,30 @@ macro_rules! __pgrx_c_args_range_table_walker {
 /// ```text
 /// #define range_table_walker( rt , w , c , f ) range_table_walker_impl ( rt , ( tree_walker_callback ) ( w ) , c , f )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! range_table_walker {
+    (@__pgrx_emit_check_safety; $rt:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rt);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_range_table_walker!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rt:tt, $w:tt, $c:tt, $f:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::range_table_walker!(@__pgrx_emit_value; $rt, $w, $c, $f)
@@ -5612,12 +6023,12 @@ macro_rules! range_table_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -5625,7 +6036,7 @@ macro_rules! range_table_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -5690,6 +6101,14 @@ macro_rules! range_table_walker {
         /* PGRX: range_table_walker remains expanded because range_table_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rt);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5722,12 +6141,12 @@ macro_rules! range_table_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -5738,7 +6157,7 @@ macro_rules! range_table_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -5828,12 +6247,12 @@ macro_rules! range_table_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -5841,7 +6260,7 @@ macro_rules! range_table_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(
@@ -5906,6 +6325,17 @@ macro_rules! range_table_walker {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_raw_expression_tree_walker {
@@ -6138,8 +6568,32 @@ macro_rules! __pgrx_c_args_raw_expression_tree_walker {
 /// ```text
 /// #define raw_expression_tree_walker( n , w , c ) raw_expression_tree_walker_impl ( n , ( tree_walker_callback ) ( w ) , c )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! raw_expression_tree_walker {
+    (@__pgrx_emit_check_safety; $n:tt, $w:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_raw_expression_tree_walker!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $w:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::raw_expression_tree_walker!(@__pgrx_emit_value; $n, $w, $c)
@@ -6170,12 +6624,12 @@ macro_rules! raw_expression_tree_walker {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             >,
                             _
                         >(
@@ -6183,7 +6637,7 @@ macro_rules! raw_expression_tree_walker {
                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                     $crate::tree_walker_callback,
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                     >,
                                     _
                                 >(
@@ -6241,6 +6695,13 @@ macro_rules! raw_expression_tree_walker {
         /* PGRX: raw_expression_tree_walker remains expanded because raw_expression_tree_walker_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6273,12 +6734,12 @@ macro_rules! raw_expression_tree_walker {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                             >,
                                             _
                                         >(
@@ -6289,7 +6750,7 @@ macro_rules! raw_expression_tree_walker {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::tree_walker_callback,
                                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                                        $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                                        $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                                     >,
                                                     _
                                                 >(
@@ -6366,12 +6827,12 @@ macro_rules! raw_expression_tree_walker {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                    $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                 >,
                                 _
                             >(
@@ -6379,7 +6840,7 @@ macro_rules! raw_expression_tree_walker {
                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                         $crate::tree_walker_callback,
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_ac93d4904ccdf6e2be3222d22fd39d1c
+                                            $crate::__pgrx_c_generated::Signature_1f94682042fa3420f54a9c80366f1444
                                         >,
                                         _
                                     >(

@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
@@ -190,8 +201,27 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
 /// ```text
 /// #define RelFileLocatorBackendEquals( locator1 , locator2 ) ( ( locator1 ) . locator . relNumber == ( locator2 ) . locator . relNumber && ( locator1 ) . locator . dbOid == ( locator2 ) . locator . dbOid && ( locator1 ) . backend == ( locator2 ) . backend && ( locator1 ) . locator . spcOid == ( locator2 ) . locator . spcOid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileLocatorBackendEquals {
+    (@__pgrx_emit_check_safety; $locator1:tt, $locator2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locator1);
+                $crate::__pgrx_c_operand!(@check_safety; $locator2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locator1:tt, $locator2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileLocatorBackendEquals!(@__pgrx_emit_value; $locator1, $locator2)
@@ -221,12 +251,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -246,12 +276,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -279,12 +309,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -304,12 +334,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -341,7 +371,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field617,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -360,7 +390,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field617,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -388,12 +418,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2964,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locator1)))
@@ -403,12 +433,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2964,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locator2)))
@@ -447,6 +477,12 @@ macro_rules! RelFileLocatorBackendEquals {
     (@__pgrx_emit_size; $locator1:tt, $locator2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locator1);
+                        $crate::__pgrx_c_operand!(@check_safety; $locator2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -476,12 +512,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4532,
+                                                                                $crate::__pgrx_c_generated::Field_relNumber,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2964,
+                                                                                    $crate::__pgrx_c_generated::Field_locator,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -501,12 +537,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4532,
+                                                                                $crate::__pgrx_c_generated::Field_relNumber,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2964,
+                                                                                    $crate::__pgrx_c_generated::Field_locator,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -534,12 +570,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field1306,
+                                                                                $crate::__pgrx_c_generated::Field_dbOid,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2964,
+                                                                                    $crate::__pgrx_c_generated::Field_locator,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -559,12 +595,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field1306,
+                                                                                $crate::__pgrx_c_generated::Field_dbOid,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2964,
+                                                                                    $crate::__pgrx_c_generated::Field_locator,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -599,7 +635,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field617,
+                                                                    $crate::__pgrx_c_generated::Field_backend,
                                                                     _,
                                                                     _
                                                                 >(
@@ -618,7 +654,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field617,
+                                                                    $crate::__pgrx_c_generated::Field_backend,
                                                                     _,
                                                                     _
                                                                 >(
@@ -649,12 +685,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5296,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2964,
+                                                            $crate::__pgrx_c_generated::Field_locator,
                                                             _,
                                                             _
                                                         >(
@@ -674,12 +710,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5296,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2964,
+                                                            $crate::__pgrx_c_generated::Field_locator,
                                                             _,
                                                             _
                                                         >(
@@ -736,12 +772,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -761,12 +797,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -794,12 +830,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -819,12 +855,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2964,
+                                                                        $crate::__pgrx_c_generated::Field_locator,
                                                                         _,
                                                                         _
                                                                     >(
@@ -856,7 +892,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field617,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -875,7 +911,7 @@ macro_rules! RelFileLocatorBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field617,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -903,12 +939,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2964,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locator1)))
@@ -918,12 +954,12 @@ macro_rules! RelFileLocatorBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2964,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locator2)))
@@ -960,6 +996,17 @@ macro_rules! RelFileLocatorBackendEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileLocatorBackendIsTemp {
@@ -1084,8 +1131,26 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendIsTemp {
 /// ```text
 /// #define RelFileLocatorBackendIsTemp( rlocator ) ( ( rlocator ) . backend != INVALID_PROC_NUMBER )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileLocatorBackendIsTemp {
+    (@__pgrx_emit_check_safety; $rlocator:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $rlocator:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileLocatorBackendIsTemp!(@__pgrx_emit_value; $rlocator)
@@ -1098,7 +1163,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field617,
+                                $crate::__pgrx_c_generated::Field_backend,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1134,6 +1199,11 @@ macro_rules! RelFileLocatorBackendIsTemp {
     (@__pgrx_emit_size; $rlocator:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1141,7 +1211,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field617,
+                                            $crate::__pgrx_c_generated::Field_backend,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1171,7 +1241,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field617,
+                                $crate::__pgrx_c_generated::Field_backend,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1205,6 +1275,17 @@ macro_rules! RelFileLocatorBackendIsTemp {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileLocatorEquals {
@@ -1373,8 +1454,24 @@ macro_rules! __pgrx_c_args_RelFileLocatorEquals {
 /// ```text
 /// #define RelFileLocatorEquals( locator1 , locator2 ) ( ( locator1 ) . relNumber == ( locator2 ) . relNumber && ( locator1 ) . dbOid == ( locator2 ) . dbOid && ( locator1 ) . spcOid == ( locator2 ) . spcOid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileLocatorEquals {
+    (@__pgrx_emit_check_safety; $locator1:tt, $locator2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locator1);
+                $crate::__pgrx_c_operand!(@check_safety; $locator2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileLocatorEquals!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $locator1:tt, $locator2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileLocatorEquals!(@__pgrx_emit_value; $locator1, $locator2)
@@ -1396,7 +1493,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4532,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -1415,7 +1512,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4532,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -1439,7 +1536,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1306,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1458,7 +1555,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1306,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1486,7 +1583,7 @@ macro_rules! RelFileLocatorEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locator1)))
@@ -1495,7 +1592,7 @@ macro_rules! RelFileLocatorEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locator2)))
@@ -1530,6 +1627,12 @@ macro_rules! RelFileLocatorEquals {
     (@__pgrx_emit_size; $locator1:tt, $locator2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locator1);
+                        $crate::__pgrx_c_operand!(@check_safety; $locator2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1551,7 +1654,7 @@ macro_rules! RelFileLocatorEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1570,7 +1673,7 @@ macro_rules! RelFileLocatorEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4532,
+                                                                    $crate::__pgrx_c_generated::Field_relNumber,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1597,7 +1700,7 @@ macro_rules! RelFileLocatorEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1616,7 +1719,7 @@ macro_rules! RelFileLocatorEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1306,
+                                                                    $crate::__pgrx_c_generated::Field_dbOid,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1647,7 +1750,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5296,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
@@ -1666,7 +1769,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5296,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
@@ -1714,7 +1817,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4532,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -1733,7 +1836,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4532,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -1757,7 +1860,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1306,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1776,7 +1879,7 @@ macro_rules! RelFileLocatorEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1306,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1804,7 +1907,7 @@ macro_rules! RelFileLocatorEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locator1)))
@@ -1813,7 +1916,7 @@ macro_rules! RelFileLocatorEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5296,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locator2)))

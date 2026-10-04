@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_gistentryinit {
@@ -394,15 +405,34 @@ macro_rules! __pgrx_c_args_gistentryinit {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! gistentryinit {
+    (@__pgrx_emit_check_safety; $e:tt, $k:tt, $r:tt, $pg:tt, $o:tt, $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $e);
+                $crate::__pgrx_c_operand!(@check_safety; $k);
+                $crate::__pgrx_c_operand!(@check_safety; $r);
+                $crate::__pgrx_c_operand!(@check_safety; $pg);
+                $crate::__pgrx_c_operand!(@check_safety; $o);
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_gistentryinit!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $e:tt, $k:tt, $r:tt, $pg:tt, $o:tt, $l:tt $(,)?) => {
         {
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2642,
+                            $crate::__pgrx_c_generated::Field_key,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $e))),
@@ -418,7 +448,7 @@ macro_rules! gistentryinit {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4352,
+                            $crate::__pgrx_c_generated::Field_rel,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $e))),
@@ -434,7 +464,7 @@ macro_rules! gistentryinit {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3752,
+                            $crate::__pgrx_c_generated::Field_page,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $e))),
@@ -450,7 +480,7 @@ macro_rules! gistentryinit {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3508,
+                            $crate::__pgrx_c_generated::Field_offset,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $e))),
@@ -466,7 +496,7 @@ macro_rules! gistentryinit {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2758,
+                            $crate::__pgrx_c_generated::Field_leafkey,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $e))),

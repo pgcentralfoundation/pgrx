@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_addlength_datum {
@@ -229,8 +240,29 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
 /// ```text
 /// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_addlength_datum {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attlen:tt, $attdatum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_addlength_datum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attlen:tt, $attdatum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_addlength_datum!(@__pgrx_emit_value; $cur_offset, $attlen, $attdatum)
@@ -373,7 +405,7 @@ macro_rules! att_addlength_datum {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -400,11 +432,14 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 <
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                        >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                 >::from_storage(
-                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                         <
                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -502,7 +537,7 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -529,11 +564,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 <
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                        >,
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                         <
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -625,7 +663,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -652,11 +690,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                             >(
                                                                                                                                                                                                 <
                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                                                        >,
                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                                                         <
                                                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -762,7 +803,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -789,11 +830,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                             >(
                                                                                                                                                                                                 <
                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                                                        >,
                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                                                         <
                                                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -946,7 +990,7 @@ macro_rules! att_addlength_datum {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -973,11 +1017,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                         >(
                                                                                                                                                             <
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                    >,
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                             >::from_storage(
-                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                     <
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1061,7 +1108,7 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -1088,11 +1135,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 <
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                        >,
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                         <
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1177,12 +1227,12 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -1209,11 +1259,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                 >(
                                                                                                                                                                     <
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                ::core::ffi::c_char
+                                                                                                                                                                            >,
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                     >::from_storage(
-                                                                                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                        $crate::DatumGetPointer(
                                                                                                                                                                             <
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1357,7 +1410,7 @@ macro_rules! att_addlength_datum {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                        $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1389,11 +1442,14 @@ macro_rules! att_addlength_datum {
                                                                                                                 >(
                                                                                                                     <
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                ::core::ffi::c_char
+                                                                                                                            >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                     >::from_storage(
-                                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                        $crate::DatumGetPointer(
                                                                                                                             <
                                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1477,6 +1533,13 @@ macro_rules! att_addlength_datum {
         /* PGRX: VARHDRSZ_EXTERNAL remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: att_addlength_datum remains expanded because att_addlength_pointer expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1640,7 +1703,7 @@ macro_rules! att_addlength_datum {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -1667,11 +1730,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                         >(
                                                                                                                                             <
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                    >,
                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                             >::from_storage(
-                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                     <
                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1769,7 +1835,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -1796,11 +1862,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                         >(
                                                                                                                                                                             <
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                                    >,
                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                             >::from_storage(
-                                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                                     <
                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1892,7 +1961,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                         >(
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                                     _,
                                                                                                                                                                                     _
                                                                                                                                                                                 >(
@@ -1919,11 +1988,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                                         >(
                                                                                                                                                                                                             <
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                                                                    >,
                                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                             >::from_storage(
-                                                                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                                                                     <
                                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2029,7 +2101,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                         >(
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                                     _,
                                                                                                                                                                                     _
                                                                                                                                                                                 >(
@@ -2056,11 +2128,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                                         >(
                                                                                                                                                                                                             <
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                                                                    >,
                                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                             >::from_storage(
-                                                                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                                                                     <
                                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2213,7 +2288,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -2240,11 +2315,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                     >(
                                                                                                                                                                         <
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                    ::core::ffi::c_char
+                                                                                                                                                                                >,
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                         >::from_storage(
-                                                                                                                                                                            $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                            $crate::DatumGetPointer(
                                                                                                                                                                                 <
                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                         $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2328,7 +2406,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -2355,11 +2433,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                         >(
                                                                                                                                                                             <
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                                    >,
                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                             >::from_storage(
-                                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                                     <
                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2444,12 +2525,12 @@ macro_rules! att_addlength_datum {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                        $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                                         _,
                                                                                                                                                         _
                                                                                                                                                     >(
@@ -2476,11 +2557,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                             >(
                                                                                                                                                                                 <
                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                                        >,
                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                                         <
                                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2628,7 +2712,7 @@ macro_rules! att_addlength_datum {
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::from_storage(
-                                                                                                    $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                                    $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2660,11 +2744,14 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 <
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                        >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                 >::from_storage(
-                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                         <
                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -2876,7 +2963,7 @@ macro_rules! att_addlength_datum {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -2903,11 +2990,14 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 <
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                        >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                 >::from_storage(
-                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                         <
                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3005,7 +3095,7 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -3032,11 +3122,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 <
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                        >,
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                         <
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3128,7 +3221,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -3155,11 +3248,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                             >(
                                                                                                                                                                                                 <
                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                                                        >,
                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                                                         <
                                                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3265,7 +3361,7 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -3292,11 +3388,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                                             >(
                                                                                                                                                                                                 <
                                                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                                                        >,
                                                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                                                         <
                                                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3449,7 +3548,7 @@ macro_rules! att_addlength_datum {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -3476,11 +3575,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                         >(
                                                                                                                                                             <
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                                                    >,
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                             >::from_storage(
-                                                                                                                                                                $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                $crate::DatumGetPointer(
                                                                                                                                                                     <
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3564,7 +3666,7 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -3591,11 +3693,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                             >(
                                                                                                                                                                 <
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            ::core::ffi::c_char
+                                                                                                                                                                        >,
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                 >::from_storage(
-                                                                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                    $crate::DatumGetPointer(
                                                                                                                                                                         <
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3680,12 +3785,12 @@ macro_rules! att_addlength_datum {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -3712,11 +3817,14 @@ macro_rules! att_addlength_datum {
                                                                                                                                                                 >(
                                                                                                                                                                     <
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                                                                ::core::ffi::c_char
+                                                                                                                                                                            >,
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                                                                     >::from_storage(
-                                                                                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                                                                        $crate::DatumGetPointer(
                                                                                                                                                                             <
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3860,7 +3968,7 @@ macro_rules! att_addlength_datum {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                        $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -3892,11 +4000,14 @@ macro_rules! att_addlength_datum {
                                                                                                                 >(
                                                                                                                     <
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                ::core::ffi::c_char
+                                                                                                                            >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                     >::from_storage(
-                                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                        $crate::DatumGetPointer(
                                                                                                                             <
                                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3977,6 +4088,17 @@ macro_rules! att_addlength_datum {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_addlength_pointer {
@@ -4199,8 +4321,29 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( char * ) ( attptr ) ) + 1 ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_addlength_pointer {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attlen:tt, $attptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_addlength_pointer!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attlen:tt, $attptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_addlength_pointer!(@__pgrx_emit_value; $cur_offset, $attlen, $attptr)
@@ -4343,7 +4486,7 @@ macro_rules! att_addlength_pointer {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -4443,7 +4586,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -4537,7 +4680,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -4645,7 +4788,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -4800,7 +4943,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -4886,7 +5029,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -4973,12 +5116,12 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -5124,7 +5267,7 @@ macro_rules! att_addlength_pointer {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                        $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -5215,6 +5358,13 @@ macro_rules! att_addlength_pointer {
         /* PGRX: VARHDRSZ_EXTERNAL remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_4B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_ANY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_IS_EXPANDED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_SIZE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attptr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5378,7 +5528,7 @@ macro_rules! att_addlength_pointer {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -5478,7 +5628,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -5572,7 +5722,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                                         >(
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                                     _,
                                                                                                                                                                                     _
                                                                                                                                                                                 >(
@@ -5680,7 +5830,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                                         >(
                                                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                                    $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                                     _,
                                                                                                                                                                                     _
                                                                                                                                                                                 >(
@@ -5835,7 +5985,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -5921,7 +6071,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -6008,12 +6158,12 @@ macro_rules! att_addlength_pointer {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                        $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                                         _,
                                                                                                                                                         _
                                                                                                                                                     >(
@@ -6163,7 +6313,7 @@ macro_rules! att_addlength_pointer {
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::from_storage(
-                                                                                                    $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                                    $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -6382,7 +6532,7 @@ macro_rules! att_addlength_pointer {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -6482,7 +6632,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -6576,7 +6726,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -6684,7 +6834,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                                                             >(
                                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                        $crate::__pgrx_c_generated::Field6349,
+                                                                                                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                                                                                                         _,
                                                                                                                                                                         _
                                                                                                                                                                     >(
@@ -6839,7 +6989,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -6925,7 +7075,7 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -7012,12 +7162,12 @@ macro_rules! att_addlength_pointer {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field6342,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -7163,7 +7313,7 @@ macro_rules! att_addlength_pointer {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_049b97a7837779e7bb88614c9dabecec(
+                                                                                        $crate::__pgrx_c_generated::Inline_c10da568653324ab4cd4a2db8ed49364(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -7251,6 +7401,17 @@ macro_rules! att_addlength_pointer {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_align_datum {
@@ -7522,8 +7683,30 @@ macro_rules! __pgrx_c_args_att_align_datum {
 /// ```text
 /// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_align_datum {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalign:tt, $attlen:tt, $attdatum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalign);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_align_datum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalign:tt, $attlen:tt, $attdatum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_align_datum!(@__pgrx_emit_value; $cur_offset, $attalign, $attlen, $attdatum)
@@ -7594,7 +7777,7 @@ macro_rules! att_align_datum {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6347,
+                                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                                             _,
                                                                             _
                                                                         >(
@@ -7621,11 +7804,14 @@ macro_rules! att_align_datum {
                                                                                                 >(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::from_storage(
-                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                        $crate::DatumGetPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -8344,6 +8530,14 @@ macro_rules! att_align_datum {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: DOUBLEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: INTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: SHORTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_SHORT remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: att_align_nominal remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attalign);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8413,7 +8607,7 @@ macro_rules! att_align_datum {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -8440,11 +8634,14 @@ macro_rules! att_align_datum {
                                                                                                             >(
                                                                                                                 <
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                 >::from_storage(
-                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                    $crate::DatumGetPointer(
                                                                                                                         <
                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -9232,7 +9429,7 @@ macro_rules! att_align_datum {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6347,
+                                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                                             _,
                                                                             _
                                                                         >(
@@ -9259,11 +9456,14 @@ macro_rules! att_align_datum {
                                                                                                 >(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::from_storage(
-                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                        $crate::DatumGetPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -9979,6 +10179,17 @@ macro_rules! att_align_datum {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_align_nominal {
@@ -10142,8 +10353,28 @@ macro_rules! __pgrx_c_args_att_align_nominal {
 /// ```text
 /// #define att_align_nominal( cur_offset , attalign ) ( ( ( attalign ) == TYPALIGN_INT ) ? INTALIGN ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_CHAR ) ? ( uintptr_t ) ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_DOUBLE ) ? DOUBLEALIGN ( cur_offset ) : ( AssertMacro ( ( attalign ) == TYPALIGN_SHORT ) , SHORTALIGN ( cur_offset ) ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_align_nominal {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalign:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalign);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_align_nominal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalign:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_align_nominal!(@__pgrx_emit_value; $cur_offset, $attalign)
@@ -10751,6 +10982,12 @@ macro_rules! att_align_nominal {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: DOUBLEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: INTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: SHORTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attalign);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11961,6 +12198,17 @@ macro_rules! att_align_nominal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_align_pointer {
@@ -12232,8 +12480,30 @@ macro_rules! __pgrx_c_args_att_align_pointer {
 /// ```text
 /// #define att_align_pointer( cur_offset , attalign , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_align_pointer {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalign:tt, $attlen:tt, $attptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalign);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_align_pointer!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalign:tt, $attlen:tt, $attptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_align_pointer!(@__pgrx_emit_value; $cur_offset, $attalign, $attlen, $attptr)
@@ -12998,6 +13268,14 @@ macro_rules! att_align_pointer {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: DOUBLEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: INTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: SHORTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_NOT_PAD_BYTE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: att_align_nominal remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attalign);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attptr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14523,6 +14801,17 @@ macro_rules! att_align_pointer {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_datum_alignby {
@@ -14794,8 +15083,30 @@ macro_rules! __pgrx_c_args_att_datum_alignby {
 /// ```text
 /// #define att_datum_alignby( cur_offset , attalignby , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : TYPEALIGN ( attalignby , cur_offset ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_datum_alignby {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalignby:tt, $attlen:tt, $attdatum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalignby);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_datum_alignby!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalignby:tt, $attlen:tt, $attdatum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_datum_alignby!(
@@ -14872,7 +15183,7 @@ macro_rules! att_datum_alignby {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6347,
+                                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14899,11 +15210,14 @@ macro_rules! att_datum_alignby {
                                                                                                 >(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::from_storage(
-                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                        $crate::DatumGetPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -15140,6 +15454,14 @@ macro_rules! att_datum_alignby {
         /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_SHORT remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attalignby);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attdatum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15209,7 +15531,7 @@ macro_rules! att_datum_alignby {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field6347,
+                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -15236,11 +15558,14 @@ macro_rules! att_datum_alignby {
                                                                                                             >(
                                                                                                                 <
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                 >::from_storage(
-                                                                                                                    $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                                    $crate::DatumGetPointer(
                                                                                                                         <
                                                                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -15546,7 +15871,7 @@ macro_rules! att_datum_alignby {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6347,
+                                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                                             _,
                                                                             _
                                                                         >(
@@ -15573,11 +15898,14 @@ macro_rules! att_datum_alignby {
                                                                                                 >(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::from_storage(
-                                                                                                        $crate::__pgrx_c_generated::Inline_da685e6401ccfec73c4bfc1d8d233b7c(
+                                                                                                        $crate::DatumGetPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -15811,6 +16139,17 @@ macro_rules! att_datum_alignby {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_nominal_alignby {
@@ -15974,8 +16313,28 @@ macro_rules! __pgrx_c_args_att_nominal_alignby {
 /// ```text
 /// #define att_nominal_alignby( cur_offset , attalignby ) TYPEALIGN ( attalignby , cur_offset )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_nominal_alignby {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalignby:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalignby);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_nominal_alignby!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalignby:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_nominal_alignby!(@__pgrx_emit_value; $cur_offset, $attalignby)
@@ -16024,6 +16383,17 @@ macro_rules! att_nominal_alignby {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_att_pointer_alignby {
@@ -16295,8 +16665,30 @@ macro_rules! __pgrx_c_args_att_pointer_alignby {
 /// ```text
 /// #define att_pointer_alignby( cur_offset , attalignby , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : TYPEALIGN ( attalignby , cur_offset ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_pointer_alignby {
+    (@__pgrx_emit_check_safety; $cur_offset:tt, $attalignby:tt, $attlen:tt, $attptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                $crate::__pgrx_c_operand!(@check_safety; $attalignby);
+                $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                $crate::__pgrx_c_operand!(@check_safety; $attptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_att_pointer_alignby!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cur_offset:tt, $attalignby:tt, $attlen:tt, $attptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::att_pointer_alignby!(
@@ -16585,6 +16977,14 @@ macro_rules! att_pointer_alignby {
         /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_NOT_PAD_BYTE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur_offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $attalignby);
+                        $crate::__pgrx_c_operand!(@check_safety; $attlen);
+                        $crate::__pgrx_c_operand!(@check_safety; $attptr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17146,6 +17546,17 @@ macro_rules! att_pointer_alignby {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_fetchatt {
@@ -17275,8 +17686,28 @@ macro_rules! __pgrx_c_args_fetchatt {
 /// ```text
 /// #define fetchatt( A , T ) fetch_att ( T , ( A ) -> attbyval , ( A ) -> attlen )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! fetchatt {
+    (@__pgrx_emit_check_safety; $A:tt, $T:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $A);
+                $crate::__pgrx_c_operand!(@check_safety; $T);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fetchatt!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $A:tt, $T:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::fetchatt!(@__pgrx_emit_value; $A, $T)
@@ -17291,7 +17722,7 @@ macro_rules! fetchatt {
                     $crate::Datum
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_cb5682d81ec35159dfca7d92db95cbaa(
+                $crate::fetch_att(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -17318,7 +17749,7 @@ macro_rules! fetchatt {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field563,
+                                        $crate::__pgrx_c_generated::Field_attbyval,
                                         _,
                                         _
                                     >(
@@ -17343,7 +17774,7 @@ macro_rules! fetchatt {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field579,
+                                        $crate::__pgrx_c_generated::Field_attlen,
                                         _,
                                         _
                                     >(
@@ -17383,6 +17814,12 @@ macro_rules! fetchatt {
         /* PGRX: fetchatt remains expanded because fetch_att is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $A);
+                        $crate::__pgrx_c_operand!(@check_safety; $T);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17392,7 +17829,7 @@ macro_rules! fetchatt {
                                     $crate::Datum
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_cb5682d81ec35159dfca7d92db95cbaa(
+                                $crate::fetch_att(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -17425,7 +17862,7 @@ macro_rules! fetchatt {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field563,
+                                                        $crate::__pgrx_c_generated::Field_attbyval,
                                                         _,
                                                         _
                                                     >(
@@ -17460,7 +17897,7 @@ macro_rules! fetchatt {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field579,
+                                                        $crate::__pgrx_c_generated::Field_attlen,
                                                         _,
                                                         _
                                                     >(
@@ -17505,7 +17942,7 @@ macro_rules! fetchatt {
                         $crate::Datum
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_cb5682d81ec35159dfca7d92db95cbaa(
+                    $crate::fetch_att(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -17534,7 +17971,7 @@ macro_rules! fetchatt {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field563,
+                                            $crate::__pgrx_c_generated::Field_attbyval,
                                             _,
                                             _
                                         >(
@@ -17561,7 +17998,7 @@ macro_rules! fetchatt {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field579,
+                                            $crate::__pgrx_c_generated::Field_attlen,
                                             _,
                                             _
                                         >(

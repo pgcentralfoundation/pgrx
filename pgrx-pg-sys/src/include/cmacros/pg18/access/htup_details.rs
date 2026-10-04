@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
@@ -136,8 +147,26 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
 /// ```text
 /// #define HeapTupleHeaderGetNatts( tup ) ( ( tup ) -> t_infomask2 & HEAP_NATTS_MASK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetNatts {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HeapTupleHeaderGetNatts!(@__pgrx_emit_value; $tup)
@@ -150,7 +179,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5853,
+                                $crate::__pgrx_c_generated::Field_t_infomask2,
                                 _,
                                 _
                             >(
@@ -192,6 +221,11 @@ macro_rules! HeapTupleHeaderGetNatts {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -199,7 +233,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5853,
+                                            $crate::__pgrx_c_generated::Field_t_infomask2,
                                             _,
                                             _
                                         >(
@@ -243,7 +277,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5853,
+                                $crate::__pgrx_c_generated::Field_t_infomask2,
                                 _,
                                 _
                             >(
@@ -283,6 +317,17 @@ macro_rules! HeapTupleHeaderGetNatts {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
@@ -407,8 +452,26 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
 /// ```text
 /// #define HeapTupleHeaderHasExternal( tup ) ( ( ( tup ) -> t_infomask & HEAP_HASEXTERNAL ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! HeapTupleHeaderHasExternal {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HeapTupleHeaderHasExternal!(@__pgrx_emit_value; $tup)
@@ -424,7 +487,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5852,
+                                            $crate::__pgrx_c_generated::Field_t_infomask,
                                             _,
                                             _
                                         >(
@@ -484,6 +547,11 @@ macro_rules! HeapTupleHeaderHasExternal {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -497,7 +565,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5852,
+                                                        $crate::__pgrx_c_generated::Field_t_infomask,
                                                         _,
                                                         _
                                                     >(
@@ -557,7 +625,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5852,
+                                            $crate::__pgrx_c_generated::Field_t_infomask,
                                             _,
                                             _
                                         >(
@@ -612,6 +680,17 @@ macro_rules! HeapTupleHeaderHasExternal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
@@ -790,8 +869,27 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
 /// ```text
 /// #define HeapTupleHeaderSetNatts( tup , natts ) ( ( tup ) -> t_infomask2 = ( ( tup ) -> t_infomask2 & ~ HEAP_NATTS_MASK ) | ( natts ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetNatts {
+    (@__pgrx_emit_check_safety; $tup:tt, $natts:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $natts);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $tup:tt, $natts:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HeapTupleHeaderSetNatts!(@__pgrx_emit_value; $tup, $natts)
@@ -802,7 +900,7 @@ macro_rules! HeapTupleHeaderSetNatts {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5853,
+                        $crate::__pgrx_c_generated::Field_t_infomask2,
                         _,
                         _
                     >(
@@ -825,7 +923,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5853,
+                                                    $crate::__pgrx_c_generated::Field_t_infomask2,
                                                     _,
                                                     _
                                                 >(
@@ -892,12 +990,18 @@ macro_rules! HeapTupleHeaderSetNatts {
     (@__pgrx_emit_size; $tup:tt, $natts:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                        $crate::__pgrx_c_operand!(@check_safety; $natts);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5853,
+                                    $crate::__pgrx_c_generated::Field_t_infomask2,
                                     _,
                                     _
                                 >(
@@ -924,7 +1028,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5853,
+                                                                $crate::__pgrx_c_generated::Field_t_infomask2,
                                                                 _,
                                                                 _
                                                             >(
@@ -989,7 +1093,7 @@ macro_rules! HeapTupleHeaderSetNatts {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5853,
+                        $crate::__pgrx_c_generated::Field_t_infomask2,
                         _,
                         _
                     >(
@@ -1012,7 +1116,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5853,
+                                                    $crate::__pgrx_c_generated::Field_t_infomask2,
                                                     _,
                                                     _
                                                 >(

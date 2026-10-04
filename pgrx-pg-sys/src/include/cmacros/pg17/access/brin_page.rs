@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BRIN_IS_META_PAGE {
@@ -121,8 +132,27 @@ macro_rules! __pgrx_c_args_BRIN_IS_META_PAGE {
 /// ```text
 /// #define BRIN_IS_META_PAGE( page ) ( BrinPageType ( page ) == BRIN_PAGETYPE_META )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BRIN_IS_META_PAGE {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BRIN_IS_META_PAGE!(@__pgrx_emit_value; $page)
@@ -140,7 +170,7 @@ macro_rules! BRIN_IS_META_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -166,20 +196,29 @@ macro_rules! BRIN_IS_META_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -407,6 +446,11 @@ macro_rules! BRIN_IS_META_PAGE {
         /* PGRX: BrinPageType remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -421,7 +465,7 @@ macro_rules! BRIN_IS_META_PAGE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6144,
+                                                            $crate::__pgrx_c_generated::Field_vector,
                                                             _,
                                                             _
                                                         >(
@@ -447,20 +491,29 @@ macro_rules! BRIN_IS_META_PAGE {
                                                                             >(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::from_storage(
-                                                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                                    $crate::PageGetSpecialPointer(
                                                                                         <
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                         >::into_storage(
                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
                                                                                                 _
@@ -692,7 +745,7 @@ macro_rules! BRIN_IS_META_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -718,20 +771,29 @@ macro_rules! BRIN_IS_META_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -956,6 +1018,17 @@ macro_rules! BRIN_IS_META_PAGE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BRIN_IS_REGULAR_PAGE {
@@ -1070,8 +1143,27 @@ macro_rules! __pgrx_c_args_BRIN_IS_REGULAR_PAGE {
 /// ```text
 /// #define BRIN_IS_REGULAR_PAGE( page ) ( BrinPageType ( page ) == BRIN_PAGETYPE_REGULAR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BRIN_IS_REGULAR_PAGE {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BRIN_IS_REGULAR_PAGE!(@__pgrx_emit_value; $page)
@@ -1089,7 +1181,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -1115,20 +1207,29 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -1356,6 +1457,11 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
         /* PGRX: BrinPageType remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1370,7 +1476,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6144,
+                                                            $crate::__pgrx_c_generated::Field_vector,
                                                             _,
                                                             _
                                                         >(
@@ -1396,20 +1502,29 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                                                             >(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::from_storage(
-                                                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                                    $crate::PageGetSpecialPointer(
                                                                                         <
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                         >::into_storage(
                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
                                                                                                 _
@@ -1641,7 +1756,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -1667,20 +1782,29 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -1905,6 +2029,17 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BRIN_IS_REVMAP_PAGE {
@@ -2014,8 +2149,27 @@ macro_rules! __pgrx_c_args_BRIN_IS_REVMAP_PAGE {
 /// ```text
 /// #define BRIN_IS_REVMAP_PAGE( page ) ( BrinPageType ( page ) == BRIN_PAGETYPE_REVMAP )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BRIN_IS_REVMAP_PAGE {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BRIN_IS_REVMAP_PAGE!(@__pgrx_emit_value; $page)
@@ -2033,7 +2187,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -2059,20 +2213,29 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -2300,6 +2463,11 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
         /* PGRX: BrinPageType remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2314,7 +2482,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6144,
+                                                            $crate::__pgrx_c_generated::Field_vector,
                                                             _,
                                                             _
                                                         >(
@@ -2340,20 +2508,29 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                                                             >(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::from_storage(
-                                                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                                    $crate::PageGetSpecialPointer(
                                                                                         <
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                         >::into_storage(
                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
                                                                                                 _
@@ -2585,7 +2762,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6144,
+                                                $crate::__pgrx_c_generated::Field_vector,
                                                 _,
                                                 _
                                             >(
@@ -2611,20 +2788,29 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                                                                 >(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                        $crate::PageGetSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -2849,6 +3035,17 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinPageFlags {
@@ -2958,8 +3155,27 @@ macro_rules! __pgrx_c_args_BrinPageFlags {
 /// ```text
 /// #define BrinPageFlags( page ) ( ( ( BrinSpecialSpace * ) PageGetSpecialPointer ( page ) ) -> vector [ MAXALIGN ( 1 ) / sizeof ( uint16 ) - 2 ] )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinPageFlags {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinPageFlags!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinPageFlags!(@__pgrx_emit_value; $page)
@@ -2974,7 +3190,7 @@ macro_rules! BrinPageFlags {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field6144,
+                                    $crate::__pgrx_c_generated::Field_vector,
                                     _,
                                     _
                                 >(
@@ -3000,20 +3216,29 @@ macro_rules! BrinPageFlags {
                                                     >(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                            $crate::PageGetSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
                                                                         _
@@ -3210,7 +3435,7 @@ macro_rules! BrinPageFlags {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6144,
+                            $crate::__pgrx_c_generated::Field_vector,
                             _,
                             _
                         >(
@@ -3233,20 +3458,29 @@ macro_rules! BrinPageFlags {
                                             >(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                    $crate::PageGetSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
                                                                 _
@@ -3435,7 +3669,7 @@ macro_rules! BrinPageFlags {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6144,
+                            $crate::__pgrx_c_generated::Field_vector,
                             _,
                             _
                         >(
@@ -3458,20 +3692,29 @@ macro_rules! BrinPageFlags {
                                             >(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                    $crate::PageGetSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
                                                                 _
@@ -3657,13 +3900,18 @@ macro_rules! BrinPageFlags {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::index(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field6144,
+                                        $crate::__pgrx_c_generated::Field_vector,
                                         _,
                                         _
                                     >(
@@ -3689,20 +3937,29 @@ macro_rules! BrinPageFlags {
                                                         >(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                $crate::PageGetSpecialPointer(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::into_storage(
                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
                                                                             _
@@ -3906,7 +4163,7 @@ macro_rules! BrinPageFlags {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field6144,
+                                    $crate::__pgrx_c_generated::Field_vector,
                                     _,
                                     _
                                 >(
@@ -3932,20 +4189,29 @@ macro_rules! BrinPageFlags {
                                                     >(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                            $crate::PageGetSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
                                                                         _
@@ -4148,6 +4414,17 @@ macro_rules! BrinPageFlags {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinPageType {
@@ -4246,8 +4523,27 @@ macro_rules! __pgrx_c_args_BrinPageType {
 /// ```text
 /// #define BrinPageType( page ) ( ( ( BrinSpecialSpace * ) PageGetSpecialPointer ( page ) ) -> vector [ MAXALIGN ( 1 ) / sizeof ( uint16 ) - 1 ] )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinPageType {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinPageType!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinPageType!(@__pgrx_emit_value; $page)
@@ -4262,7 +4558,7 @@ macro_rules! BrinPageType {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field6144,
+                                    $crate::__pgrx_c_generated::Field_vector,
                                     _,
                                     _
                                 >(
@@ -4288,20 +4584,29 @@ macro_rules! BrinPageType {
                                                     >(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                            $crate::PageGetSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
                                                                         _
@@ -4498,7 +4803,7 @@ macro_rules! BrinPageType {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6144,
+                            $crate::__pgrx_c_generated::Field_vector,
                             _,
                             _
                         >(
@@ -4521,20 +4826,29 @@ macro_rules! BrinPageType {
                                             >(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                    $crate::PageGetSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
                                                                 _
@@ -4723,7 +5037,7 @@ macro_rules! BrinPageType {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6144,
+                            $crate::__pgrx_c_generated::Field_vector,
                             _,
                             _
                         >(
@@ -4746,20 +5060,29 @@ macro_rules! BrinPageType {
                                             >(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                    $crate::PageGetSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
                                                                 _
@@ -4945,13 +5268,18 @@ macro_rules! BrinPageType {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::index(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field6144,
+                                        $crate::__pgrx_c_generated::Field_vector,
                                         _,
                                         _
                                     >(
@@ -4977,20 +5305,29 @@ macro_rules! BrinPageType {
                                                         >(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                                $crate::PageGetSpecialPointer(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::into_storage(
                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
                                                                             _
@@ -5194,7 +5531,7 @@ macro_rules! BrinPageType {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field6144,
+                                    $crate::__pgrx_c_generated::Field_vector,
                                     _,
                                     _
                                 >(
@@ -5220,20 +5557,29 @@ macro_rules! BrinPageType {
                                                     >(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_a842caac8e1dd87ba3044777e4655c97(
+                                                            $crate::PageGetSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
                                                                         _

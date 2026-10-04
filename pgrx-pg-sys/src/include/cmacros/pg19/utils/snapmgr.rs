@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitDirtySnapshot {
@@ -121,8 +132,23 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
 /// ```text
 /// #define InitDirtySnapshot( snapshotdata ) ( ( snapshotdata ) . snapshot_type = SNAPSHOT_DIRTY )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitDirtySnapshot {
+    (@__pgrx_emit_check_safety; $snapshotdata:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitDirtySnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshotdata:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InitDirtySnapshot!(@__pgrx_emit_value; $snapshotdata)
@@ -133,7 +159,7 @@ macro_rules! InitDirtySnapshot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5638,
+                        $crate::__pgrx_c_generated::Field_snapshot_type,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -164,12 +190,17 @@ macro_rules! InitDirtySnapshot {
     (@__pgrx_emit_size; $snapshotdata:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5638,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -195,7 +226,7 @@ macro_rules! InitDirtySnapshot {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5638,
+                        $crate::__pgrx_c_generated::Field_snapshot_type,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -224,6 +255,17 @@ macro_rules! InitDirtySnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
@@ -402,8 +444,27 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
 /// ```text
 /// #define InitNonVacuumableSnapshot( snapshotdata , vistestp ) ( ( snapshotdata ) . snapshot_type = SNAPSHOT_NON_VACUUMABLE , ( snapshotdata ) . vistest = ( vistestp ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitNonVacuumableSnapshot {
+    (@__pgrx_emit_check_safety; $snapshotdata:tt, $vistestp:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                $crate::__pgrx_c_operand!(@check_safety; $vistestp);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $snapshotdata:tt, $vistestp:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InitNonVacuumableSnapshot!(@__pgrx_emit_value; $snapshotdata, $vistestp)
@@ -417,7 +478,7 @@ macro_rules! InitNonVacuumableSnapshot {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5638,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -432,7 +493,7 @@ macro_rules! InitNonVacuumableSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6594,
+                                $crate::__pgrx_c_generated::Field_vistest,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -468,6 +529,12 @@ macro_rules! InitNonVacuumableSnapshot {
     (@__pgrx_emit_size; $snapshotdata:tt, $vistestp:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                        $crate::__pgrx_c_operand!(@check_safety; $vistestp);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -479,7 +546,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5638,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -499,7 +566,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6594,
+                                            $crate::__pgrx_c_generated::Field_vistest,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -531,7 +598,7 @@ macro_rules! InitNonVacuumableSnapshot {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5638,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -546,7 +613,7 @@ macro_rules! InitNonVacuumableSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6594,
+                                $crate::__pgrx_c_generated::Field_vistest,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -577,6 +644,17 @@ macro_rules! InitNonVacuumableSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
@@ -695,8 +773,26 @@ macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
 /// ```text
 /// #define IsHistoricMVCCSnapshot( snapshot ) ( ( snapshot ) -> snapshot_type == SNAPSHOT_HISTORIC_MVCC )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IsHistoricMVCCSnapshot {
+    (@__pgrx_emit_check_safety; $snapshot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsHistoricMVCCSnapshot!(@__pgrx_emit_value; $snapshot)
@@ -709,7 +805,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5638,
+                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                 _,
                                 _
                             >(
@@ -751,6 +847,11 @@ macro_rules! IsHistoricMVCCSnapshot {
     (@__pgrx_emit_size; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -758,7 +859,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5638,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -802,7 +903,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5638,
+                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                 _,
                                 _
                             >(
@@ -842,6 +943,17 @@ macro_rules! IsHistoricMVCCSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
@@ -951,8 +1063,23 @@ macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
 /// ```text
 /// #define IsMVCCLikeSnapshot( snapshot ) ( IsMVCCSnapshot ( snapshot ) || IsHistoricMVCCSnapshot ( snapshot ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IsMVCCLikeSnapshot {
+    (@__pgrx_emit_check_safety; $snapshot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsMVCCLikeSnapshot!(@__pgrx_emit_value; $snapshot)
@@ -970,7 +1097,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5638,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(
@@ -1007,7 +1134,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5638,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(
@@ -1063,6 +1190,11 @@ macro_rules! IsMVCCLikeSnapshot {
         /* PGRX: IsHistoricMVCCSnapshot remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: IsMVCCSnapshot remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1080,7 +1212,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5638,
+                                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                                             _,
                                                             _
                                                         >(
@@ -1128,7 +1260,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5638,
+                                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                                             _,
                                                             _
                                                         >(
@@ -1190,7 +1322,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5638,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(
@@ -1227,7 +1359,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5638,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(
@@ -1280,6 +1412,17 @@ macro_rules! IsMVCCLikeSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsMVCCSnapshot {
@@ -1389,8 +1532,23 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
 /// ```text
 /// #define IsMVCCSnapshot( snapshot ) ( ( snapshot ) -> snapshot_type == SNAPSHOT_MVCC )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
+    (@__pgrx_emit_check_safety; $snapshot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsMVCCSnapshot!(@__pgrx_emit_value; $snapshot)
@@ -1403,7 +1561,7 @@ macro_rules! IsMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5638,
+                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                 _,
                                 _
                             >(
@@ -1447,6 +1605,11 @@ macro_rules! IsMVCCSnapshot {
     (@__pgrx_emit_size; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1454,7 +1617,7 @@ macro_rules! IsMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5638,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -1500,7 +1663,7 @@ macro_rules! IsMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5638,
+                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                 _,
                                 _
                             >(

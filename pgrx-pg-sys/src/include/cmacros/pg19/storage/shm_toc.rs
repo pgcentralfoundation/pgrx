@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
@@ -184,8 +195,31 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
 /// ```text
 /// #define shm_toc_estimate_chunk( e , sz ) ( ( e ) -> space_for_chunks = add_size ( ( e ) -> space_for_chunks , BUFFERALIGN ( sz ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! shm_toc_estimate_chunk {
+    (@__pgrx_emit_check_safety; $e:tt, $sz:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $e);
+                $crate::__pgrx_c_operand!(@check_safety; $sz);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $e:tt, $sz:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::shm_toc_estimate_chunk!(@__pgrx_emit_value; $e, $sz)
@@ -197,7 +231,7 @@ macro_rules! shm_toc_estimate_chunk {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5686,
+                        $crate::__pgrx_c_generated::Field_space_for_chunks,
                         _,
                         _
                     >(
@@ -236,7 +270,7 @@ macro_rules! shm_toc_estimate_chunk {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5686,
+                                                    $crate::__pgrx_c_generated::Field_space_for_chunks,
                                                     _,
                                                     _
                                                 >(
@@ -433,12 +467,18 @@ macro_rules! shm_toc_estimate_chunk {
         /* PGRX: BUFFERALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $e);
+                        $crate::__pgrx_c_operand!(@check_safety; $sz);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5686,
+                                    $crate::__pgrx_c_generated::Field_space_for_chunks,
                                     _,
                                     _
                                 >(
@@ -478,7 +518,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5686,
+                                                                $crate::__pgrx_c_generated::Field_space_for_chunks,
                                                                 _,
                                                                 _
                                                             >(
@@ -674,7 +714,7 @@ macro_rules! shm_toc_estimate_chunk {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5686,
+                        $crate::__pgrx_c_generated::Field_space_for_chunks,
                         _,
                         _
                     >(
@@ -713,7 +753,7 @@ macro_rules! shm_toc_estimate_chunk {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5686,
+                                                    $crate::__pgrx_c_generated::Field_space_for_chunks,
                                                     _,
                                                     _
                                                 >(
@@ -907,6 +947,17 @@ macro_rules! shm_toc_estimate_chunk {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
@@ -1075,8 +1126,28 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
 /// ```text
 /// #define shm_toc_estimate_keys( e , cnt ) ( ( e ) -> number_of_keys = add_size ( ( e ) -> number_of_keys , cnt ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! shm_toc_estimate_keys {
+    (@__pgrx_emit_check_safety; $e:tt, $cnt:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $e);
+                $crate::__pgrx_c_operand!(@check_safety; $cnt);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_shm_toc_estimate_keys!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $e:tt, $cnt:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::shm_toc_estimate_keys!(@__pgrx_emit_value; $e, $cnt)
@@ -1087,7 +1158,7 @@ macro_rules! shm_toc_estimate_keys {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3872,
+                        $crate::__pgrx_c_generated::Field_number_of_keys,
                         _,
                         _
                     >(
@@ -1126,7 +1197,7 @@ macro_rules! shm_toc_estimate_keys {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3872,
+                                                    $crate::__pgrx_c_generated::Field_number_of_keys,
                                                     _,
                                                     _
                                                 >(
@@ -1192,12 +1263,18 @@ macro_rules! shm_toc_estimate_keys {
     (@__pgrx_emit_size; $e:tt, $cnt:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $e);
+                        $crate::__pgrx_c_operand!(@check_safety; $cnt);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field3872,
+                                    $crate::__pgrx_c_generated::Field_number_of_keys,
                                     _,
                                     _
                                 >(
@@ -1237,7 +1314,7 @@ macro_rules! shm_toc_estimate_keys {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field3872,
+                                                                $crate::__pgrx_c_generated::Field_number_of_keys,
                                                                 _,
                                                                 _
                                                             >(
@@ -1303,7 +1380,7 @@ macro_rules! shm_toc_estimate_keys {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3872,
+                        $crate::__pgrx_c_generated::Field_number_of_keys,
                         _,
                         _
                     >(
@@ -1342,7 +1419,7 @@ macro_rules! shm_toc_estimate_keys {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3872,
+                                                    $crate::__pgrx_c_generated::Field_number_of_keys,
                                                     _,
                                                     _
                                                 >(
@@ -1406,6 +1483,17 @@ macro_rules! shm_toc_estimate_keys {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
@@ -1533,8 +1621,26 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
 /// ```text
 /// #define shm_toc_initialize_estimator( e ) ( ( e ) -> space_for_chunks = 0 , ( e ) -> number_of_keys = 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! shm_toc_initialize_estimator {
+    (@__pgrx_emit_check_safety; $e:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $e);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $e:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::shm_toc_initialize_estimator!(@__pgrx_emit_value; $e)
@@ -1548,7 +1654,7 @@ macro_rules! shm_toc_initialize_estimator {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5686,
+                                    $crate::__pgrx_c_generated::Field_space_for_chunks,
                                     _,
                                     _
                                 >(
@@ -1574,7 +1680,7 @@ macro_rules! shm_toc_initialize_estimator {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field3872,
+                                $crate::__pgrx_c_generated::Field_number_of_keys,
                                 _,
                                 _
                             >(
@@ -1621,6 +1727,11 @@ macro_rules! shm_toc_initialize_estimator {
     (@__pgrx_emit_size; $e:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $e);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1632,7 +1743,7 @@ macro_rules! shm_toc_initialize_estimator {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5686,
+                                                $crate::__pgrx_c_generated::Field_space_for_chunks,
                                                 _,
                                                 _
                                             >(
@@ -1666,7 +1777,7 @@ macro_rules! shm_toc_initialize_estimator {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field3872,
+                                            $crate::__pgrx_c_generated::Field_number_of_keys,
                                             _,
                                             _
                                         >(
@@ -1711,7 +1822,7 @@ macro_rules! shm_toc_initialize_estimator {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5686,
+                                    $crate::__pgrx_c_generated::Field_space_for_chunks,
                                     _,
                                     _
                                 >(
@@ -1737,7 +1848,7 @@ macro_rules! shm_toc_initialize_estimator {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field3872,
+                                $crate::__pgrx_c_generated::Field_number_of_keys,
                                 _,
                                 _
                             >(

@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
@@ -180,8 +191,28 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
 /// ```text
 /// #define GetSysCacheHashValue1( cacheId , key1 ) GetSysCacheHashValue ( cacheId , key1 , 0 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheHashValue1 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheHashValue1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheHashValue1!(@__pgrx_emit_value; $cacheId, $key1)
@@ -309,6 +340,12 @@ macro_rules! GetSysCacheHashValue1 {
         /* PGRX: GetSysCacheHashValue1 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -561,6 +598,17 @@ macro_rules! GetSysCacheHashValue1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
@@ -783,8 +831,29 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
 /// ```text
 /// #define GetSysCacheHashValue2( cacheId , key1 , key2 ) GetSysCacheHashValue ( cacheId , key1 , key2 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheHashValue2 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheHashValue2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheHashValue2!(@__pgrx_emit_value; $cacheId, $key1, $key2)
@@ -908,6 +977,13 @@ macro_rules! GetSysCacheHashValue2 {
         /* PGRX: GetSysCacheHashValue2 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1150,6 +1226,17 @@ macro_rules! GetSysCacheHashValue2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
@@ -1426,8 +1513,30 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
 /// ```text
 /// #define GetSysCacheHashValue3( cacheId , key1 , key2 , key3 ) GetSysCacheHashValue ( cacheId , key1 , key2 , key3 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheHashValue3 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheHashValue3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheHashValue3!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3)
@@ -1547,6 +1656,14 @@ macro_rules! GetSysCacheHashValue3 {
         /* PGRX: GetSysCacheHashValue3 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1779,6 +1896,17 @@ macro_rules! GetSysCacheHashValue3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
@@ -2109,8 +2237,31 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
 /// ```text
 /// #define GetSysCacheHashValue4( cacheId , key1 , key2 , key3 , key4 ) GetSysCacheHashValue ( cacheId , key1 , key2 , key3 , key4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheHashValue4 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+                $crate::__pgrx_c_operand!(@check_safety; $key4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheHashValue4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheHashValue4!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3, $key4)
@@ -2226,6 +2377,15 @@ macro_rules! GetSysCacheHashValue4 {
         /* PGRX: GetSysCacheHashValue4 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                        $crate::__pgrx_c_operand!(@check_safety; $key4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2448,6 +2608,17 @@ macro_rules! GetSysCacheHashValue4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheOid1 {
@@ -2665,8 +2836,29 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
 /// ```text
 /// #define GetSysCacheOid1( cacheId , oidcol , key1 ) GetSysCacheOid ( cacheId , oidcol , key1 , 0 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheOid1 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $oidcol:tt, $key1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheOid1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $oidcol:tt, $key1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheOid1!(@__pgrx_emit_value; $cacheId, $oidcol, $key1)
@@ -2809,6 +3001,13 @@ macro_rules! GetSysCacheOid1 {
         /* PGRX: GetSysCacheOid1 remains expanded because GetSysCacheOid is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3092,6 +3291,17 @@ macro_rules! GetSysCacheOid1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheOid2 {
@@ -3363,8 +3573,30 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
 /// ```text
 /// #define GetSysCacheOid2( cacheId , oidcol , key1 , key2 ) GetSysCacheOid ( cacheId , oidcol , key1 , key2 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheOid2 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheOid2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheOid2!(@__pgrx_emit_value; $cacheId, $oidcol, $key1, $key2)
@@ -3503,6 +3735,14 @@ macro_rules! GetSysCacheOid2 {
         /* PGRX: GetSysCacheOid2 remains expanded because GetSysCacheOid is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3776,6 +4016,17 @@ macro_rules! GetSysCacheOid2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheOid3 {
@@ -4101,8 +4352,31 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
 /// ```text
 /// #define GetSysCacheOid3( cacheId , oidcol , key1 , key2 , key3 ) GetSysCacheOid ( cacheId , oidcol , key1 , key2 , key3 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheOid3 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheOid3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheOid3!(@__pgrx_emit_value; $cacheId, $oidcol, $key1, $key2, $key3)
@@ -4237,6 +4511,15 @@ macro_rules! GetSysCacheOid3 {
         /* PGRX: GetSysCacheOid3 remains expanded because GetSysCacheOid is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4500,6 +4783,17 @@ macro_rules! GetSysCacheOid3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetSysCacheOid4 {
@@ -4879,8 +5173,40 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
 /// ```text
 /// #define GetSysCacheOid4( cacheId , oidcol , key1 , key2 , key3 , key4 ) GetSysCacheOid ( cacheId , oidcol , key1 , key2 , key3 , key4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetSysCacheOid4 {
+    (
+        @__pgrx_emit_check_safety;
+        $cacheId:tt,
+        $oidcol:tt,
+        $key1:tt,
+        $key2:tt,
+        $key3:tt,
+        $key4:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+                $crate::__pgrx_c_operand!(@check_safety; $key4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetSysCacheOid4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetSysCacheOid4!(
@@ -5019,6 +5345,16 @@ macro_rules! GetSysCacheOid4 {
         /* PGRX: GetSysCacheOid4 remains expanded because GetSysCacheOid is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $oidcol);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                        $crate::__pgrx_c_operand!(@check_safety; $key4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5272,6 +5608,17 @@ macro_rules! GetSysCacheOid4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ReleaseSysCacheList {
@@ -5381,8 +5728,27 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
 /// ```text
 /// #define ReleaseSysCacheList( x ) ReleaseCatCacheList ( x )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ReleaseSysCacheList {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ReleaseSysCacheList!(@__pgrx_emit_value; $x)
@@ -5432,6 +5798,11 @@ macro_rules! ReleaseSysCacheList {
         /* PGRX: ReleaseSysCacheList remains expanded because ReleaseCatCacheList is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5514,6 +5885,17 @@ macro_rules! ReleaseSysCacheList {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
@@ -5677,8 +6059,28 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
 /// ```text
 /// #define SearchSysCacheCopy1( cacheId , key1 ) SearchSysCacheCopy ( cacheId , key1 , 0 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheCopy1 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheCopy1!(@__pgrx_emit_value; $cacheId, $key1)
@@ -5811,6 +6213,12 @@ macro_rules! SearchSysCacheCopy1 {
         /* PGRX: SearchSysCacheCopy1 remains expanded because SearchSysCacheCopy is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6071,6 +6479,17 @@ macro_rules! SearchSysCacheCopy1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
@@ -6288,8 +6707,29 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
 /// ```text
 /// #define SearchSysCacheCopy2( cacheId , key1 , key2 ) SearchSysCacheCopy ( cacheId , key1 , key2 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheCopy2 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheCopy2!(@__pgrx_emit_value; $cacheId, $key1, $key2)
@@ -6418,6 +6858,13 @@ macro_rules! SearchSysCacheCopy2 {
         /* PGRX: SearchSysCacheCopy2 remains expanded because SearchSysCacheCopy is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6668,6 +7115,17 @@ macro_rules! SearchSysCacheCopy2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
@@ -6939,8 +7397,30 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
 /// ```text
 /// #define SearchSysCacheCopy3( cacheId , key1 , key2 , key3 ) SearchSysCacheCopy ( cacheId , key1 , key2 , key3 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheCopy3 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheCopy3!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3)
@@ -7065,6 +7545,14 @@ macro_rules! SearchSysCacheCopy3 {
         /* PGRX: SearchSysCacheCopy3 remains expanded because SearchSysCacheCopy is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7305,6 +7793,17 @@ macro_rules! SearchSysCacheCopy3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
@@ -7630,8 +8129,31 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
 /// ```text
 /// #define SearchSysCacheCopy4( cacheId , key1 , key2 , key3 , key4 ) SearchSysCacheCopy ( cacheId , key1 , key2 , key3 , key4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheCopy4 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+                $crate::__pgrx_c_operand!(@check_safety; $key4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheCopy4!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3, $key4)
@@ -7752,6 +8274,15 @@ macro_rules! SearchSysCacheCopy4 {
         /* PGRX: SearchSysCacheCopy4 remains expanded because SearchSysCacheCopy is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                        $crate::__pgrx_c_operand!(@check_safety; $key4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7982,6 +8513,17 @@ macro_rules! SearchSysCacheCopy4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
@@ -8150,8 +8692,28 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
 /// ```text
 /// #define SearchSysCacheExists1( cacheId , key1 ) SearchSysCacheExists ( cacheId , key1 , 0 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheExists1 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheExists1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheExists1!(@__pgrx_emit_value; $cacheId, $key1)
@@ -8279,6 +8841,12 @@ macro_rules! SearchSysCacheExists1 {
         /* PGRX: SearchSysCacheExists1 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8529,6 +9097,17 @@ macro_rules! SearchSysCacheExists1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
@@ -8751,8 +9330,29 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
 /// ```text
 /// #define SearchSysCacheExists2( cacheId , key1 , key2 ) SearchSysCacheExists ( cacheId , key1 , key2 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheExists2 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheExists2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheExists2!(@__pgrx_emit_value; $cacheId, $key1, $key2)
@@ -8876,6 +9476,13 @@ macro_rules! SearchSysCacheExists2 {
         /* PGRX: SearchSysCacheExists2 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9116,6 +9723,17 @@ macro_rules! SearchSysCacheExists2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
@@ -9392,8 +10010,30 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
 /// ```text
 /// #define SearchSysCacheExists3( cacheId , key1 , key2 , key3 ) SearchSysCacheExists ( cacheId , key1 , key2 , key3 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheExists3 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheExists3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheExists3!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3)
@@ -9513,6 +10153,14 @@ macro_rules! SearchSysCacheExists3 {
         /* PGRX: SearchSysCacheExists3 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9743,6 +10391,17 @@ macro_rules! SearchSysCacheExists3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
@@ -10073,8 +10732,31 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
 /// ```text
 /// #define SearchSysCacheExists4( cacheId , key1 , key2 , key3 , key4 ) SearchSysCacheExists ( cacheId , key1 , key2 , key3 , key4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheExists4 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+                $crate::__pgrx_c_operand!(@check_safety; $key4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheExists4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheExists4!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3, $key4)
@@ -10190,6 +10872,15 @@ macro_rules! SearchSysCacheExists4 {
         /* PGRX: SearchSysCacheExists4 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                        $crate::__pgrx_c_operand!(@check_safety; $key4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10410,6 +11101,17 @@ macro_rules! SearchSysCacheExists4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheList1 {
@@ -10573,8 +11275,28 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
 /// ```text
 /// #define SearchSysCacheList1( cacheId , key1 ) SearchSysCacheList ( cacheId , 1 , key1 , 0 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheList1 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheList1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheList1!(@__pgrx_emit_value; $cacheId, $key1)
@@ -10697,6 +11419,12 @@ macro_rules! SearchSysCacheList1 {
         /* PGRX: SearchSysCacheList1 remains expanded because SearchSysCacheList is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10939,6 +11667,17 @@ macro_rules! SearchSysCacheList1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheList2 {
@@ -11156,8 +11895,29 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
 /// ```text
 /// #define SearchSysCacheList2( cacheId , key1 , key2 ) SearchSysCacheList ( cacheId , 2 , key1 , key2 , 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheList2 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheList2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheList2!(@__pgrx_emit_value; $cacheId, $key1, $key2)
@@ -11276,6 +12036,13 @@ macro_rules! SearchSysCacheList2 {
         /* PGRX: SearchSysCacheList2 remains expanded because SearchSysCacheList is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11508,6 +12275,17 @@ macro_rules! SearchSysCacheList2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SearchSysCacheList3 {
@@ -11779,8 +12557,30 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
 /// ```text
 /// #define SearchSysCacheList3( cacheId , key1 , key2 , key3 ) SearchSysCacheList ( cacheId , 3 , key1 , key2 , key3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SearchSysCacheList3 {
+    (@__pgrx_emit_check_safety; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                $crate::__pgrx_c_operand!(@check_safety; $key1);
+                $crate::__pgrx_c_operand!(@check_safety; $key2);
+                $crate::__pgrx_c_operand!(@check_safety; $key3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SearchSysCacheList3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SearchSysCacheList3!(@__pgrx_emit_value; $cacheId, $key1, $key2, $key3)
@@ -11895,6 +12695,14 @@ macro_rules! SearchSysCacheList3 {
         /* PGRX: SearchSysCacheList3 remains expanded because SearchSysCacheList is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cacheId);
+                        $crate::__pgrx_c_operand!(@check_safety; $key1);
+                        $crate::__pgrx_c_operand!(@check_safety; $key2);
+                        $crate::__pgrx_c_operand!(@check_safety; $key3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_boolVal {
@@ -102,8 +113,27 @@ macro_rules! __pgrx_c_args_boolVal {
 /// ```text
 /// #define boolVal( v ) ( castNode ( Boolean , v ) -> boolval )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! boolVal {
+    (@__pgrx_emit_check_safety; $v:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $v);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_boolVal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $v:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::boolVal!(@__pgrx_emit_value; $v))
     };
@@ -113,7 +143,7 @@ macro_rules! boolVal {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field757,
+                        $crate::__pgrx_c_generated::Field_boolval,
                         _,
                         _
                     >(
@@ -152,7 +182,7 @@ macro_rules! boolVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field757,
+                $crate::__pgrx_c_generated::Field_boolval,
                 _,
                 _
             >(
@@ -186,7 +216,7 @@ macro_rules! boolVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field757,
+                $crate::__pgrx_c_generated::Field_boolval,
                 _,
                 _
             >(
@@ -220,10 +250,15 @@ macro_rules! boolVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $v);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field757,
+                            $crate::__pgrx_c_generated::Field_boolval,
                             _,
                             _
                         >(
@@ -267,7 +302,7 @@ macro_rules! boolVal {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field757,
+                        $crate::__pgrx_c_generated::Field_boolval,
                         _,
                         _
                     >(
@@ -315,6 +350,17 @@ macro_rules! boolVal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_floatVal {
@@ -407,8 +453,27 @@ macro_rules! __pgrx_c_args_floatVal {
 /// ```text
 /// #define floatVal( v ) atof ( castNode ( Float , v ) -> fval )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! floatVal {
+    (@__pgrx_emit_check_safety; $v:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $v);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_floatVal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $v:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::floatVal!(@__pgrx_emit_value; $v)
@@ -420,7 +485,7 @@ macro_rules! floatVal {
             <
                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_18be5a20915ae66d34a9445e33cd21c1(
+                $crate::__pgrx_c_generated::Inline_f0d49af47247f79f1ae7811c8c10fc1e(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::CChar,
@@ -437,7 +502,7 @@ macro_rules! floatVal {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2119,
+                                        $crate::__pgrx_c_generated::Field_fval,
                                         _,
                                         _
                                     >(
@@ -500,13 +565,18 @@ macro_rules! floatVal {
         /* PGRX: floatVal remains expanded because atof is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $v);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_18be5a20915ae66d34a9445e33cd21c1(
+                                $crate::__pgrx_c_generated::Inline_f0d49af47247f79f1ae7811c8c10fc1e(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::CChar,
@@ -526,7 +596,7 @@ macro_rules! floatVal {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2119,
+                                                        $crate::__pgrx_c_generated::Field_fval,
                                                         _,
                                                         _
                                                     >(
@@ -586,7 +656,7 @@ macro_rules! floatVal {
                 <
                     $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_18be5a20915ae66d34a9445e33cd21c1(
+                    $crate::__pgrx_c_generated::Inline_f0d49af47247f79f1ae7811c8c10fc1e(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::CChar,
@@ -603,7 +673,7 @@ macro_rules! floatVal {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2119,
+                                            $crate::__pgrx_c_generated::Field_fval,
                                             _,
                                             _
                                         >(
@@ -664,6 +734,17 @@ macro_rules! floatVal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_intVal {
@@ -754,8 +835,27 @@ macro_rules! __pgrx_c_args_intVal {
 /// ```text
 /// #define intVal( v ) ( castNode ( Integer , v ) -> ival )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! intVal {
+    (@__pgrx_emit_check_safety; $v:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $v);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_intVal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $v:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::intVal!(@__pgrx_emit_value; $v))
     };
@@ -765,7 +865,7 @@ macro_rules! intVal {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2850,
+                        $crate::__pgrx_c_generated::Field_ival,
                         _,
                         _
                     >(
@@ -804,7 +904,7 @@ macro_rules! intVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2850,
+                $crate::__pgrx_c_generated::Field_ival,
                 _,
                 _
             >(
@@ -838,7 +938,7 @@ macro_rules! intVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2850,
+                $crate::__pgrx_c_generated::Field_ival,
                 _,
                 _
             >(
@@ -872,10 +972,15 @@ macro_rules! intVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $v);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2850,
+                            $crate::__pgrx_c_generated::Field_ival,
                             _,
                             _
                         >(
@@ -919,7 +1024,7 @@ macro_rules! intVal {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2850,
+                        $crate::__pgrx_c_generated::Field_ival,
                         _,
                         _
                     >(
@@ -967,6 +1072,17 @@ macro_rules! intVal {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_strVal {
@@ -1057,8 +1173,27 @@ macro_rules! __pgrx_c_args_strVal {
 /// ```text
 /// #define strVal( v ) ( castNode ( String , v ) -> sval )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! strVal {
+    (@__pgrx_emit_check_safety; $v:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $v);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_strVal!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $v:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::strVal!(@__pgrx_emit_value; $v))
     };
@@ -1068,7 +1203,7 @@ macro_rules! strVal {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5822,
+                        $crate::__pgrx_c_generated::Field_sval,
                         _,
                         _
                     >(
@@ -1107,7 +1242,7 @@ macro_rules! strVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5822,
+                $crate::__pgrx_c_generated::Field_sval,
                 _,
                 _
             >(
@@ -1141,7 +1276,7 @@ macro_rules! strVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5822,
+                $crate::__pgrx_c_generated::Field_sval,
                 _,
                 _
             >(
@@ -1175,10 +1310,15 @@ macro_rules! strVal {
         /* PGRX: castNode remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $v);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5822,
+                            $crate::__pgrx_c_generated::Field_sval,
                             _,
                             _
                         >(
@@ -1222,7 +1362,7 @@ macro_rules! strVal {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5822,
+                        $crate::__pgrx_c_generated::Field_sval,
                         _,
                         _
                     >(

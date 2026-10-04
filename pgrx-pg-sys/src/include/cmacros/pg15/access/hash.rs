@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BMPGSZ_BIT {
@@ -107,8 +118,27 @@ macro_rules! __pgrx_c_args_BMPGSZ_BIT {
 /// ```text
 /// #define BMPGSZ_BIT( metap ) ( ( metap ) -> hashm_bmsize << BYTE_TO_BIT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BMPGSZ_BIT {
+    (@__pgrx_emit_check_safety; $metap:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $metap);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BMPGSZ_BIT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BMPGSZ_BIT!(@__pgrx_emit_value; $metap)
@@ -121,7 +151,7 @@ macro_rules! BMPGSZ_BIT {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2106,
+                                $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                 _,
                                 _
                             >(
@@ -163,6 +193,11 @@ macro_rules! BMPGSZ_BIT {
     (@__pgrx_emit_size; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $metap);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -174,7 +209,7 @@ macro_rules! BMPGSZ_BIT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2106,
+                                            $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                             _,
                                             _
                                         >(
@@ -218,7 +253,7 @@ macro_rules! BMPGSZ_BIT {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2106,
+                                $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                 _,
                                 _
                             >(
@@ -258,6 +293,17 @@ macro_rules! BMPGSZ_BIT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BMPGSZ_BYTE {
@@ -353,8 +399,23 @@ macro_rules! __pgrx_c_args_BMPGSZ_BYTE {
 /// ```text
 /// #define BMPGSZ_BYTE( metap ) ( ( metap ) -> hashm_bmsize )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BMPGSZ_BYTE {
+    (@__pgrx_emit_check_safety; $metap:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $metap);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BMPGSZ_BYTE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BMPGSZ_BYTE!(@__pgrx_emit_value; $metap)
@@ -365,7 +426,7 @@ macro_rules! BMPGSZ_BYTE {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2106,
+                        $crate::__pgrx_c_generated::Field_hashm_bmsize,
                         _,
                         _
                     >(
@@ -387,7 +448,7 @@ macro_rules! BMPGSZ_BYTE {
     (@__pgrx_emit_place; $metap:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2106,
+                $crate::__pgrx_c_generated::Field_hashm_bmsize,
                 _,
                 _
             >(
@@ -407,7 +468,7 @@ macro_rules! BMPGSZ_BYTE {
     (@__pgrx_emit_read_place; $metap:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2106,
+                $crate::__pgrx_c_generated::Field_hashm_bmsize,
                 _,
                 _
             >(
@@ -427,10 +488,15 @@ macro_rules! BMPGSZ_BYTE {
     (@__pgrx_emit_size; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $metap);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2106,
+                            $crate::__pgrx_c_generated::Field_hashm_bmsize,
                             _,
                             _
                         >(
@@ -457,7 +523,7 @@ macro_rules! BMPGSZ_BYTE {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2106,
+                        $crate::__pgrx_c_generated::Field_hashm_bmsize,
                         _,
                         _
                     >(
@@ -489,6 +555,17 @@ macro_rules! BMPGSZ_BYTE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BMPG_MASK {
@@ -581,8 +658,27 @@ macro_rules! __pgrx_c_args_BMPG_MASK {
 /// ```text
 /// #define BMPG_MASK( metap ) ( BMPGSZ_BIT ( metap ) - 1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BMPG_MASK {
+    (@__pgrx_emit_check_safety; $metap:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $metap);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BMPG_MASK!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BMPG_MASK!(@__pgrx_emit_value; $metap)
@@ -603,7 +699,7 @@ macro_rules! BMPG_MASK {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2106,
+                                            $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                             _,
                                             _
                                         >(
@@ -657,6 +753,11 @@ macro_rules! BMPG_MASK {
         /* PGRX: BMPGSZ_BIT remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $metap);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -678,7 +779,7 @@ macro_rules! BMPG_MASK {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2106,
+                                                        $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                                         _,
                                                         _
                                                     >(
@@ -741,7 +842,7 @@ macro_rules! BMPG_MASK {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2106,
+                                            $crate::__pgrx_c_generated::Field_hashm_bmsize,
                                             _,
                                             _
                                         >(
@@ -792,6 +893,17 @@ macro_rules! BMPG_MASK {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BMPG_SHIFT {
@@ -887,8 +999,23 @@ macro_rules! __pgrx_c_args_BMPG_SHIFT {
 /// ```text
 /// #define BMPG_SHIFT( metap ) ( ( metap ) -> hashm_bmshift )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BMPG_SHIFT {
+    (@__pgrx_emit_check_safety; $metap:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $metap);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BMPG_SHIFT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BMPG_SHIFT!(@__pgrx_emit_value; $metap)
@@ -899,7 +1026,7 @@ macro_rules! BMPG_SHIFT {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2105,
+                        $crate::__pgrx_c_generated::Field_hashm_bmshift,
                         _,
                         _
                     >(
@@ -921,7 +1048,7 @@ macro_rules! BMPG_SHIFT {
     (@__pgrx_emit_place; $metap:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2105,
+                $crate::__pgrx_c_generated::Field_hashm_bmshift,
                 _,
                 _
             >(
@@ -941,7 +1068,7 @@ macro_rules! BMPG_SHIFT {
     (@__pgrx_emit_read_place; $metap:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2105,
+                $crate::__pgrx_c_generated::Field_hashm_bmshift,
                 _,
                 _
             >(
@@ -961,10 +1088,15 @@ macro_rules! BMPG_SHIFT {
     (@__pgrx_emit_size; $metap:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $metap);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2105,
+                            $crate::__pgrx_c_generated::Field_hashm_bmshift,
                             _,
                             _
                         >(
@@ -991,7 +1123,7 @@ macro_rules! BMPG_SHIFT {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2105,
+                        $crate::__pgrx_c_generated::Field_hashm_bmshift,
                         _,
                         _
                     >(
@@ -1023,6 +1155,17 @@ macro_rules! BMPG_SHIFT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BUCKET_TO_BLKNO {
@@ -1186,8 +1329,28 @@ macro_rules! __pgrx_c_args_BUCKET_TO_BLKNO {
 /// ```text
 /// #define BUCKET_TO_BLKNO( metap , B ) ( ( BlockNumber ) ( ( B ) + ( ( B ) ? ( metap ) -> hashm_spares [ _hash_spareindex ( ( B ) + 1 ) - 1 ] : 0 ) ) + 1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BUCKET_TO_BLKNO {
+    (@__pgrx_emit_check_safety; $metap:tt, $B:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $metap);
+                $crate::__pgrx_c_operand!(@check_safety; $B);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BUCKET_TO_BLKNO!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $metap:tt, $B:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BUCKET_TO_BLKNO!(@__pgrx_emit_value; $metap, $B)
@@ -1248,7 +1411,7 @@ macro_rules! BUCKET_TO_BLKNO {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2119,
+                                                                                    $crate::__pgrx_c_generated::Field_hashm_spares,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -1394,6 +1557,12 @@ macro_rules! BUCKET_TO_BLKNO {
     (@__pgrx_emit_size; $metap:tt, $B:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $metap);
+                        $crate::__pgrx_c_operand!(@check_safety; $B);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1461,7 +1630,7 @@ macro_rules! BUCKET_TO_BLKNO {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2119,
+                                                                                                $crate::__pgrx_c_generated::Field_hashm_spares,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -1656,7 +1825,7 @@ macro_rules! BUCKET_TO_BLKNO {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2119,
+                                                                                    $crate::__pgrx_c_generated::Field_hashm_spares,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -1800,6 +1969,17 @@ macro_rules! BUCKET_TO_BLKNO {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_CLRBIT {
@@ -1927,8 +2107,28 @@ macro_rules! __pgrx_c_args_CLRBIT {
 /// ```text
 /// #define CLRBIT( A , N ) ( ( A ) [ ( N ) / BITS_PER_MAP ] &= ~ ( 1 << ( ( N ) % BITS_PER_MAP ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! CLRBIT {
+    (@__pgrx_emit_check_safety; $A:tt, $N:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $A);
+                $crate::__pgrx_c_operand!(@check_safety; $N);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_CLRBIT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::CLRBIT!(@__pgrx_emit_value; $A, $N)
@@ -2033,6 +2233,12 @@ macro_rules! CLRBIT {
     (@__pgrx_emit_size; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $A);
+                        $crate::__pgrx_c_operand!(@check_safety; $N);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2232,6 +2438,17 @@ macro_rules! CLRBIT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_H_BUCKET_BEING_POPULATED {
@@ -2356,8 +2573,26 @@ macro_rules! __pgrx_c_args_H_BUCKET_BEING_POPULATED {
 /// ```text
 /// #define H_BUCKET_BEING_POPULATED( opaque ) ( ( ( opaque ) -> hasho_flag & LH_BUCKET_BEING_POPULATED ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! H_BUCKET_BEING_POPULATED {
+    (@__pgrx_emit_check_safety; $opaque:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $opaque);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_H_BUCKET_BEING_POPULATED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::H_BUCKET_BEING_POPULATED!(@__pgrx_emit_value; $opaque)
@@ -2373,7 +2608,7 @@ macro_rules! H_BUCKET_BEING_POPULATED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -2433,6 +2668,11 @@ macro_rules! H_BUCKET_BEING_POPULATED {
     (@__pgrx_emit_size; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $opaque);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2446,7 +2686,7 @@ macro_rules! H_BUCKET_BEING_POPULATED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2123,
+                                                        $crate::__pgrx_c_generated::Field_hasho_flag,
                                                         _,
                                                         _
                                                     >(
@@ -2506,7 +2746,7 @@ macro_rules! H_BUCKET_BEING_POPULATED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -2561,6 +2801,17 @@ macro_rules! H_BUCKET_BEING_POPULATED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_H_BUCKET_BEING_SPLIT {
@@ -2675,8 +2926,23 @@ macro_rules! __pgrx_c_args_H_BUCKET_BEING_SPLIT {
 /// ```text
 /// #define H_BUCKET_BEING_SPLIT( opaque ) ( ( ( opaque ) -> hasho_flag & LH_BUCKET_BEING_SPLIT ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! H_BUCKET_BEING_SPLIT {
+    (@__pgrx_emit_check_safety; $opaque:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $opaque);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_H_BUCKET_BEING_SPLIT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::H_BUCKET_BEING_SPLIT!(@__pgrx_emit_value; $opaque)
@@ -2692,7 +2958,7 @@ macro_rules! H_BUCKET_BEING_SPLIT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -2749,6 +3015,11 @@ macro_rules! H_BUCKET_BEING_SPLIT {
     (@__pgrx_emit_size; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $opaque);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2762,7 +3033,7 @@ macro_rules! H_BUCKET_BEING_SPLIT {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2123,
+                                                        $crate::__pgrx_c_generated::Field_hasho_flag,
                                                         _,
                                                         _
                                                     >(
@@ -2822,7 +3093,7 @@ macro_rules! H_BUCKET_BEING_SPLIT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -2877,6 +3148,17 @@ macro_rules! H_BUCKET_BEING_SPLIT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_H_HAS_DEAD_TUPLES {
@@ -2986,8 +3268,23 @@ macro_rules! __pgrx_c_args_H_HAS_DEAD_TUPLES {
 /// ```text
 /// #define H_HAS_DEAD_TUPLES( opaque ) ( ( ( opaque ) -> hasho_flag & LH_PAGE_HAS_DEAD_TUPLES ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! H_HAS_DEAD_TUPLES {
+    (@__pgrx_emit_check_safety; $opaque:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $opaque);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_H_HAS_DEAD_TUPLES!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::H_HAS_DEAD_TUPLES!(@__pgrx_emit_value; $opaque)
@@ -3003,7 +3300,7 @@ macro_rules! H_HAS_DEAD_TUPLES {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -3060,6 +3357,11 @@ macro_rules! H_HAS_DEAD_TUPLES {
     (@__pgrx_emit_size; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $opaque);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3073,7 +3375,7 @@ macro_rules! H_HAS_DEAD_TUPLES {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2123,
+                                                        $crate::__pgrx_c_generated::Field_hasho_flag,
                                                         _,
                                                         _
                                                     >(
@@ -3133,7 +3435,7 @@ macro_rules! H_HAS_DEAD_TUPLES {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -3188,6 +3490,17 @@ macro_rules! H_HAS_DEAD_TUPLES {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_H_NEEDS_SPLIT_CLEANUP {
@@ -3302,8 +3615,23 @@ macro_rules! __pgrx_c_args_H_NEEDS_SPLIT_CLEANUP {
 /// ```text
 /// #define H_NEEDS_SPLIT_CLEANUP( opaque ) ( ( ( opaque ) -> hasho_flag & LH_BUCKET_NEEDS_SPLIT_CLEANUP ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! H_NEEDS_SPLIT_CLEANUP {
+    (@__pgrx_emit_check_safety; $opaque:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $opaque);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_H_NEEDS_SPLIT_CLEANUP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::H_NEEDS_SPLIT_CLEANUP!(@__pgrx_emit_value; $opaque)
@@ -3319,7 +3647,7 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -3376,6 +3704,11 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
     (@__pgrx_emit_size; $opaque:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $opaque);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3389,7 +3722,7 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2123,
+                                                        $crate::__pgrx_c_generated::Field_hasho_flag,
                                                         _,
                                                         _
                                                     >(
@@ -3449,7 +3782,7 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2123,
+                                            $crate::__pgrx_c_generated::Field_hasho_flag,
                                             _,
                                             _
                                         >(
@@ -3504,6 +3837,17 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HashGetMaxBitmapSize {
@@ -3613,8 +3957,27 @@ macro_rules! __pgrx_c_args_HashGetMaxBitmapSize {
 /// ```text
 /// #define HashGetMaxBitmapSize( page ) ( PageGetPageSize ( ( Page ) page ) - ( MAXALIGN ( SizeOfPageHeaderData ) + MAXALIGN ( sizeof ( HashPageOpaqueData ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashGetMaxBitmapSize {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HashGetMaxBitmapSize!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HashGetMaxBitmapSize!(@__pgrx_emit_value; $page)
@@ -3644,7 +4007,7 @@ macro_rules! HashGetMaxBitmapSize {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3886,
+                                                        $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                         _,
                                                         _
                                                     >(
@@ -3672,7 +4035,10 @@ macro_rules! HashGetMaxBitmapSize {
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                     $crate::Page,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -4021,6 +4387,11 @@ macro_rules! HashGetMaxBitmapSize {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetPageSize remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4051,7 +4422,7 @@ macro_rules! HashGetMaxBitmapSize {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field3886,
+                                                                    $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                     _,
                                                                     _
                                                                 >(
@@ -4079,7 +4450,10 @@ macro_rules! HashGetMaxBitmapSize {
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                 $crate::Page,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
                                                                                                 _
@@ -4451,7 +4825,7 @@ macro_rules! HashGetMaxBitmapSize {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3886,
+                                                        $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                         _,
                                                         _
                                                     >(
@@ -4479,7 +4853,10 @@ macro_rules! HashGetMaxBitmapSize {
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                     $crate::Page,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
                                                                                     _
@@ -4825,6 +5202,17 @@ macro_rules! HashGetMaxBitmapSize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HashMaxItemSize {
@@ -4934,8 +5322,27 @@ macro_rules! __pgrx_c_args_HashMaxItemSize {
 /// ```text
 /// #define HashMaxItemSize( page ) MAXALIGN_DOWN ( PageGetPageSize ( page ) - SizeOfPageHeaderData - sizeof ( ItemIdData ) - MAXALIGN ( sizeof ( HashPageOpaqueData ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashMaxItemSize {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HashMaxItemSize!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HashMaxItemSize!(@__pgrx_emit_value; $page)
@@ -4990,7 +5397,7 @@ macro_rules! HashMaxItemSize {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -5217,6 +5624,11 @@ macro_rules! HashMaxItemSize {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $page);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5268,7 +5680,7 @@ macro_rules! HashMaxItemSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -5562,7 +5974,7 @@ macro_rules! HashMaxItemSize {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -5789,6 +6201,11 @@ macro_rules! HashMaxItemSize {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $page);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5840,7 +6257,7 @@ macro_rules! HashMaxItemSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -6134,7 +6551,7 @@ macro_rules! HashMaxItemSize {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -6361,6 +6778,11 @@ macro_rules! HashMaxItemSize {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $page);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6412,7 +6834,7 @@ macro_rules! HashMaxItemSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -6706,7 +7128,7 @@ macro_rules! HashMaxItemSize {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -6933,6 +7355,11 @@ macro_rules! HashMaxItemSize {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $page);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6984,7 +7411,7 @@ macro_rules! HashMaxItemSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -7278,7 +7705,7 @@ macro_rules! HashMaxItemSize {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -7505,6 +7932,11 @@ macro_rules! HashMaxItemSize {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $page);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7556,7 +7988,7 @@ macro_rules! HashMaxItemSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3886,
+                                                                                                $crate::__pgrx_c_generated::Field_pd_pagesize_version,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -7814,6 +8246,17 @@ macro_rules! HashMaxItemSize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HashPageGetBitmap {
@@ -7923,8 +8366,27 @@ macro_rules! __pgrx_c_args_HashPageGetBitmap {
 /// ```text
 /// #define HashPageGetBitmap( page ) ( ( uint32 * ) PageGetContents ( page ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashPageGetBitmap {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HashPageGetBitmap!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HashPageGetBitmap!(@__pgrx_emit_value; $page)
@@ -8127,6 +8589,11 @@ macro_rules! HashPageGetBitmap {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8519,6 +8986,17 @@ macro_rules! HashPageGetBitmap {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HashPageGetMeta {
@@ -8628,8 +9106,27 @@ macro_rules! __pgrx_c_args_HashPageGetMeta {
 /// ```text
 /// #define HashPageGetMeta( page ) ( ( HashMetaPage ) PageGetContents ( page ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashPageGetMeta {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HashPageGetMeta!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HashPageGetMeta!(@__pgrx_emit_value; $page)
@@ -8832,6 +9329,11 @@ macro_rules! HashPageGetMeta {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9226,6 +9728,17 @@ macro_rules! HashPageGetMeta {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HashScanPosInvalidate {
@@ -9343,15 +9856,29 @@ macro_rules! __pgrx_c_args_HashScanPosInvalidate {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! HashScanPosInvalidate {
+    (@__pgrx_emit_check_safety; $scanpos:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HashScanPosInvalidate!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $scanpos:tt $(,)?) => {
         {
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field741,
+                            $crate::__pgrx_c_generated::Field_buf,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9369,7 +9896,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1167,
+                            $crate::__pgrx_c_generated::Field_currPage,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9386,7 +9913,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3272,
+                            $crate::__pgrx_c_generated::Field_nextPage,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9403,7 +9930,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4048,
+                            $crate::__pgrx_c_generated::Field_prevPage,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9420,7 +9947,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1734,
+                            $crate::__pgrx_c_generated::Field_firstItem,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9438,7 +9965,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2700,
+                            $crate::__pgrx_c_generated::Field_lastItem,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9456,7 +9983,7 @@ macro_rules! HashScanPosInvalidate {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2594,
+                            $crate::__pgrx_c_generated::Field_itemIndex,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
@@ -9494,6 +10021,17 @@ macro_rules! HashScanPosInvalidate {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ISSET {
@@ -9619,8 +10157,28 @@ macro_rules! __pgrx_c_args_ISSET {
 /// ```text
 /// #define ISSET( A , N ) ( ( A ) [ ( N ) / BITS_PER_MAP ] & ( 1 << ( ( N ) % BITS_PER_MAP ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ISSET {
+    (@__pgrx_emit_check_safety; $A:tt, $N:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $A);
+                $crate::__pgrx_c_operand!(@check_safety; $N);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ISSET!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ISSET!(@__pgrx_emit_value; $A, $N)
@@ -9716,6 +10274,12 @@ macro_rules! ISSET {
     (@__pgrx_emit_size; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $A);
+                        $crate::__pgrx_c_operand!(@check_safety; $N);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9904,6 +10468,17 @@ macro_rules! ISSET {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SETBIT {
@@ -10031,8 +10606,28 @@ macro_rules! __pgrx_c_args_SETBIT {
 /// ```text
 /// #define SETBIT( A , N ) ( ( A ) [ ( N ) / BITS_PER_MAP ] |= ( 1 << ( ( N ) % BITS_PER_MAP ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SETBIT {
+    (@__pgrx_emit_check_safety; $A:tt, $N:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $A);
+                $crate::__pgrx_c_operand!(@check_safety; $N);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SETBIT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SETBIT!(@__pgrx_emit_value; $A, $N)
@@ -10122,6 +10717,12 @@ macro_rules! SETBIT {
     (@__pgrx_emit_size; $A:tt, $N:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $A);
+                        $crate::__pgrx_c_operand!(@check_safety; $N);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

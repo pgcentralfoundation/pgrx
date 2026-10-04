@@ -158,22 +158,22 @@ pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
 pub const DEF_PGPORT: u32 = 28819;
 pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"28819";
-pub const DLSUFFIX: &::core::ffi::CStr = c".so";
+pub const DLSUFFIX: &::core::ffi::CStr = c".dylib";
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta4";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta1";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19beta4";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19beta1";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"19";
 pub const PG_MAJORVERSION_NUM: u32 = 19;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"19beta4";
+pub const PG_VERSION: &::core::ffi::CStr = c"19beta1";
 pub const PG_VERSION_NUM: u32 = 190000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta1 on aarch64-apple-darwin25.4.0, compiled by Apple clang version 21.0.0 (clang-2100.0.123.102), 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_INTMAX_T: u32 = 8;
 pub const SIZEOF_LONG: u32 = 8;
@@ -182,14 +182,14 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
+pub const STRERROR_R_INT: u32 = 1;
+pub const USE_ARMV8_CRC32C: u32 = 1;
 pub const USE_ASSERT_CHECKING: u32 = 1;
-pub const USE_AVX2_WITH_RUNTIME_CHECK: u32 = 1;
-pub const USE_AVX512_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
-pub const USE_AVX512_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_ICU: u32 = 1;
-pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_PMULL_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_SVE_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_SYSV_SEMAPHORES: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
-pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const SLRU_PAGES_PER_SEGMENT: u32 = 32;
@@ -203,16 +203,56 @@ pub const MAXPGPATH: u32 = 1024;
 pub const BITS_PER_BYTE: u32 = 8;
 pub const ALIGNOF_BUFFER: u32 = 32;
 pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
-pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
+pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 0;
+pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 0;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
 pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/tmp";
 pub const DEFAULT_EVENT_SOURCE: &::core::ffi::CStr = c"PostgreSQL";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const PG_IO_ALIGN_SIZE: u32 = 4096;
+pub const __darwin__: u32 = 1;
 pub const SIG_ATOMIC_MIN: i32 = -2147483648;
 pub const SIG_ATOMIC_MAX: u32 = 2147483647;
-pub const SIG_ATOMIC_WIDTH: u32 = 32;
+pub const SIGHUP: u32 = 1;
+pub const SIGINT: u32 = 2;
+pub const SIGQUIT: u32 = 3;
+pub const SIGILL: u32 = 4;
+pub const SIGTRAP: u32 = 5;
+pub const SIGABRT: u32 = 6;
+pub const SIGIOT: u32 = 6;
+pub const SIGEMT: u32 = 7;
+pub const SIGFPE: u32 = 8;
+pub const SIGKILL: u32 = 9;
+pub const SIGBUS: u32 = 10;
+pub const SIGSEGV: u32 = 11;
+pub const SIGSYS: u32 = 12;
+pub const SIGPIPE: u32 = 13;
+pub const SIGALRM: u32 = 14;
+pub const SIGTERM: u32 = 15;
+pub const SIGURG: u32 = 16;
+pub const SIGSTOP: u32 = 17;
+pub const SIGTSTP: u32 = 18;
+pub const SIGCONT: u32 = 19;
+pub const SIGCHLD: u32 = 20;
+pub const SIGTTIN: u32 = 21;
+pub const SIGTTOU: u32 = 22;
+pub const SIGIO: u32 = 23;
+pub const SIGXCPU: u32 = 24;
+pub const SIGXFSZ: u32 = 25;
+pub const SIGVTALRM: u32 = 26;
+pub const SIGPROF: u32 = 27;
+pub const SIGWINCH: u32 = 28;
+pub const SIGINFO: u32 = 29;
+pub const SIGUSR1: u32 = 30;
+pub const SIGUSR2: u32 = 31;
+pub const SIGEV_NONE: u32 = 0;
+pub const SIGEV_SIGNAL: u32 = 1;
+pub const SIGEV_THREAD: u32 = 3;
+pub const SIGEV_KEVENT: u32 = 4;
+pub const SIG_BLOCK: u32 = 1;
+pub const SIG_UNBLOCK: u32 = 2;
+pub const SIG_SETMASK: u32 = 3;
+pub const SIGSTKSZ: u32 = 131072;
 pub const PG_DIAG_SEVERITY: u8 = 83u8;
 pub const PG_DIAG_SEVERITY_NONLOCALIZED: u8 = 86u8;
 pub const PG_DIAG_SQLSTATE: u8 = 67u8;
@@ -231,9 +271,9 @@ pub const PG_DIAG_CONSTRAINT_NAME: u8 = 110u8;
 pub const PG_DIAG_SOURCE_FILE: u8 = 70u8;
 pub const PG_DIAG_SOURCE_LINE: u8 = 76u8;
 pub const PG_DIAG_SOURCE_FUNCTION: u8 = 82u8;
-pub const INT64_FORMAT: &::core::ffi::CStr = c"%ld";
-pub const UINT64_FORMAT: &::core::ffi::CStr = c"%lu";
-pub const OID8_FORMAT: &::core::ffi::CStr = c"%lu";
+pub const INT64_FORMAT: &::core::ffi::CStr = c"%lld";
+pub const UINT64_FORMAT: &::core::ffi::CStr = c"%llu";
+pub const OID8_FORMAT: &::core::ffi::CStr = c"%llu";
 pub const PG_INT8_MIN: i32 = -128;
 pub const PG_INT8_MAX: u32 = 127;
 pub const PG_UINT8_MAX: u32 = 255;
@@ -243,7 +283,11 @@ pub const PG_UINT16_MAX: u32 = 65535;
 pub const PG_INT32_MIN: i32 = -2147483648;
 pub const PG_INT32_MAX: u32 = 2147483647;
 pub const PG_UINT32_MAX: u32 = 4294967295;
+pub const PG_INT64_MIN: i64 = -9223372036854775808;
+pub const PG_INT64_MAX: u64 = 9223372036854775807;
+pub const PG_UINT64_MAX: i32 = -1;
 pub const FLOAT8PASSBYVAL: u32 = 1;
+pub const OID8_MAX: i32 = -1;
 pub const HIGHBIT: u32 = 128;
 pub const ESCAPE_STRING_SYNTAX: u8 = 69u8;
 pub const STATUS_OK: u32 = 0;
@@ -254,7 +298,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19beta4\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19beta1\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -407,7 +451,7 @@ pub const ATTNULLABLE_UNRESTRICTED: u8 = 102u8;
 pub const ATTNULLABLE_UNKNOWN: u8 = 117u8;
 pub const ATTNULLABLE_VALID: u8 = 118u8;
 pub const ATTNULLABLE_INVALID: u8 = 105u8;
-pub const CATALOG_VERSION_NO: u32 = 202609165;
+pub const CATALOG_VERSION_NO: u32 = 202605131;
 pub const PG_TBLSPC_DIR: &::core::ffi::CStr = c"pg_tblspc";
 pub const PG_TBLSPC_DIR_SLASH: &::core::ffi::CStr = c"pg_tblspc/";
 pub const OIDCHARS: u32 = 10;
@@ -455,7 +499,7 @@ pub const PIV_LOG_LOG: u32 = 2;
 pub const PIV_IGNORE_CHECKSUM_FAILURE: u32 = 4;
 pub const PIV_ZERO_BUFFERS_ON_ERROR: u32 = 8;
 pub const SIZEOF_DSA_POINTER: u32 = 8;
-pub const DSA_POINTER_FORMAT: &::core::ffi::CStr = c"%016lx";
+pub const DSA_POINTER_FORMAT: &::core::ffi::CStr = c"%016llx";
 pub const DSA_ALLOC_HUGE: u32 = 1;
 pub const DSA_ALLOC_NO_OOM: u32 = 2;
 pub const DSA_ALLOC_ZERO: u32 = 4;
@@ -586,6 +630,10 @@ pub const SECS_PER_MINUTE: u32 = 60;
 pub const MINS_PER_HOUR: u32 = 60;
 pub const MAX_TZDISP_HOUR: u32 = 15;
 pub const TZDISP_LIMIT: u32 = 57600;
+pub const TIMESTAMP_MINUS_INFINITY: i64 = -9223372036854775808;
+pub const TIMESTAMP_INFINITY: u64 = 9223372036854775807;
+pub const DT_NOBEGIN: i64 = -9223372036854775808;
+pub const DT_NOEND: u64 = 9223372036854775807;
 pub const JULIAN_MINYEAR: i32 = -4713;
 pub const JULIAN_MINMONTH: u32 = 11;
 pub const JULIAN_MINDAY: u32 = 24;
@@ -686,6 +734,7 @@ pub const RELKIND_COMPOSITE_TYPE: u8 = 99u8;
 pub const RELKIND_FOREIGN_TABLE: u8 = 102u8;
 pub const RELKIND_PARTITIONED_TABLE: u8 = 112u8;
 pub const RELKIND_PARTITIONED_INDEX: u8 = 73u8;
+pub const RELKIND_PROPGRAPH: u8 = 103u8;
 pub const RELPERSISTENCE_PERMANENT: u8 = 112u8;
 pub const RELPERSISTENCE_UNLOGGED: u8 = 117u8;
 pub const RELPERSISTENCE_TEMP: u8 = 116u8;
@@ -726,7 +775,6 @@ pub const INNER_VAR: i32 = -1;
 pub const OUTER_VAR: i32 = -2;
 pub const INDEX_VAR: i32 = -3;
 pub const ROWID_VAR: i32 = -4;
-pub const INVALID_VAR: i32 = -5;
 pub const PRS2_OLD_VARNO: u32 = 1;
 pub const PRS2_NEW_VARNO: u32 = 2;
 pub const NO_NULLTREATMENT: u32 = 0;
@@ -794,6 +842,7 @@ pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
 pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
 pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
 pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
+pub const FETCH_ALL: u64 = 9223372036854775807;
 pub const PublicationRelationId: Oid = Oid(6104);
 pub const PublicationObjectIndexId: u32 = 6110;
 pub const PublicationNameIndexId: u32 = 6111;
@@ -1213,7 +1262,7 @@ pub const IO_DIRECT_DATA: u32 = 1;
 pub const IO_DIRECT_WAL: u32 = 2;
 pub const IO_DIRECT_WAL_INIT: u32 = 4;
 pub const DEFAULT_FILE_EXTEND_METHOD: u32 = 0;
-pub const PG_O_DIRECT: u32 = 16384;
+pub const PG_O_DIRECT: u32 = 2147483648;
 pub const GIST_MAX_SPLIT_PAGES: u32 = 75;
 pub const GIST_ROOT_BLKNO: u32 = 0;
 pub const TUPLE_IS_VALID: u32 = 65535;
@@ -1271,44 +1320,6 @@ pub const XLOG_HASH_UPDATE_META_PAGE: u32 = 176;
 pub const XLOG_HASH_VACUUM_ONE_PAGE: u32 = 192;
 pub const XLH_SPLIT_META_UPDATE_MASKS: u32 = 1;
 pub const XLH_SPLIT_META_UPDATE_SPLITPOINT: u32 = 2;
-pub const SIGINT: u32 = 2;
-pub const SIGILL: u32 = 4;
-pub const SIGABRT: u32 = 6;
-pub const SIGFPE: u32 = 8;
-pub const SIGSEGV: u32 = 11;
-pub const SIGTERM: u32 = 15;
-pub const SIGHUP: u32 = 1;
-pub const SIGQUIT: u32 = 3;
-pub const SIGTRAP: u32 = 5;
-pub const SIGKILL: u32 = 9;
-pub const SIGPIPE: u32 = 13;
-pub const SIGALRM: u32 = 14;
-pub const SIGIOT: u32 = 6;
-pub const SIGSTKFLT: u32 = 16;
-pub const SIGPWR: u32 = 30;
-pub const SIGBUS: u32 = 7;
-pub const SIGSYS: u32 = 31;
-pub const SIGURG: u32 = 23;
-pub const SIGSTOP: u32 = 19;
-pub const SIGTSTP: u32 = 20;
-pub const SIGCONT: u32 = 18;
-pub const SIGCHLD: u32 = 17;
-pub const SIGTTIN: u32 = 21;
-pub const SIGTTOU: u32 = 22;
-pub const SIGPOLL: u32 = 29;
-pub const SIGXFSZ: u32 = 25;
-pub const SIGXCPU: u32 = 24;
-pub const SIGVTALRM: u32 = 26;
-pub const SIGPROF: u32 = 27;
-pub const SIGUSR1: u32 = 10;
-pub const SIGUSR2: u32 = 12;
-pub const SIGWINCH: u32 = 28;
-pub const SIGIO: u32 = 29;
-pub const SIGCLD: u32 = 17;
-pub const SIG_BLOCK: u32 = 0;
-pub const SIG_UNBLOCK: u32 = 1;
-pub const SIG_SETMASK: u32 = 2;
-pub const SIGSTKSZ: u32 = 8192;
 pub const SHAREDINVALCATALOG_ID: i32 = -1;
 pub const SHAREDINVALRELCACHE_ID: i32 = -2;
 pub const SHAREDINVALSMGR_ID: i32 = -3;
@@ -1353,18 +1364,8 @@ pub const XLH_DELETE_IS_SUPER: u32 = 8;
 pub const XLH_DELETE_IS_PARTITION_MOVE: u32 = 16;
 pub const XLH_DELETE_NO_LOGICAL: u32 = 32;
 pub const XLH_DELETE_CONTAINS_OLD: u32 = 6;
-pub const HEAP_DELETE_BLKREF_HEAP: u32 = 0;
-pub const HEAP_DELETE_BLKREF_VM: u32 = 1;
 pub const XLH_TRUNCATE_CASCADE: u32 = 1;
 pub const XLH_TRUNCATE_RESTART_SEQS: u32 = 2;
-pub const HEAP_INSERT_BLKREF_HEAP: u32 = 0;
-pub const HEAP_INSERT_BLKREF_VM: u32 = 1;
-pub const HEAP_MULTI_INSERT_BLKREF_HEAP: u32 = 0;
-pub const HEAP_MULTI_INSERT_BLKREF_VM: u32 = 1;
-pub const HEAP_UPDATE_BLKREF_HEAP_NEW: u32 = 0;
-pub const HEAP_UPDATE_BLKREF_HEAP_OLD: u32 = 1;
-pub const HEAP_UPDATE_BLKREF_VM_NEW: u32 = 2;
-pub const HEAP_UPDATE_BLKREF_VM_OLD: u32 = 3;
 pub const XLHP_IS_CATALOG_REL: u32 = 2;
 pub const XLHP_CLEANUP_LOCK: u32 = 4;
 pub const XLHP_HAS_CONFLICT_HORIZON: u32 = 8;
@@ -1382,8 +1383,6 @@ pub const XLHL_XMAX_EXCL_LOCK: u32 = 4;
 pub const XLHL_XMAX_KEYSHR_LOCK: u32 = 8;
 pub const XLHL_KEYS_UPDATED: u32 = 16;
 pub const XLH_LOCK_ALL_FROZEN_CLEARED: u32 = 1;
-pub const HEAP_LOCK_BLKREF_HEAP: u32 = 0;
-pub const HEAP_LOCK_BLKREF_VM: u32 = 1;
 pub const DEFAULT_SPINS_PER_DELAY: u32 = 100;
 pub const GIDSIZE: u32 = 200;
 pub const XACT_READ_UNCOMMITTED: u32 = 0;
@@ -1681,7 +1680,7 @@ pub const BITS_PER_HEAPBLOCK: u32 = 2;
 pub const VISIBILITYMAP_ALL_VISIBLE: u32 = 1;
 pub const VISIBILITYMAP_ALL_FROZEN: u32 = 2;
 pub const VISIBILITYMAP_VALID_BITS: u32 = 3;
-pub const XLOG_PAGE_MAGIC: u32 = 53538;
+pub const XLOG_PAGE_MAGIC: u32 = 53536;
 pub const XLP_FIRST_IS_CONTRECORD: u32 = 1;
 pub const XLP_LONG_HEADER: u32 = 2;
 pub const XLP_FIRST_IS_OVERWRITE_CONTRECORD: u32 = 4;
@@ -1694,7 +1693,7 @@ pub const XLOGDIR: &::core::ffi::CStr = c"pg_wal";
 pub const XLOG_CONTROL_FILE: &::core::ffi::CStr = c"global/pg_control";
 pub const MAXFNAMELEN: u32 = 64;
 pub const XLOG_FNAME_LEN: u32 = 24;
-pub const PG_CONTROL_VERSION: u32 = 1905;
+pub const PG_CONTROL_VERSION: u32 = 1902;
 pub const MOCK_AUTH_NONCE_LEN: u32 = 32;
 pub const XLOG_CHECKPOINT_SHUTDOWN: u32 = 0;
 pub const XLOG_CHECKPOINT_ONLINE: u32 = 16;
@@ -1712,6 +1711,7 @@ pub const XLOG_ASSIGN_LSN: u32 = 192;
 pub const XLOG_OVERWRITE_CONTRECORD: u32 = 208;
 pub const XLOG_CHECKPOINT_REDO: u32 = 224;
 pub const XLOG_LOGICAL_DECODING_STATUS_CHANGE: u32 = 240;
+pub const XLOG2_CHECKSUMS: u32 = 0;
 pub const FLOATFORMAT_VALUE: f64 = 1234567.0;
 pub const PG_CONTROL_MAX_SAFE_SIZE: u32 = 512;
 pub const PG_CONTROL_FILE_SIZE: u32 = 8192;
@@ -1764,7 +1764,6 @@ pub const INDEX_CREATE_IF_NOT_EXISTS: u32 = 16;
 pub const INDEX_CREATE_PARTITIONED: u32 = 32;
 pub const INDEX_CREATE_INVALID: u32 = 64;
 pub const INDEX_CREATE_SUPPRESS_PROGRESS: u32 = 128;
-pub const INDEX_CREATE_DEFERRABLE: u32 = 256;
 pub const INDEX_CONSTR_CREATE_MARK_AS_PRIMARY: u32 = 1;
 pub const INDEX_CONSTR_CREATE_DEFERRABLE: u32 = 2;
 pub const INDEX_CONSTR_CREATE_INIT_DEFERRED: u32 = 4;
@@ -2027,6 +2026,7 @@ pub const Natts_pg_db_role_setting: u32 = 3;
 pub const EOH_HEADER_MAGIC: i32 = -1;
 pub const MAXDIM: u32 = 6;
 pub const EA_MAGIC: u32 = 689375833;
+pub const MAX_KILOBYTES: u32 = 2147483647;
 pub const PG_AUTOCONF_FILENAME: &::core::ffi::CStr = c"postgresql.auto.conf";
 pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
 pub const GUC_LIST_INPUT: u32 = 1;
@@ -2239,6 +2239,7 @@ pub const ACL_ALL_RIGHTS_FUNCTION: u32 = 128;
 pub const ACL_ALL_RIGHTS_LANGUAGE: u32 = 256;
 pub const ACL_ALL_RIGHTS_LARGEOBJECT: u32 = 6;
 pub const ACL_ALL_RIGHTS_PARAMETER_ACL: u32 = 12288;
+pub const ACL_ALL_RIGHTS_PROPGRAPH: u32 = 2;
 pub const ACL_ALL_RIGHTS_SCHEMA: u32 = 768;
 pub const ACL_ALL_RIGHTS_TABLESPACE: u32 = 512;
 pub const ACL_ALL_RIGHTS_TYPE: u32 = 256;
@@ -2342,7 +2343,6 @@ pub const OID_ARRAY_CONTAINED_OP: u32 = 2752;
 pub const RECORD_EQ_OP: u32 = 2988;
 pub const RECORD_LT_OP: u32 = 2990;
 pub const RECORD_GT_OP: u32 = 2991;
-pub const RANGE_EQ_OP: u32 = 3882;
 pub const OID_RANGE_LESS_OP: u32 = 3884;
 pub const OID_RANGE_LESS_EQUAL_OP: u32 = 3885;
 pub const OID_RANGE_GREATER_EQUAL_OP: u32 = 3886;
@@ -2357,7 +2357,6 @@ pub const OID_RANGE_RIGHT_OP: u32 = 3894;
 pub const OID_RANGE_OVERLAPS_LEFT_OP: u32 = 3895;
 pub const OID_RANGE_OVERLAPS_RIGHT_OP: u32 = 3896;
 pub const OID_RANGE_INTERSECT_RANGE_OP: u32 = 3900;
-pub const MULTIRANGE_EQ_OP: u32 = 2860;
 pub const OID_MULTIRANGE_LESS_OP: u32 = 2862;
 pub const OID_MULTIRANGE_LESS_EQUAL_OP: u32 = 2863;
 pub const OID_MULTIRANGE_GREATER_EQUAL_OP: u32 = 2864;
@@ -2411,7 +2410,6 @@ pub const BPCHAR_PATTERN_BTREE_FAM_OID: Oid = Oid(2097);
 pub const BOOL_HASH_FAM_OID: Oid = Oid(2222);
 pub const TEXT_SPGIST_FAM_OID: Oid = Oid(4017);
 pub const ParameterAclRelationId: Oid = Oid(6243);
-pub const ParameterAclRelation_Rowtype_Id: u32 = 2173;
 pub const PgParameterAclToastTable: u32 = 6244;
 pub const PgParameterAclToastIndex: u32 = 6245;
 pub const ParameterAclParnameIndexId: u32 = 6246;
@@ -2884,12 +2882,9 @@ pub const EIIT_IS_UPDATE: u32 = 1;
 pub const EIIT_NO_DUPE_ERROR: u32 = 2;
 pub const EIIT_ONLY_SUMMARIZING: u32 = 4;
 pub const TICKS_TO_NS_SHIFT: u32 = 14;
-pub const PG_INSTR_TICKS_TO_NS: u32 = 1;
-pub const PG_INSTR_TSC_CLOCK: u32 = 1;
-pub const PG_INSTR_SYSTEM_CLOCK: u32 = 1;
-pub const PG_INSTR_SYSTEM_CLOCK_NAME: &::core::ffi::CStr = c"clock_gettime (CLOCK_MONOTONIC)";
-pub const PG_INSTR_TSC_CLOCK_NAME_FAST: &::core::ffi::CStr = c"RDTSC";
-pub const PG_INSTR_TSC_CLOCK_NAME: &::core::ffi::CStr = c"RDTSCP";
+pub const PG_INSTR_TICKS_TO_NS: u32 = 0;
+pub const PG_INSTR_TSC_CLOCK: u32 = 0;
+pub const PG_INSTR_SYSTEM_CLOCK_NAME: &::core::ffi::CStr = c"clock_gettime (CLOCK_MONOTONIC_RAW)";
 pub const PROGRESS_VACUUM_PHASE: u32 = 0;
 pub const PROGRESS_VACUUM_TOTAL_HEAP_BLKS: u32 = 1;
 pub const PROGRESS_VACUUM_HEAP_BLKS_SCANNED: u32 = 2;
@@ -3004,6 +2999,18 @@ pub const PROGRESS_COPY_TYPE_FILE: u32 = 1;
 pub const PROGRESS_COPY_TYPE_PROGRAM: u32 = 2;
 pub const PROGRESS_COPY_TYPE_PIPE: u32 = 3;
 pub const PROGRESS_COPY_TYPE_CALLBACK: u32 = 4;
+pub const PROGRESS_DATACHECKSUMS_PHASE: u32 = 0;
+pub const PROGRESS_DATACHECKSUMS_DBS_TOTAL: u32 = 1;
+pub const PROGRESS_DATACHECKSUMS_DBS_DONE: u32 = 2;
+pub const PROGRESS_DATACHECKSUMS_RELS_TOTAL: u32 = 3;
+pub const PROGRESS_DATACHECKSUMS_RELS_DONE: u32 = 4;
+pub const PROGRESS_DATACHECKSUMS_BLOCKS_TOTAL: u32 = 5;
+pub const PROGRESS_DATACHECKSUMS_BLOCKS_DONE: u32 = 6;
+pub const PROGRESS_DATACHECKSUMS_PHASE_ENABLING: u32 = 0;
+pub const PROGRESS_DATACHECKSUMS_PHASE_DISABLING: u32 = 1;
+pub const PROGRESS_DATACHECKSUMS_PHASE_WAITING_TEMPREL: u32 = 2;
+pub const PROGRESS_DATACHECKSUMS_PHASE_WAITING_BARRIER: u32 = 3;
+pub const PROGRESS_DATACHECKSUMS_PHASE_DONE: u32 = 4;
 pub const MIN_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const DEFAULT_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const MAX_DEBUG_DISCARD_CACHES: u32 = 5;
@@ -3274,7 +3281,6 @@ pub const PqMsg_NegotiateProtocolVersion: u8 = 118u8;
 pub const PqMsg_CopyDone: u8 = 99u8;
 pub const PqMsg_CopyData: u8 = 100u8;
 pub const PqMsg_Progress: u8 = 80u8;
-pub const PqRepackMsg_Terminate: u8 = 88u8;
 pub const PqReplMsg_Keepalive: u8 = 107u8;
 pub const PqReplMsg_PrimaryStatusUpdate: u8 = 115u8;
 pub const PqReplMsg_WALData: u8 = 119u8;
@@ -3451,8 +3457,8 @@ pub const UNICODE_CASEMAP_LEN: u32 = 3;
 pub const UNICODE_CASEMAP_BUFSZ: u32 = 12;
 pub const MAXSTRLEN: u32 = 2047;
 pub const MAXSTRPOS: u32 = 1048575;
-pub const MAXNUMPOS: u32 = 256;
 pub const MAXENTRYPOS: u32 = 16384;
+pub const MAXNUMPOS: u32 = 256;
 pub const QI_VAL: u32 = 1;
 pub const QI_OPR: u32 = 2;
 pub const QI_VALSTOP: u32 = 3;
@@ -6990,6 +6996,7 @@ pub const F_HASHOID8EXTENDED: u32 = 6462;
 pub const F_BTOID8CMP: u32 = 6463;
 pub const F_BTOID8SORTSUPPORT: u32 = 6464;
 pub const F_BTOID8SKIPSUPPORT: u32 = 6465;
+pub const F_PG_GET_PROPGRAPHDEF: u32 = 6469;
 pub const F_REGDATABASEIN: u32 = 6485;
 pub const F_REGDATABASEOUT: u32 = 6486;
 pub const F_TO_REGDATABASE: u32 = 6487;
@@ -7000,9 +7007,15 @@ pub const F_MULTIRANGE_MINUS_MULTI: u32 = 6495;
 pub const F_RANGE_MINUS_MULTI: u32 = 6496;
 pub const F_ERROR_ON_NULL: u32 = 6497;
 pub const F_PG_STAT_GET_FUNCTION_STAT_RESET_TIME: u32 = 6498;
+pub const F_PG_GET_TABLESPACE_DDL_OID_TEXT: u32 = 6499;
+pub const F_PG_GET_TABLESPACE_DDL_NAME_TEXT: u32 = 6500;
+pub const F_PG_GET_ROLE_DDL: u32 = 6501;
+pub const F_PG_GET_DATABASE_DDL: u32 = 6502;
 pub const F_PG_GET_MULTIXACT_STATS: u32 = 6503;
 pub const F_PG_STAT_GET_STAT_RESET_TIME: u32 = 6504;
 pub const F_BINARY_UPGRADE_CREATE_CONFLICT_DETECTION_SLOT: u32 = 6505;
+pub const F_PG_ENABLE_DATA_CHECKSUMS: u32 = 6506;
+pub const F_PG_DISABLE_DATA_CHECKSUMS: u32 = 6507;
 pub const F_PG_GET_DSM_REGISTRY_ALLOCATIONS: u32 = 6508;
 pub const F_PG_STAT_GET_LOCK: u32 = 6509;
 pub const F_BYTEA_UUID: u32 = 6510;
@@ -7091,77 +7104,28 @@ pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub const TUPLESORT_NONE: u32 = 0;
 pub const TUPLESORT_RANDOMACCESS: u32 = 1;
 pub const TUPLESORT_ALLOWBOUNDED: u32 = 2;
+pub type __uint8_t = ::core::ffi::c_uchar;
 pub type __uint16_t = ::core::ffi::c_ushort;
+pub type __int32_t = ::core::ffi::c_int;
 pub type __uint32_t = ::core::ffi::c_uint;
-pub type __uint64_t = ::core::ffi::c_ulong;
-pub type __uint_least16_t = __uint16_t;
-pub type __uint_least32_t = __uint32_t;
-pub type __dev_t = ::core::ffi::c_ulong;
-pub type __uid_t = ::core::ffi::c_uint;
-pub type __gid_t = ::core::ffi::c_uint;
-pub type __ino_t = ::core::ffi::c_ulong;
-pub type __mode_t = ::core::ffi::c_uint;
-pub type __off_t = ::core::ffi::c_long;
-pub type __off64_t = ::core::ffi::c_long;
-pub type __pid_t = ::core::ffi::c_int;
-pub type __socklen_t = ::core::ffi::c_uint;
-pub type __sig_atomic_t = ::core::ffi::c_int;
-pub type __gnuc_va_list = __builtin_va_list;
-pub type FILE = _IO_FILE;
+pub type __int64_t = ::core::ffi::c_longlong;
+pub type __uint64_t = ::core::ffi::c_ulonglong;
+pub type __darwin_va_list = __builtin_va_list;
+pub type __darwin_wchar_t = ::core::ffi::c_int;
+pub type __darwin_socklen_t = __uint32_t;
+pub type __darwin_dev_t = __int32_t;
+pub type __darwin_ino64_t = __uint64_t;
+pub type __darwin_ino_t = __darwin_ino64_t;
+pub type __darwin_mode_t = __uint16_t;
+pub type __darwin_off_t = __int64_t;
+pub type __darwin_pid_t = __int32_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _IO_marker {
-    _unused: [u8; 0],
+pub struct _opaque_pthread_mutex_t {
+    pub __sig: ::core::ffi::c_long,
+    pub __opaque: [::core::ffi::c_char; 56usize],
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_codecvt {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_wide_data {
-    _unused: [u8; 0],
-}
-pub type _IO_lock_t = ::core::ffi::c_void;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_FILE {
-    pub _flags: ::core::ffi::c_int,
-    pub _IO_read_ptr: *mut ::core::ffi::c_char,
-    pub _IO_read_end: *mut ::core::ffi::c_char,
-    pub _IO_read_base: *mut ::core::ffi::c_char,
-    pub _IO_write_base: *mut ::core::ffi::c_char,
-    pub _IO_write_ptr: *mut ::core::ffi::c_char,
-    pub _IO_write_end: *mut ::core::ffi::c_char,
-    pub _IO_buf_base: *mut ::core::ffi::c_char,
-    pub _IO_buf_end: *mut ::core::ffi::c_char,
-    pub _IO_save_base: *mut ::core::ffi::c_char,
-    pub _IO_backup_base: *mut ::core::ffi::c_char,
-    pub _IO_save_end: *mut ::core::ffi::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: ::core::ffi::c_int,
-    pub _bitfield_align_1: [u32; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
-    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
-    pub _old_offset: __off_t,
-    pub _cur_column: ::core::ffi::c_ushort,
-    pub _vtable_offset: ::core::ffi::c_schar,
-    pub _shortbuf: [::core::ffi::c_char; 1usize],
-    pub _lock: *mut _IO_lock_t,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub _prevchain: *mut *mut _IO_FILE,
-    pub _mode: ::core::ffi::c_int,
-    pub _unused3: ::core::ffi::c_int,
-    pub _total_written: __uint64_t,
-    pub _unused2: [::core::ffi::c_char; 8usize],
-}
-impl Default for _IO_FILE {
+impl Default for _opaque_pthread_mutex_t {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -7170,63 +7134,17 @@ impl Default for _IO_FILE {
         }
     }
 }
-impl _IO_FILE {
-    #[inline]
-    pub fn _flags2(&self) -> ::core::ffi::c_int {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
-    }
-    #[inline]
-    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 24u8, val as u64)
-        }
-    }
-    #[inline]
-    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
-        unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                24u8,
-            ) as u32)
-        }
-    }
-    #[inline]
-    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
-                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                24u8,
-                val as u64,
-            )
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 24u8, {
-            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
-            _flags2 as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-pub type va_list = __gnuc_va_list;
-pub type off_t = __off_t;
-pub type wchar_t = ::core::ffi::c_int;
+pub type __darwin_pthread_mutex_t = _opaque_pthread_mutex_t;
+pub type wchar_t = __darwin_wchar_t;
+pub type va_list = __darwin_va_list;
+pub type fpos_t = __darwin_off_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __locale_struct {
-    pub __locales: [*mut __locale_data; 13usize],
-    pub __ctype_b: *const ::core::ffi::c_ushort,
-    pub __ctype_tolower: *const ::core::ffi::c_int,
-    pub __ctype_toupper: *const ::core::ffi::c_int,
-    pub __names: [*const ::core::ffi::c_char; 13usize],
+pub struct __sbuf {
+    pub _base: *mut ::core::ffi::c_uchar,
+    pub _size: ::core::ffi::c_int,
 }
-impl Default for __locale_struct {
+impl Default for __sbuf {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -7235,19 +7153,77 @@ impl Default for __locale_struct {
         }
     }
 }
-pub type __locale_t = *mut __locale_struct;
-pub type locale_t = __locale_t;
-pub type ino_t = __ino_t;
-pub type dev_t = __dev_t;
-pub type gid_t = __gid_t;
-pub type mode_t = __mode_t;
-pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __sigset_t {
-    pub __val: [::core::ffi::c_ulong; 16usize],
+#[derive(Debug, Copy, Clone)]
+pub struct __sFILEX {
+    _unused: [u8; 0],
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __sFILE {
+    pub _p: *mut ::core::ffi::c_uchar,
+    pub _r: ::core::ffi::c_int,
+    pub _w: ::core::ffi::c_int,
+    pub _flags: ::core::ffi::c_short,
+    pub _file: ::core::ffi::c_short,
+    pub _bf: __sbuf,
+    pub _lbfsize: ::core::ffi::c_int,
+    pub _cookie: *mut ::core::ffi::c_void,
+    pub _close: ::core::option::Option<
+        unsafe extern "C-unwind" fn(arg1: *mut ::core::ffi::c_void) -> ::core::ffi::c_int,
+    >,
+    pub _read: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            arg1: *mut ::core::ffi::c_void,
+            arg2: *mut ::core::ffi::c_char,
+            __n: ::core::ffi::c_int,
+        ) -> ::core::ffi::c_int,
+    >,
+    pub _seek: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            arg1: *mut ::core::ffi::c_void,
+            arg2: fpos_t,
+            arg3: ::core::ffi::c_int,
+        ) -> fpos_t,
+    >,
+    pub _write: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            arg1: *mut ::core::ffi::c_void,
+            arg2: *const ::core::ffi::c_char,
+            __n: ::core::ffi::c_int,
+        ) -> ::core::ffi::c_int,
+    >,
+    pub _ub: __sbuf,
+    pub _extra: *mut __sFILEX,
+    pub _ur: ::core::ffi::c_int,
+    pub _ubuf: [::core::ffi::c_uchar; 3usize],
+    pub _nbuf: [::core::ffi::c_uchar; 1usize],
+    pub _lb: __sbuf,
+    pub _blksize: ::core::ffi::c_int,
+    pub _offset: fpos_t,
+}
+impl Default for __sFILE {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type FILE = __sFILE;
+pub type off_t = __darwin_off_t;
+pub type pid_t = __darwin_pid_t;
+pub type sig_atomic_t = ::core::ffi::c_int;
+pub type dev_t = __darwin_dev_t;
+pub type mode_t = __darwin_mode_t;
+pub type ino_t = __darwin_ino_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _xlocale {
+    _unused: [u8; 0],
+}
+pub type locale_t = *mut _xlocale;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lconv {
@@ -7270,8 +7246,8 @@ pub struct lconv {
     pub p_sign_posn: ::core::ffi::c_char,
     pub n_sign_posn: ::core::ffi::c_char,
     pub int_p_cs_precedes: ::core::ffi::c_char,
-    pub int_p_sep_by_space: ::core::ffi::c_char,
     pub int_n_cs_precedes: ::core::ffi::c_char,
+    pub int_p_sep_by_space: ::core::ffi::c_char,
     pub int_n_sep_by_space: ::core::ffi::c_char,
     pub int_p_sign_posn: ::core::ffi::c_char,
     pub int_n_sign_posn: ::core::ffi::c_char,
@@ -7442,17 +7418,9 @@ pub type pqsigfunc = ::core::option::Option<
         pg_siginfo: *const pg_signal_info,
     ),
 >;
-pub type char16_t = __uint_least16_t;
-pub type char32_t = __uint_least32_t;
-pub type __jmp_buf = [::core::ffi::c_long; 8usize];
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __jmp_buf_tag {
-    pub __jmpbuf: __jmp_buf,
-    pub __mask_was_saved: ::core::ffi::c_int,
-    pub __saved_mask: __sigset_t,
-}
-pub type sigjmp_buf = [__jmp_buf_tag; 1usize];
+pub type char16_t = u16;
+pub type char32_t = u32;
+pub type sigjmp_buf = [::core::ffi::c_int; 49usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct StringInfoData {
@@ -8295,432 +8263,447 @@ pub enum NodeTag {
     T_NextValueExpr = 59,
     T_InferenceElem = 60,
     T_ReturningExpr = 61,
-    T_TargetEntry = 62,
-    T_RangeTblRef = 63,
-    T_JoinExpr = 64,
-    T_FromExpr = 65,
-    T_OnConflictExpr = 66,
-    T_Query = 67,
-    T_TypeName = 68,
-    T_ColumnRef = 69,
-    T_ParamRef = 70,
-    T_A_Expr = 71,
-    T_A_Const = 72,
-    T_TypeCast = 73,
-    T_CollateClause = 74,
-    T_RoleSpec = 75,
-    T_FuncCall = 76,
-    T_A_Star = 77,
-    T_A_Indices = 78,
-    T_A_Indirection = 79,
-    T_A_ArrayExpr = 80,
-    T_ResTarget = 81,
-    T_MultiAssignRef = 82,
-    T_SortBy = 83,
-    T_WindowDef = 84,
-    T_RangeSubselect = 85,
-    T_RangeFunction = 86,
-    T_RangeTableFunc = 87,
-    T_RangeTableFuncCol = 88,
-    T_RangeTableSample = 89,
-    T_ColumnDef = 90,
-    T_TableLikeClause = 91,
-    T_IndexElem = 92,
-    T_DefElem = 93,
-    T_LockingClause = 94,
-    T_XmlSerialize = 95,
-    T_PartitionElem = 96,
-    T_PartitionSpec = 97,
-    T_PartitionBoundSpec = 98,
-    T_PartitionRangeDatum = 99,
-    T_PartitionCmd = 100,
-    T_RangeTblEntry = 101,
-    T_RTEPermissionInfo = 102,
-    T_RangeTblFunction = 103,
-    T_TableSampleClause = 104,
-    T_WithCheckOption = 105,
-    T_SortGroupClause = 106,
-    T_GroupingSet = 107,
-    T_WindowClause = 108,
-    T_RowMarkClause = 109,
-    T_WithClause = 110,
-    T_InferClause = 111,
-    T_OnConflictClause = 112,
-    T_CTESearchClause = 113,
-    T_CTECycleClause = 114,
-    T_CommonTableExpr = 115,
-    T_MergeWhenClause = 116,
-    T_ReturningOption = 117,
-    T_ReturningClause = 118,
-    T_TriggerTransition = 119,
-    T_JsonOutput = 120,
-    T_JsonArgument = 121,
-    T_JsonFuncExpr = 122,
-    T_JsonTablePathSpec = 123,
-    T_JsonTable = 124,
-    T_JsonTableColumn = 125,
-    T_JsonKeyValue = 126,
-    T_JsonParseExpr = 127,
-    T_JsonScalarExpr = 128,
-    T_JsonSerializeExpr = 129,
-    T_JsonObjectConstructor = 130,
-    T_JsonArrayConstructor = 131,
-    T_JsonArrayQueryConstructor = 132,
-    T_JsonAggConstructor = 133,
-    T_JsonObjectAgg = 134,
-    T_JsonArrayAgg = 135,
-    T_RawStmt = 136,
-    T_InsertStmt = 137,
-    T_DeleteStmt = 138,
-    T_UpdateStmt = 139,
-    T_MergeStmt = 140,
-    T_SelectStmt = 141,
-    T_SetOperationStmt = 142,
-    T_ReturnStmt = 143,
-    T_PLAssignStmt = 144,
-    T_CreateSchemaStmt = 145,
-    T_AlterTableStmt = 146,
-    T_AlterTableCmd = 147,
-    T_ATAlterConstraint = 148,
-    T_ReplicaIdentityStmt = 149,
-    T_AlterCollationStmt = 150,
-    T_AlterDomainStmt = 151,
-    T_GrantStmt = 152,
-    T_ObjectWithArgs = 153,
-    T_AccessPriv = 154,
-    T_GrantRoleStmt = 155,
-    T_AlterDefaultPrivilegesStmt = 156,
-    T_CopyStmt = 157,
-    T_VariableSetStmt = 158,
-    T_VariableShowStmt = 159,
-    T_CreateStmt = 160,
-    T_Constraint = 161,
-    T_CreateTableSpaceStmt = 162,
-    T_DropTableSpaceStmt = 163,
-    T_AlterTableSpaceOptionsStmt = 164,
-    T_AlterTableMoveAllStmt = 165,
-    T_CreateExtensionStmt = 166,
-    T_AlterExtensionStmt = 167,
-    T_AlterExtensionContentsStmt = 168,
-    T_CreateFdwStmt = 169,
-    T_AlterFdwStmt = 170,
-    T_CreateForeignServerStmt = 171,
-    T_AlterForeignServerStmt = 172,
-    T_CreateForeignTableStmt = 173,
-    T_CreateUserMappingStmt = 174,
-    T_AlterUserMappingStmt = 175,
-    T_DropUserMappingStmt = 176,
-    T_ImportForeignSchemaStmt = 177,
-    T_CreatePolicyStmt = 178,
-    T_AlterPolicyStmt = 179,
-    T_CreateAmStmt = 180,
-    T_CreateTrigStmt = 181,
-    T_CreateEventTrigStmt = 182,
-    T_AlterEventTrigStmt = 183,
-    T_CreatePLangStmt = 184,
-    T_CreateRoleStmt = 185,
-    T_AlterRoleStmt = 186,
-    T_AlterRoleSetStmt = 187,
-    T_DropRoleStmt = 188,
-    T_CreateSeqStmt = 189,
-    T_AlterSeqStmt = 190,
-    T_DefineStmt = 191,
-    T_CreateDomainStmt = 192,
-    T_CreateOpClassStmt = 193,
-    T_CreateOpClassItem = 194,
-    T_CreateOpFamilyStmt = 195,
-    T_AlterOpFamilyStmt = 196,
-    T_DropStmt = 197,
-    T_TruncateStmt = 198,
-    T_CommentStmt = 199,
-    T_SecLabelStmt = 200,
-    T_DeclareCursorStmt = 201,
-    T_ClosePortalStmt = 202,
-    T_FetchStmt = 203,
-    T_IndexStmt = 204,
-    T_CreateStatsStmt = 205,
-    T_StatsElem = 206,
-    T_AlterStatsStmt = 207,
-    T_CreateFunctionStmt = 208,
-    T_FunctionParameter = 209,
-    T_AlterFunctionStmt = 210,
-    T_DoStmt = 211,
-    T_InlineCodeBlock = 212,
-    T_CallStmt = 213,
-    T_CallContext = 214,
-    T_RenameStmt = 215,
-    T_AlterObjectDependsStmt = 216,
-    T_AlterObjectSchemaStmt = 217,
-    T_AlterOwnerStmt = 218,
-    T_AlterOperatorStmt = 219,
-    T_AlterTypeStmt = 220,
-    T_RuleStmt = 221,
-    T_NotifyStmt = 222,
-    T_ListenStmt = 223,
-    T_UnlistenStmt = 224,
-    T_TransactionStmt = 225,
-    T_CompositeTypeStmt = 226,
-    T_CreateEnumStmt = 227,
-    T_CreateRangeStmt = 228,
-    T_AlterEnumStmt = 229,
-    T_ViewStmt = 230,
-    T_LoadStmt = 231,
-    T_CreatedbStmt = 232,
-    T_AlterDatabaseStmt = 233,
-    T_AlterDatabaseRefreshCollStmt = 234,
-    T_AlterDatabaseSetStmt = 235,
-    T_DropdbStmt = 236,
-    T_AlterSystemStmt = 237,
-    T_VacuumStmt = 238,
-    T_VacuumRelation = 239,
-    T_RepackStmt = 240,
-    T_ExplainStmt = 241,
-    T_CreateTableAsStmt = 242,
-    T_RefreshMatViewStmt = 243,
-    T_CheckPointStmt = 244,
-    T_DiscardStmt = 245,
-    T_LockStmt = 246,
-    T_ConstraintsSetStmt = 247,
-    T_ReindexStmt = 248,
-    T_CreateConversionStmt = 249,
-    T_CreateCastStmt = 250,
-    T_CreateTransformStmt = 251,
-    T_PrepareStmt = 252,
-    T_ExecuteStmt = 253,
-    T_DeallocateStmt = 254,
-    T_DropOwnedStmt = 255,
-    T_ReassignOwnedStmt = 256,
-    T_AlterTSDictionaryStmt = 257,
-    T_AlterTSConfigurationStmt = 258,
-    T_PublicationTable = 259,
-    T_PublicationObjSpec = 260,
-    T_PublicationAllObjSpec = 261,
-    T_CreatePublicationStmt = 262,
-    T_AlterPublicationStmt = 263,
-    T_CreateSubscriptionStmt = 264,
-    T_AlterSubscriptionStmt = 265,
-    T_DropSubscriptionStmt = 266,
-    T_WaitStmt = 267,
-    T_PlannerGlobal = 268,
-    T_PlannerInfo = 269,
-    T_RelOptInfo = 270,
-    T_RelAggInfo = 271,
-    T_IndexOptInfo = 272,
-    T_ForeignKeyOptInfo = 273,
-    T_StatisticExtInfo = 274,
-    T_JoinDomain = 275,
-    T_EquivalenceClass = 276,
-    T_EquivalenceMember = 277,
-    T_PathKey = 278,
-    T_GroupByOrdering = 279,
-    T_PathTarget = 280,
-    T_ParamPathInfo = 281,
-    T_Path = 282,
-    T_IndexPath = 283,
-    T_IndexClause = 284,
-    T_BitmapHeapPath = 285,
-    T_BitmapAndPath = 286,
-    T_BitmapOrPath = 287,
-    T_TidPath = 288,
-    T_TidRangePath = 289,
-    T_SubqueryScanPath = 290,
-    T_ForeignPath = 291,
-    T_CustomPath = 292,
-    T_AppendPath = 293,
-    T_MergeAppendPath = 294,
-    T_GroupResultPath = 295,
-    T_MaterialPath = 296,
-    T_MemoizePath = 297,
-    T_GatherPath = 298,
-    T_GatherMergePath = 299,
-    T_NestPath = 300,
-    T_MergePath = 301,
-    T_HashPath = 302,
-    T_ProjectionPath = 303,
-    T_ProjectSetPath = 304,
-    T_SortPath = 305,
-    T_IncrementalSortPath = 306,
-    T_GroupPath = 307,
-    T_UniquePath = 308,
-    T_AggPath = 309,
-    T_GroupingSetData = 310,
-    T_RollupData = 311,
-    T_GroupingSetsPath = 312,
-    T_MinMaxAggPath = 313,
-    T_WindowAggPath = 314,
-    T_SetOpPath = 315,
-    T_RecursiveUnionPath = 316,
-    T_LockRowsPath = 317,
-    T_ModifyTablePath = 318,
-    T_LimitPath = 319,
-    T_RestrictInfo = 320,
-    T_PlaceHolderVar = 321,
-    T_SpecialJoinInfo = 322,
-    T_OuterJoinClauseInfo = 323,
-    T_AppendRelInfo = 324,
-    T_RowIdentityVarInfo = 325,
-    T_PlaceHolderInfo = 326,
-    T_MinMaxAggInfo = 327,
-    T_AggClauseInfo = 328,
-    T_GroupingExprInfo = 329,
-    T_PlannerParamItem = 330,
-    T_AggInfo = 331,
-    T_AggTransInfo = 332,
-    T_UniqueRelInfo = 333,
-    T_PlannedStmt = 334,
-    T_Result = 335,
-    T_ProjectSet = 336,
-    T_ModifyTable = 337,
-    T_Append = 338,
-    T_MergeAppend = 339,
-    T_RecursiveUnion = 340,
-    T_BitmapAnd = 341,
-    T_BitmapOr = 342,
-    T_SeqScan = 343,
-    T_SampleScan = 344,
-    T_IndexScan = 345,
-    T_IndexOnlyScan = 346,
-    T_BitmapIndexScan = 347,
-    T_BitmapHeapScan = 348,
-    T_TidScan = 349,
-    T_TidRangeScan = 350,
-    T_SubqueryScan = 351,
-    T_FunctionScan = 352,
-    T_ValuesScan = 353,
-    T_TableFuncScan = 354,
-    T_CteScan = 355,
-    T_NamedTuplestoreScan = 356,
-    T_WorkTableScan = 357,
-    T_ForeignScan = 358,
-    T_CustomScan = 359,
-    T_NestLoop = 360,
-    T_NestLoopParam = 361,
-    T_MergeJoin = 362,
-    T_HashJoin = 363,
-    T_Material = 364,
-    T_Memoize = 365,
-    T_Sort = 366,
-    T_IncrementalSort = 367,
-    T_Group = 368,
-    T_Agg = 369,
-    T_WindowAgg = 370,
-    T_Unique = 371,
-    T_Gather = 372,
-    T_GatherMerge = 373,
-    T_Hash = 374,
-    T_SetOp = 375,
-    T_LockRows = 376,
-    T_Limit = 377,
-    T_PlanRowMark = 378,
-    T_PartitionPruneInfo = 379,
-    T_PartitionedRelPruneInfo = 380,
-    T_PartitionPruneStepOp = 381,
-    T_PartitionPruneStepCombine = 382,
-    T_PlanInvalItem = 383,
-    T_SubPlanRTInfo = 384,
-    T_ElidedNode = 385,
-    T_ExprState = 386,
-    T_IndexInfo = 387,
-    T_ExprContext = 388,
-    T_ReturnSetInfo = 389,
-    T_ProjectionInfo = 390,
-    T_JunkFilter = 391,
-    T_OnConflictActionState = 392,
-    T_MergeActionState = 393,
-    T_ResultRelInfo = 394,
-    T_EState = 395,
-    T_WindowFuncExprState = 396,
-    T_SetExprState = 397,
-    T_SubPlanState = 398,
-    T_DomainConstraintState = 399,
-    T_ResultState = 400,
-    T_ProjectSetState = 401,
-    T_ModifyTableState = 402,
-    T_AppendState = 403,
-    T_MergeAppendState = 404,
-    T_RecursiveUnionState = 405,
-    T_BitmapAndState = 406,
-    T_BitmapOrState = 407,
-    T_ScanState = 408,
-    T_SeqScanState = 409,
-    T_SampleScanState = 410,
-    T_IndexScanState = 411,
-    T_IndexOnlyScanState = 412,
-    T_BitmapIndexScanState = 413,
-    T_BitmapHeapScanState = 414,
-    T_TidScanState = 415,
-    T_TidRangeScanState = 416,
-    T_SubqueryScanState = 417,
-    T_FunctionScanState = 418,
-    T_ValuesScanState = 419,
-    T_TableFuncScanState = 420,
-    T_CteScanState = 421,
-    T_NamedTuplestoreScanState = 422,
-    T_WorkTableScanState = 423,
-    T_ForeignScanState = 424,
-    T_CustomScanState = 425,
-    T_JoinState = 426,
-    T_NestLoopState = 427,
-    T_MergeJoinState = 428,
-    T_HashJoinState = 429,
-    T_MaterialState = 430,
-    T_MemoizeState = 431,
-    T_SortState = 432,
-    T_IncrementalSortState = 433,
-    T_GroupState = 434,
-    T_AggState = 435,
-    T_WindowAggState = 436,
-    T_UniqueState = 437,
-    T_GatherState = 438,
-    T_GatherMergeState = 439,
-    T_HashState = 440,
-    T_SetOpState = 441,
-    T_LockRowsState = 442,
-    T_LimitState = 443,
-    T_IndexAmRoutine = 444,
-    T_TableAmRoutine = 445,
-    T_TsmRoutine = 446,
-    T_EventTriggerData = 447,
-    T_TriggerData = 448,
-    T_TupleTableSlot = 449,
-    T_FdwRoutine = 450,
-    T_Bitmapset = 451,
-    T_ExtensibleNode = 452,
-    T_ErrorSaveContext = 453,
-    T_IdentifySystemCmd = 454,
-    T_BaseBackupCmd = 455,
-    T_CreateReplicationSlotCmd = 456,
-    T_DropReplicationSlotCmd = 457,
-    T_AlterReplicationSlotCmd = 458,
-    T_StartReplicationCmd = 459,
-    T_ReadReplicationSlotCmd = 460,
-    T_TimeLineHistoryCmd = 461,
-    T_UploadManifestCmd = 462,
-    T_SupportRequestSimplify = 463,
-    T_SupportRequestSimplifyAggref = 464,
-    T_SupportRequestInlineInFrom = 465,
-    T_SupportRequestSelectivity = 466,
-    T_SupportRequestCost = 467,
-    T_SupportRequestRows = 468,
-    T_SupportRequestIndexCondition = 469,
-    T_SupportRequestWFuncMonotonic = 470,
-    T_SupportRequestOptimizeWindowClause = 471,
-    T_SupportRequestModifyInPlace = 472,
-    T_Integer = 473,
-    T_Float = 474,
-    T_Boolean = 475,
-    T_String = 476,
-    T_BitString = 477,
-    T_ForeignKeyCacheInfo = 478,
-    T_IntList = 479,
-    T_OidList = 480,
-    T_XidList = 481,
-    T_AllocSetContext = 482,
-    T_GenerationContext = 483,
-    T_SlabContext = 484,
-    T_BumpContext = 485,
-    T_TIDBitmap = 486,
-    T_WindowObjectData = 487,
+    T_GraphLabelRef = 62,
+    T_GraphPropertyRef = 63,
+    T_TargetEntry = 64,
+    T_RangeTblRef = 65,
+    T_JoinExpr = 66,
+    T_FromExpr = 67,
+    T_OnConflictExpr = 68,
+    T_ForPortionOfExpr = 69,
+    T_Query = 70,
+    T_TypeName = 71,
+    T_ColumnRef = 72,
+    T_ParamRef = 73,
+    T_A_Expr = 74,
+    T_A_Const = 75,
+    T_TypeCast = 76,
+    T_CollateClause = 77,
+    T_RoleSpec = 78,
+    T_FuncCall = 79,
+    T_A_Star = 80,
+    T_A_Indices = 81,
+    T_A_Indirection = 82,
+    T_A_ArrayExpr = 83,
+    T_ResTarget = 84,
+    T_MultiAssignRef = 85,
+    T_SortBy = 86,
+    T_WindowDef = 87,
+    T_RangeSubselect = 88,
+    T_RangeFunction = 89,
+    T_RangeTableFunc = 90,
+    T_RangeTableFuncCol = 91,
+    T_RangeGraphTable = 92,
+    T_RangeTableSample = 93,
+    T_ColumnDef = 94,
+    T_TableLikeClause = 95,
+    T_IndexElem = 96,
+    T_DefElem = 97,
+    T_LockingClause = 98,
+    T_XmlSerialize = 99,
+    T_PartitionElem = 100,
+    T_PartitionSpec = 101,
+    T_PartitionBoundSpec = 102,
+    T_PartitionRangeDatum = 103,
+    T_SinglePartitionSpec = 104,
+    T_PartitionCmd = 105,
+    T_GraphPattern = 106,
+    T_GraphElementPattern = 107,
+    T_RangeTblEntry = 108,
+    T_RTEPermissionInfo = 109,
+    T_RangeTblFunction = 110,
+    T_TableSampleClause = 111,
+    T_WithCheckOption = 112,
+    T_SortGroupClause = 113,
+    T_GroupingSet = 114,
+    T_WindowClause = 115,
+    T_RowMarkClause = 116,
+    T_ForPortionOfClause = 117,
+    T_WithClause = 118,
+    T_InferClause = 119,
+    T_OnConflictClause = 120,
+    T_CTESearchClause = 121,
+    T_CTECycleClause = 122,
+    T_CommonTableExpr = 123,
+    T_MergeWhenClause = 124,
+    T_ReturningOption = 125,
+    T_ReturningClause = 126,
+    T_TriggerTransition = 127,
+    T_JsonOutput = 128,
+    T_JsonArgument = 129,
+    T_JsonFuncExpr = 130,
+    T_JsonTablePathSpec = 131,
+    T_JsonTable = 132,
+    T_JsonTableColumn = 133,
+    T_JsonKeyValue = 134,
+    T_JsonParseExpr = 135,
+    T_JsonScalarExpr = 136,
+    T_JsonSerializeExpr = 137,
+    T_JsonObjectConstructor = 138,
+    T_JsonArrayConstructor = 139,
+    T_JsonArrayQueryConstructor = 140,
+    T_JsonAggConstructor = 141,
+    T_JsonObjectAgg = 142,
+    T_JsonArrayAgg = 143,
+    T_RawStmt = 144,
+    T_InsertStmt = 145,
+    T_DeleteStmt = 146,
+    T_UpdateStmt = 147,
+    T_MergeStmt = 148,
+    T_SelectStmt = 149,
+    T_SetOperationStmt = 150,
+    T_ReturnStmt = 151,
+    T_PLAssignStmt = 152,
+    T_CreateSchemaStmt = 153,
+    T_AlterTableStmt = 154,
+    T_AlterTableCmd = 155,
+    T_ATAlterConstraint = 156,
+    T_ReplicaIdentityStmt = 157,
+    T_AlterCollationStmt = 158,
+    T_AlterDomainStmt = 159,
+    T_GrantStmt = 160,
+    T_ObjectWithArgs = 161,
+    T_AccessPriv = 162,
+    T_GrantRoleStmt = 163,
+    T_AlterDefaultPrivilegesStmt = 164,
+    T_CopyStmt = 165,
+    T_VariableSetStmt = 166,
+    T_VariableShowStmt = 167,
+    T_CreateStmt = 168,
+    T_Constraint = 169,
+    T_CreateTableSpaceStmt = 170,
+    T_DropTableSpaceStmt = 171,
+    T_AlterTableSpaceOptionsStmt = 172,
+    T_AlterTableMoveAllStmt = 173,
+    T_CreateExtensionStmt = 174,
+    T_AlterExtensionStmt = 175,
+    T_AlterExtensionContentsStmt = 176,
+    T_CreateFdwStmt = 177,
+    T_AlterFdwStmt = 178,
+    T_CreateForeignServerStmt = 179,
+    T_AlterForeignServerStmt = 180,
+    T_CreateForeignTableStmt = 181,
+    T_CreateUserMappingStmt = 182,
+    T_AlterUserMappingStmt = 183,
+    T_DropUserMappingStmt = 184,
+    T_ImportForeignSchemaStmt = 185,
+    T_CreatePolicyStmt = 186,
+    T_AlterPolicyStmt = 187,
+    T_CreateAmStmt = 188,
+    T_CreateTrigStmt = 189,
+    T_CreateEventTrigStmt = 190,
+    T_AlterEventTrigStmt = 191,
+    T_CreatePLangStmt = 192,
+    T_CreateRoleStmt = 193,
+    T_AlterRoleStmt = 194,
+    T_AlterRoleSetStmt = 195,
+    T_DropRoleStmt = 196,
+    T_CreateSeqStmt = 197,
+    T_AlterSeqStmt = 198,
+    T_DefineStmt = 199,
+    T_CreateDomainStmt = 200,
+    T_CreateOpClassStmt = 201,
+    T_CreateOpClassItem = 202,
+    T_CreateOpFamilyStmt = 203,
+    T_AlterOpFamilyStmt = 204,
+    T_DropStmt = 205,
+    T_TruncateStmt = 206,
+    T_CommentStmt = 207,
+    T_SecLabelStmt = 208,
+    T_DeclareCursorStmt = 209,
+    T_ClosePortalStmt = 210,
+    T_FetchStmt = 211,
+    T_IndexStmt = 212,
+    T_CreateStatsStmt = 213,
+    T_StatsElem = 214,
+    T_AlterStatsStmt = 215,
+    T_CreateFunctionStmt = 216,
+    T_FunctionParameter = 217,
+    T_AlterFunctionStmt = 218,
+    T_DoStmt = 219,
+    T_InlineCodeBlock = 220,
+    T_CallStmt = 221,
+    T_CallContext = 222,
+    T_RenameStmt = 223,
+    T_AlterObjectDependsStmt = 224,
+    T_AlterObjectSchemaStmt = 225,
+    T_AlterOwnerStmt = 226,
+    T_AlterOperatorStmt = 227,
+    T_AlterTypeStmt = 228,
+    T_RuleStmt = 229,
+    T_NotifyStmt = 230,
+    T_ListenStmt = 231,
+    T_UnlistenStmt = 232,
+    T_TransactionStmt = 233,
+    T_CompositeTypeStmt = 234,
+    T_CreateEnumStmt = 235,
+    T_CreateRangeStmt = 236,
+    T_AlterEnumStmt = 237,
+    T_ViewStmt = 238,
+    T_LoadStmt = 239,
+    T_CreatedbStmt = 240,
+    T_AlterDatabaseStmt = 241,
+    T_AlterDatabaseRefreshCollStmt = 242,
+    T_AlterDatabaseSetStmt = 243,
+    T_DropdbStmt = 244,
+    T_AlterSystemStmt = 245,
+    T_VacuumStmt = 246,
+    T_VacuumRelation = 247,
+    T_RepackStmt = 248,
+    T_ExplainStmt = 249,
+    T_CreateTableAsStmt = 250,
+    T_RefreshMatViewStmt = 251,
+    T_CheckPointStmt = 252,
+    T_DiscardStmt = 253,
+    T_LockStmt = 254,
+    T_ConstraintsSetStmt = 255,
+    T_ReindexStmt = 256,
+    T_CreateConversionStmt = 257,
+    T_CreateCastStmt = 258,
+    T_CreatePropGraphStmt = 259,
+    T_PropGraphVertex = 260,
+    T_PropGraphEdge = 261,
+    T_PropGraphLabelAndProperties = 262,
+    T_PropGraphProperties = 263,
+    T_AlterPropGraphStmt = 264,
+    T_CreateTransformStmt = 265,
+    T_PrepareStmt = 266,
+    T_ExecuteStmt = 267,
+    T_DeallocateStmt = 268,
+    T_DropOwnedStmt = 269,
+    T_ReassignOwnedStmt = 270,
+    T_AlterTSDictionaryStmt = 271,
+    T_AlterTSConfigurationStmt = 272,
+    T_PublicationTable = 273,
+    T_PublicationObjSpec = 274,
+    T_PublicationAllObjSpec = 275,
+    T_CreatePublicationStmt = 276,
+    T_AlterPublicationStmt = 277,
+    T_CreateSubscriptionStmt = 278,
+    T_AlterSubscriptionStmt = 279,
+    T_DropSubscriptionStmt = 280,
+    T_WaitStmt = 281,
+    T_PlannerGlobal = 282,
+    T_PlannerInfo = 283,
+    T_RelOptInfo = 284,
+    T_RelAggInfo = 285,
+    T_IndexOptInfo = 286,
+    T_ForeignKeyOptInfo = 287,
+    T_StatisticExtInfo = 288,
+    T_JoinDomain = 289,
+    T_EquivalenceClass = 290,
+    T_EquivalenceMember = 291,
+    T_PathKey = 292,
+    T_GroupByOrdering = 293,
+    T_PathTarget = 294,
+    T_ParamPathInfo = 295,
+    T_Path = 296,
+    T_IndexPath = 297,
+    T_IndexClause = 298,
+    T_BitmapHeapPath = 299,
+    T_BitmapAndPath = 300,
+    T_BitmapOrPath = 301,
+    T_TidPath = 302,
+    T_TidRangePath = 303,
+    T_SubqueryScanPath = 304,
+    T_ForeignPath = 305,
+    T_CustomPath = 306,
+    T_AppendPath = 307,
+    T_MergeAppendPath = 308,
+    T_GroupResultPath = 309,
+    T_MaterialPath = 310,
+    T_MemoizePath = 311,
+    T_GatherPath = 312,
+    T_GatherMergePath = 313,
+    T_NestPath = 314,
+    T_MergePath = 315,
+    T_HashPath = 316,
+    T_ProjectionPath = 317,
+    T_ProjectSetPath = 318,
+    T_SortPath = 319,
+    T_IncrementalSortPath = 320,
+    T_GroupPath = 321,
+    T_UniquePath = 322,
+    T_AggPath = 323,
+    T_GroupingSetData = 324,
+    T_RollupData = 325,
+    T_GroupingSetsPath = 326,
+    T_MinMaxAggPath = 327,
+    T_WindowAggPath = 328,
+    T_SetOpPath = 329,
+    T_RecursiveUnionPath = 330,
+    T_LockRowsPath = 331,
+    T_ModifyTablePath = 332,
+    T_LimitPath = 333,
+    T_RestrictInfo = 334,
+    T_PlaceHolderVar = 335,
+    T_SpecialJoinInfo = 336,
+    T_OuterJoinClauseInfo = 337,
+    T_AppendRelInfo = 338,
+    T_RowIdentityVarInfo = 339,
+    T_PlaceHolderInfo = 340,
+    T_MinMaxAggInfo = 341,
+    T_AggClauseInfo = 342,
+    T_GroupingExprInfo = 343,
+    T_PlannerParamItem = 344,
+    T_AggInfo = 345,
+    T_AggTransInfo = 346,
+    T_UniqueRelInfo = 347,
+    T_PlannedStmt = 348,
+    T_Result = 349,
+    T_ProjectSet = 350,
+    T_ModifyTable = 351,
+    T_Append = 352,
+    T_MergeAppend = 353,
+    T_RecursiveUnion = 354,
+    T_BitmapAnd = 355,
+    T_BitmapOr = 356,
+    T_SeqScan = 357,
+    T_SampleScan = 358,
+    T_IndexScan = 359,
+    T_IndexOnlyScan = 360,
+    T_BitmapIndexScan = 361,
+    T_BitmapHeapScan = 362,
+    T_TidScan = 363,
+    T_TidRangeScan = 364,
+    T_SubqueryScan = 365,
+    T_FunctionScan = 366,
+    T_ValuesScan = 367,
+    T_TableFuncScan = 368,
+    T_CteScan = 369,
+    T_NamedTuplestoreScan = 370,
+    T_WorkTableScan = 371,
+    T_ForeignScan = 372,
+    T_CustomScan = 373,
+    T_NestLoop = 374,
+    T_NestLoopParam = 375,
+    T_MergeJoin = 376,
+    T_HashJoin = 377,
+    T_Material = 378,
+    T_Memoize = 379,
+    T_Sort = 380,
+    T_IncrementalSort = 381,
+    T_Group = 382,
+    T_Agg = 383,
+    T_WindowAgg = 384,
+    T_Unique = 385,
+    T_Gather = 386,
+    T_GatherMerge = 387,
+    T_Hash = 388,
+    T_SetOp = 389,
+    T_LockRows = 390,
+    T_Limit = 391,
+    T_PlanRowMark = 392,
+    T_PartitionPruneInfo = 393,
+    T_PartitionedRelPruneInfo = 394,
+    T_PartitionPruneStepOp = 395,
+    T_PartitionPruneStepCombine = 396,
+    T_PlanInvalItem = 397,
+    T_SubPlanRTInfo = 398,
+    T_ElidedNode = 399,
+    T_ExprState = 400,
+    T_IndexInfo = 401,
+    T_ExprContext = 402,
+    T_ReturnSetInfo = 403,
+    T_ProjectionInfo = 404,
+    T_JunkFilter = 405,
+    T_OnConflictActionState = 406,
+    T_MergeActionState = 407,
+    T_ForPortionOfState = 408,
+    T_ResultRelInfo = 409,
+    T_EState = 410,
+    T_WindowFuncExprState = 411,
+    T_SetExprState = 412,
+    T_SubPlanState = 413,
+    T_DomainConstraintState = 414,
+    T_ResultState = 415,
+    T_ProjectSetState = 416,
+    T_ModifyTableState = 417,
+    T_AppendState = 418,
+    T_MergeAppendState = 419,
+    T_RecursiveUnionState = 420,
+    T_BitmapAndState = 421,
+    T_BitmapOrState = 422,
+    T_ScanState = 423,
+    T_SeqScanState = 424,
+    T_SampleScanState = 425,
+    T_IndexScanState = 426,
+    T_IndexOnlyScanState = 427,
+    T_BitmapIndexScanState = 428,
+    T_BitmapHeapScanState = 429,
+    T_TidScanState = 430,
+    T_TidRangeScanState = 431,
+    T_SubqueryScanState = 432,
+    T_FunctionScanState = 433,
+    T_ValuesScanState = 434,
+    T_TableFuncScanState = 435,
+    T_CteScanState = 436,
+    T_NamedTuplestoreScanState = 437,
+    T_WorkTableScanState = 438,
+    T_ForeignScanState = 439,
+    T_CustomScanState = 440,
+    T_JoinState = 441,
+    T_NestLoopState = 442,
+    T_MergeJoinState = 443,
+    T_HashJoinState = 444,
+    T_MaterialState = 445,
+    T_MemoizeState = 446,
+    T_SortState = 447,
+    T_IncrementalSortState = 448,
+    T_GroupState = 449,
+    T_AggState = 450,
+    T_WindowAggState = 451,
+    T_UniqueState = 452,
+    T_GatherState = 453,
+    T_GatherMergeState = 454,
+    T_HashState = 455,
+    T_SetOpState = 456,
+    T_LockRowsState = 457,
+    T_LimitState = 458,
+    T_IndexAmRoutine = 459,
+    T_TableAmRoutine = 460,
+    T_TsmRoutine = 461,
+    T_EventTriggerData = 462,
+    T_TriggerData = 463,
+    T_TupleTableSlot = 464,
+    T_FdwRoutine = 465,
+    T_Bitmapset = 466,
+    T_ExtensibleNode = 467,
+    T_ErrorSaveContext = 468,
+    T_IdentifySystemCmd = 469,
+    T_BaseBackupCmd = 470,
+    T_CreateReplicationSlotCmd = 471,
+    T_DropReplicationSlotCmd = 472,
+    T_AlterReplicationSlotCmd = 473,
+    T_StartReplicationCmd = 474,
+    T_ReadReplicationSlotCmd = 475,
+    T_TimeLineHistoryCmd = 476,
+    T_UploadManifestCmd = 477,
+    T_SupportRequestSimplify = 478,
+    T_SupportRequestSimplifyAggref = 479,
+    T_SupportRequestInlineInFrom = 480,
+    T_SupportRequestSelectivity = 481,
+    T_SupportRequestCost = 482,
+    T_SupportRequestRows = 483,
+    T_SupportRequestIndexCondition = 484,
+    T_SupportRequestWFuncMonotonic = 485,
+    T_SupportRequestOptimizeWindowClause = 486,
+    T_SupportRequestModifyInPlace = 487,
+    T_Integer = 488,
+    T_Float = 489,
+    T_Boolean = 490,
+    T_String = 491,
+    T_BitString = 492,
+    T_ForeignKeyCacheInfo = 493,
+    T_IntList = 494,
+    T_OidList = 495,
+    T_XidList = 496,
+    T_AllocSetContext = 497,
+    T_GenerationContext = 498,
+    T_SlabContext = 499,
+    T_BumpContext = 500,
+    T_TIDBitmap = 501,
+    T_WindowObjectData = 502,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9993,21 +9976,6 @@ pub struct BrinStatsData {
     pub pagesPerRange: BlockNumber,
     pub revmapNumPages: BlockNumber,
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct iovec {
-    pub iov_base: *mut ::core::ffi::c_void,
-    pub iov_len: usize,
-}
-impl Default for iovec {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 pub type XLogRecPtr = uint64;
 pub type XLogSegNo = uint64;
 pub type TimeLineID = uint32;
@@ -10046,7 +10014,7 @@ pub type PageHeader = *mut PageHeaderData;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
-    pub value: ::core::ffi::c_char,
+    pub value: ::core::ffi::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -10320,7 +10288,8 @@ pub mod RmgrIds {
     pub const RM_REPLORIGIN_ID: Type = 19;
     pub const RM_GENERIC_ID: Type = 20;
     pub const RM_LOGICALMSG_ID: Type = 21;
-    pub const RM_NEXT_ID: Type = 22;
+    pub const RM_XLOG2_ID: Type = 22;
+    pub const RM_NEXT_ID: Type = 23;
 }
 pub type pg_crc32c = uint32;
 pub type ProcNumber = ::core::ffi::c_int;
@@ -10604,7 +10573,21 @@ pub struct xl_brin_desummarize {
     pub heapBlk: BlockNumber,
     pub regOffset: OffsetNumber,
 }
-pub type socklen_t = __socklen_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iovec {
+    pub iov_base: *mut ::core::ffi::c_void,
+    pub iov_len: usize,
+}
+impl Default for iovec {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgAioWaitRef {
@@ -11418,43 +11401,51 @@ pub mod SysCacheIdentifier {
     pub const PARTRELID: Type = 45;
     pub const PROCNAMEARGSNSP: Type = 46;
     pub const PROCOID: Type = 47;
-    pub const PUBLICATIONNAME: Type = 48;
-    pub const PUBLICATIONNAMESPACE: Type = 49;
-    pub const PUBLICATIONNAMESPACEMAP: Type = 50;
-    pub const PUBLICATIONOID: Type = 51;
-    pub const PUBLICATIONREL: Type = 52;
-    pub const PUBLICATIONRELMAP: Type = 53;
-    pub const RANGEMULTIRANGE: Type = 54;
-    pub const RANGETYPE: Type = 55;
-    pub const RELNAMENSP: Type = 56;
-    pub const RELOID: Type = 57;
-    pub const REPLORIGIDENT: Type = 58;
-    pub const REPLORIGNAME: Type = 59;
-    pub const RULERELNAME: Type = 60;
-    pub const SEQRELID: Type = 61;
-    pub const STATEXTDATASTXOID: Type = 62;
-    pub const STATEXTNAMENSP: Type = 63;
-    pub const STATEXTOID: Type = 64;
-    pub const STATRELATTINH: Type = 65;
-    pub const SUBSCRIPTIONNAME: Type = 66;
-    pub const SUBSCRIPTIONOID: Type = 67;
-    pub const SUBSCRIPTIONRELMAP: Type = 68;
-    pub const TABLESPACEOID: Type = 69;
-    pub const TRFOID: Type = 70;
-    pub const TRFTYPELANG: Type = 71;
-    pub const TSCONFIGMAP: Type = 72;
-    pub const TSCONFIGNAMENSP: Type = 73;
-    pub const TSCONFIGOID: Type = 74;
-    pub const TSDICTNAMENSP: Type = 75;
-    pub const TSDICTOID: Type = 76;
-    pub const TSPARSERNAMENSP: Type = 77;
-    pub const TSPARSEROID: Type = 78;
-    pub const TSTEMPLATENAMENSP: Type = 79;
-    pub const TSTEMPLATEOID: Type = 80;
-    pub const TYPENAMENSP: Type = 81;
-    pub const TYPEOID: Type = 82;
-    pub const USERMAPPINGOID: Type = 83;
-    pub const USERMAPPINGUSERSERVER: Type = 84;
+    pub const PROPGRAPHELALIAS: Type = 48;
+    pub const PROPGRAPHELEMENTLABELELEMENTLABEL: Type = 49;
+    pub const PROPGRAPHELOID: Type = 50;
+    pub const PROPGRAPHLABELNAME: Type = 51;
+    pub const PROPGRAPHLABELOID: Type = 52;
+    pub const PROPGRAPHLABELPROP: Type = 53;
+    pub const PROPGRAPHPROPNAME: Type = 54;
+    pub const PROPGRAPHPROPOID: Type = 55;
+    pub const PUBLICATIONNAME: Type = 56;
+    pub const PUBLICATIONNAMESPACE: Type = 57;
+    pub const PUBLICATIONNAMESPACEMAP: Type = 58;
+    pub const PUBLICATIONOID: Type = 59;
+    pub const PUBLICATIONREL: Type = 60;
+    pub const PUBLICATIONRELMAP: Type = 61;
+    pub const RANGEMULTIRANGE: Type = 62;
+    pub const RANGETYPE: Type = 63;
+    pub const RELNAMENSP: Type = 64;
+    pub const RELOID: Type = 65;
+    pub const REPLORIGIDENT: Type = 66;
+    pub const REPLORIGNAME: Type = 67;
+    pub const RULERELNAME: Type = 68;
+    pub const SEQRELID: Type = 69;
+    pub const STATEXTDATASTXOID: Type = 70;
+    pub const STATEXTNAMENSP: Type = 71;
+    pub const STATEXTOID: Type = 72;
+    pub const STATRELATTINH: Type = 73;
+    pub const SUBSCRIPTIONNAME: Type = 74;
+    pub const SUBSCRIPTIONOID: Type = 75;
+    pub const SUBSCRIPTIONRELMAP: Type = 76;
+    pub const TABLESPACEOID: Type = 77;
+    pub const TRFOID: Type = 78;
+    pub const TRFTYPELANG: Type = 79;
+    pub const TSCONFIGMAP: Type = 80;
+    pub const TSCONFIGNAMENSP: Type = 81;
+    pub const TSCONFIGOID: Type = 82;
+    pub const TSDICTNAMENSP: Type = 83;
+    pub const TSDICTOID: Type = 84;
+    pub const TSPARSERNAMENSP: Type = 85;
+    pub const TSPARSEROID: Type = 86;
+    pub const TSTEMPLATENAMENSP: Type = 87;
+    pub const TSTEMPLATEOID: Type = 88;
+    pub const TYPENAMENSP: Type = 89;
+    pub const TYPEOID: Type = 90;
+    pub const USERMAPPINGOID: Type = 91;
+    pub const USERMAPPINGUSERSERVER: Type = 92;
 }
 pub mod LockClauseStrength {
     pub type Type = ::core::ffi::c_uint;
@@ -12469,7 +12460,6 @@ pub struct JsonConstructorExpr {
     pub coercion: *mut Expr,
     pub returning: *mut JsonReturning,
     pub orig_query: *mut Node,
-    pub format: *mut JsonFormat,
     pub absent_on_null: bool,
     pub unique: bool,
     pub location: ParseLoc,
@@ -12849,6 +12839,42 @@ impl Default for ReturningExpr {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct GraphLabelRef {
+    pub type_: NodeTag,
+    pub labelid: Oid,
+    pub location: ParseLoc,
+}
+impl Default for GraphLabelRef {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GraphPropertyRef {
+    pub xpr: Expr,
+    pub elvarname: *const ::core::ffi::c_char,
+    pub propid: Oid,
+    pub typeId: Oid,
+    pub typmod: int32,
+    pub collation: Oid,
+    pub location: ParseLoc,
+}
+impl Default for GraphPropertyRef {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct TargetEntry {
     pub xpr: Expr,
     pub expr: *mut Expr,
@@ -12937,6 +12963,32 @@ pub struct OnConflictExpr {
     pub exclRelTlist: *mut List,
 }
 impl Default for OnConflictExpr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ForPortionOfExpr {
+    pub type_: NodeTag,
+    pub rangeVar: *mut Var,
+    pub range_name: *mut ::core::ffi::c_char,
+    pub targetFrom: *mut Node,
+    pub targetTo: *mut Node,
+    pub targetRange: *mut Node,
+    pub rangeType: Oid,
+    pub isDomain: bool,
+    pub overlapsExpr: *mut Node,
+    pub rangeTargetList: *mut List,
+    pub withoutPortionProc: Oid,
+    pub location: ParseLoc,
+    pub targetLocation: ParseLoc,
+}
+impl Default for ForPortionOfExpr {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -13073,6 +13125,7 @@ pub struct Query {
     pub canSetTag: bool,
     pub utilityStmt: *mut Node,
     pub resultRelation: ::core::ffi::c_int,
+    pub forPortionOf: *mut ForPortionOfExpr,
     pub hasAggs: bool,
     pub hasWindowFuncs: bool,
     pub hasTargetSRFs: bool,
@@ -13099,6 +13152,7 @@ pub struct Query {
     pub returningList: *mut List,
     pub groupClause: *mut List,
     pub groupDistinct: bool,
+    pub groupByAll: bool,
     pub groupingSets: *mut List,
     pub havingQual: *mut Node,
     pub windowClause: *mut List,
@@ -13559,6 +13613,25 @@ impl Default for RangeTableFuncCol {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct RangeGraphTable {
+    pub type_: NodeTag,
+    pub graph_name: *mut RangeVar,
+    pub graph_pattern: *mut GraphPattern,
+    pub columns: *mut List,
+    pub alias: *mut Alias,
+    pub location: ParseLoc,
+}
+impl Default for RangeGraphTable {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct RangeTableSample {
     pub type_: NodeTag,
     pub relation: *mut Node,
@@ -13813,13 +13886,75 @@ impl Default for PartitionRangeDatum {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct SinglePartitionSpec {
+    pub type_: NodeTag,
+    pub name: *mut RangeVar,
+    pub bound: *mut PartitionBoundSpec,
+}
+impl Default for SinglePartitionSpec {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct PartitionCmd {
     pub type_: NodeTag,
     pub name: *mut RangeVar,
     pub bound: *mut PartitionBoundSpec,
+    pub partlist: *mut List,
     pub concurrent: bool,
 }
 impl Default for PartitionCmd {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GraphPattern {
+    pub type_: NodeTag,
+    pub path_pattern_list: *mut List,
+    pub whereClause: *mut Node,
+}
+impl Default for GraphPattern {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod GraphElementPatternKind {
+    pub type Type = ::core::ffi::c_uint;
+    pub const VERTEX_PATTERN: Type = 0;
+    pub const EDGE_PATTERN_LEFT: Type = 1;
+    pub const EDGE_PATTERN_RIGHT: Type = 2;
+    pub const EDGE_PATTERN_ANY: Type = 3;
+    pub const PAREN_EXPR: Type = 4;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GraphElementPattern {
+    pub type_: NodeTag,
+    pub kind: GraphElementPatternKind::Type,
+    pub variable: *const ::core::ffi::c_char,
+    pub labelexpr: *mut Node,
+    pub subexpr: *mut List,
+    pub whereClause: *mut Node,
+    pub quantifier: *mut List,
+    pub location: ParseLoc,
+}
+impl Default for GraphElementPattern {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -13838,8 +13973,9 @@ pub mod RTEKind {
     pub const RTE_VALUES: Type = 5;
     pub const RTE_CTE: Type = 6;
     pub const RTE_NAMEDTUPLESTORE: Type = 7;
-    pub const RTE_RESULT: Type = 8;
-    pub const RTE_GROUP: Type = 9;
+    pub const RTE_GRAPH_TABLE: Type = 8;
+    pub const RTE_RESULT: Type = 9;
+    pub const RTE_GROUP: Type = 10;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -13865,6 +14001,8 @@ pub struct RangeTblEntry {
     pub functions: *mut List,
     pub funcordinality: bool,
     pub tablefunc: *mut TableFunc,
+    pub graph_pattern: *mut GraphPattern,
+    pub graph_table_columns: *mut List,
     pub values_lists: *mut List,
     pub ctename: *mut ::core::ffi::c_char,
     pub ctelevelsup: Index,
@@ -14058,6 +14196,26 @@ pub struct RowMarkClause {
     pub pushedDown: bool,
 }
 impl Default for RowMarkClause {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ForPortionOfClause {
+    pub type_: NodeTag,
+    pub range_name: *mut ::core::ffi::c_char,
+    pub location: ParseLoc,
+    pub target_location: ParseLoc,
+    pub target: *mut Node,
+    pub target_start: *mut Node,
+    pub target_end: *mut Node,
+}
+impl Default for ForPortionOfClause {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -14634,6 +14792,7 @@ pub struct DeleteStmt {
     pub whereClause: *mut Node,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
+    pub forPortionOf: *mut ForPortionOfClause,
 }
 impl Default for DeleteStmt {
     fn default() -> Self {
@@ -14654,6 +14813,7 @@ pub struct UpdateStmt {
     pub fromClause: *mut List,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
+    pub forPortionOf: *mut ForPortionOfClause,
 }
 impl Default for UpdateStmt {
     fn default() -> Self {
@@ -14702,6 +14862,7 @@ pub struct SelectStmt {
     pub whereClause: *mut Node,
     pub groupClause: *mut List,
     pub groupDistinct: bool,
+    pub groupByAll: bool,
     pub havingClause: *mut Node,
     pub windowClause: *mut List,
     pub valuesLists: *mut List,
@@ -14814,8 +14975,8 @@ pub mod ObjectType {
     pub const OBJECT_PARAMETER_ACL: Type = 27;
     pub const OBJECT_POLICY: Type = 28;
     pub const OBJECT_PROCEDURE: Type = 29;
-    pub const OBJECT_PUBLICATION: Type = 30;
-    pub const OBJECT_PUBLICATION_EXCLUDED_REL: Type = 31;
+    pub const OBJECT_PROPGRAPH: Type = 30;
+    pub const OBJECT_PUBLICATION: Type = 31;
     pub const OBJECT_PUBLICATION_NAMESPACE: Type = 32;
     pub const OBJECT_PUBLICATION_REL: Type = 33;
     pub const OBJECT_ROLE: Type = 34;
@@ -14943,10 +15104,12 @@ pub mod AlterTableType {
     pub const AT_AttachPartition: Type = 59;
     pub const AT_DetachPartition: Type = 60;
     pub const AT_DetachPartitionFinalize: Type = 61;
-    pub const AT_AddIdentity: Type = 62;
-    pub const AT_SetIdentity: Type = 63;
-    pub const AT_DropIdentity: Type = 64;
-    pub const AT_ReAddStatistics: Type = 65;
+    pub const AT_SplitPartition: Type = 62;
+    pub const AT_MergePartitions: Type = 63;
+    pub const AT_AddIdentity: Type = 64;
+    pub const AT_SetIdentity: Type = 65;
+    pub const AT_DropIdentity: Type = 66;
+    pub const AT_ReAddStatistics: Type = 67;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -16157,7 +16320,6 @@ pub struct CreateStatsStmt {
     pub stxcomment: *mut ::core::ffi::c_char,
     pub transformed: bool,
     pub if_not_exists: bool,
-    pub owner: Oid,
 }
 impl Default for CreateStatsStmt {
     fn default() -> Self {
@@ -16993,6 +17155,132 @@ impl Default for CreateCastStmt {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct CreatePropGraphStmt {
+    pub type_: NodeTag,
+    pub pgname: *mut RangeVar,
+    pub vertex_tables: *mut List,
+    pub edge_tables: *mut List,
+}
+impl Default for CreatePropGraphStmt {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PropGraphVertex {
+    pub type_: NodeTag,
+    pub vtable: *mut RangeVar,
+    pub vkey: *mut List,
+    pub labels: *mut List,
+    pub location: ParseLoc,
+}
+impl Default for PropGraphVertex {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PropGraphEdge {
+    pub type_: NodeTag,
+    pub etable: *mut RangeVar,
+    pub ekey: *mut List,
+    pub esrckey: *mut List,
+    pub esrcvertex: *mut ::core::ffi::c_char,
+    pub esrcvertexcols: *mut List,
+    pub edestkey: *mut List,
+    pub edestvertex: *mut ::core::ffi::c_char,
+    pub edestvertexcols: *mut List,
+    pub labels: *mut List,
+    pub location: ParseLoc,
+}
+impl Default for PropGraphEdge {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PropGraphLabelAndProperties {
+    pub type_: NodeTag,
+    pub label: *const ::core::ffi::c_char,
+    pub properties: *mut PropGraphProperties,
+    pub location: ParseLoc,
+}
+impl Default for PropGraphLabelAndProperties {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PropGraphProperties {
+    pub type_: NodeTag,
+    pub properties: *mut List,
+    pub all: bool,
+    pub location: ParseLoc,
+}
+impl Default for PropGraphProperties {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod AlterPropGraphElementKind {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PROPGRAPH_ELEMENT_KIND_VERTEX: Type = 1;
+    pub const PROPGRAPH_ELEMENT_KIND_EDGE: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterPropGraphStmt {
+    pub type_: NodeTag,
+    pub pgname: *mut RangeVar,
+    pub missing_ok: bool,
+    pub add_vertex_tables: *mut List,
+    pub add_edge_tables: *mut List,
+    pub drop_vertex_tables: *mut List,
+    pub drop_edge_tables: *mut List,
+    pub drop_behavior: DropBehavior::Type,
+    pub element_kind: AlterPropGraphElementKind::Type,
+    pub element_alias: *const ::core::ffi::c_char,
+    pub add_labels: *mut List,
+    pub drop_label: *const ::core::ffi::c_char,
+    pub alter_label: *const ::core::ffi::c_char,
+    pub add_properties: *mut PropGraphProperties,
+    pub drop_properties: *mut List,
+}
+impl Default for AlterPropGraphStmt {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct CreateTransformStmt {
     pub type_: NodeTag,
     pub replace: bool,
@@ -17323,7 +17611,6 @@ pub struct WaitStmt {
     pub type_: NodeTag,
     pub lsn_literal: *mut ::core::ffi::c_char,
     pub options: *mut List,
-    pub lsn_location: ParseLoc,
 }
 impl Default for WaitStmt {
     fn default() -> Self {
@@ -18508,7 +18795,7 @@ impl Default for SortSupportData {
 pub struct GinTuple {
     pub tuplen: ::core::ffi::c_int,
     pub attrnum: OffsetNumber,
-    pub keylen: Size,
+    pub keylen: uint16,
     pub typlen: int16,
     pub typbyval: bool,
     pub category: ::core::ffi::c_schar,
@@ -18691,11 +18978,12 @@ impl Default for GistEntryVector {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: ::core::ffi::c_ushort,
-    pub d_type: ::core::ffi::c_uchar,
-    pub d_name: [::core::ffi::c_char; 256usize],
+    pub d_ino: __uint64_t,
+    pub d_seekoff: __uint64_t,
+    pub d_reclen: __uint16_t,
+    pub d_namlen: __uint16_t,
+    pub d_type: __uint8_t,
+    pub d_name: [::core::ffi::c_char; 1024usize],
 }
 impl Default for dirent {
     fn default() -> Self {
@@ -18708,15 +18996,36 @@ impl Default for dirent {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __dirstream {
+pub struct _telldir {
     _unused: [u8; 0],
 }
-pub type DIR = __dirstream;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DIR {
+    pub __dd_fd: ::core::ffi::c_int,
+    pub __dd_loc: usize,
+    pub __dd_size: usize,
+    pub __dd_buf: *mut ::core::ffi::c_char,
+    pub __dd_len: ::core::ffi::c_int,
+    pub __dd_seek: ::core::ffi::c_long,
+    pub __padding: ::core::ffi::c_long,
+    pub __dd_flags: ::core::ffi::c_int,
+    pub __dd_lock: __darwin_pthread_mutex_t,
+    pub __dd_td: *mut _telldir,
+}
+impl Default for DIR {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type File = ::core::ffi::c_int;
 pub mod FileExtendMethod {
     pub type Type = ::core::ffi::c_uint;
-    pub const FILE_EXTEND_METHOD_POSIX_FALLOCATE: Type = 0;
-    pub const FILE_EXTEND_METHOD_WRITE_ZEROS: Type = 1;
+    pub const FILE_EXTEND_METHOD_WRITE_ZEROS: Type = 0;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19267,14 +19576,6 @@ impl Default for xl_hash_vacuum_one_page {
         }
     }
 }
-pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_17 {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SIGEV_SIGNAL: Type = 0;
-    pub const SIGEV_NONE: Type = 1;
-    pub const SIGEV_THREAD: Type = 2;
-    pub const SIGEV_THREAD_ID: Type = 4;
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SharedInvalCatcacheMsg {
@@ -19628,7 +19929,7 @@ impl Default for xl_heap_rewrite_mapping {
         }
     }
 }
-pub type slock_t = ::core::ffi::c_uchar;
+pub type slock_t = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SpinDelayStatus {
@@ -21433,177 +21734,180 @@ pub mod CommandTag {
     pub const CMDTAG_ALTER_OPERATOR_FAMILY: Type = 21;
     pub const CMDTAG_ALTER_POLICY: Type = 22;
     pub const CMDTAG_ALTER_PROCEDURE: Type = 23;
-    pub const CMDTAG_ALTER_PUBLICATION: Type = 24;
-    pub const CMDTAG_ALTER_ROLE: Type = 25;
-    pub const CMDTAG_ALTER_ROUTINE: Type = 26;
-    pub const CMDTAG_ALTER_RULE: Type = 27;
-    pub const CMDTAG_ALTER_SCHEMA: Type = 28;
-    pub const CMDTAG_ALTER_SEQUENCE: Type = 29;
-    pub const CMDTAG_ALTER_SERVER: Type = 30;
-    pub const CMDTAG_ALTER_STATISTICS: Type = 31;
-    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 32;
-    pub const CMDTAG_ALTER_SYSTEM: Type = 33;
-    pub const CMDTAG_ALTER_TABLE: Type = 34;
-    pub const CMDTAG_ALTER_TABLESPACE: Type = 35;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 36;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 37;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 38;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 39;
-    pub const CMDTAG_ALTER_TRANSFORM: Type = 40;
-    pub const CMDTAG_ALTER_TRIGGER: Type = 41;
-    pub const CMDTAG_ALTER_TYPE: Type = 42;
-    pub const CMDTAG_ALTER_USER_MAPPING: Type = 43;
-    pub const CMDTAG_ALTER_VIEW: Type = 44;
-    pub const CMDTAG_ANALYZE: Type = 45;
-    pub const CMDTAG_BEGIN: Type = 46;
-    pub const CMDTAG_CALL: Type = 47;
-    pub const CMDTAG_CHECKPOINT: Type = 48;
-    pub const CMDTAG_CLOSE: Type = 49;
-    pub const CMDTAG_CLOSE_CURSOR: Type = 50;
-    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 51;
-    pub const CMDTAG_CLUSTER: Type = 52;
-    pub const CMDTAG_COMMENT: Type = 53;
-    pub const CMDTAG_COMMIT: Type = 54;
-    pub const CMDTAG_COMMIT_PREPARED: Type = 55;
-    pub const CMDTAG_COPY: Type = 56;
-    pub const CMDTAG_COPY_FROM: Type = 57;
-    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 58;
-    pub const CMDTAG_CREATE_AGGREGATE: Type = 59;
-    pub const CMDTAG_CREATE_CAST: Type = 60;
-    pub const CMDTAG_CREATE_COLLATION: Type = 61;
-    pub const CMDTAG_CREATE_CONSTRAINT: Type = 62;
-    pub const CMDTAG_CREATE_CONVERSION: Type = 63;
-    pub const CMDTAG_CREATE_DATABASE: Type = 64;
-    pub const CMDTAG_CREATE_DOMAIN: Type = 65;
-    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 66;
-    pub const CMDTAG_CREATE_EXTENSION: Type = 67;
-    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 68;
-    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 69;
-    pub const CMDTAG_CREATE_FUNCTION: Type = 70;
-    pub const CMDTAG_CREATE_INDEX: Type = 71;
-    pub const CMDTAG_CREATE_LANGUAGE: Type = 72;
-    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 73;
-    pub const CMDTAG_CREATE_OPERATOR: Type = 74;
-    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 75;
-    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 76;
-    pub const CMDTAG_CREATE_POLICY: Type = 77;
-    pub const CMDTAG_CREATE_PROCEDURE: Type = 78;
-    pub const CMDTAG_CREATE_PUBLICATION: Type = 79;
-    pub const CMDTAG_CREATE_ROLE: Type = 80;
-    pub const CMDTAG_CREATE_ROUTINE: Type = 81;
-    pub const CMDTAG_CREATE_RULE: Type = 82;
-    pub const CMDTAG_CREATE_SCHEMA: Type = 83;
-    pub const CMDTAG_CREATE_SEQUENCE: Type = 84;
-    pub const CMDTAG_CREATE_SERVER: Type = 85;
-    pub const CMDTAG_CREATE_STATISTICS: Type = 86;
-    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 87;
-    pub const CMDTAG_CREATE_TABLE: Type = 88;
-    pub const CMDTAG_CREATE_TABLE_AS: Type = 89;
-    pub const CMDTAG_CREATE_TABLESPACE: Type = 90;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 91;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 92;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 93;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 94;
-    pub const CMDTAG_CREATE_TRANSFORM: Type = 95;
-    pub const CMDTAG_CREATE_TRIGGER: Type = 96;
-    pub const CMDTAG_CREATE_TYPE: Type = 97;
-    pub const CMDTAG_CREATE_USER_MAPPING: Type = 98;
-    pub const CMDTAG_CREATE_VIEW: Type = 99;
-    pub const CMDTAG_DEALLOCATE: Type = 100;
-    pub const CMDTAG_DEALLOCATE_ALL: Type = 101;
-    pub const CMDTAG_DECLARE_CURSOR: Type = 102;
-    pub const CMDTAG_DELETE: Type = 103;
-    pub const CMDTAG_DISCARD: Type = 104;
-    pub const CMDTAG_DISCARD_ALL: Type = 105;
-    pub const CMDTAG_DISCARD_PLANS: Type = 106;
-    pub const CMDTAG_DISCARD_SEQUENCES: Type = 107;
-    pub const CMDTAG_DISCARD_TEMP: Type = 108;
-    pub const CMDTAG_DO: Type = 109;
-    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 110;
-    pub const CMDTAG_DROP_AGGREGATE: Type = 111;
-    pub const CMDTAG_DROP_CAST: Type = 112;
-    pub const CMDTAG_DROP_COLLATION: Type = 113;
-    pub const CMDTAG_DROP_CONSTRAINT: Type = 114;
-    pub const CMDTAG_DROP_CONVERSION: Type = 115;
-    pub const CMDTAG_DROP_DATABASE: Type = 116;
-    pub const CMDTAG_DROP_DOMAIN: Type = 117;
-    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 118;
-    pub const CMDTAG_DROP_EXTENSION: Type = 119;
-    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 120;
-    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 121;
-    pub const CMDTAG_DROP_FUNCTION: Type = 122;
-    pub const CMDTAG_DROP_INDEX: Type = 123;
-    pub const CMDTAG_DROP_LANGUAGE: Type = 124;
-    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 125;
-    pub const CMDTAG_DROP_OPERATOR: Type = 126;
-    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 127;
-    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 128;
-    pub const CMDTAG_DROP_OWNED: Type = 129;
-    pub const CMDTAG_DROP_POLICY: Type = 130;
-    pub const CMDTAG_DROP_PROCEDURE: Type = 131;
-    pub const CMDTAG_DROP_PUBLICATION: Type = 132;
-    pub const CMDTAG_DROP_ROLE: Type = 133;
-    pub const CMDTAG_DROP_ROUTINE: Type = 134;
-    pub const CMDTAG_DROP_RULE: Type = 135;
-    pub const CMDTAG_DROP_SCHEMA: Type = 136;
-    pub const CMDTAG_DROP_SEQUENCE: Type = 137;
-    pub const CMDTAG_DROP_SERVER: Type = 138;
-    pub const CMDTAG_DROP_STATISTICS: Type = 139;
-    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 140;
-    pub const CMDTAG_DROP_TABLE: Type = 141;
-    pub const CMDTAG_DROP_TABLESPACE: Type = 142;
-    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 143;
-    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 144;
-    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 145;
-    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 146;
-    pub const CMDTAG_DROP_TRANSFORM: Type = 147;
-    pub const CMDTAG_DROP_TRIGGER: Type = 148;
-    pub const CMDTAG_DROP_TYPE: Type = 149;
-    pub const CMDTAG_DROP_USER_MAPPING: Type = 150;
-    pub const CMDTAG_DROP_VIEW: Type = 151;
-    pub const CMDTAG_EXECUTE: Type = 152;
-    pub const CMDTAG_EXPLAIN: Type = 153;
-    pub const CMDTAG_FETCH: Type = 154;
-    pub const CMDTAG_GRANT: Type = 155;
-    pub const CMDTAG_GRANT_ROLE: Type = 156;
-    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 157;
-    pub const CMDTAG_INSERT: Type = 158;
-    pub const CMDTAG_LISTEN: Type = 159;
-    pub const CMDTAG_LOAD: Type = 160;
-    pub const CMDTAG_LOCK_TABLE: Type = 161;
-    pub const CMDTAG_LOGIN: Type = 162;
-    pub const CMDTAG_MERGE: Type = 163;
-    pub const CMDTAG_MOVE: Type = 164;
-    pub const CMDTAG_NOTIFY: Type = 165;
-    pub const CMDTAG_PREPARE: Type = 166;
-    pub const CMDTAG_PREPARE_TRANSACTION: Type = 167;
-    pub const CMDTAG_REASSIGN_OWNED: Type = 168;
-    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 169;
-    pub const CMDTAG_REINDEX: Type = 170;
-    pub const CMDTAG_RELEASE: Type = 171;
-    pub const CMDTAG_REPACK: Type = 172;
-    pub const CMDTAG_RESET: Type = 173;
-    pub const CMDTAG_REVOKE: Type = 174;
-    pub const CMDTAG_REVOKE_ROLE: Type = 175;
-    pub const CMDTAG_ROLLBACK: Type = 176;
-    pub const CMDTAG_ROLLBACK_PREPARED: Type = 177;
-    pub const CMDTAG_SAVEPOINT: Type = 178;
-    pub const CMDTAG_SECURITY_LABEL: Type = 179;
-    pub const CMDTAG_SELECT: Type = 180;
-    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 181;
-    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 182;
-    pub const CMDTAG_SELECT_FOR_SHARE: Type = 183;
-    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 184;
-    pub const CMDTAG_SELECT_INTO: Type = 185;
-    pub const CMDTAG_SET: Type = 186;
-    pub const CMDTAG_SET_CONSTRAINTS: Type = 187;
-    pub const CMDTAG_SHOW: Type = 188;
-    pub const CMDTAG_START_TRANSACTION: Type = 189;
-    pub const CMDTAG_TRUNCATE_TABLE: Type = 190;
-    pub const CMDTAG_UNLISTEN: Type = 191;
-    pub const CMDTAG_UPDATE: Type = 192;
-    pub const CMDTAG_VACUUM: Type = 193;
-    pub const CMDTAG_WAIT: Type = 194;
+    pub const CMDTAG_ALTER_PROPERTY_GRAPH: Type = 24;
+    pub const CMDTAG_ALTER_PUBLICATION: Type = 25;
+    pub const CMDTAG_ALTER_ROLE: Type = 26;
+    pub const CMDTAG_ALTER_ROUTINE: Type = 27;
+    pub const CMDTAG_ALTER_RULE: Type = 28;
+    pub const CMDTAG_ALTER_SCHEMA: Type = 29;
+    pub const CMDTAG_ALTER_SEQUENCE: Type = 30;
+    pub const CMDTAG_ALTER_SERVER: Type = 31;
+    pub const CMDTAG_ALTER_STATISTICS: Type = 32;
+    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 33;
+    pub const CMDTAG_ALTER_SYSTEM: Type = 34;
+    pub const CMDTAG_ALTER_TABLE: Type = 35;
+    pub const CMDTAG_ALTER_TABLESPACE: Type = 36;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 37;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 38;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 39;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 40;
+    pub const CMDTAG_ALTER_TRANSFORM: Type = 41;
+    pub const CMDTAG_ALTER_TRIGGER: Type = 42;
+    pub const CMDTAG_ALTER_TYPE: Type = 43;
+    pub const CMDTAG_ALTER_USER_MAPPING: Type = 44;
+    pub const CMDTAG_ALTER_VIEW: Type = 45;
+    pub const CMDTAG_ANALYZE: Type = 46;
+    pub const CMDTAG_BEGIN: Type = 47;
+    pub const CMDTAG_CALL: Type = 48;
+    pub const CMDTAG_CHECKPOINT: Type = 49;
+    pub const CMDTAG_CLOSE: Type = 50;
+    pub const CMDTAG_CLOSE_CURSOR: Type = 51;
+    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 52;
+    pub const CMDTAG_CLUSTER: Type = 53;
+    pub const CMDTAG_COMMENT: Type = 54;
+    pub const CMDTAG_COMMIT: Type = 55;
+    pub const CMDTAG_COMMIT_PREPARED: Type = 56;
+    pub const CMDTAG_COPY: Type = 57;
+    pub const CMDTAG_COPY_FROM: Type = 58;
+    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 59;
+    pub const CMDTAG_CREATE_AGGREGATE: Type = 60;
+    pub const CMDTAG_CREATE_CAST: Type = 61;
+    pub const CMDTAG_CREATE_COLLATION: Type = 62;
+    pub const CMDTAG_CREATE_CONSTRAINT: Type = 63;
+    pub const CMDTAG_CREATE_CONVERSION: Type = 64;
+    pub const CMDTAG_CREATE_DATABASE: Type = 65;
+    pub const CMDTAG_CREATE_DOMAIN: Type = 66;
+    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 67;
+    pub const CMDTAG_CREATE_EXTENSION: Type = 68;
+    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 69;
+    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 70;
+    pub const CMDTAG_CREATE_FUNCTION: Type = 71;
+    pub const CMDTAG_CREATE_INDEX: Type = 72;
+    pub const CMDTAG_CREATE_LANGUAGE: Type = 73;
+    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 74;
+    pub const CMDTAG_CREATE_OPERATOR: Type = 75;
+    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 76;
+    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 77;
+    pub const CMDTAG_CREATE_POLICY: Type = 78;
+    pub const CMDTAG_CREATE_PROCEDURE: Type = 79;
+    pub const CMDTAG_CREATE_PROPERTY_GRAPH: Type = 80;
+    pub const CMDTAG_CREATE_PUBLICATION: Type = 81;
+    pub const CMDTAG_CREATE_ROLE: Type = 82;
+    pub const CMDTAG_CREATE_ROUTINE: Type = 83;
+    pub const CMDTAG_CREATE_RULE: Type = 84;
+    pub const CMDTAG_CREATE_SCHEMA: Type = 85;
+    pub const CMDTAG_CREATE_SEQUENCE: Type = 86;
+    pub const CMDTAG_CREATE_SERVER: Type = 87;
+    pub const CMDTAG_CREATE_STATISTICS: Type = 88;
+    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 89;
+    pub const CMDTAG_CREATE_TABLE: Type = 90;
+    pub const CMDTAG_CREATE_TABLE_AS: Type = 91;
+    pub const CMDTAG_CREATE_TABLESPACE: Type = 92;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 93;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 94;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 95;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 96;
+    pub const CMDTAG_CREATE_TRANSFORM: Type = 97;
+    pub const CMDTAG_CREATE_TRIGGER: Type = 98;
+    pub const CMDTAG_CREATE_TYPE: Type = 99;
+    pub const CMDTAG_CREATE_USER_MAPPING: Type = 100;
+    pub const CMDTAG_CREATE_VIEW: Type = 101;
+    pub const CMDTAG_DEALLOCATE: Type = 102;
+    pub const CMDTAG_DEALLOCATE_ALL: Type = 103;
+    pub const CMDTAG_DECLARE_CURSOR: Type = 104;
+    pub const CMDTAG_DELETE: Type = 105;
+    pub const CMDTAG_DISCARD: Type = 106;
+    pub const CMDTAG_DISCARD_ALL: Type = 107;
+    pub const CMDTAG_DISCARD_PLANS: Type = 108;
+    pub const CMDTAG_DISCARD_SEQUENCES: Type = 109;
+    pub const CMDTAG_DISCARD_TEMP: Type = 110;
+    pub const CMDTAG_DO: Type = 111;
+    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 112;
+    pub const CMDTAG_DROP_AGGREGATE: Type = 113;
+    pub const CMDTAG_DROP_CAST: Type = 114;
+    pub const CMDTAG_DROP_COLLATION: Type = 115;
+    pub const CMDTAG_DROP_CONSTRAINT: Type = 116;
+    pub const CMDTAG_DROP_CONVERSION: Type = 117;
+    pub const CMDTAG_DROP_DATABASE: Type = 118;
+    pub const CMDTAG_DROP_DOMAIN: Type = 119;
+    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 120;
+    pub const CMDTAG_DROP_EXTENSION: Type = 121;
+    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 122;
+    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 123;
+    pub const CMDTAG_DROP_FUNCTION: Type = 124;
+    pub const CMDTAG_DROP_INDEX: Type = 125;
+    pub const CMDTAG_DROP_LANGUAGE: Type = 126;
+    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 127;
+    pub const CMDTAG_DROP_OPERATOR: Type = 128;
+    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 129;
+    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 130;
+    pub const CMDTAG_DROP_OWNED: Type = 131;
+    pub const CMDTAG_DROP_POLICY: Type = 132;
+    pub const CMDTAG_DROP_PROCEDURE: Type = 133;
+    pub const CMDTAG_DROP_PROPERTY_GRAPH: Type = 134;
+    pub const CMDTAG_DROP_PUBLICATION: Type = 135;
+    pub const CMDTAG_DROP_ROLE: Type = 136;
+    pub const CMDTAG_DROP_ROUTINE: Type = 137;
+    pub const CMDTAG_DROP_RULE: Type = 138;
+    pub const CMDTAG_DROP_SCHEMA: Type = 139;
+    pub const CMDTAG_DROP_SEQUENCE: Type = 140;
+    pub const CMDTAG_DROP_SERVER: Type = 141;
+    pub const CMDTAG_DROP_STATISTICS: Type = 142;
+    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 143;
+    pub const CMDTAG_DROP_TABLE: Type = 144;
+    pub const CMDTAG_DROP_TABLESPACE: Type = 145;
+    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 146;
+    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 147;
+    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 148;
+    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 149;
+    pub const CMDTAG_DROP_TRANSFORM: Type = 150;
+    pub const CMDTAG_DROP_TRIGGER: Type = 151;
+    pub const CMDTAG_DROP_TYPE: Type = 152;
+    pub const CMDTAG_DROP_USER_MAPPING: Type = 153;
+    pub const CMDTAG_DROP_VIEW: Type = 154;
+    pub const CMDTAG_EXECUTE: Type = 155;
+    pub const CMDTAG_EXPLAIN: Type = 156;
+    pub const CMDTAG_FETCH: Type = 157;
+    pub const CMDTAG_GRANT: Type = 158;
+    pub const CMDTAG_GRANT_ROLE: Type = 159;
+    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 160;
+    pub const CMDTAG_INSERT: Type = 161;
+    pub const CMDTAG_LISTEN: Type = 162;
+    pub const CMDTAG_LOAD: Type = 163;
+    pub const CMDTAG_LOCK_TABLE: Type = 164;
+    pub const CMDTAG_LOGIN: Type = 165;
+    pub const CMDTAG_MERGE: Type = 166;
+    pub const CMDTAG_MOVE: Type = 167;
+    pub const CMDTAG_NOTIFY: Type = 168;
+    pub const CMDTAG_PREPARE: Type = 169;
+    pub const CMDTAG_PREPARE_TRANSACTION: Type = 170;
+    pub const CMDTAG_REASSIGN_OWNED: Type = 171;
+    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 172;
+    pub const CMDTAG_REINDEX: Type = 173;
+    pub const CMDTAG_RELEASE: Type = 174;
+    pub const CMDTAG_REPACK: Type = 175;
+    pub const CMDTAG_RESET: Type = 176;
+    pub const CMDTAG_REVOKE: Type = 177;
+    pub const CMDTAG_REVOKE_ROLE: Type = 178;
+    pub const CMDTAG_ROLLBACK: Type = 179;
+    pub const CMDTAG_ROLLBACK_PREPARED: Type = 180;
+    pub const CMDTAG_SAVEPOINT: Type = 181;
+    pub const CMDTAG_SECURITY_LABEL: Type = 182;
+    pub const CMDTAG_SELECT: Type = 183;
+    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 184;
+    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 185;
+    pub const CMDTAG_SELECT_FOR_SHARE: Type = 186;
+    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 187;
+    pub const CMDTAG_SELECT_INTO: Type = 188;
+    pub const CMDTAG_SET: Type = 189;
+    pub const CMDTAG_SET_CONSTRAINTS: Type = 190;
+    pub const CMDTAG_SHOW: Type = 191;
+    pub const CMDTAG_START_TRANSACTION: Type = 192;
+    pub const CMDTAG_TRUNCATE_TABLE: Type = 193;
+    pub const CMDTAG_UNLISTEN: Type = 194;
+    pub const CMDTAG_UPDATE: Type = 195;
+    pub const CMDTAG_VACUUM: Type = 196;
+    pub const CMDTAG_WAIT: Type = 197;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -21917,6 +22221,7 @@ pub struct ModifyTable {
     pub onConflictSet: *mut List,
     pub onConflictCols: *mut List,
     pub onConflictWhere: *mut Node,
+    pub forPortionOf: *mut Node,
     pub exclRelRTI: Index,
     pub exclRelTlist: *mut List,
     pub mergeActionLists: *mut List,
@@ -23136,6 +23441,27 @@ impl Default for MergeActionState {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct ForPortionOfState {
+    pub type_: NodeTag,
+    pub fp_rangeName: *mut ::core::ffi::c_char,
+    pub fp_rangeType: Oid,
+    pub fp_rangeAttno: ::core::ffi::c_int,
+    pub fp_targetRange: Datum,
+    pub fp_leftoverstypcache: *mut TypeCacheEntry,
+    pub fp_Existing: *mut TupleTableSlot,
+    pub fp_Leftover: *mut TupleTableSlot,
+}
+impl Default for ForPortionOfState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ResultRelInfo {
     pub type_: NodeTag,
     pub ri_RangeTableIndex: Index,
@@ -23181,6 +23507,7 @@ pub struct ResultRelInfo {
     pub ri_onConflict: *mut OnConflictActionState,
     pub ri_MergeActions: [*mut List; 3usize],
     pub ri_MergeJoinCondition: *mut ExprState,
+    pub ri_forPortionOf: *mut ForPortionOfState,
     pub ri_PartitionCheckExpr: *mut ExprState,
     pub ri_ChildToRootMap: *mut TupleConversionMap,
     pub ri_ChildToRootMapValid: bool,
@@ -23665,7 +23992,6 @@ pub struct ModifyTableState {
     pub mt_updateColnosLists: *mut List,
     pub mt_mergeActionLists: *mut List,
     pub mt_mergeJoinConditions: *mut List,
-    pub mt_fdwPrivLists: *mut List,
 }
 impl Default for ModifyTableState {
     fn default() -> Self {
@@ -27934,6 +28260,7 @@ pub struct ModifyTablePath {
     pub returningLists: *mut List,
     pub rowMarks: *mut List,
     pub onconflict: *mut OnConflictExpr,
+    pub forPortionOf: *mut ForPortionOfExpr,
     pub epqParam: ::core::ffi::c_int,
     pub mergeActionLists: *mut List,
     pub mergeJoinConditions: *mut List,
@@ -28495,6 +28822,8 @@ pub mod ChecksumStateType {
     pub type Type = ::core::ffi::c_uint;
     pub const PG_DATA_CHECKSUM_OFF: Type = 0;
     pub const PG_DATA_CHECKSUM_VERSION: Type = 1;
+    pub const PG_DATA_CHECKSUM_INPROGRESS_OFF: Type = 2;
+    pub const PG_DATA_CHECKSUM_INPROGRESS_ON: Type = 3;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -28543,6 +28872,20 @@ impl Default for xl_restore_point {
     }
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xl_checksum_state {
+    pub new_checksum_state: ChecksumStateType::Type,
+}
+impl Default for xl_checksum_state {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct xl_overwrite_contrecord {
     pub overwritten_lsn: XLogRecPtr,
@@ -28560,6 +28903,7 @@ pub struct xl_end_of_recovery {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct xl_checkpoint_redo {
     pub wal_level: ::core::ffi::c_int,
+    pub data_checksum_version: uint32,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -28637,6 +28981,7 @@ pub struct CheckPoint {
     pub oldestCommitTsXid: TransactionId,
     pub newestCommitTsXid: TransactionId,
     pub oldestActiveXid: TransactionId,
+    pub dataChecksumState: uint32,
 }
 impl Default for CheckPoint {
     fn default() -> Self {
@@ -28692,7 +29037,6 @@ pub struct ControlFileData {
     pub toast_max_chunk_size: uint32,
     pub loblksize: uint32,
     pub float8ByVal: bool,
-    pub data_checksum_version_init: uint32,
     pub data_checksum_version: uint32,
     pub default_char_signedness: bool,
     pub mock_authentication_nonce: [::core::ffi::c_char; 32usize],
@@ -28785,7 +29129,6 @@ pub mod RecoveryPauseState {
 pub struct XLogRecoveryCtlData {
     pub SharedHotStandbyActive: bool,
     pub SharedPromoteIsTriggered: bool,
-    pub SharedRecoverySubtransInitialized: bool,
     pub recoveryWakeupLatch: Latch,
     pub lastReplayedReadRecPtr: XLogRecPtr,
     pub lastReplayedEndRecPtr: XLogRecPtr,
@@ -28966,32 +29309,34 @@ pub mod ParseExprKind {
     pub const EXPR_KIND_UPDATE_SOURCE: Type = 16;
     pub const EXPR_KIND_UPDATE_TARGET: Type = 17;
     pub const EXPR_KIND_MERGE_WHEN: Type = 18;
-    pub const EXPR_KIND_GROUP_BY: Type = 19;
-    pub const EXPR_KIND_ORDER_BY: Type = 20;
-    pub const EXPR_KIND_DISTINCT_ON: Type = 21;
-    pub const EXPR_KIND_LIMIT: Type = 22;
-    pub const EXPR_KIND_OFFSET: Type = 23;
-    pub const EXPR_KIND_RETURNING: Type = 24;
-    pub const EXPR_KIND_MERGE_RETURNING: Type = 25;
-    pub const EXPR_KIND_VALUES: Type = 26;
-    pub const EXPR_KIND_VALUES_SINGLE: Type = 27;
-    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 28;
-    pub const EXPR_KIND_DOMAIN_CHECK: Type = 29;
-    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 30;
-    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 31;
-    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 32;
-    pub const EXPR_KIND_INDEX_PREDICATE: Type = 33;
-    pub const EXPR_KIND_STATS_EXPRESSION: Type = 34;
-    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 35;
-    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 36;
-    pub const EXPR_KIND_TRIGGER_WHEN: Type = 37;
-    pub const EXPR_KIND_POLICY: Type = 38;
-    pub const EXPR_KIND_PARTITION_BOUND: Type = 39;
-    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 40;
-    pub const EXPR_KIND_CALL_ARGUMENT: Type = 41;
-    pub const EXPR_KIND_COPY_WHERE: Type = 42;
-    pub const EXPR_KIND_GENERATED_COLUMN: Type = 43;
-    pub const EXPR_KIND_CYCLE_MARK: Type = 44;
+    pub const EXPR_KIND_FOR_PORTION: Type = 19;
+    pub const EXPR_KIND_GROUP_BY: Type = 20;
+    pub const EXPR_KIND_ORDER_BY: Type = 21;
+    pub const EXPR_KIND_DISTINCT_ON: Type = 22;
+    pub const EXPR_KIND_LIMIT: Type = 23;
+    pub const EXPR_KIND_OFFSET: Type = 24;
+    pub const EXPR_KIND_RETURNING: Type = 25;
+    pub const EXPR_KIND_MERGE_RETURNING: Type = 26;
+    pub const EXPR_KIND_VALUES: Type = 27;
+    pub const EXPR_KIND_VALUES_SINGLE: Type = 28;
+    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 29;
+    pub const EXPR_KIND_DOMAIN_CHECK: Type = 30;
+    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 31;
+    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 32;
+    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 33;
+    pub const EXPR_KIND_INDEX_PREDICATE: Type = 34;
+    pub const EXPR_KIND_STATS_EXPRESSION: Type = 35;
+    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 36;
+    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 37;
+    pub const EXPR_KIND_TRIGGER_WHEN: Type = 38;
+    pub const EXPR_KIND_POLICY: Type = 39;
+    pub const EXPR_KIND_PARTITION_BOUND: Type = 40;
+    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 41;
+    pub const EXPR_KIND_CALL_ARGUMENT: Type = 42;
+    pub const EXPR_KIND_COPY_WHERE: Type = 43;
+    pub const EXPR_KIND_GENERATED_COLUMN: Type = 44;
+    pub const EXPR_KIND_CYCLE_MARK: Type = 45;
+    pub const EXPR_KIND_PROPGRAPH_PROPERTY: Type = 46;
 }
 pub type PreParseColumnRefHook = ::core::option::Option<
     unsafe extern "C-unwind" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
@@ -29015,6 +29360,22 @@ pub type CoerceParamHook = ::core::option::Option<
         location: ::core::ffi::c_int,
     ) -> *mut Node,
 >;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GraphTableParseState {
+    pub graphid: Oid,
+    pub variables: *mut List,
+    pub cur_gep: *mut GraphElementPattern,
+}
+impl Default for GraphTableParseState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ParseState {
@@ -29041,6 +29402,7 @@ pub struct ParseState {
     pub p_locked_from_parent: bool,
     pub p_resolve_unknowns: bool,
     pub p_queryEnv: *mut QueryEnvironment,
+    pub p_graph_table_pstate: *mut GraphTableParseState,
     pub p_hasAggs: bool,
     pub p_hasWindowFuncs: bool,
     pub p_hasTargetSRFs: bool,
@@ -30721,6 +31083,7 @@ pub struct Subscription {
     pub retaindeadtuples: bool,
     pub maxretention: int32,
     pub retentionactive: bool,
+    pub conninfo: *mut ::core::ffi::c_char,
     pub slotname: *mut ::core::ffi::c_char,
     pub synccommit: *mut ::core::ffi::c_char,
     pub walrcvtimeout: *mut ::core::ffi::c_char,
@@ -31226,6 +31589,8 @@ impl Default for TransitionCaptureState {
         }
     }
 }
+pub type AfterTriggerBatchCallback =
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg: *mut ::core::ffi::c_void)>;
 pub mod CopySource {
     pub type Type = ::core::ffi::c_uint;
     pub const COPY_FILE: Type = 0;
@@ -31700,23 +32065,6 @@ pub mod TimingClockSourceType {
     pub type Type = ::core::ffi::c_uint;
     pub const TIMING_CLOCK_SOURCE_AUTO: Type = 0;
     pub const TIMING_CLOCK_SOURCE_SYSTEM: Type = 1;
-    pub const TIMING_CLOCK_SOURCE_TSC: Type = 2;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TscClockSourceInfo {
-    pub frequency_khz: int32,
-    pub calibrated_frequency_khz: int32,
-    pub frequency_source: [::core::ffi::c_char; 128usize],
-}
-impl Default for TscClockSourceInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -32529,13 +32877,16 @@ pub struct OutputPluginCallbacks {
     pub stream_message_cb: LogicalDecodeStreamMessageCB,
     pub stream_truncate_cb: LogicalDecodeStreamTruncateCB,
 }
-pub type sa_family_t = ::core::ffi::c_ushort;
+pub type socklen_t = __darwin_socklen_t;
+pub type sa_family_t = __uint8_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_storage {
+    pub ss_len: __uint8_t,
     pub ss_family: sa_family_t,
-    pub __ss_padding: [::core::ffi::c_char; 118usize],
-    pub __ss_align: ::core::ffi::c_ulong,
+    pub __ss_pad1: [::core::ffi::c_char; 6usize],
+    pub __ss_align: __int64_t,
+    pub __ss_pad2: [::core::ffi::c_char; 112usize],
 }
 impl Default for sockaddr_storage {
     fn default() -> Self {
@@ -32885,7 +33236,6 @@ pub type walrcv_identify_system_fn = ::core::option::Option<
     unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         primary_tli: *mut TimeLineID,
-        server_lsn: *mut XLogRecPtr,
     ) -> *mut ::core::ffi::c_char,
 >;
 pub type walrcv_get_dbname_from_conninfo_fn = ::core::option::Option<
@@ -33188,10 +33538,9 @@ pub struct DecodingWorkerShared {
     pub mutex: slock_t,
     pub dbid: Oid,
     pub roleid: Oid,
-    pub lock_timeout: ::core::ffi::c_int,
-    pub transaction_timeout: ::core::ffi::c_int,
     pub relid: Oid,
     pub cv: ConditionVariable,
+    pub backend_proc: *mut PGPROC,
     pub backend_pid: pid_t,
     pub backend_proc_number: ProcNumber,
     pub error_queue: __IncompleteArrayField<::core::ffi::c_char>,
@@ -34757,7 +35106,9 @@ pub mod BackendType {
     pub const B_WAL_RECEIVER: Type = 14;
     pub const B_WAL_SUMMARIZER: Type = 15;
     pub const B_WAL_WRITER: Type = 16;
-    pub const B_LOGGER: Type = 17;
+    pub const B_DATACHECKSUMSWORKER_LAUNCHER: Type = 17;
+    pub const B_DATACHECKSUMSWORKER_WORKER: Type = 18;
+    pub const B_LOGGER: Type = 19;
 }
 pub mod ProcessingMode {
     #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
@@ -34766,7 +35117,6 @@ pub mod ProcessingMode {
     pub const InitProcessing: Type = 1;
     pub const NormalProcessing: Type = 2;
 }
-pub type ConnectionWarningFilter = ::core::option::Option<unsafe extern "C-unwind" fn() -> bool>;
 pub type shmem_request_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36415,9 +36765,6 @@ impl Default for WindowFuncLists {
         }
     }
 }
-pub type grouping_eqop_callback = ::core::option::Option<
-    unsafe extern "C-unwind" fn(var: *mut Var, context: *mut ::core::ffi::c_void) -> Oid,
->;
 pub mod ConstraintExclusionType {
     pub type Type = ::core::ffi::c_uint;
     pub const CONSTRAINT_EXCLUSION_OFF: Type = 0;
@@ -36432,16 +36779,10 @@ pub struct pg_prng_state {
 }
 pub type Gene = ::core::ffi::c_int;
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct Fitness {
-    pub disabled_nodes: ::core::ffi::c_int,
-    pub cost: Cost,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Chromosome {
     pub string: *mut Gene,
-    pub worth: Fitness,
+    pub worth: Cost,
 }
 impl Default for Chromosome {
     fn default() -> Self {
@@ -36852,6 +37193,7 @@ pub mod ProgressCommandType {
     pub const PROGRESS_COMMAND_BASEBACKUP: Type = 4;
     pub const PROGRESS_COMMAND_COPY: Type = 5;
     pub const PROGRESS_COMMAND_REPACK: Type = 6;
+    pub const PROGRESS_COMMAND_DATACHECKSUMS: Type = 7;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -37194,7 +37536,7 @@ pub struct PgStat_PendingIO {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgStat_IO {
     pub stat_reset_timestamp: TimestampTz,
-    pub stats: [PgStat_BktypeIO; 18usize],
+    pub stats: [PgStat_BktypeIO; 20usize],
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -37529,7 +37871,7 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_27 {
+pub mod _bindgen_ty_1 {
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RC_OK: Type = 0;
     pub const PLPGSQL_RC_EXIT: Type = 1;
@@ -38744,7 +39086,7 @@ pub struct PipeProtoHeader {
 #[repr(C)]
 pub union PipeProtoChunk {
     pub proto: ::core::mem::ManuallyDrop<PipeProtoHeader>,
-    pub filler: ::core::mem::ManuallyDrop<[::core::ffi::c_char; 4096usize]>,
+    pub filler: ::core::mem::ManuallyDrop<[::core::ffi::c_char; 512usize]>,
 }
 impl Default for PipeProtoChunk {
     fn default() -> Self {
@@ -39106,6 +39448,17 @@ pub mod ReplaceVarsNoMatchOption {
     pub const REPLACEVARS_REPORT_ERROR: Type = 0;
     pub const REPLACEVARS_CHANGE_VARNO: Type = 1;
     pub const REPLACEVARS_SUBSTITUTE_NULL: Type = 2;
+}
+pub type ChangeVarNodes_callback = ::core::option::Option<
+    unsafe extern "C-unwind" fn(node: *mut Node, arg: *mut ChangeVarNodes_context) -> bool,
+>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ChangeVarNodes_context {
+    pub rt_index: ::core::ffi::c_int,
+    pub new_index: ::core::ffi::c_int,
+    pub sublevels_up: ::core::ffi::c_int,
+    pub callback: ChangeVarNodes_callback,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -40499,6 +40852,10 @@ pub mod ProcSignalBarrierType {
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIGNAL_BARRIER_SMGRRELEASE: Type = 0;
     pub const PROCSIGNAL_BARRIER_UPDATE_XLOG_LOGICAL_INFO: Type = 1;
+    pub const PROCSIGNAL_BARRIER_CHECKSUM_OFF: Type = 2;
+    pub const PROCSIGNAL_BARRIER_CHECKSUM_INPROGRESS_ON: Type = 3;
+    pub const PROCSIGNAL_BARRIER_CHECKSUM_INPROGRESS_OFF: Type = 4;
+    pub const PROCSIGNAL_BARRIER_CHECKSUM_ON: Type = 5;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -40785,6 +41142,15 @@ pub struct ctype_methods {
             locale: pg_locale_t,
         ) -> usize,
     >,
+    pub downcase_ident: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            dest: *mut ::core::ffi::c_char,
+            destsize: usize,
+            src: *const ::core::ffi::c_char,
+            srclen: usize,
+            locale: pg_locale_t,
+        ) -> usize,
+    >,
     pub wc_isdigit: ::core::option::Option<
         unsafe extern "C-unwind" fn(wc: pg_wchar, locale: pg_locale_t) -> bool,
     >,
@@ -40864,6 +41230,7 @@ pub struct pg_locale_struct__bindgen_ty_1__bindgen_ty_2 {
     pub locale: *const ::core::ffi::c_char,
     pub ucol: *mut UCollator,
     pub ucasemap: *mut UCaseMap,
+    pub lt: locale_t,
 }
 impl Default for pg_locale_struct__bindgen_ty_1__bindgen_ty_2 {
     fn default() -> Self {
@@ -42615,8 +42982,11 @@ pub mod WaitEventClient {
     pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
     pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
     pub const WAIT_EVENT_WAIT_FOR_STANDBY_CONFIRMATION: Type = 100663302;
-    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663303;
-    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663304;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_FLUSH: Type = 100663303;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_REPLAY: Type = 100663304;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_WRITE: Type = 100663305;
+    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663306;
+    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663307;
 }
 pub mod WaitEventIO {
     pub type Type = ::core::ffi::c_uint;
@@ -42719,55 +43089,53 @@ pub mod WaitEventIPC {
     pub const WAIT_EVENT_CHECKPOINT_DELAY_START: Type = 134217738;
     pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217739;
     pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217740;
-    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217741;
-    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217742;
-    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217743;
-    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217744;
-    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217745;
-    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217746;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217747;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217748;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217749;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217750;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217751;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217752;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217753;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217754;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217755;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217756;
-    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217757;
-    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217758;
-    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217759;
-    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217760;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217761;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217762;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217763;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217764;
-    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217765;
-    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217766;
-    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217767;
-    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217768;
-    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217769;
-    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217770;
-    pub const WAIT_EVENT_PROMOTE: Type = 134217771;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217772;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217773;
-    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217774;
-    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217775;
-    pub const WAIT_EVENT_REPACK_WORKER_EXPORT: Type = 134217776;
-    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217777;
-    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217778;
-    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217779;
-    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217780;
-    pub const WAIT_EVENT_SYNC_REP: Type = 134217781;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_FLUSH: Type = 134217782;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_REPLAY: Type = 134217783;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_WRITE: Type = 134217784;
-    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217785;
-    pub const WAIT_EVENT_WAL_RECEIVER_UPSTREAM_CATCHUP: Type = 134217786;
-    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217787;
-    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217788;
-    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217789;
+    pub const WAIT_EVENT_CHECKSUM_ENABLE_STARTCONDITION: Type = 134217741;
+    pub const WAIT_EVENT_CHECKSUM_ENABLE_TEMPTABLE_WAIT: Type = 134217742;
+    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217743;
+    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217744;
+    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217745;
+    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217746;
+    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217747;
+    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217748;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217749;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217750;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217751;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217752;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217753;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217754;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217755;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217756;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217757;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217758;
+    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217759;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217760;
+    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217761;
+    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217762;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217763;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217764;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217765;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217766;
+    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217767;
+    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217768;
+    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217769;
+    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217770;
+    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217771;
+    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217772;
+    pub const WAIT_EVENT_PROMOTE: Type = 134217773;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217774;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217775;
+    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217776;
+    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217777;
+    pub const WAIT_EVENT_REPACK_WORKER_EXPORT: Type = 134217778;
+    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217779;
+    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217780;
+    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217781;
+    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217782;
+    pub const WAIT_EVENT_SYNC_REP: Type = 134217783;
+    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217784;
+    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217785;
+    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217786;
+    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217787;
 }
 pub mod WaitEventTimeout {
     pub type Type = ::core::ffi::c_uint;
@@ -42783,29 +43151,7 @@ pub mod WaitEventTimeout {
     pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994953;
     pub const WAIT_EVENT_WAL_SUMMARIZER_ERROR: Type = 150994954;
 }
-pub type __builtin_va_list = [__va_list_tag; 1usize];
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __va_list_tag {
-    pub gp_offset: ::core::ffi::c_uint,
-    pub fp_offset: ::core::ffi::c_uint,
-    pub overflow_arg_area: *mut ::core::ffi::c_void,
-    pub reg_save_area: *mut ::core::ffi::c_void,
-}
-impl Default for __va_list_tag {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __locale_data {
-    pub _address: u8,
-}
+pub type __builtin_va_list = *mut ::core::ffi::c_char;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct GlobalVisState {
@@ -42883,6 +43229,7 @@ unsafe extern "C-unwind" {
         fileName: *const ::core::ffi::c_char,
         lineNumber: ::core::ffi::c_int,
     );
+    pub fn fdatasync(fd: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn pg_set_noblock(sock: pgsocket) -> bool;
     pub fn pg_set_block(sock: pgsocket) -> bool;
     pub fn has_drive_prefix(path: *const ::core::ffi::c_char) -> bool;
@@ -42993,7 +43340,7 @@ unsafe extern "C-unwind" {
         str_: *mut ::core::ffi::c_char,
         count: usize,
         fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
+        args: va_list,
     ) -> ::core::ffi::c_int;
     pub fn pg_snprintf(
         str_: *mut ::core::ffi::c_char,
@@ -43004,7 +43351,7 @@ unsafe extern "C-unwind" {
     pub fn pg_vsprintf(
         str_: *mut ::core::ffi::c_char,
         fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
+        args: va_list,
     ) -> ::core::ffi::c_int;
     pub fn pg_sprintf(
         str_: *mut ::core::ffi::c_char,
@@ -43014,17 +43361,14 @@ unsafe extern "C-unwind" {
     pub fn pg_vfprintf(
         stream: *mut FILE,
         fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
+        args: va_list,
     ) -> ::core::ffi::c_int;
     pub fn pg_fprintf(
         stream: *mut FILE,
         fmt: *const ::core::ffi::c_char,
         ...
     ) -> ::core::ffi::c_int;
-    pub fn pg_vprintf(
-        fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
-    ) -> ::core::ffi::c_int;
+    pub fn pg_vprintf(fmt: *const ::core::ffi::c_char, args: va_list) -> ::core::ffi::c_int;
     pub fn pg_printf(fmt: *const ::core::ffi::c_char, ...) -> ::core::ffi::c_int;
     pub fn pg_strfromd(
         str_: *mut ::core::ffi::c_char,
@@ -43041,16 +43385,7 @@ unsafe extern "C-unwind" {
     pub fn pg_strsignal(signum: ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn pclose_check(stream: *mut FILE) -> ::core::ffi::c_int;
     pub fn rmtree(path: *const ::core::ffi::c_char, rmtopdir: bool) -> bool;
-    pub fn getpeereid(
-        sock: ::core::ffi::c_int,
-        uid: *mut uid_t,
-        gid: *mut gid_t,
-    ) -> ::core::ffi::c_int;
-    pub fn timingsafe_bcmp(
-        b1: *const ::core::ffi::c_void,
-        b2: *const ::core::ffi::c_void,
-        n: usize,
-    ) -> ::core::ffi::c_int;
+    pub fn explicit_bzero(buf: *mut ::core::ffi::c_void, len: usize);
     pub fn pg_qsort(
         base: *mut ::core::ffi::c_void,
         nel: usize,
@@ -43151,7 +43486,7 @@ unsafe extern "C-unwind" {
     pub fn appendStringInfoVA(
         str_: StringInfo,
         fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
+        args: va_list,
     ) -> ::core::ffi::c_int;
     pub fn appendStringInfoString(str_: StringInfo, s: *const ::core::ffi::c_char);
     pub fn appendStringInfoChar(str_: StringInfo, ch: ::core::ffi::c_char);
@@ -43264,7 +43599,7 @@ unsafe extern "C-unwind" {
     pub fn write_csvlog(edata: *mut ErrorData);
     pub fn write_jsonlog(edata: *mut ErrorData);
     pub fn write_stderr(fmt: *const ::core::ffi::c_char, ...);
-    pub fn vwrite_stderr(fmt: *const ::core::ffi::c_char, ap: *mut __va_list_tag);
+    pub fn vwrite_stderr(fmt: *const ::core::ffi::c_char, ap: va_list);
     pub static mut CurrentMemoryContext: MemoryContext;
     pub fn MemoryContextAlloc(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn MemoryContextAllocZero(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
@@ -43342,7 +43677,7 @@ unsafe extern "C-unwind" {
         buf: *mut ::core::ffi::c_char,
         len: usize,
         fmt: *const ::core::ffi::c_char,
-        args: *mut __va_list_tag,
+        args: va_list,
     ) -> usize;
     #[link_name = "DatumGetBool__pgrx_cshim"]
     pub fn DatumGetBool(X: Datum) -> bool;
@@ -44421,6 +44756,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn AssertCouldGetRelation();
     pub fn RelationIdGetRelation(relationId: Oid) -> Relation;
+    pub fn RelationGetQualifiedRelationName(rel: Relation) -> *mut ::core::ffi::c_char;
     pub fn RelationClose(relation: Relation);
     pub fn RelationGetFKeyList(relation: Relation) -> *mut List;
     pub fn RelationGetIndexList(relation: Relation) -> *mut List;
@@ -44782,42 +45118,40 @@ unsafe extern "C-unwind" {
         newsize: Size,
     ) -> bool;
     pub fn PageSetChecksum(page: Page, blkno: BlockNumber);
-    #[link_name = "pg_spin_delay_impl__pgrx_cshim"]
-    pub fn pg_spin_delay_impl();
     #[link_name = "pg_atomic_test_set_flag_impl__pgrx_cshim"]
     pub fn pg_atomic_test_set_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
+    #[link_name = "pg_atomic_unlocked_test_flag_impl__pgrx_cshim"]
+    pub fn pg_atomic_unlocked_test_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
     #[link_name = "pg_atomic_clear_flag_impl__pgrx_cshim"]
     pub fn pg_atomic_clear_flag_impl(ptr: *mut pg_atomic_flag);
+    #[link_name = "pg_atomic_init_flag_impl__pgrx_cshim"]
+    pub fn pg_atomic_init_flag_impl(ptr: *mut pg_atomic_flag);
     #[link_name = "pg_atomic_compare_exchange_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_compare_exchange_u32_impl(
         ptr: *mut pg_atomic_uint32,
         expected: *mut uint32,
         newval: uint32,
     ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u32_impl(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_compare_exchange_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_compare_exchange_u64_impl(
-        ptr: *mut pg_atomic_uint64,
-        expected: *mut uint64,
-        newval: uint64,
-    ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u64_impl(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
-    #[link_name = "pg_atomic_unlocked_test_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_test_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_init_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_init_flag_impl(ptr: *mut pg_atomic_flag);
     #[link_name = "pg_atomic_exchange_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_exchange_u32_impl(ptr: *mut pg_atomic_uint32, newval: uint32) -> uint32;
+    #[link_name = "pg_atomic_fetch_add_u32_impl__pgrx_cshim"]
+    pub fn pg_atomic_fetch_add_u32_impl(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
     #[link_name = "pg_atomic_fetch_sub_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_sub_u32_impl(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
     #[link_name = "pg_atomic_fetch_and_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_and_u32_impl(ptr: *mut pg_atomic_uint32, and_: uint32) -> uint32;
     #[link_name = "pg_atomic_fetch_or_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_or_u32_impl(ptr: *mut pg_atomic_uint32, or_: uint32) -> uint32;
+    #[link_name = "pg_atomic_compare_exchange_u64_impl__pgrx_cshim"]
+    pub fn pg_atomic_compare_exchange_u64_impl(
+        ptr: *mut pg_atomic_uint64,
+        expected: *mut uint64,
+        newval: uint64,
+    ) -> bool;
     #[link_name = "pg_atomic_exchange_u64_impl__pgrx_cshim"]
     pub fn pg_atomic_exchange_u64_impl(ptr: *mut pg_atomic_uint64, newval: uint64) -> uint64;
+    #[link_name = "pg_atomic_fetch_add_u64_impl__pgrx_cshim"]
+    pub fn pg_atomic_fetch_add_u64_impl(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
     #[link_name = "pg_atomic_fetch_sub_u64_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_sub_u64_impl(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
     #[link_name = "pg_atomic_fetch_and_u64_impl__pgrx_cshim"]
@@ -45196,11 +45530,6 @@ unsafe extern "C-unwind" {
     pub fn RmgrIdIsBuiltin(rmid: ::core::ffi::c_int) -> bool;
     #[link_name = "RmgrIdIsCustom__pgrx_cshim"]
     pub fn RmgrIdIsCustom(rmid: ::core::ffi::c_int) -> bool;
-    pub fn pg_comp_crc32c_sb8(
-        crc: pg_crc32c,
-        data: *const ::core::ffi::c_void,
-        len: usize,
-    ) -> pg_crc32c;
     pub static mut pg_comp_crc32c: ::core::option::Option<
         unsafe extern "C-unwind" fn(
             crc: pg_crc32c,
@@ -45208,12 +45537,12 @@ unsafe extern "C-unwind" {
             len: usize,
         ) -> pg_crc32c,
     >;
-    pub fn pg_comp_crc32c_sse42(
+    pub fn pg_comp_crc32c_armv8(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
         len: usize,
     ) -> pg_crc32c;
-    pub fn pg_comp_crc32c_avx512(
+    pub fn pg_comp_crc32c_pmull(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
         len: usize,
@@ -45738,6 +46067,7 @@ unsafe extern "C-unwind" {
     pub static mut CommitSiblings: ::core::ffi::c_int;
     pub static mut track_wal_io_timing: bool;
     pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
+    pub static mut data_checksums: ::core::ffi::c_int;
     pub static mut CheckPointSegments: ::core::ffi::c_int;
     pub static mut XLogArchiveMode: ::core::ffi::c_int;
     pub static mut wal_level: ::core::ffi::c_int;
@@ -45763,8 +46093,11 @@ unsafe extern "C-unwind" {
     pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
     pub fn XLogGetReplicationSlotMinimumLSN() -> XLogRecPtr;
     pub fn xlog_redo(record: *mut XLogReaderState);
+    pub fn xlog2_redo(record: *mut XLogReaderState);
     pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
+    pub fn xlog2_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn xlog_identify(info: uint8) -> *const ::core::ffi::c_char;
+    pub fn xlog2_identify(info: uint8) -> *const ::core::ffi::c_char;
     pub fn issue_xlog_fsync(fd: ::core::ffi::c_int, segno: XLogSegNo, tli: TimeLineID);
     pub fn RecoveryInProgress() -> bool;
     pub fn GetRecoveryState() -> RecoveryState::Type;
@@ -45774,7 +46107,18 @@ unsafe extern "C-unwind" {
     pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
     pub fn GetSystemIdentifier() -> uint64;
     pub fn GetMockAuthenticationNonce() -> *mut ::core::ffi::c_char;
-    pub fn DataChecksumsEnabled() -> bool;
+    pub fn DataChecksumsNeedWrite() -> bool;
+    pub fn DataChecksumsNeedVerify() -> bool;
+    pub fn DataChecksumsOn() -> bool;
+    pub fn DataChecksumsOff() -> bool;
+    pub fn DataChecksumsInProgressOn() -> bool;
+    pub fn SetDataChecksumsOnInProgress();
+    pub fn SetDataChecksumsOn();
+    pub fn SetDataChecksumsOff();
+    pub fn show_data_checksums() -> *const ::core::ffi::c_char;
+    pub fn get_checksum_state_string(state: uint32) -> *const ::core::ffi::c_char;
+    pub fn InitLocalDataChecksumState();
+    pub fn SetLocalDataChecksumState(data_checksum_version: uint32);
     pub fn GetDefaultCharSignedness() -> bool;
     pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
     pub fn BootStrapXLOG(data_checksum_version: uint32);
@@ -46042,7 +46386,6 @@ unsafe extern "C-unwind" {
     ) -> *mut Publication;
     pub fn GetRelationIncludedPublications(relid: Oid) -> *mut List;
     pub fn GetRelationExcludedPublications(relid: Oid) -> *mut List;
-    pub fn RelationHasPublication(relid: Oid) -> bool;
     pub fn GetIncludedPublicationRelations(
         pubid: Oid,
         pub_partopt: PublicationPartOpt::Type,
@@ -46967,7 +47310,7 @@ unsafe extern "C-unwind" {
     );
     pub fn ginInsertCleanup(
         ginstate: *mut GinState,
-        must_empty_list: bool,
+        full_clean: bool,
         fill_fsm: bool,
         forceCleanup: bool,
         stats: *mut IndexBulkDeleteResult,
@@ -48192,7 +48535,6 @@ unsafe extern "C-unwind" {
     ) -> *mut ReadStream;
     pub fn read_stream_pause(stream: *mut ReadStream) -> BlockNumber;
     pub fn read_stream_resume(stream: *mut ReadStream);
-    pub fn read_stream_clear_strategy(stream: *mut ReadStream);
     pub fn read_stream_reset(stream: *mut ReadStream);
     pub fn read_stream_end(stream: *mut ReadStream);
     pub fn read_stream_enable_stats(stream: *mut ReadStream, stats: *mut IOStats);
@@ -48886,10 +49228,6 @@ unsafe extern "C-unwind" {
         vmbuffer_other: *mut Buffer,
         num_pages: ::core::ffi::c_int,
     ) -> Buffer;
-    #[link_name = "MultiXactIdPrecedes__pgrx_cshim"]
-    pub fn MultiXactIdPrecedes(multi1: MultiXactId, multi2: MultiXactId) -> bool;
-    #[link_name = "MultiXactIdPrecedesOrEquals__pgrx_cshim"]
-    pub fn MultiXactIdPrecedesOrEquals(multi1: MultiXactId, multi2: MultiXactId) -> bool;
     pub fn MultiXactIdCreate(
         xid1: TransactionId,
         status1: MultiXactStatus::Type,
@@ -48921,6 +49259,8 @@ unsafe extern "C-unwind" {
         oldestMultiXactId: *mut MultiXactId,
         oldestOffset: *mut MultiXactOffset,
     );
+    pub fn MultiXactIdPrecedes(multi1: MultiXactId, multi2: MultiXactId) -> bool;
+    pub fn MultiXactIdPrecedesOrEquals(multi1: MultiXactId, multi2: MultiXactId) -> bool;
     pub fn multixactoffsetssyncfiletag(
         ftag: *const FileTag,
         path: *mut ::core::ffi::c_char,
@@ -50381,7 +50721,7 @@ unsafe extern "C-unwind" {
         vmBuf: Buffer,
         flags: uint8,
         rlocator: RelFileLocator,
-    ) -> uint8;
+    );
     pub fn visibilitymap_get_status(
         rel: Relation,
         heapBlk: BlockNumber,
@@ -50724,8 +51064,6 @@ unsafe extern "C-unwind" {
     pub fn GetCurrentReplayRecPtr(replayEndTLI: *mut TimeLineID) -> XLogRecPtr;
     pub fn PromoteIsTriggered() -> bool;
     pub fn CheckPromoteSignal() -> bool;
-    pub fn RecoverySubtransInitialized() -> bool;
-    pub fn SetRecoverySubtransInitialized();
     pub fn WakeupRecovery();
     pub fn StartupRequestWalReceiverRestart();
     pub fn XLogRequestWalReceiverReply();
@@ -50755,11 +51093,6 @@ unsafe extern "C-unwind" {
         buf: *mut Buffer,
     ) -> XLogRedoAction::Type;
     pub fn XLogInitBufferForRedo(record: *mut XLogReaderState, block_id: uint8) -> Buffer;
-    pub fn XLogFlushBufferForRedoIfInit(
-        record: *mut XLogReaderState,
-        block_id: uint8,
-        buffer: Buffer,
-    );
     pub fn XLogReadBufferForRedoExtended(
         record: *mut XLogReaderState,
         block_id: uint8,
@@ -50810,7 +51143,7 @@ unsafe extern "C-unwind" {
     pub fn WaitForLSN(
         lsnType: WaitLSNType::Type,
         targetLSN: XLogRecPtr,
-        timeout: ::core::ffi::c_int,
+        timeout: int64,
     ) -> WaitLSNResult::Type;
     pub static mut binary_upgrade_next_pg_tablespace_oid: Oid;
     pub static mut binary_upgrade_next_pg_type_oid: Oid;
@@ -50829,6 +51162,11 @@ unsafe extern "C-unwind" {
     pub fn AcquireDeletionLock(object: *const ObjectAddress, flags: ::core::ffi::c_int);
     pub fn ReleaseDeletionLock(object: *const ObjectAddress);
     pub fn performDeletion(
+        object: *const ObjectAddress,
+        behavior: DropBehavior::Type,
+        flags: ::core::ffi::c_int,
+    );
+    pub fn performDeletionCheck(
         object: *const ObjectAddress,
         behavior: DropBehavior::Type,
         flags: ::core::ffi::c_int,
@@ -50857,8 +51195,6 @@ unsafe extern "C-unwind" {
         self_behavior: DependencyType::Type,
         reverse_self: bool,
     );
-    pub fn CheckUsageOnTypesInExpr(expr: *mut Node, rtable: *mut List, roleid: Oid);
-    pub fn CheckUsageOnTypesInSingleRelExpr(expr: *mut Node, relId: Oid, roleid: Oid);
     pub fn find_temp_object(
         addrs: *const ObjectAddresses,
         local_temp_okay: bool,
@@ -51212,7 +51548,6 @@ unsafe extern "C-unwind" {
         attmap: *const AttrMap,
     ) -> bool;
     pub fn BuildSpeculativeIndexInfo(index: Relation, ii: *mut IndexInfo);
-    pub fn IsIndexCompatibleAsArbiter(indexRel1: Relation, indexRel2: Relation) -> bool;
     pub fn FormIndexDatum(
         indexInfo: *mut IndexInfo,
         slot: *mut TupleTableSlot,
@@ -51450,7 +51785,6 @@ unsafe extern "C-unwind" {
         finalfnModify: ::core::ffi::c_char,
         mfinalfnModify: ::core::ffi::c_char,
         aggsortopName: *mut List,
-        aggsupportfuncName: *mut List,
         aggTransType: Oid,
         aggTransSpace: int32,
         aggmTransType: Oid,
@@ -52303,7 +52637,6 @@ unsafe extern "C-unwind" {
     pub fn is_member_of_role(member: Oid, role: Oid) -> bool;
     pub fn is_member_of_role_nosuper(member: Oid, role: Oid) -> bool;
     pub fn is_admin_of_role(member: Oid, role: Oid) -> bool;
-    pub fn has_admin_privs_of_role(member: Oid, role: Oid) -> bool;
     pub fn select_best_admin(member: Oid, role: Oid) -> Oid;
     pub fn get_role_oid(rolname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_role_oid_or_public(rolname: *const ::core::ffi::c_char) -> Oid;
@@ -52319,7 +52652,6 @@ unsafe extern "C-unwind" {
         grantorId: *mut Oid,
         grantOptions: *mut AclMode,
     );
-    pub static mut cached_db_hash: uint32;
     pub fn initialize_acl();
     pub fn ExecuteGrantStmt(stmt: *mut GrantStmt);
     pub fn ExecAlterDefaultPrivilegesStmt(
@@ -52501,8 +52833,7 @@ unsafe extern "C-unwind" {
         mltrngConstruct2: RegProcedure,
     );
     pub fn RangeDelete(rangeTypeOid: Oid);
-    pub fn GetSubscription(subid: Oid, missing_ok: bool) -> *mut Subscription;
-    pub fn SubscriptionConninfo(sub: *mut Subscription) -> *mut ::core::ffi::c_char;
+    pub fn GetSubscription(subid: Oid, missing_ok: bool, aclcheck: bool) -> *mut Subscription;
     pub fn DisableSubscription(subid: Oid);
     pub fn CountDBSubscriptions(dbid: Oid) -> ::core::ffi::c_int;
     pub fn GetPublicationsStr(publications: *mut List, dest: StringInfo, quote_literal: bool);
@@ -52636,7 +52967,7 @@ unsafe extern "C-unwind" {
     pub fn smgr_redo(record: *mut XLogReaderState);
     pub fn smgr_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn smgr_identify(info: uint8) -> *const ::core::ffi::c_char;
-    pub static sys_fk_relationships: [SysFKRelationship; 226usize];
+    pub static sys_fk_relationships: [SysFKRelationship; 238usize];
     pub fn NewRelationCreateToastTable(relOid: Oid, reloptions: Datum);
     pub fn NewHeapCreateToastTable(
         relOid: Oid,
@@ -52936,7 +53267,11 @@ unsafe extern "C-unwind" {
     pub fn RI_Initial_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation) -> bool;
     pub fn RI_PartitionRemove_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation);
     pub fn RI_FKey_trigger_type(tgfoid: Oid) -> ::core::ffi::c_int;
-    pub fn AtEOXact_RI(isCommit: bool);
+    pub fn RegisterAfterTriggerBatchCallback(
+        callback: AfterTriggerBatchCallback,
+        arg: *mut ::core::ffi::c_void,
+    );
+    pub fn AfterTriggerIsActive() -> bool;
     pub fn ReceiveCopyBegin(cstate: CopyFromState);
     pub fn ReceiveCopyBinaryHeader(cstate: CopyFromState);
     pub fn CopyFromTextOneRow(
@@ -53079,11 +53414,7 @@ unsafe extern "C-unwind" {
     pub fn DefineOperator(names: *mut List, parameters: *mut List) -> ObjectAddress;
     pub fn RemoveOperatorById(operOid: Oid);
     pub fn AlterOperator(stmt: *mut AlterOperatorStmt) -> ObjectAddress;
-    pub fn CreateStatistics(
-        relids: *mut List,
-        stmt: *mut CreateStatsStmt,
-        check_rights: bool,
-    ) -> ObjectAddress;
+    pub fn CreateStatistics(stmt: *mut CreateStatsStmt, check_rights: bool) -> ObjectAddress;
     pub fn AlterStatistics(stmt: *mut AlterStatsStmt) -> ObjectAddress;
     pub fn RemoveStatisticsById(statsOid: Oid);
     pub fn RemoveStatisticsDataById(statsOid: Oid, inh: bool);
@@ -53517,6 +53848,11 @@ unsafe extern "C-unwind" {
     #[link_name = "ExecProcNode__pgrx_cshim"]
     pub fn ExecProcNode(node: *mut PlanState) -> *mut TupleTableSlot;
     pub fn ExecInitExpr(node: *mut Expr, parent: *mut PlanState) -> *mut ExprState;
+    pub fn ExecInitExprWithContext(
+        node: *mut Expr,
+        parent: *mut PlanState,
+        escontext: *mut Node,
+    ) -> *mut ExprState;
     pub fn ExecInitExprWithParams(node: *mut Expr, ext_params: ParamListInfo) -> *mut ExprState;
     pub fn ExecInitQual(qual: *mut List, parent: *mut PlanState) -> *mut ExprState;
     pub fn ExecInitCheck(qual: *mut List, parent: *mut PlanState) -> *mut ExprState;
@@ -53585,6 +53921,11 @@ unsafe extern "C-unwind" {
         parent: *mut PlanState,
     ) -> *mut ProjectionInfo;
     pub fn ExecPrepareExpr(node: *mut Expr, estate: *mut EState) -> *mut ExprState;
+    pub fn ExecPrepareExprWithContext(
+        node: *mut Expr,
+        estate: *mut EState,
+        escontext: *mut Node,
+    ) -> *mut ExprState;
     pub fn ExecPrepareQual(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareCheck(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareExprList(nodes: *mut List, estate: *mut EState) -> *mut List;
@@ -53722,7 +54063,6 @@ unsafe extern "C-unwind" {
     );
     pub fn ExecCloseRangeTableRelations(estate: *mut EState);
     pub fn ExecCloseResultRelations(estate: *mut EState);
-    pub fn ExecCloseTrigTargetRelations(estate: *mut EState);
     #[link_name = "exec_rt_fetch__pgrx_cshim"]
     pub fn exec_rt_fetch(rti: Index, estate: *mut EState) -> *mut RangeTblEntry;
     pub fn ExecGetRangeTableRelation(
@@ -53895,8 +54235,6 @@ unsafe extern "C-unwind" {
     pub fn pg_set_timing_clock_source(source: TimingClockSourceType::Type) -> bool;
     pub static mut timing_tsc_enabled: bool;
     pub static mut timing_tsc_frequency_khz: int32;
-    pub fn pg_initialize_timing_tsc();
-    pub fn pg_timing_tsc_clock_source_info() -> *const TscClockSourceInfo;
     #[link_name = "pg_current_timing_clock_source__pgrx_cshim"]
     pub fn pg_current_timing_clock_source() -> TimingClockSourceType::Type;
     #[link_name = "pg_get_ticks_system__pgrx_cshim"]
@@ -53905,10 +54243,6 @@ unsafe extern "C-unwind" {
     pub fn pg_ticks_to_ns(ticks: int64) -> int64;
     #[link_name = "pg_ns_to_ticks__pgrx_cshim"]
     pub fn pg_ns_to_ticks(ns: int64) -> int64;
-    #[link_name = "pg_rdtsc__pgrx_cshim"]
-    pub fn pg_rdtsc() -> int64;
-    #[link_name = "pg_rdtscp__pgrx_cshim"]
-    pub fn pg_rdtscp() -> int64;
     #[link_name = "pg_get_ticks__pgrx_cshim"]
     pub fn pg_get_ticks() -> instr_time;
     #[link_name = "pg_get_ticks_fast__pgrx_cshim"]
@@ -54892,8 +55226,8 @@ unsafe extern "C-unwind" {
         moveto: XLogRecPtr,
         found_consistent_snapshot: *mut bool,
     ) -> XLogRecPtr;
-    pub static mut output_plugin_libraries_string: *mut ::core::ffi::c_char;
     pub fn xlog_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
+    pub fn xlog2_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap2_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn xact_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
@@ -54975,7 +55309,6 @@ unsafe extern "C-unwind" {
         retention_active: bool,
         max_retention_set: bool,
     );
-    pub fn CheckPubDeadTupleRetention(wrconn: *mut WalReceiverConn);
     pub fn DefineRelation(
         stmt: *mut CreateStmt,
         relkind: ::core::ffi::c_char,
@@ -55116,7 +55449,6 @@ unsafe extern "C-unwind" {
         names: *mut List,
         newConstraint: *mut Node,
         constrAddr: *mut ObjectAddress,
-        is_readd: bool,
     ) -> ObjectAddress;
     pub fn AlterDomainValidateConstraint(
         names: *mut List,
@@ -55768,11 +56100,7 @@ unsafe extern "C-unwind" {
         out_dbname: *mut ::core::ffi::c_char,
     );
     pub fn BaseInit();
-    pub fn StoreConnectionWarning(
-        msg: *mut ::core::ffi::c_char,
-        detail: *mut ::core::ffi::c_char,
-        filter: ConnectionWarningFilter,
-    );
+    pub fn StoreConnectionWarning(msg: *mut ::core::ffi::c_char, detail: *mut ::core::ffi::c_char);
     pub static mut IgnoreSystemIndexes: bool;
     pub static mut process_shared_preload_libraries_in_progress: bool;
     pub static mut process_shared_preload_libraries_done: bool;
@@ -56517,7 +56845,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SPI_execp(
         plan: SPIPlanPtr,
-        Values: *const Datum,
+        Values: *mut Datum,
         Nulls: *const ::core::ffi::c_char,
         tcount: ::core::ffi::c_long,
     ) -> ::core::ffi::c_int;
@@ -56578,7 +56906,7 @@ unsafe extern "C-unwind" {
         tuple: HeapTuple,
         natts: ::core::ffi::c_int,
         attnum: *mut ::core::ffi::c_int,
-        Values: *const Datum,
+        Values: *mut Datum,
         Nulls: *const ::core::ffi::c_char,
     ) -> HeapTuple;
     pub fn SPI_fnumber(tupdesc: TupleDesc, fname: *const ::core::ffi::c_char)
@@ -56618,7 +56946,7 @@ unsafe extern "C-unwind" {
         src: *const ::core::ffi::c_char,
         nargs: ::core::ffi::c_int,
         argtypes: *mut Oid,
-        Values: *const Datum,
+        Values: *mut Datum,
         Nulls: *const ::core::ffi::c_char,
         read_only: bool,
         cursorOptions: ::core::ffi::c_int,
@@ -56697,11 +57025,6 @@ unsafe extern "C-unwind" {
         server: *mut ForeignServer,
     ) -> *mut ::core::ffi::c_char;
     pub fn GetUserMapping(userid: Oid, serverid: Oid) -> *mut UserMapping;
-    pub fn GetUserMappingExtended(
-        userid: Oid,
-        serverid: Oid,
-        elevel: ::core::ffi::c_int,
-    ) -> *mut UserMapping;
     pub fn GetForeignDataWrapper(fdwid: Oid) -> *mut ForeignDataWrapper;
     pub fn GetForeignDataWrapperExtended(fdwid: Oid, flags: uint16) -> *mut ForeignDataWrapper;
     pub fn GetForeignDataWrapperByName(
@@ -57527,11 +57850,6 @@ unsafe extern "C-unwind" {
     pub fn CommuteOpExpr(clause: *mut OpExpr);
     pub fn inline_function_in_from(root: *mut PlannerInfo, rte: *mut RangeTblEntry) -> *mut Query;
     pub fn pull_paramids(expr: *mut Expr) -> *mut Bitmapset;
-    pub fn expression_has_grouping_conflict(
-        expr: *mut Node,
-        get_eqop: grouping_eqop_callback,
-        context: *mut ::core::ffi::c_void,
-    ) -> bool;
     pub static mut disable_cost: Cost;
     pub static mut max_parallel_workers_per_gather: ::core::ffi::c_int;
     pub static mut enable_seqscan: bool;
@@ -57898,10 +58216,6 @@ unsafe extern "C-unwind" {
     pub fn pg_prng_double(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_double_normal(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_bool(state: *mut pg_prng_state) -> bool;
-    #[link_name = "fitness_is_valid__pgrx_cshim"]
-    pub fn fitness_is_valid(fitness: Fitness) -> bool;
-    #[link_name = "fitness_compare__pgrx_cshim"]
-    pub fn fitness_compare(fitness1: Fitness, fitness2: Fitness) -> ::core::ffi::c_int;
     pub static mut Geqo_effort: ::core::ffi::c_int;
     pub static mut Geqo_pool_size: ::core::ffi::c_int;
     pub static mut Geqo_generations: ::core::ffi::c_int;
@@ -57915,11 +58229,8 @@ unsafe extern "C-unwind" {
         number_of_rels: ::core::ffi::c_int,
         initial_rels: *mut List,
     ) -> *mut RelOptInfo;
-    pub fn geqo_eval(
-        root: *mut PlannerInfo,
-        tour: *mut Gene,
-        num_gene: ::core::ffi::c_int,
-    ) -> Fitness;
+    pub fn geqo_eval(root: *mut PlannerInfo, tour: *mut Gene, num_gene: ::core::ffi::c_int)
+    -> Cost;
     pub fn gimme_tree(
         root: *mut PlannerInfo,
         tour: *mut Gene,
@@ -58038,6 +58349,11 @@ unsafe extern "C-unwind" {
         rel2: *mut RelOptInfo,
     ) -> bool;
     pub fn add_join_clause_to_rels(
+        root: *mut PlannerInfo,
+        restrictinfo: *mut RestrictInfo,
+        join_relids: Relids,
+    );
+    pub fn remove_join_clause_from_rels(
         root: *mut PlannerInfo,
         restrictinfo: *mut RestrictInfo,
         join_relids: Relids,
@@ -58647,6 +58963,7 @@ unsafe extern "C-unwind" {
         onconflict: *mut OnConflictExpr,
         mergeActionLists: *mut List,
         mergeJoinConditions: *mut List,
+        forPortionOf: *mut ForPortionOfExpr,
         epqParam: ::core::ffi::c_int,
     ) -> *mut ModifyTablePath;
     pub fn create_limit_path(
@@ -58859,6 +59176,7 @@ unsafe extern "C-unwind" {
         req_collation: Oid,
     ) -> *mut Expr;
     pub fn reconsider_outer_join_clauses(root: *mut PlannerInfo);
+    pub fn rebuild_eclass_attr_needed(root: *mut PlannerInfo);
     pub fn get_eclass_for_sort_expr(
         root: *mut PlannerInfo,
         expr: *mut Expr,
@@ -58968,6 +59286,7 @@ unsafe extern "C-unwind" {
         rinfo: *mut RestrictInfo,
         indexclauses: *mut List,
     ) -> bool;
+    pub fn ec_clear_derived_clauses(ec: *mut EquivalenceClass);
     pub fn compare_pathkeys(keys1: *mut List, keys2: *mut List) -> PathKeysComparison::Type;
     pub fn pathkeys_contained_in(keys1: *mut List, keys2: *mut List) -> bool;
     pub fn pathkeys_count_contained_in(
@@ -59086,6 +59405,7 @@ unsafe extern "C-unwind" {
     ) -> *mut PlaceHolderInfo;
     pub fn find_placeholders_in_jointree(root: *mut PlannerInfo);
     pub fn fix_placeholder_input_needed_levels(root: *mut PlannerInfo);
+    pub fn rebuild_placeholder_attr_needed(root: *mut PlannerInfo);
     pub fn add_placeholders_to_base_rels(root: *mut PlannerInfo);
     pub fn add_placeholders_to_joinrel(
         root: *mut PlannerInfo,
@@ -59228,9 +59548,11 @@ unsafe extern "C-unwind" {
     pub fn add_other_rels_to_query(root: *mut PlannerInfo);
     pub fn build_base_rel_tlists(root: *mut PlannerInfo, final_tlist: *mut List);
     pub fn add_vars_to_targetlist(root: *mut PlannerInfo, vars: *mut List, where_needed: Relids);
+    pub fn add_vars_to_attr_needed(root: *mut PlannerInfo, vars: *mut List, where_needed: Relids);
     pub fn remove_useless_groupby_columns(root: *mut PlannerInfo);
     pub fn setup_eager_aggregation(root: *mut PlannerInfo);
     pub fn find_lateral_references(root: *mut PlannerInfo);
+    pub fn rebuild_lateral_attr_needed(root: *mut PlannerInfo);
     pub fn create_lateral_join_info(root: *mut PlannerInfo);
     pub fn deconstruct_jointree(root: *mut PlannerInfo) -> *mut List;
     pub fn restriction_is_always_true(
@@ -59261,9 +59583,10 @@ unsafe extern "C-unwind" {
         qualscope: Relids,
         security_level: Index,
     ) -> *mut RestrictInfo;
+    pub fn rebuild_joinclause_attr_needed(root: *mut PlannerInfo);
     pub fn match_foreign_keys_to_quals(root: *mut PlannerInfo);
-    pub fn remove_useless_outer_joins(root: *mut PlannerInfo) -> bool;
-    pub fn reduce_unique_semijoins(root: *mut PlannerInfo) -> bool;
+    pub fn remove_useless_joins(root: *mut PlannerInfo, joinlist: *mut List) -> *mut List;
+    pub fn reduce_unique_semijoins(root: *mut PlannerInfo);
     pub fn query_supports_distinctness(query: *mut Query) -> bool;
     pub fn query_is_distinct_for(query: *mut Query, distinct_cols: *mut List) -> bool;
     pub fn innerrel_is_unique(
@@ -59275,7 +59598,17 @@ unsafe extern "C-unwind" {
         restrictlist: *mut List,
         force_cache: bool,
     ) -> bool;
-    pub fn remove_useless_self_joins(root: *mut PlannerInfo, joinlist: *mut List) -> bool;
+    pub fn innerrel_is_unique_ext(
+        root: *mut PlannerInfo,
+        joinrelids: Relids,
+        outerrelids: Relids,
+        innerrel: *mut RelOptInfo,
+        jointype: JoinType::Type,
+        restrictlist: *mut List,
+        force_cache: bool,
+        extra_clauses: *mut *mut List,
+    ) -> bool;
+    pub fn remove_useless_self_joins(root: *mut PlannerInfo, joinlist: *mut List) -> *mut List;
     pub fn set_plan_references(root: *mut PlannerInfo, plan: *mut Plan) -> *mut Plan;
     pub fn trivial_subqueryscan(plan: *mut SubqueryScan) -> bool;
     pub fn find_minmax_agg_replacement_param(
@@ -59313,6 +59646,7 @@ unsafe extern "C-unwind" {
     pub fn limit_needed(parse: *mut Query) -> bool;
     pub fn mark_partial_aggref(agg: *mut Aggref, aggsplit: AggSplit::Type);
     pub fn get_cheapest_fractional_path(rel: *mut RelOptInfo, tuple_fraction: f64) -> *mut Path;
+    pub fn preprocess_phv_expression(root: *mut PlannerInfo, expr: *mut Expr) -> *mut Expr;
     pub fn create_unique_paths(
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
@@ -59511,7 +59845,11 @@ unsafe extern "C-unwind" {
         attrnos: *mut List,
         strip_indirection: bool,
     ) -> *mut List;
-    pub fn transformUpdateTargetList(pstate: *mut ParseState, origTlist: *mut List) -> *mut List;
+    pub fn transformUpdateTargetList(
+        pstate: *mut ParseState,
+        origTlist: *mut List,
+        forPortionOf: *mut ForPortionOfExpr,
+    ) -> *mut List;
     pub fn transformReturningClause(
         pstate: *mut ParseState,
         qry: *mut Query,
@@ -59536,6 +59874,15 @@ unsafe extern "C-unwind" {
     -> *mut List;
     pub fn makeSortGroupClauseForSetOp(rescoltype: Oid, require_hash: bool)
     -> *mut SortGroupClause;
+    pub fn constructSetOpTargetlist(
+        pstate: *mut ParseState,
+        op: *mut SetOperationStmt,
+        ltargetlist: *const List,
+        rtargetlist: *const List,
+        targetlist: *mut *mut List,
+        context: *const ::core::ffi::c_char,
+        recursive: bool,
+    );
     pub fn transformAggregateCall(
         pstate: *mut ParseState,
         agg: *mut Aggref,
@@ -59610,6 +59957,7 @@ unsafe extern "C-unwind" {
     pub fn transformGroupClause(
         pstate: *mut ParseState,
         grouplist: *mut List,
+        groupByAll: bool,
         groupingSets: *mut *mut List,
         targetlist: *mut *mut List,
         sortClause: *mut List,
@@ -59976,7 +60324,6 @@ unsafe extern "C-unwind" {
         varno: ::core::ffi::c_int,
         sublevels_up: ::core::ffi::c_int,
     ) -> *mut ParseNamespaceItem;
-    pub fn GetNSItemByVar(pstate: *mut ParseState, var: *mut Var) -> *mut ParseNamespaceItem;
     pub fn GetRTEByRangeTablePosn(
         pstate: *mut ParseState,
         varno: ::core::ffi::c_int,
@@ -60051,6 +60398,16 @@ unsafe extern "C-unwind" {
     pub fn addRangeTableEntryForTableFunc(
         pstate: *mut ParseState,
         tf: *mut TableFunc,
+        alias: *mut Alias,
+        lateral: bool,
+        inFromCl: bool,
+    ) -> *mut ParseNamespaceItem;
+    pub fn addRangeTableEntryForGraphTable(
+        pstate: *mut ParseState,
+        graphid: Oid,
+        graph_pattern: *mut GraphPattern,
+        columns: *mut List,
+        colnames: *mut List,
         alias: *mut Alias,
         lateral: bool,
         inFromCl: bool,
@@ -60448,6 +60805,19 @@ unsafe extern "C-unwind" {
         modulus: ::core::ffi::c_int,
         remainder: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int;
+    pub fn check_partitions_for_split(
+        parent: Relation,
+        splitPartOid: Oid,
+        partlist: *mut List,
+        pstate: *mut ParseState,
+    );
+    pub fn calculate_partition_bound_for_merge(
+        parent: Relation,
+        partNames: *mut List,
+        partOids: *mut List,
+        spec: *mut PartitionBoundSpec,
+        pstate: *mut ParseState,
+    );
     pub fn RelationGetPartitionDesc(rel: Relation, omit_detached: bool) -> PartitionDesc;
     pub fn CreatePartitionDirectory(mcxt: MemoryContext, omit_detached: bool)
     -> PartitionDirectory;
@@ -60601,7 +60971,7 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn pgstat_lock_flush(nowait: bool);
     pub fn pgstat_count_lock_fastpath_exceeded(locktag_type: uint8);
-    pub fn pgstat_count_lock_waits(locktag_type: uint8, usecs: PgStat_Counter);
+    pub fn pgstat_count_lock_waits(locktag_type: uint8, msecs: ::core::ffi::c_long);
     pub fn pgstat_fetch_stat_lock() -> *mut PgStat_Lock;
     pub fn pgstat_drop_database(databaseid: Oid);
     pub fn pgstat_report_autovac(dboid: Oid);
@@ -61118,7 +61488,6 @@ unsafe extern "C-unwind" {
     pub static mut Log_truncate_on_rotation: bool;
     pub static mut Log_file_mode: ::core::ffi::c_int;
     pub static mut syslogPipe: [::core::ffi::c_int; 2usize];
-    pub static mut syslogger_setup_done: bool;
     pub fn SysLogger_Start(child_slot: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn write_syslogger_file(
         buffer: *const ::core::ffi::c_char,
@@ -61307,7 +61676,6 @@ unsafe extern "C-unwind" {
     pub static mut MyParallelShared: *mut ParallelApplyWorkerShared;
     pub static mut LogRepWorkerWalRcvConn: *mut WalReceiverConn;
     pub static mut MySubscription: *mut Subscription;
-    pub static mut MySubscriptionConninfo: *mut ::core::ffi::c_char;
     pub static mut MyLogicalRepWorker: *mut LogicalRepWorker;
     pub static mut in_remote_transaction: bool;
     pub static mut InitializingApplyWorker: bool;
@@ -61471,6 +61839,11 @@ unsafe extern "C-unwind" {
         rt_index: ::core::ffi::c_int,
     ) -> *mut Node;
     pub fn build_generation_expression(rel: Relation, attrno: ::core::ffi::c_int) -> *mut Node;
+    pub fn adjust_relid_set(
+        relids: Relids,
+        oldrelid: ::core::ffi::c_int,
+        newrelid: ::core::ffi::c_int,
+    ) -> Relids;
     pub fn CombineRangeTables(
         dst_rtable: *mut *mut List,
         dst_perminfos: *mut *mut List,
@@ -61488,6 +61861,17 @@ unsafe extern "C-unwind" {
         new_index: ::core::ffi::c_int,
         sublevels_up: ::core::ffi::c_int,
     );
+    pub fn ChangeVarNodesExtended(
+        node: *mut Node,
+        rt_index: ::core::ffi::c_int,
+        new_index: ::core::ffi::c_int,
+        sublevels_up: ::core::ffi::c_int,
+        callback: ChangeVarNodes_callback,
+    );
+    pub fn ChangeVarNodesWalkExpression(
+        node: *mut Node,
+        context: *mut ChangeVarNodes_context,
+    ) -> bool;
     pub fn IncrementVarSublevelsUp(
         node: *mut Node,
         delta_sublevels_up: ::core::ffi::c_int,
@@ -61632,34 +62016,6 @@ unsafe extern "C-unwind" {
         nclauses: ::core::ffi::c_int,
     ) -> *mut StatisticExtInfo;
     pub fn statext_expressions_load(stxoid: Oid, inh: bool, idx: ::core::ffi::c_int) -> HeapTuple;
-    pub fn import_relation_statistics(
-        rel: Relation,
-        version: *const NullableDatum,
-        relpages: *const NullableDatum,
-        reltuples: *const NullableDatum,
-        relallvisible: *const NullableDatum,
-        relallfrozen: *const NullableDatum,
-    ) -> bool;
-    pub fn import_attribute_statistics(
-        rel: Relation,
-        attnum: AttrNumber,
-        inherited: bool,
-        version: *const NullableDatum,
-        null_frac: *const NullableDatum,
-        avg_width: *const NullableDatum,
-        n_distinct: *const NullableDatum,
-        most_common_vals: *const NullableDatum,
-        most_common_freqs: *const NullableDatum,
-        histogram_bounds: *const NullableDatum,
-        correlation: *const NullableDatum,
-        most_common_elems: *const NullableDatum,
-        most_common_elem_freqs: *const NullableDatum,
-        elem_count_histogram: *const NullableDatum,
-        range_length_histogram: *const NullableDatum,
-        range_empty_frac: *const NullableDatum,
-        range_bounds_histogram: *const NullableDatum,
-    ) -> bool;
-    pub fn delete_attribute_statistics(rel: Relation, attnum: AttrNumber, inherited: bool) -> bool;
     pub fn statext_ndistinct_build(totalrows: f64, data: *mut StatsBuildData) -> *mut MVNDistinct;
     pub fn statext_ndistinct_serialize(ndistinct: *mut MVNDistinct) -> *mut bytea;
     pub fn statext_ndistinct_deserialize(data: *mut bytea) -> *mut MVNDistinct;
@@ -62356,7 +62712,6 @@ unsafe extern "C-unwind" {
     pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
-    pub fn GetAnyGrantedHeavyweightLock(locktag: *mut LOCKTAG) -> bool;
     pub fn GetLockMethodLocalHash() -> *mut HTAB;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
@@ -62541,9 +62896,6 @@ unsafe extern "C-unwind" {
     pub fn MarkPostmasterChildWalSender();
     pub fn PostmasterIsAliveInternal() -> bool;
     pub fn PostmasterDeathSignalInit();
-    pub static mut postmaster_possibly_dead: sig_atomic_t;
-    #[link_name = "PostmasterIsAlive__pgrx_cshim"]
-    pub fn PostmasterIsAlive() -> bool;
     pub static mut max_predicate_locks_per_xact: ::core::ffi::c_int;
     pub static mut max_predicate_locks_per_relation: ::core::ffi::c_int;
     pub static mut max_predicate_locks_per_page: ::core::ffi::c_int;
@@ -62934,6 +63286,7 @@ unsafe extern "C-unwind" {
     pub static WaitEventCustomShmemCallbacks: ShmemCallbacks;
     pub static WaitLSNShmemCallbacks: ShmemCallbacks;
     pub static LogicalDecodingCtlShmemCallbacks: ShmemCallbacks;
+    pub static DataChecksumsShmemCallbacks: ShmemCallbacks;
     pub static AioShmemCallbacks: ShmemCallbacks;
     pub static mut Trace_connection_negotiation: bool;
     pub static mut log_connections: uint32;
@@ -63142,6 +63495,12 @@ unsafe extern "C-unwind" {
         src: *const ::core::ffi::c_char,
         srclen: usize,
         locale: pg_locale_t,
+    ) -> usize;
+    pub fn pg_downcase_ident(
+        dst: *mut ::core::ffi::c_char,
+        dstsize: usize,
+        src: *const ::core::ffi::c_char,
+        srclen: usize,
     ) -> usize;
     pub fn pg_strcoll(
         arg1: *const ::core::ffi::c_char,
@@ -66354,6 +66713,7 @@ unsafe extern "C-unwind" {
     pub fn btoid8cmp(fcinfo: FunctionCallInfo) -> Datum;
     pub fn btoid8sortsupport(fcinfo: FunctionCallInfo) -> Datum;
     pub fn btoid8skipsupport(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_get_propgraphdef(fcinfo: FunctionCallInfo) -> Datum;
     pub fn regdatabasein(fcinfo: FunctionCallInfo) -> Datum;
     pub fn regdatabaseout(fcinfo: FunctionCallInfo) -> Datum;
     pub fn to_regdatabase(fcinfo: FunctionCallInfo) -> Datum;
@@ -66364,9 +66724,15 @@ unsafe extern "C-unwind" {
     pub fn range_minus_multi(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_error_on_null(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_function_stat_reset_time(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_get_tablespace_ddl_oid(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_get_tablespace_ddl_name(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_get_role_ddl(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_get_database_ddl(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_get_multixact_stats(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_stat_reset_time(fcinfo: FunctionCallInfo) -> Datum;
     pub fn binary_upgrade_create_conflict_detection_slot(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn enable_data_checksums(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn disable_data_checksums(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_get_dsm_registry_allocations(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_lock(fcinfo: FunctionCallInfo) -> Datum;
     pub fn uuid_bytea(fcinfo: FunctionCallInfo) -> Datum;
@@ -66937,7 +67303,6 @@ unsafe extern "C-unwind" {
     pub fn numeric_mod_safe(num1: Numeric, num2: Numeric, escontext: *mut Node) -> Numeric;
     pub fn numeric_int4_safe(num: Numeric, escontext: *mut Node) -> int32;
     pub fn numeric_int8_safe(num: Numeric, escontext: *mut Node) -> int64;
-    pub fn make_numeric_typmod_safe(precision: int32, scale: int32, escontext: *mut Node) -> int32;
     pub fn random_numeric(state: *mut pg_prng_state, rmin: Numeric, rmax: Numeric) -> Numeric;
     #[link_name = "DatumGetJsonbP__pgrx_cshim"]
     pub fn DatumGetJsonbP(d: Datum) -> *mut Jsonb;
@@ -67068,12 +67433,6 @@ unsafe extern "C-unwind" {
     -> bool;
     pub fn get_op_hash_functions(
         opno: Oid,
-        lhs_procno: *mut RegProcedure,
-        rhs_procno: *mut RegProcedure,
-    ) -> bool;
-    pub fn get_op_hash_functions_ext(
-        opno: Oid,
-        inputtype: Oid,
         lhs_procno: *mut RegProcedure,
         rhs_procno: *mut RegProcedure,
     ) -> bool;
@@ -67224,6 +67583,7 @@ unsafe extern "C-unwind" {
     ) -> *mut ::core::ffi::c_char;
     pub fn get_range_subtype(rangeOid: Oid) -> Oid;
     pub fn get_range_collation(rangeOid: Oid) -> Oid;
+    pub fn get_range_constructor2(rangeOid: Oid) -> Oid;
     pub fn get_range_multirange(rangeOid: Oid) -> Oid;
     pub fn get_multirange_range(multirangeOid: Oid) -> Oid;
     pub fn get_index_column_opclass(index_oid: Oid, attno: ::core::ffi::c_int) -> Oid;
@@ -67234,6 +67594,8 @@ unsafe extern "C-unwind" {
     pub fn get_publication_name(pubid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
     pub fn get_subscription_oid(subname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_subscription_name(subid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
+    pub fn get_propgraph_label_name(labeloid: Oid) -> *mut ::core::ffi::c_char;
+    pub fn get_propgraph_property_name(propoid: Oid) -> *mut ::core::ffi::c_char;
     pub static mut update_process_title: bool;
     pub fn save_ps_display_args(
         argc: ::core::ffi::c_int,
@@ -67450,6 +67812,7 @@ unsafe extern "C-unwind" {
     pub fn generate_collation_name(collid: Oid) -> *mut ::core::ffi::c_char;
     pub fn generate_opclass_name(opclass: Oid) -> *mut ::core::ffi::c_char;
     pub fn get_range_partbound_string(bound_datums: *mut List) -> *mut ::core::ffi::c_char;
+    pub fn get_reloptions(buf: StringInfo, reloptions: Datum);
     pub fn pg_get_statisticsobjdef_string(statextid: Oid) -> *mut ::core::ffi::c_char;
     pub fn sampler_random_init_state(seed: uint32, randstate: *mut pg_prng_state);
     pub fn sampler_random_fract(randstate: *mut pg_prng_state) -> f64;
@@ -68314,6 +68677,15 @@ impl ::core::fmt::Display for AlterPolicyStmt {
         self.display_node().fmt(f)
     }
 }
+impl pg_sys::seal::Sealed for AlterPropGraphStmt {}
+impl pg_sys::PgNode for AlterPropGraphStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPropGraphStmt];
+}
+impl ::core::fmt::Display for AlterPropGraphStmt {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
 impl pg_sys::seal::Sealed for AlterPublicationStmt {}
 impl pg_sys::PgNode for AlterPublicationStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPublicationStmt];
@@ -69052,6 +69424,15 @@ impl ::core::fmt::Display for CreatePolicyStmt {
         self.display_node().fmt(f)
     }
 }
+impl pg_sys::seal::Sealed for CreatePropGraphStmt {}
+impl pg_sys::PgNode for CreatePropGraphStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePropGraphStmt];
+}
+impl ::core::fmt::Display for CreatePropGraphStmt {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
 impl pg_sys::seal::Sealed for CreatePublicationStmt {}
 impl pg_sys::PgNode for CreatePublicationStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePublicationStmt];
@@ -69482,6 +69863,7 @@ impl pg_sys::PgNode for Expr {
         pg_sys::NodeTag::T_FieldSelect,
         pg_sys::NodeTag::T_FieldStore,
         pg_sys::NodeTag::T_FuncExpr,
+        pg_sys::NodeTag::T_GraphPropertyRef,
         pg_sys::NodeTag::T_GroupingFunc,
         pg_sys::NodeTag::T_InferenceElem,
         pg_sys::NodeTag::T_JsonConstructorExpr,
@@ -69585,6 +69967,33 @@ impl pg_sys::PgNode for Float {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Float];
 }
 impl ::core::fmt::Display for Float {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for ForPortionOfClause {}
+impl pg_sys::PgNode for ForPortionOfClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfClause];
+}
+impl ::core::fmt::Display for ForPortionOfClause {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for ForPortionOfExpr {}
+impl pg_sys::PgNode for ForPortionOfExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfExpr];
+}
+impl ::core::fmt::Display for ForPortionOfExpr {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for ForPortionOfState {}
+impl pg_sys::PgNode for ForPortionOfState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfState];
+}
+impl ::core::fmt::Display for ForPortionOfState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -69756,6 +70165,42 @@ impl pg_sys::PgNode for GrantStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GrantStmt];
 }
 impl ::core::fmt::Display for GrantStmt {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for GraphElementPattern {}
+impl pg_sys::PgNode for GraphElementPattern {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphElementPattern];
+}
+impl ::core::fmt::Display for GraphElementPattern {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for GraphLabelRef {}
+impl pg_sys::PgNode for GraphLabelRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphLabelRef];
+}
+impl ::core::fmt::Display for GraphLabelRef {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for GraphPattern {}
+impl pg_sys::PgNode for GraphPattern {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphPattern];
+}
+impl ::core::fmt::Display for GraphPattern {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for GraphPropertyRef {}
+impl pg_sys::PgNode for GraphPropertyRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphPropertyRef];
+}
+impl ::core::fmt::Display for GraphPropertyRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -71323,6 +71768,42 @@ impl ::core::fmt::Display for ProjectionPath {
         self.display_node().fmt(f)
     }
 }
+impl pg_sys::seal::Sealed for PropGraphEdge {}
+impl pg_sys::PgNode for PropGraphEdge {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphEdge];
+}
+impl ::core::fmt::Display for PropGraphEdge {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for PropGraphLabelAndProperties {}
+impl pg_sys::PgNode for PropGraphLabelAndProperties {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphLabelAndProperties];
+}
+impl ::core::fmt::Display for PropGraphLabelAndProperties {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for PropGraphProperties {}
+impl pg_sys::PgNode for PropGraphProperties {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphProperties];
+}
+impl ::core::fmt::Display for PropGraphProperties {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for PropGraphVertex {}
+impl pg_sys::PgNode for PropGraphVertex {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphVertex];
+}
+impl ::core::fmt::Display for PropGraphVertex {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
 impl pg_sys::seal::Sealed for PublicationAllObjSpec {}
 impl pg_sys::PgNode for PublicationAllObjSpec {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PublicationAllObjSpec];
@@ -71373,6 +71854,15 @@ impl pg_sys::PgNode for RangeFunction {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeFunction];
 }
 impl ::core::fmt::Display for RangeFunction {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for RangeGraphTable {}
+impl pg_sys::PgNode for RangeGraphTable {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeGraphTable];
+}
+impl ::core::fmt::Display for RangeGraphTable {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -71912,6 +72402,15 @@ impl pg_sys::PgNode for SetToDefault {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetToDefault];
 }
 impl ::core::fmt::Display for SetToDefault {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        self.display_node().fmt(f)
+    }
+}
+impl pg_sys::seal::Sealed for SinglePartitionSpec {}
+impl pg_sys::PgNode for SinglePartitionSpec {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SinglePartitionSpec];
+}
+impl ::core::fmt::Display for SinglePartitionSpec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }

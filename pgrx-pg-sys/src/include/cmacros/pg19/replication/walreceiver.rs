@@ -12,13 +12,37 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 /// C macro AllowCascadeReplication from walreceiver.h:40
 ///
 /// ```text
 /// #define AllowCascadeReplication( ) ( EnableHotStandby && max_wal_senders > 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! AllowCascadeReplication {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::AllowCascadeReplication!(@__pgrx_emit_check_safety; $($raw)*)
+    };
     (@__pgrx_emit_public;) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::AllowCascadeReplication!(@__pgrx_emit_value;)
@@ -82,6 +106,9 @@ macro_rules! AllowCascadeReplication {
     (@__pgrx_emit_size;) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {}
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -202,6 +229,17 @@ macro_rules! AllowCascadeReplication {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_alter_slot {
@@ -473,8 +511,30 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
 /// ```text
 /// #define walrcv_alter_slot( conn , slotname , failover , two_phase ) WalReceiverFunctions -> walrcv_alter_slot ( conn , slotname , failover , two_phase )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_alter_slot {
+    (@__pgrx_emit_check_safety; $conn:tt, $slotname:tt, $failover:tt, $two_phase:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $slotname);
+                $crate::__pgrx_c_operand!(@check_safety; $failover);
+                $crate::__pgrx_c_operand!(@check_safety; $two_phase);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_alter_slot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $slotname:tt, $failover:tt, $two_phase:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_alter_slot!(@__pgrx_emit_value; $conn, $slotname, $failover, $two_phase)
@@ -486,7 +546,7 @@ macro_rules! walrcv_alter_slot {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6648,
+                            $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
                             _,
                             _
                         >(
@@ -533,7 +593,7 @@ macro_rules! walrcv_alter_slot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6648,
+                        $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
                         _,
                         _
                     >(
@@ -577,7 +637,7 @@ macro_rules! walrcv_alter_slot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6648,
+                        $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
                         _,
                         _
                     >(
@@ -619,6 +679,14 @@ macro_rules! walrcv_alter_slot {
     (@__pgrx_emit_size; $conn:tt, $slotname:tt, $failover:tt, $two_phase:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $slotname);
+                        $crate::__pgrx_c_operand!(@check_safety; $failover);
+                        $crate::__pgrx_c_operand!(@check_safety; $two_phase);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -626,7 +694,7 @@ macro_rules! walrcv_alter_slot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6648,
+                                            $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
                                             _,
                                             _
                                         >(
@@ -686,7 +754,7 @@ macro_rules! walrcv_alter_slot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6648,
+                                $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
                                 _,
                                 _
                             >(
@@ -744,6 +812,17 @@ macro_rules! walrcv_alter_slot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_check_conninfo {
@@ -912,8 +991,28 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
 /// ```text
 /// #define walrcv_check_conninfo( conninfo , must_use_password ) WalReceiverFunctions -> walrcv_check_conninfo ( conninfo , must_use_password )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_check_conninfo {
+    (@__pgrx_emit_check_safety; $conninfo:tt, $must_use_password:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+                $crate::__pgrx_c_operand!(@check_safety; $must_use_password);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_check_conninfo!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conninfo:tt, $must_use_password:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_check_conninfo!(@__pgrx_emit_value; $conninfo, $must_use_password)
@@ -925,7 +1024,7 @@ macro_rules! walrcv_check_conninfo {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6649,
+                            $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
                             _,
                             _
                         >(
@@ -966,7 +1065,7 @@ macro_rules! walrcv_check_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6649,
+                        $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
                         _,
                         _
                     >(
@@ -1004,7 +1103,7 @@ macro_rules! walrcv_check_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6649,
+                        $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
                         _,
                         _
                     >(
@@ -1040,6 +1139,12 @@ macro_rules! walrcv_check_conninfo {
     (@__pgrx_emit_size; $conninfo:tt, $must_use_password:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $must_use_password);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1047,7 +1152,7 @@ macro_rules! walrcv_check_conninfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6649,
+                                            $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
                                             _,
                                             _
                                         >(
@@ -1101,7 +1206,7 @@ macro_rules! walrcv_check_conninfo {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6649,
+                                $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
                                 _,
                                 _
                             >(
@@ -1153,6 +1258,17 @@ macro_rules! walrcv_check_conninfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_connect {
@@ -1532,8 +1648,40 @@ macro_rules! __pgrx_c_args_walrcv_connect {
 /// ```text
 /// #define walrcv_connect( conninfo , replication , logical , must_use_password , appname , err ) WalReceiverFunctions -> walrcv_connect ( conninfo , replication , logical , must_use_password , appname , err )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_connect {
+    (
+        @__pgrx_emit_check_safety;
+        $conninfo:tt,
+        $replication:tt,
+        $logical:tt,
+        $must_use_password:tt,
+        $appname:tt,
+        $err:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+                $crate::__pgrx_c_operand!(@check_safety; $replication);
+                $crate::__pgrx_c_operand!(@check_safety; $logical);
+                $crate::__pgrx_c_operand!(@check_safety; $must_use_password);
+                $crate::__pgrx_c_operand!(@check_safety; $appname);
+                $crate::__pgrx_c_operand!(@check_safety; $err);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_connect!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $conninfo:tt,
@@ -1569,7 +1717,7 @@ macro_rules! walrcv_connect {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6650,
+                            $crate::__pgrx_c_generated::Field_walrcv_connect,
                             _,
                             _
                         >(
@@ -1630,7 +1778,7 @@ macro_rules! walrcv_connect {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6650,
+                        $crate::__pgrx_c_generated::Field_walrcv_connect,
                         _,
                         _
                     >(
@@ -1688,7 +1836,7 @@ macro_rules! walrcv_connect {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6650,
+                        $crate::__pgrx_c_generated::Field_walrcv_connect,
                         _,
                         _
                     >(
@@ -1744,6 +1892,16 @@ macro_rules! walrcv_connect {
     ) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $replication);
+                        $crate::__pgrx_c_operand!(@check_safety; $logical);
+                        $crate::__pgrx_c_operand!(@check_safety; $must_use_password);
+                        $crate::__pgrx_c_operand!(@check_safety; $appname);
+                        $crate::__pgrx_c_operand!(@check_safety; $err);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1751,7 +1909,7 @@ macro_rules! walrcv_connect {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6650,
+                                            $crate::__pgrx_c_generated::Field_walrcv_connect,
                                             _,
                                             _
                                         >(
@@ -1825,7 +1983,7 @@ macro_rules! walrcv_connect {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6650,
+                                $crate::__pgrx_c_generated::Field_walrcv_connect,
                                 _,
                                 _
                             >(
@@ -1889,6 +2047,17 @@ macro_rules! walrcv_connect {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_create_slot {
@@ -2322,8 +2491,42 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
 /// ```text
 /// #define walrcv_create_slot( conn , slotname , temporary , two_phase , failover , snapshot_action , lsn ) WalReceiverFunctions -> walrcv_create_slot ( conn , slotname , temporary , two_phase , failover , snapshot_action , lsn )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_create_slot {
+    (
+        @__pgrx_emit_check_safety;
+        $conn:tt,
+        $slotname:tt,
+        $temporary:tt,
+        $two_phase:tt,
+        $failover:tt,
+        $snapshot_action:tt,
+        $lsn:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $slotname);
+                $crate::__pgrx_c_operand!(@check_safety; $temporary);
+                $crate::__pgrx_c_operand!(@check_safety; $two_phase);
+                $crate::__pgrx_c_operand!(@check_safety; $failover);
+                $crate::__pgrx_c_operand!(@check_safety; $snapshot_action);
+                $crate::__pgrx_c_operand!(@check_safety; $lsn);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_create_slot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $conn:tt,
@@ -2362,7 +2565,7 @@ macro_rules! walrcv_create_slot {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6651,
+                            $crate::__pgrx_c_generated::Field_walrcv_create_slot,
                             _,
                             _
                         >(
@@ -2427,7 +2630,7 @@ macro_rules! walrcv_create_slot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6651,
+                        $crate::__pgrx_c_generated::Field_walrcv_create_slot,
                         _,
                         _
                     >(
@@ -2489,7 +2692,7 @@ macro_rules! walrcv_create_slot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6651,
+                        $crate::__pgrx_c_generated::Field_walrcv_create_slot,
                         _,
                         _
                     >(
@@ -2549,6 +2752,17 @@ macro_rules! walrcv_create_slot {
     ) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $slotname);
+                        $crate::__pgrx_c_operand!(@check_safety; $temporary);
+                        $crate::__pgrx_c_operand!(@check_safety; $two_phase);
+                        $crate::__pgrx_c_operand!(@check_safety; $failover);
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshot_action);
+                        $crate::__pgrx_c_operand!(@check_safety; $lsn);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2556,7 +2770,7 @@ macro_rules! walrcv_create_slot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6651,
+                                            $crate::__pgrx_c_generated::Field_walrcv_create_slot,
                                             _,
                                             _
                                         >(
@@ -2634,7 +2848,7 @@ macro_rules! walrcv_create_slot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6651,
+                                $crate::__pgrx_c_generated::Field_walrcv_create_slot,
                                 _,
                                 _
                             >(
@@ -2701,6 +2915,17 @@ macro_rules! walrcv_create_slot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_disconnect {
@@ -2810,8 +3035,27 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
 /// ```text
 /// #define walrcv_disconnect( conn ) WalReceiverFunctions -> walrcv_disconnect ( conn )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_disconnect {
+    (@__pgrx_emit_check_safety; $conn:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_disconnect!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_disconnect!(@__pgrx_emit_value; $conn)
@@ -2823,7 +3067,7 @@ macro_rules! walrcv_disconnect {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6652,
+                            $crate::__pgrx_c_generated::Field_walrcv_disconnect,
                             _,
                             _
                         >(
@@ -2861,7 +3105,7 @@ macro_rules! walrcv_disconnect {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6652,
+                        $crate::__pgrx_c_generated::Field_walrcv_disconnect,
                         _,
                         _
                     >(
@@ -2896,7 +3140,7 @@ macro_rules! walrcv_disconnect {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6652,
+                        $crate::__pgrx_c_generated::Field_walrcv_disconnect,
                         _,
                         _
                     >(
@@ -2929,6 +3173,11 @@ macro_rules! walrcv_disconnect {
     (@__pgrx_emit_size; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2936,7 +3185,7 @@ macro_rules! walrcv_disconnect {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6652,
+                                            $crate::__pgrx_c_generated::Field_walrcv_disconnect,
                                             _,
                                             _
                                         >(
@@ -2987,7 +3236,7 @@ macro_rules! walrcv_disconnect {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6652,
+                                $crate::__pgrx_c_generated::Field_walrcv_disconnect,
                                 _,
                                 _
                             >(
@@ -3036,6 +3285,17 @@ macro_rules! walrcv_disconnect {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_endstreaming {
@@ -3199,8 +3459,28 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
 /// ```text
 /// #define walrcv_endstreaming( conn , next_tli ) WalReceiverFunctions -> walrcv_endstreaming ( conn , next_tli )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_endstreaming {
+    (@__pgrx_emit_check_safety; $conn:tt, $next_tli:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $next_tli);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_endstreaming!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $next_tli:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_endstreaming!(@__pgrx_emit_value; $conn, $next_tli)
@@ -3212,7 +3492,7 @@ macro_rules! walrcv_endstreaming {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6653,
+                            $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
                             _,
                             _
                         >(
@@ -3253,7 +3533,7 @@ macro_rules! walrcv_endstreaming {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6653,
+                        $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
                         _,
                         _
                     >(
@@ -3291,7 +3571,7 @@ macro_rules! walrcv_endstreaming {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6653,
+                        $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
                         _,
                         _
                     >(
@@ -3327,6 +3607,12 @@ macro_rules! walrcv_endstreaming {
     (@__pgrx_emit_size; $conn:tt, $next_tli:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $next_tli);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3334,7 +3620,7 @@ macro_rules! walrcv_endstreaming {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6653,
+                                            $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
                                             _,
                                             _
                                         >(
@@ -3388,7 +3674,7 @@ macro_rules! walrcv_endstreaming {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6653,
+                                $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
                                 _,
                                 _
                             >(
@@ -3440,6 +3726,17 @@ macro_rules! walrcv_endstreaming {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_exec {
@@ -3655,8 +3952,30 @@ macro_rules! __pgrx_c_args_walrcv_exec {
 /// ```text
 /// #define walrcv_exec( conn , exec , nRetTypes , retTypes ) WalReceiverFunctions -> walrcv_exec ( conn , exec , nRetTypes , retTypes )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_exec {
+    (@__pgrx_emit_check_safety; $conn:tt, $exec:tt, $nRetTypes:tt, $retTypes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $exec);
+                $crate::__pgrx_c_operand!(@check_safety; $nRetTypes);
+                $crate::__pgrx_c_operand!(@check_safety; $retTypes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_exec!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $exec:tt, $nRetTypes:tt, $retTypes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_exec!(@__pgrx_emit_value; $conn, $exec, $nRetTypes, $retTypes)
@@ -3668,7 +3987,7 @@ macro_rules! walrcv_exec {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6654,
+                            $crate::__pgrx_c_generated::Field_walrcv_exec,
                             _,
                             _
                         >(
@@ -3715,7 +4034,7 @@ macro_rules! walrcv_exec {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6654,
+                        $crate::__pgrx_c_generated::Field_walrcv_exec,
                         _,
                         _
                     >(
@@ -3759,7 +4078,7 @@ macro_rules! walrcv_exec {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6654,
+                        $crate::__pgrx_c_generated::Field_walrcv_exec,
                         _,
                         _
                     >(
@@ -3801,6 +4120,14 @@ macro_rules! walrcv_exec {
     (@__pgrx_emit_size; $conn:tt, $exec:tt, $nRetTypes:tt, $retTypes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $exec);
+                        $crate::__pgrx_c_operand!(@check_safety; $nRetTypes);
+                        $crate::__pgrx_c_operand!(@check_safety; $retTypes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3808,7 +4135,7 @@ macro_rules! walrcv_exec {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6654,
+                                            $crate::__pgrx_c_generated::Field_walrcv_exec,
                                             _,
                                             _
                                         >(
@@ -3868,7 +4195,7 @@ macro_rules! walrcv_exec {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6654,
+                                $crate::__pgrx_c_generated::Field_walrcv_exec,
                                 _,
                                 _
                             >(
@@ -3926,6 +4253,17 @@ macro_rules! walrcv_exec {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
@@ -4044,8 +4382,30 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
 /// ```text
 /// #define walrcv_get_backend_pid( conn ) WalReceiverFunctions -> walrcv_get_backend_pid ( conn )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_get_backend_pid {
+    (@__pgrx_emit_check_safety; $conn:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_get_backend_pid!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_get_backend_pid!(@__pgrx_emit_value; $conn)
@@ -4057,7 +4417,7 @@ macro_rules! walrcv_get_backend_pid {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6655,
+                            $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
                             _,
                             _
                         >(
@@ -4095,7 +4455,7 @@ macro_rules! walrcv_get_backend_pid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6655,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
                         _,
                         _
                     >(
@@ -4130,7 +4490,7 @@ macro_rules! walrcv_get_backend_pid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6655,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
                         _,
                         _
                     >(
@@ -4163,6 +4523,11 @@ macro_rules! walrcv_get_backend_pid {
     (@__pgrx_emit_size; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4170,7 +4535,7 @@ macro_rules! walrcv_get_backend_pid {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6655,
+                                            $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
                                             _,
                                             _
                                         >(
@@ -4221,7 +4586,7 @@ macro_rules! walrcv_get_backend_pid {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6655,
+                                $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
                                 _,
                                 _
                             >(
@@ -4270,6 +4635,17 @@ macro_rules! walrcv_get_backend_pid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_get_conninfo {
@@ -4379,8 +4755,27 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
 /// ```text
 /// #define walrcv_get_conninfo( conn ) WalReceiverFunctions -> walrcv_get_conninfo ( conn )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_get_conninfo {
+    (@__pgrx_emit_check_safety; $conn:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_get_conninfo!(@__pgrx_emit_value; $conn)
@@ -4392,7 +4787,7 @@ macro_rules! walrcv_get_conninfo {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6656,
+                            $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
                             _,
                             _
                         >(
@@ -4430,7 +4825,7 @@ macro_rules! walrcv_get_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6656,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
                         _,
                         _
                     >(
@@ -4465,7 +4860,7 @@ macro_rules! walrcv_get_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6656,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
                         _,
                         _
                     >(
@@ -4498,6 +4893,11 @@ macro_rules! walrcv_get_conninfo {
     (@__pgrx_emit_size; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4505,7 +4905,7 @@ macro_rules! walrcv_get_conninfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6656,
+                                            $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
                                             _,
                                             _
                                         >(
@@ -4556,7 +4956,7 @@ macro_rules! walrcv_get_conninfo {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6656,
+                                $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
                                 _,
                                 _
                             >(
@@ -4605,6 +5005,17 @@ macro_rules! walrcv_get_conninfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
@@ -4732,8 +5143,30 @@ macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
 /// ```text
 /// #define walrcv_get_dbname_from_conninfo( conninfo ) WalReceiverFunctions -> walrcv_get_dbname_from_conninfo ( conninfo )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_get_dbname_from_conninfo {
+    (@__pgrx_emit_check_safety; $conninfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $conninfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_get_dbname_from_conninfo!(@__pgrx_emit_value; $conninfo)
@@ -4745,7 +5178,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6657,
+                            $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
                             _,
                             _
                         >(
@@ -4786,7 +5219,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6657,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
                         _,
                         _
                     >(
@@ -4824,7 +5257,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6657,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
                         _,
                         _
                     >(
@@ -4860,6 +5293,11 @@ macro_rules! walrcv_get_dbname_from_conninfo {
     (@__pgrx_emit_size; $conninfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conninfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4867,7 +5305,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6657,
+                                            $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
                                             _,
                                             _
                                         >(
@@ -4921,7 +5359,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6657,
+                                $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
                                 _,
                                 _
                             >(
@@ -4976,6 +5414,17 @@ macro_rules! walrcv_get_dbname_from_conninfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
@@ -5198,8 +5647,29 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
 /// ```text
 /// #define walrcv_get_senderinfo( conn , sender_host , sender_port ) WalReceiverFunctions -> walrcv_get_senderinfo ( conn , sender_host , sender_port )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_get_senderinfo {
+    (@__pgrx_emit_check_safety; $conn:tt, $sender_host:tt, $sender_port:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $sender_host);
+                $crate::__pgrx_c_operand!(@check_safety; $sender_port);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_get_senderinfo!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $sender_host:tt, $sender_port:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_get_senderinfo!(@__pgrx_emit_value; $conn, $sender_host, $sender_port)
@@ -5211,7 +5681,7 @@ macro_rules! walrcv_get_senderinfo {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6658,
+                            $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
                             _,
                             _
                         >(
@@ -5255,7 +5725,7 @@ macro_rules! walrcv_get_senderinfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6658,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
                         _,
                         _
                     >(
@@ -5296,7 +5766,7 @@ macro_rules! walrcv_get_senderinfo {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6658,
+                        $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
                         _,
                         _
                     >(
@@ -5335,6 +5805,13 @@ macro_rules! walrcv_get_senderinfo {
     (@__pgrx_emit_size; $conn:tt, $sender_host:tt, $sender_port:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $sender_host);
+                        $crate::__pgrx_c_operand!(@check_safety; $sender_port);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5342,7 +5819,7 @@ macro_rules! walrcv_get_senderinfo {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6658,
+                                            $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
                                             _,
                                             _
                                         >(
@@ -5399,7 +5876,7 @@ macro_rules! walrcv_get_senderinfo {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6658,
+                                $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
                                 _,
                                 _
                             >(
@@ -5454,6 +5931,17 @@ macro_rules! walrcv_get_senderinfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_identify_system {
@@ -5626,8 +6114,31 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
 /// ```text
 /// #define walrcv_identify_system( conn , primary_tli ) WalReceiverFunctions -> walrcv_identify_system ( conn , primary_tli )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_identify_system {
+    (@__pgrx_emit_check_safety; $conn:tt, $primary_tli:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $primary_tli);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_identify_system!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $conn:tt, $primary_tli:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_identify_system!(@__pgrx_emit_value; $conn, $primary_tli)
@@ -5639,7 +6150,7 @@ macro_rules! walrcv_identify_system {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6659,
+                            $crate::__pgrx_c_generated::Field_walrcv_identify_system,
                             _,
                             _
                         >(
@@ -5680,7 +6191,7 @@ macro_rules! walrcv_identify_system {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6659,
+                        $crate::__pgrx_c_generated::Field_walrcv_identify_system,
                         _,
                         _
                     >(
@@ -5718,7 +6229,7 @@ macro_rules! walrcv_identify_system {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6659,
+                        $crate::__pgrx_c_generated::Field_walrcv_identify_system,
                         _,
                         _
                     >(
@@ -5754,6 +6265,12 @@ macro_rules! walrcv_identify_system {
     (@__pgrx_emit_size; $conn:tt, $primary_tli:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $primary_tli);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5761,7 +6278,7 @@ macro_rules! walrcv_identify_system {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6659,
+                                            $crate::__pgrx_c_generated::Field_walrcv_identify_system,
                                             _,
                                             _
                                         >(
@@ -5815,7 +6332,7 @@ macro_rules! walrcv_identify_system {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6659,
+                                $crate::__pgrx_c_generated::Field_walrcv_identify_system,
                                 _,
                                 _
                             >(
@@ -5867,6 +6384,17 @@ macro_rules! walrcv_identify_system {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
@@ -6222,8 +6750,34 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
 /// ```text
 /// #define walrcv_readtimelinehistoryfile( conn , tli , filename , content , size ) WalReceiverFunctions -> walrcv_readtimelinehistoryfile ( conn , tli , filename , content , size )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_readtimelinehistoryfile {
+    (@__pgrx_emit_check_safety; $conn:tt, $tli:tt, $filename:tt, $content:tt, $size:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $tli);
+                $crate::__pgrx_c_operand!(@check_safety; $filename);
+                $crate::__pgrx_c_operand!(@check_safety; $content);
+                $crate::__pgrx_c_operand!(@check_safety; $size);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $conn:tt, $tli:tt, $filename:tt, $content:tt, $size:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_readtimelinehistoryfile!(
@@ -6242,7 +6796,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6660,
+                            $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
                             _,
                             _
                         >(
@@ -6295,7 +6849,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6660,
+                        $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
                         _,
                         _
                     >(
@@ -6345,7 +6899,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6660,
+                        $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
                         _,
                         _
                     >(
@@ -6393,6 +6947,15 @@ macro_rules! walrcv_readtimelinehistoryfile {
     (@__pgrx_emit_size; $conn:tt, $tli:tt, $filename:tt, $content:tt, $size:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $tli);
+                        $crate::__pgrx_c_operand!(@check_safety; $filename);
+                        $crate::__pgrx_c_operand!(@check_safety; $content);
+                        $crate::__pgrx_c_operand!(@check_safety; $size);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6400,7 +6963,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6660,
+                                            $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
                                             _,
                                             _
                                         >(
@@ -6466,7 +7029,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6660,
+                                $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
                                 _,
                                 _
                             >(
@@ -6533,6 +7096,17 @@ macro_rules! walrcv_readtimelinehistoryfile {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_receive {
@@ -6750,8 +7324,29 @@ macro_rules! __pgrx_c_args_walrcv_receive {
 /// ```text
 /// #define walrcv_receive( conn , buffer , wait_fd ) WalReceiverFunctions -> walrcv_receive ( conn , buffer , wait_fd )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_receive {
+    (@__pgrx_emit_check_safety; $conn:tt, $buffer:tt, $wait_fd:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $buffer);
+                $crate::__pgrx_c_operand!(@check_safety; $wait_fd);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_receive!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $buffer:tt, $wait_fd:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_receive!(@__pgrx_emit_value; $conn, $buffer, $wait_fd)
@@ -6763,7 +7358,7 @@ macro_rules! walrcv_receive {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6661,
+                            $crate::__pgrx_c_generated::Field_walrcv_receive,
                             _,
                             _
                         >(
@@ -6807,7 +7402,7 @@ macro_rules! walrcv_receive {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6661,
+                        $crate::__pgrx_c_generated::Field_walrcv_receive,
                         _,
                         _
                     >(
@@ -6848,7 +7443,7 @@ macro_rules! walrcv_receive {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6661,
+                        $crate::__pgrx_c_generated::Field_walrcv_receive,
                         _,
                         _
                     >(
@@ -6887,6 +7482,13 @@ macro_rules! walrcv_receive {
     (@__pgrx_emit_size; $conn:tt, $buffer:tt, $wait_fd:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $buffer);
+                        $crate::__pgrx_c_operand!(@check_safety; $wait_fd);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6894,7 +7496,7 @@ macro_rules! walrcv_receive {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6661,
+                                            $crate::__pgrx_c_generated::Field_walrcv_receive,
                                             _,
                                             _
                                         >(
@@ -6951,7 +7553,7 @@ macro_rules! walrcv_receive {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6661,
+                                $crate::__pgrx_c_generated::Field_walrcv_receive,
                                 _,
                                 _
                             >(
@@ -7006,6 +7608,17 @@ macro_rules! walrcv_receive {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_send {
@@ -7181,8 +7794,29 @@ macro_rules! __pgrx_c_args_walrcv_send {
 /// ```text
 /// #define walrcv_send( conn , buffer , nbytes ) WalReceiverFunctions -> walrcv_send ( conn , buffer , nbytes )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_send {
+    (@__pgrx_emit_check_safety; $conn:tt, $buffer:tt, $nbytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $buffer);
+                $crate::__pgrx_c_operand!(@check_safety; $nbytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_send!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $buffer:tt, $nbytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_send!(@__pgrx_emit_value; $conn, $buffer, $nbytes)
@@ -7194,7 +7828,7 @@ macro_rules! walrcv_send {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6662,
+                            $crate::__pgrx_c_generated::Field_walrcv_send,
                             _,
                             _
                         >(
@@ -7238,7 +7872,7 @@ macro_rules! walrcv_send {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6662,
+                        $crate::__pgrx_c_generated::Field_walrcv_send,
                         _,
                         _
                     >(
@@ -7279,7 +7913,7 @@ macro_rules! walrcv_send {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6662,
+                        $crate::__pgrx_c_generated::Field_walrcv_send,
                         _,
                         _
                     >(
@@ -7318,6 +7952,13 @@ macro_rules! walrcv_send {
     (@__pgrx_emit_size; $conn:tt, $buffer:tt, $nbytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $buffer);
+                        $crate::__pgrx_c_operand!(@check_safety; $nbytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7325,7 +7966,7 @@ macro_rules! walrcv_send {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6662,
+                                            $crate::__pgrx_c_generated::Field_walrcv_send,
                                             _,
                                             _
                                         >(
@@ -7382,7 +8023,7 @@ macro_rules! walrcv_send {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6662,
+                                $crate::__pgrx_c_generated::Field_walrcv_send,
                                 _,
                                 _
                             >(
@@ -7437,6 +8078,17 @@ macro_rules! walrcv_send {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_server_version {
@@ -7551,8 +8203,27 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
 /// ```text
 /// #define walrcv_server_version( conn ) WalReceiverFunctions -> walrcv_server_version ( conn )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_server_version {
+    (@__pgrx_emit_check_safety; $conn:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_server_version!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_server_version!(@__pgrx_emit_value; $conn)
@@ -7564,7 +8235,7 @@ macro_rules! walrcv_server_version {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6663,
+                            $crate::__pgrx_c_generated::Field_walrcv_server_version,
                             _,
                             _
                         >(
@@ -7602,7 +8273,7 @@ macro_rules! walrcv_server_version {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6663,
+                        $crate::__pgrx_c_generated::Field_walrcv_server_version,
                         _,
                         _
                     >(
@@ -7637,7 +8308,7 @@ macro_rules! walrcv_server_version {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6663,
+                        $crate::__pgrx_c_generated::Field_walrcv_server_version,
                         _,
                         _
                     >(
@@ -7670,6 +8341,11 @@ macro_rules! walrcv_server_version {
     (@__pgrx_emit_size; $conn:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7677,7 +8353,7 @@ macro_rules! walrcv_server_version {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6663,
+                                            $crate::__pgrx_c_generated::Field_walrcv_server_version,
                                             _,
                                             _
                                         >(
@@ -7728,7 +8404,7 @@ macro_rules! walrcv_server_version {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6663,
+                                $crate::__pgrx_c_generated::Field_walrcv_server_version,
                                 _,
                                 _
                             >(
@@ -7777,6 +8453,17 @@ macro_rules! walrcv_server_version {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_walrcv_startstreaming {
@@ -7945,8 +8632,28 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
 /// ```text
 /// #define walrcv_startstreaming( conn , options ) WalReceiverFunctions -> walrcv_startstreaming ( conn , options )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_startstreaming {
+    (@__pgrx_emit_check_safety; $conn:tt, $options:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $conn);
+                $crate::__pgrx_c_operand!(@check_safety; $options);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_startstreaming!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $conn:tt, $options:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::walrcv_startstreaming!(@__pgrx_emit_value; $conn, $options)
@@ -7958,7 +8665,7 @@ macro_rules! walrcv_startstreaming {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6664,
+                            $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
                             _,
                             _
                         >(
@@ -7999,7 +8706,7 @@ macro_rules! walrcv_startstreaming {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6664,
+                        $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
                         _,
                         _
                     >(
@@ -8037,7 +8744,7 @@ macro_rules! walrcv_startstreaming {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6664,
+                        $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
                         _,
                         _
                     >(
@@ -8073,6 +8780,12 @@ macro_rules! walrcv_startstreaming {
     (@__pgrx_emit_size; $conn:tt, $options:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $conn);
+                        $crate::__pgrx_c_operand!(@check_safety; $options);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8080,7 +8793,7 @@ macro_rules! walrcv_startstreaming {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6664,
+                                            $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
                                             _,
                                             _
                                         >(
@@ -8134,7 +8847,7 @@ macro_rules! walrcv_startstreaming {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field6664,
+                                $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
                                 _,
                                 _
                             >(

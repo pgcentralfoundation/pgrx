@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
@@ -139,8 +150,30 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
 /// ```text
 /// #define GET_PREDICATELOCKTARGETTAG_DB( locktag ) ( ( Oid ) ( locktag ) . locktag_field1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
+    (@__pgrx_emit_check_safety; $locktag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GET_PREDICATELOCKTARGETTAG_DB!(@__pgrx_emit_value; $locktag)
@@ -160,7 +193,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2932,
+                                $crate::__pgrx_c_generated::Field_locktag_field1,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -197,6 +230,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
     (@__pgrx_emit_size; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -211,7 +249,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2932,
+                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -243,7 +281,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2932,
+                                $crate::__pgrx_c_generated::Field_locktag_field1,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -275,6 +313,17 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
@@ -402,8 +451,30 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
 /// ```text
 /// #define GET_PREDICATELOCKTARGETTAG_OFFSET( locktag ) ( ( OffsetNumber ) ( locktag ) . locktag_field4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
+    (@__pgrx_emit_check_safety; $locktag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GET_PREDICATELOCKTARGETTAG_OFFSET!(@__pgrx_emit_value; $locktag)
@@ -420,7 +491,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -457,6 +528,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
     (@__pgrx_emit_size; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -468,7 +544,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2935,
+                                            $crate::__pgrx_c_generated::Field_locktag_field4,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -500,7 +576,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -532,6 +608,17 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
@@ -659,8 +746,30 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
 /// ```text
 /// #define GET_PREDICATELOCKTARGETTAG_PAGE( locktag ) ( ( BlockNumber ) ( locktag ) . locktag_field3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
+    (@__pgrx_emit_check_safety; $locktag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GET_PREDICATELOCKTARGETTAG_PAGE!(@__pgrx_emit_value; $locktag)
@@ -677,7 +786,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2934,
+                                $crate::__pgrx_c_generated::Field_locktag_field3,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -714,6 +823,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
     (@__pgrx_emit_size; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -725,7 +839,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -757,7 +871,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2934,
+                                $crate::__pgrx_c_generated::Field_locktag_field3,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -789,6 +903,17 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
@@ -916,8 +1041,30 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
 /// ```text
 /// #define GET_PREDICATELOCKTARGETTAG_RELATION( locktag ) ( ( Oid ) ( locktag ) . locktag_field2 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
+    (@__pgrx_emit_check_safety; $locktag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GET_PREDICATELOCKTARGETTAG_RELATION!(@__pgrx_emit_value; $locktag)
@@ -937,7 +1084,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2933,
+                                $crate::__pgrx_c_generated::Field_locktag_field2,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -974,6 +1121,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
     (@__pgrx_emit_size; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -988,7 +1140,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2933,
+                                            $crate::__pgrx_c_generated::Field_locktag_field2,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -1023,7 +1175,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2933,
+                                $crate::__pgrx_c_generated::Field_locktag_field2,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -1055,6 +1207,17 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
@@ -1182,8 +1345,26 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
 /// ```text
 /// #define GET_PREDICATELOCKTARGETTAG_TYPE( locktag ) ( ( ( locktag ) . locktag_field4 != InvalidOffsetNumber ) ? PREDLOCKTAG_TUPLE : ( ( ( locktag ) . locktag_field3 != InvalidBlockNumber ) ? PREDLOCKTAG_PAGE : PREDLOCKTAG_RELATION ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
+    (@__pgrx_emit_check_safety; $locktag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GET_PREDICATELOCKTARGETTAG_TYPE!(@__pgrx_emit_value; $locktag)
@@ -1200,7 +1381,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2935,
+                                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -1243,7 +1424,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2934,
+                                                                    $crate::__pgrx_c_generated::Field_locktag_field3,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1333,6 +1514,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
     (@__pgrx_emit_size; $locktag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1350,7 +1536,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2935,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field4,
                                                             _,
                                                             _
                                                         >(
@@ -1411,7 +1597,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field2934,
+                                                                                $crate::__pgrx_c_generated::Field_locktag_field3,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -1496,7 +1682,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field2935,
+                                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $locktag)))
@@ -1539,7 +1725,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2934,
+                                                                    $crate::__pgrx_c_generated::Field_locktag_field3,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1624,6 +1810,17 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
@@ -1922,8 +2119,29 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
 /// ```text
 /// #define SET_PREDICATELOCKTARGETTAG_PAGE( locktag , dboid , reloid , blocknum ) ( ( locktag ) . locktag_field1 = ( dboid ) , ( locktag ) . locktag_field2 = ( reloid ) , ( locktag ) . locktag_field3 = ( blocknum ) , ( locktag ) . locktag_field4 = InvalidOffsetNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
+    (@__pgrx_emit_check_safety; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                $crate::__pgrx_c_operand!(@check_safety; $reloid);
+                $crate::__pgrx_c_operand!(@check_safety; $blocknum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_PREDICATELOCKTARGETTAG_PAGE!(
@@ -1955,7 +2173,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -1986,7 +2204,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2009,7 +2227,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2027,7 +2245,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2072,6 +2290,14 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
     (@__pgrx_emit_size; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                        $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                        $crate::__pgrx_c_operand!(@check_safety; $reloid);
+                        $crate::__pgrx_c_operand!(@check_safety; $blocknum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2095,7 +2321,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::assign(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2932,
+                                                                        $crate::__pgrx_c_generated::Field_locktag_field1,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2126,7 +2352,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2933,
+                                                                    $crate::__pgrx_c_generated::Field_locktag_field2,
                                                                     _,
                                                                     _
                                                                 >(
@@ -2159,7 +2385,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2934,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field3,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2182,7 +2408,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2935,
+                                            $crate::__pgrx_c_generated::Field_locktag_field4,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2234,7 +2460,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -2265,7 +2491,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2288,7 +2514,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2306,7 +2532,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2346,6 +2572,17 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
@@ -2587,8 +2824,28 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
 /// ```text
 /// #define SET_PREDICATELOCKTARGETTAG_RELATION( locktag , dboid , reloid ) ( ( locktag ) . locktag_field1 = ( dboid ) , ( locktag ) . locktag_field2 = ( reloid ) , ( locktag ) . locktag_field3 = InvalidBlockNumber , ( locktag ) . locktag_field4 = InvalidOffsetNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
+    (@__pgrx_emit_check_safety; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                $crate::__pgrx_c_operand!(@check_safety; $reloid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_PREDICATELOCKTARGETTAG_RELATION!(
@@ -2619,7 +2876,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -2650,7 +2907,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2673,7 +2930,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2694,7 +2951,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2739,6 +2996,13 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
     (@__pgrx_emit_size; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                        $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                        $crate::__pgrx_c_operand!(@check_safety; $reloid);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2762,7 +3026,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::assign(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2932,
+                                                                        $crate::__pgrx_c_generated::Field_locktag_field1,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2793,7 +3057,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2933,
+                                                                    $crate::__pgrx_c_generated::Field_locktag_field2,
                                                                     _,
                                                                     _
                                                                 >(
@@ -2826,7 +3090,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2934,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field3,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2847,7 +3111,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2935,
+                                            $crate::__pgrx_c_generated::Field_locktag_field4,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2899,7 +3163,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -2930,7 +3194,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2953,7 +3217,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -2974,7 +3238,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3014,6 +3278,17 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
@@ -3369,8 +3644,30 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
 /// ```text
 /// #define SET_PREDICATELOCKTARGETTAG_TUPLE( locktag , dboid , reloid , blocknum , offnum ) ( ( locktag ) . locktag_field1 = ( dboid ) , ( locktag ) . locktag_field2 = ( reloid ) , ( locktag ) . locktag_field3 = ( blocknum ) , ( locktag ) . locktag_field4 = ( offnum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
+    (@__pgrx_emit_check_safety; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                $crate::__pgrx_c_operand!(@check_safety; $reloid);
+                $crate::__pgrx_c_operand!(@check_safety; $blocknum);
+                $crate::__pgrx_c_operand!(@check_safety; $offnum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_PREDICATELOCKTARGETTAG_TUPLE!(
@@ -3403,7 +3700,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -3434,7 +3731,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3457,7 +3754,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3475,7 +3772,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3517,6 +3814,15 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
     (@__pgrx_emit_size; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $locktag);
+                        $crate::__pgrx_c_operand!(@check_safety; $dboid);
+                        $crate::__pgrx_c_operand!(@check_safety; $reloid);
+                        $crate::__pgrx_c_operand!(@check_safety; $blocknum);
+                        $crate::__pgrx_c_operand!(@check_safety; $offnum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3540,7 +3846,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::assign(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2932,
+                                                                        $crate::__pgrx_c_generated::Field_locktag_field1,
                                                                         _,
                                                                         _
                                                                     >(
@@ -3571,7 +3877,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field2933,
+                                                                    $crate::__pgrx_c_generated::Field_locktag_field2,
                                                                     _,
                                                                     _
                                                                 >(
@@ -3604,7 +3910,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2934,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field3,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3627,7 +3933,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2935,
+                                            $crate::__pgrx_c_generated::Field_locktag_field4,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3674,7 +3980,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2932,
+                                                            $crate::__pgrx_c_generated::Field_locktag_field1,
                                                             _,
                                                             _
                                                         >(
@@ -3705,7 +4011,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2933,
+                                                        $crate::__pgrx_c_generated::Field_locktag_field2,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3728,7 +4034,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2934,
+                                            $crate::__pgrx_c_generated::Field_locktag_field3,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $locktag))),
@@ -3746,7 +4052,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field2935,
+                                $crate::__pgrx_c_generated::Field_locktag_field4,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),

@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EarlyPruningEnabled {
@@ -118,8 +129,27 @@ macro_rules! __pgrx_c_args_EarlyPruningEnabled {
 /// ```text
 /// #define EarlyPruningEnabled( rel ) ( old_snapshot_threshold >= 0 && RelationAllowsEarlyPruning ( rel ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! EarlyPruningEnabled {
+    (@__pgrx_emit_check_safety; $rel:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rel);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EarlyPruningEnabled!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rel:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EarlyPruningEnabled!(@__pgrx_emit_value; $rel)
@@ -174,7 +204,7 @@ macro_rules! EarlyPruningEnabled {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4408,
+                                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                                             _,
                                                                             _
                                                                         >(
@@ -185,7 +215,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -358,7 +388,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4408,
+                                                                                                                    $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -369,7 +399,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -472,7 +502,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -519,7 +549,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -658,7 +688,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -701,7 +731,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -712,7 +742,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                 _,
                                                                                                                                                                 _
                                                                                                                                                             >(
@@ -762,7 +792,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -773,7 +803,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                 _,
                                                                                                                                                                 _
                                                                                                                                                             >(
@@ -834,7 +864,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field5859,
+                                                                                                                $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -860,7 +890,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4259,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -964,6 +994,11 @@ macro_rules! EarlyPruningEnabled {
         /* PGRX: RelationAllowsEarlyPruning remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsAccessibleInLogicalDecoding remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsPermanent remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsUsedAsCatalogTable remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationNeedsWAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogIsNeeded remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogLogicalInfoActive remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rel);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1027,7 +1062,7 @@ macro_rules! EarlyPruningEnabled {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4408,
+                                                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -1038,7 +1073,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4274,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -1211,7 +1246,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4408,
+                                                                                                                                $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -1222,7 +1257,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -1325,7 +1360,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -1372,7 +1407,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -1511,7 +1546,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field4259,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -1554,7 +1589,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -1565,7 +1600,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                                 >(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                             _,
                                                                                                                                                                             _
                                                                                                                                                                         >(
@@ -1615,7 +1650,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -1626,7 +1661,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                                 >(
                                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                             _,
                                                                                                                                                                             _
                                                                                                                                                                         >(
@@ -1687,7 +1722,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                            $crate::__pgrx_c_generated::Field5859,
+                                                                                                                            $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                                             _,
                                                                                                                             _
                                                                                                                         >(
@@ -1713,7 +1748,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                             >(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                                                         _,
                                                                                                                                                         _
                                                                                                                                                     >(
@@ -1855,7 +1890,7 @@ macro_rules! EarlyPruningEnabled {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4408,
+                                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                                             _,
                                                                             _
                                                                         >(
@@ -1866,7 +1901,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -2039,7 +2074,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4408,
+                                                                                                                    $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -2050,7 +2085,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -2153,7 +2188,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -2200,7 +2235,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -2339,7 +2374,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -2382,7 +2417,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -2393,7 +2428,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                 _,
                                                                                                                                                                 _
                                                                                                                                                             >(
@@ -2443,7 +2478,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -2454,7 +2489,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                                 _,
                                                                                                                                                                 _
                                                                                                                                                             >(
@@ -2515,7 +2550,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field5859,
+                                                                                                                $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -2541,7 +2576,7 @@ macro_rules! EarlyPruningEnabled {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4259,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -2642,6 +2677,17 @@ macro_rules! EarlyPruningEnabled {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitDirtySnapshot {
@@ -2751,8 +2797,23 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
 /// ```text
 /// #define InitDirtySnapshot( snapshotdata ) ( ( snapshotdata ) . snapshot_type = SNAPSHOT_DIRTY )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitDirtySnapshot {
+    (@__pgrx_emit_check_safety; $snapshotdata:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitDirtySnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshotdata:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InitDirtySnapshot!(@__pgrx_emit_value; $snapshotdata)
@@ -2763,7 +2824,7 @@ macro_rules! InitDirtySnapshot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5035,
+                        $crate::__pgrx_c_generated::Field_snapshot_type,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -2794,12 +2855,17 @@ macro_rules! InitDirtySnapshot {
     (@__pgrx_emit_size; $snapshotdata:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5035,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -2825,7 +2891,7 @@ macro_rules! InitDirtySnapshot {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5035,
+                        $crate::__pgrx_c_generated::Field_snapshot_type,
                         _,
                         _
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -2854,6 +2920,17 @@ macro_rules! InitDirtySnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
@@ -3032,8 +3109,27 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
 /// ```text
 /// #define InitNonVacuumableSnapshot( snapshotdata , vistestp ) ( ( snapshotdata ) . snapshot_type = SNAPSHOT_NON_VACUUMABLE , ( snapshotdata ) . vistest = ( vistestp ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitNonVacuumableSnapshot {
+    (@__pgrx_emit_check_safety; $snapshotdata:tt, $vistestp:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                $crate::__pgrx_c_operand!(@check_safety; $vistestp);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $snapshotdata:tt, $vistestp:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InitNonVacuumableSnapshot!(@__pgrx_emit_value; $snapshotdata, $vistestp)
@@ -3047,7 +3143,7 @@ macro_rules! InitNonVacuumableSnapshot {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5035,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3062,7 +3158,7 @@ macro_rules! InitNonVacuumableSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5923,
+                                $crate::__pgrx_c_generated::Field_vistest,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3098,6 +3194,12 @@ macro_rules! InitNonVacuumableSnapshot {
     (@__pgrx_emit_size; $snapshotdata:tt, $vistestp:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                        $crate::__pgrx_c_operand!(@check_safety; $vistestp);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3109,7 +3211,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5035,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3129,7 +3231,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5923,
+                                            $crate::__pgrx_c_generated::Field_vistest,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3161,7 +3263,7 @@ macro_rules! InitNonVacuumableSnapshot {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5035,
+                                    $crate::__pgrx_c_generated::Field_snapshot_type,
                                     _,
                                     _
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3176,7 +3278,7 @@ macro_rules! InitNonVacuumableSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5923,
+                                $crate::__pgrx_c_generated::Field_vistest,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3207,6 +3309,17 @@ macro_rules! InitNonVacuumableSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitToastSnapshot {
@@ -3424,8 +3537,25 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
 /// ```text
 /// #define InitToastSnapshot( snapshotdata , l , w ) ( ( snapshotdata ) . snapshot_type = SNAPSHOT_TOAST , ( snapshotdata ) . lsn = ( l ) , ( snapshotdata ) . whenTaken = ( w ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitToastSnapshot {
+    (@__pgrx_emit_check_safety; $snapshotdata:tt, $l:tt, $w:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+                $crate::__pgrx_c_operand!(@check_safety; $w);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitToastSnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshotdata:tt, $l:tt, $w:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::InitToastSnapshot!(@__pgrx_emit_value; $snapshotdata, $l, $w)
@@ -3445,7 +3575,7 @@ macro_rules! InitToastSnapshot {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5035,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3463,7 +3593,7 @@ macro_rules! InitToastSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2882,
+                                            $crate::__pgrx_c_generated::Field_lsn,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3481,7 +3611,7 @@ macro_rules! InitToastSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5997,
+                                $crate::__pgrx_c_generated::Field_whenTaken,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3514,6 +3644,13 @@ macro_rules! InitToastSnapshot {
     (@__pgrx_emit_size; $snapshotdata:tt, $l:tt, $w:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                        $crate::__pgrx_c_operand!(@check_safety; $w);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3531,7 +3668,7 @@ macro_rules! InitToastSnapshot {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5035,
+                                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                                             _,
                                                             _
                                                         >(
@@ -3561,7 +3698,7 @@ macro_rules! InitToastSnapshot {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2882,
+                                                        $crate::__pgrx_c_generated::Field_lsn,
                                                         _,
                                                         _
                                                     >(
@@ -3591,7 +3728,7 @@ macro_rules! InitToastSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5997,
+                                            $crate::__pgrx_c_generated::Field_whenTaken,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3629,7 +3766,7 @@ macro_rules! InitToastSnapshot {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5035,
+                                                $crate::__pgrx_c_generated::Field_snapshot_type,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3647,7 +3784,7 @@ macro_rules! InitToastSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2882,
+                                            $crate::__pgrx_c_generated::Field_lsn,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3665,7 +3802,7 @@ macro_rules! InitToastSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5997,
+                                $crate::__pgrx_c_generated::Field_whenTaken,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
@@ -3696,6 +3833,17 @@ macro_rules! InitToastSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsMVCCSnapshot {
@@ -3805,8 +3953,23 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
 /// ```text
 /// #define IsMVCCSnapshot( snapshot ) ( ( snapshot ) -> snapshot_type == SNAPSHOT_MVCC || ( snapshot ) -> snapshot_type == SNAPSHOT_HISTORIC_MVCC )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
+    (@__pgrx_emit_check_safety; $snapshot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsMVCCSnapshot!(@__pgrx_emit_value; $snapshot)
@@ -3822,7 +3985,7 @@ macro_rules! IsMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5035,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -3857,7 +4020,7 @@ macro_rules! IsMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5035,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -3911,6 +4074,11 @@ macro_rules! IsMVCCSnapshot {
     (@__pgrx_emit_size; $snapshot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $snapshot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3924,7 +4092,7 @@ macro_rules! IsMVCCSnapshot {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5035,
+                                                        $crate::__pgrx_c_generated::Field_snapshot_type,
                                                         _,
                                                         _
                                                     >(
@@ -3967,7 +4135,7 @@ macro_rules! IsMVCCSnapshot {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5035,
+                                                        $crate::__pgrx_c_generated::Field_snapshot_type,
                                                         _,
                                                         _
                                                     >(
@@ -4026,7 +4194,7 @@ macro_rules! IsMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5035,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -4061,7 +4229,7 @@ macro_rules! IsMVCCSnapshot {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5035,
+                                            $crate::__pgrx_c_generated::Field_snapshot_type,
                                             _,
                                             _
                                         >(
@@ -4113,6 +4281,17 @@ macro_rules! IsMVCCSnapshot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationAllowsEarlyPruning {
@@ -4232,8 +4411,30 @@ macro_rules! __pgrx_c_args_RelationAllowsEarlyPruning {
 /// ```text
 /// #define RelationAllowsEarlyPruning( rel ) ( RelationIsPermanent ( rel ) && ! IsCatalogRelation ( rel ) && ! RelationIsAccessibleInLogicalDecoding ( rel ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationAllowsEarlyPruning {
+    (@__pgrx_emit_check_safety; $rel:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rel);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationAllowsEarlyPruning!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $rel:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationAllowsEarlyPruning!(@__pgrx_emit_value; $rel)
@@ -4260,7 +4461,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4408,
+                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                             _,
                                                             _
                                                         >(
@@ -4271,7 +4472,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                             _,
                                                                             _
                                                                         >(
@@ -4431,7 +4632,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4408,
+                                                                                                    $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -4442,7 +4643,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4274,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -4545,7 +4746,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -4592,7 +4793,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -4731,7 +4932,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -4774,7 +4975,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -4785,7 +4986,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -4835,7 +5036,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -4846,7 +5047,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -4907,7 +5108,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5859,
+                                                                                                $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -4933,7 +5134,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                            $crate::__pgrx_c_generated::Field4259,
+                                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                             _,
                                                                                                                             _
                                                                                                                         >(
@@ -5032,6 +5233,11 @@ macro_rules! RelationAllowsEarlyPruning {
         /* PGRX: RelationIsAccessibleInLogicalDecoding remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsPermanent remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationIsUsedAsCatalogTable remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: RelationNeedsWAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogIsNeeded remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: XLogLogicalInfoActive remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rel);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5054,7 +5260,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4408,
+                                                                        $crate::__pgrx_c_generated::Field_relpersistence,
                                                                         _,
                                                                         _
                                                                     >(
@@ -5065,7 +5271,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4274,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -5233,7 +5439,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field4408,
+                                                                                                                $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -5244,7 +5450,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -5347,7 +5553,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -5394,7 +5600,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -5533,7 +5739,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4259,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -5576,7 +5782,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -5587,7 +5793,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -5637,7 +5843,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -5648,7 +5854,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                             _,
                                                                                                                                                             _
                                                                                                                                                         >(
@@ -5709,7 +5915,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field5859,
+                                                                                                            $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -5735,7 +5941,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                                         _,
                                                                                                                                         _
                                                                                                                                     >(
@@ -5841,7 +6047,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4408,
+                                                            $crate::__pgrx_c_generated::Field_relpersistence,
                                                             _,
                                                             _
                                                         >(
@@ -5852,7 +6058,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4274,
+                                                                            $crate::__pgrx_c_generated::Field_rd_rel,
                                                                             _,
                                                                             _
                                                                         >(
@@ -6012,7 +6218,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field4408,
+                                                                                                    $crate::__pgrx_c_generated::Field_relpersistence,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -6023,7 +6229,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4274,
+                                                                                                                    $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -6126,7 +6332,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4227,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_createSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -6173,7 +6379,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4233,
+                                                                                                                                $crate::__pgrx_c_generated::Field_rd_firstRelfilenodeSubid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -6312,7 +6518,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4259,
+                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -6355,7 +6561,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -6366,7 +6572,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -6416,7 +6622,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4395,
+                                                                                                                                $crate::__pgrx_c_generated::Field_relkind,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -6427,7 +6633,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field4274,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_rd_rel,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -6488,7 +6694,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5859,
+                                                                                                $crate::__pgrx_c_generated::Field_user_catalog_table,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -6514,7 +6720,7 @@ macro_rules! RelationAllowsEarlyPruning {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                            $crate::__pgrx_c_generated::Field4259,
+                                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                                                                             _,
                                                                                                                             _
                                                                                                                         >(

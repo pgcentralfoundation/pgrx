@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RowMarkRequiresRowShareLock {
@@ -136,8 +147,26 @@ macro_rules! __pgrx_c_args_RowMarkRequiresRowShareLock {
 /// ```text
 /// #define RowMarkRequiresRowShareLock( marktype ) ( ( marktype ) <= ROW_MARK_KEYSHARE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RowMarkRequiresRowShareLock {
+    (@__pgrx_emit_check_safety; $marktype:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $marktype);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $marktype:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RowMarkRequiresRowShareLock!(@__pgrx_emit_value; $marktype)
@@ -182,6 +211,11 @@ macro_rules! RowMarkRequiresRowShareLock {
     (@__pgrx_emit_size; $marktype:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $marktype);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -245,6 +279,17 @@ macro_rules! RowMarkRequiresRowShareLock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_exec_subplan_get_plan {
@@ -413,8 +458,28 @@ macro_rules! __pgrx_c_args_exec_subplan_get_plan {
 /// ```text
 /// #define exec_subplan_get_plan( plannedstmt , subplan ) ( ( Plan * ) list_nth ( ( plannedstmt ) -> subplans , ( subplan ) -> plan_id - 1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! exec_subplan_get_plan {
+    (@__pgrx_emit_check_safety; $plannedstmt:tt, $subplan:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $plannedstmt);
+                $crate::__pgrx_c_operand!(@check_safety; $subplan);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_exec_subplan_get_plan!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $plannedstmt:tt, $subplan:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::exec_subplan_get_plan!(@__pgrx_emit_value; $plannedstmt, $subplan)
@@ -438,7 +503,7 @@ macro_rules! exec_subplan_get_plan {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_88eee48048255ff3eb2117d15c6f4c10(
+                            $crate::list_nth(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<$crate::List>,
@@ -460,7 +525,7 @@ macro_rules! exec_subplan_get_plan {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5967,
+                                                    $crate::__pgrx_c_generated::Field_subplans,
                                                     _,
                                                     _
                                                 >(
@@ -504,7 +569,7 @@ macro_rules! exec_subplan_get_plan {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4447,
+                                                            $crate::__pgrx_c_generated::Field_plan_id,
                                                             _,
                                                             _
                                                         >(
@@ -561,6 +626,12 @@ macro_rules! exec_subplan_get_plan {
     (@__pgrx_emit_size; $plannedstmt:tt, $subplan:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $plannedstmt);
+                        $crate::__pgrx_c_operand!(@check_safety; $subplan);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -579,7 +650,7 @@ macro_rules! exec_subplan_get_plan {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_88eee48048255ff3eb2117d15c6f4c10(
+                                        $crate::list_nth(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -603,7 +674,7 @@ macro_rules! exec_subplan_get_plan {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5967,
+                                                                $crate::__pgrx_c_generated::Field_subplans,
                                                                 _,
                                                                 _
                                                             >(
@@ -647,7 +718,7 @@ macro_rules! exec_subplan_get_plan {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4447,
+                                                                        $crate::__pgrx_c_generated::Field_plan_id,
                                                                         _,
                                                                         _
                                                                     >(
@@ -714,7 +785,7 @@ macro_rules! exec_subplan_get_plan {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_88eee48048255ff3eb2117d15c6f4c10(
+                            $crate::list_nth(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<$crate::List>,
@@ -736,7 +807,7 @@ macro_rules! exec_subplan_get_plan {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5967,
+                                                    $crate::__pgrx_c_generated::Field_subplans,
                                                     _,
                                                     _
                                                 >(
@@ -780,7 +851,7 @@ macro_rules! exec_subplan_get_plan {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4447,
+                                                            $crate::__pgrx_c_generated::Field_plan_id,
                                                             _,
                                                             _
                                                         >(
@@ -835,6 +906,17 @@ macro_rules! exec_subplan_get_plan {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_innerPlan {
@@ -927,8 +1009,27 @@ macro_rules! __pgrx_c_args_innerPlan {
 /// ```text
 /// #define innerPlan( node ) ( ( ( Plan * ) ( node ) ) -> righttree )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! innerPlan {
+    (@__pgrx_emit_check_safety; $node:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $node);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_innerPlan!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $node:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::innerPlan!(@__pgrx_emit_value; $node)
@@ -939,7 +1040,7 @@ macro_rules! innerPlan {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5197,
+                        $crate::__pgrx_c_generated::Field_righttree,
                         _,
                         _
                     >(
@@ -977,7 +1078,7 @@ macro_rules! innerPlan {
     (@__pgrx_emit_place; $node:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5197,
+                $crate::__pgrx_c_generated::Field_righttree,
                 _,
                 _
             >(
@@ -1010,7 +1111,7 @@ macro_rules! innerPlan {
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5197,
+                $crate::__pgrx_c_generated::Field_righttree,
                 _,
                 _
             >(
@@ -1043,10 +1144,15 @@ macro_rules! innerPlan {
     (@__pgrx_emit_size; $node:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $node);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5197,
+                            $crate::__pgrx_c_generated::Field_righttree,
                             _,
                             _
                         >(
@@ -1089,7 +1195,7 @@ macro_rules! innerPlan {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5197,
+                        $crate::__pgrx_c_generated::Field_righttree,
                         _,
                         _
                     >(
@@ -1137,6 +1243,17 @@ macro_rules! innerPlan {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_outerPlan {
@@ -1229,8 +1346,27 @@ macro_rules! __pgrx_c_args_outerPlan {
 /// ```text
 /// #define outerPlan( node ) ( ( ( Plan * ) ( node ) ) -> lefttree )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! outerPlan {
+    (@__pgrx_emit_check_safety; $node:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $node);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_outerPlan!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $node:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::outerPlan!(@__pgrx_emit_value; $node)
@@ -1241,7 +1377,7 @@ macro_rules! outerPlan {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3153,
+                        $crate::__pgrx_c_generated::Field_lefttree,
                         _,
                         _
                     >(
@@ -1279,7 +1415,7 @@ macro_rules! outerPlan {
     (@__pgrx_emit_place; $node:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3153,
+                $crate::__pgrx_c_generated::Field_lefttree,
                 _,
                 _
             >(
@@ -1312,7 +1448,7 @@ macro_rules! outerPlan {
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3153,
+                $crate::__pgrx_c_generated::Field_lefttree,
                 _,
                 _
             >(
@@ -1345,10 +1481,15 @@ macro_rules! outerPlan {
     (@__pgrx_emit_size; $node:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $node);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3153,
+                            $crate::__pgrx_c_generated::Field_lefttree,
                             _,
                             _
                         >(
@@ -1391,7 +1532,7 @@ macro_rules! outerPlan {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3153,
+                        $crate::__pgrx_c_generated::Field_lefttree,
                         _,
                         _
                     >(

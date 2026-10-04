@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_CStringGetTextDatum {
@@ -121,8 +132,27 @@ macro_rules! __pgrx_c_args_CStringGetTextDatum {
 /// ```text
 /// #define CStringGetTextDatum( s ) PointerGetDatum ( cstring_to_text ( s ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! CStringGetTextDatum {
+    (@__pgrx_emit_check_safety; $s:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $s);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_CStringGetTextDatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $s:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::CStringGetTextDatum!(@__pgrx_emit_value; $s)
@@ -143,13 +173,19 @@ macro_rules! CStringGetTextDatum {
                             $crate::cstring_to_text(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
                                         _
@@ -168,6 +204,11 @@ macro_rules! CStringGetTextDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $s);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -182,13 +223,19 @@ macro_rules! CStringGetTextDatum {
                                             $crate::cstring_to_text(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
                                                         _
@@ -235,13 +282,19 @@ macro_rules! CStringGetTextDatum {
                             $crate::cstring_to_text(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
                                         _
@@ -260,6 +313,11 @@ macro_rules! CStringGetTextDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $s);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -274,13 +332,19 @@ macro_rules! CStringGetTextDatum {
                                             $crate::cstring_to_text(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
                                                         _
@@ -327,13 +391,19 @@ macro_rules! CStringGetTextDatum {
                             $crate::cstring_to_text(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
                                         _
@@ -352,6 +422,11 @@ macro_rules! CStringGetTextDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $s);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -366,13 +441,19 @@ macro_rules! CStringGetTextDatum {
                                             $crate::cstring_to_text(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
                                                         _
@@ -419,13 +500,19 @@ macro_rules! CStringGetTextDatum {
                             $crate::cstring_to_text(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
                                         _
@@ -444,6 +531,11 @@ macro_rules! CStringGetTextDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $s);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -458,13 +550,19 @@ macro_rules! CStringGetTextDatum {
                                             $crate::cstring_to_text(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
                                                         _
@@ -511,13 +609,19 @@ macro_rules! CStringGetTextDatum {
                             $crate::cstring_to_text(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
                                         _
@@ -536,6 +640,11 @@ macro_rules! CStringGetTextDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $s);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -550,13 +659,19 @@ macro_rules! CStringGetTextDatum {
                                             $crate::cstring_to_text(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::CChar,
+                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                $crate::__pgrx_c_macros::CChar,
+                                                                ::core::ffi::c_char
+                                                            >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
                                                         _
@@ -601,6 +716,17 @@ macro_rules! CStringGetTextDatum {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TextDatumGetCString {
@@ -710,8 +836,27 @@ macro_rules! __pgrx_c_args_TextDatumGetCString {
 /// ```text
 /// #define TextDatumGetCString( d ) text_to_cstring ( ( text * ) DatumGetPointer ( d ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TextDatumGetCString {
+    (@__pgrx_emit_check_safety; $d:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $d);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TextDatumGetCString!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TextDatumGetCString!(@__pgrx_emit_value; $d)
@@ -722,7 +867,10 @@ macro_rules! TextDatumGetCString {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::CChar,
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CChar,
+                        ::core::ffi::c_char
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
@@ -759,7 +907,10 @@ macro_rules! TextDatumGetCString {
                                             $crate::__pgrx_c_macros::expression::cast_as::<
                                                 $crate::Pointer,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
                                                 _
@@ -800,12 +951,20 @@ macro_rules! TextDatumGetCString {
         /* PGRX: TextDatumGetCString remains expanded because text_to_cstring is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $d);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
@@ -849,7 +1008,10 @@ macro_rules! TextDatumGetCString {
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
                                                                 $crate::Pointer,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
                                                                 _
@@ -891,7 +1053,10 @@ macro_rules! TextDatumGetCString {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
@@ -928,7 +1093,10 @@ macro_rules! TextDatumGetCString {
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                     $crate::Pointer,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
                                                     _

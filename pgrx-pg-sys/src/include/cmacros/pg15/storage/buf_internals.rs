@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
@@ -175,8 +186,24 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
 /// ```text
 /// #define BUFFERTAGS_EQUAL( a , b ) ( RelFileNodeEquals ( ( a ) . rnode , ( b ) . rnode ) && ( a ) . blockNum == ( b ) . blockNum && ( a ) . forkNum == ( b ) . forkNum )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BUFFERTAGS_EQUAL {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BUFFERTAGS_EQUAL!(@__pgrx_emit_value; $a, $b)
@@ -219,13 +246,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -246,13 +273,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -281,13 +308,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -308,13 +335,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -350,13 +377,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         (
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4671,
+                                                                                $crate::__pgrx_c_generated::Field_rnode,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -377,13 +404,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         (
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4671,
+                                                                                $crate::__pgrx_c_generated::Field_rnode,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -417,7 +444,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field677,
+                                                        $crate::__pgrx_c_generated::Field_blockNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -429,7 +456,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field677,
+                                                        $crate::__pgrx_c_generated::Field_blockNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -450,7 +477,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -459,7 +486,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -495,6 +522,12 @@ macro_rules! BUFFERTAGS_EQUAL {
         /* PGRX: RelFileNodeEquals remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -533,13 +566,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field4354,
+                                                                                                $crate::__pgrx_c_generated::Field_relNode,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
                                                                                                 (
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -560,13 +593,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field4354,
+                                                                                                $crate::__pgrx_c_generated::Field_relNode,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
                                                                                                 (
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -595,13 +628,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field1255,
+                                                                                                $crate::__pgrx_c_generated::Field_dbNode,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
                                                                                                 (
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -622,13 +655,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field1255,
+                                                                                                $crate::__pgrx_c_generated::Field_dbNode,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
                                                                                                 (
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -664,13 +697,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5081,
+                                                                                    $crate::__pgrx_c_generated::Field_spcNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -691,13 +724,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5081,
+                                                                                    $crate::__pgrx_c_generated::Field_spcNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -734,7 +767,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field677,
+                                                                    $crate::__pgrx_c_generated::Field_blockNum,
                                                                     _,
                                                                     _
                                                                 >(
@@ -753,7 +786,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field677,
+                                                                    $crate::__pgrx_c_generated::Field_blockNum,
                                                                     _,
                                                                     _
                                                                 >(
@@ -784,7 +817,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1815,
+                                                        $crate::__pgrx_c_generated::Field_forkNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -796,7 +829,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1815,
+                                                        $crate::__pgrx_c_generated::Field_forkNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -858,13 +891,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -885,13 +918,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -920,13 +953,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -947,13 +980,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     (
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -989,13 +1022,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         (
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4671,
+                                                                                $crate::__pgrx_c_generated::Field_rnode,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -1016,13 +1049,13 @@ macro_rules! BUFFERTAGS_EQUAL {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         (
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4671,
+                                                                                $crate::__pgrx_c_generated::Field_rnode,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -1056,7 +1089,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field677,
+                                                        $crate::__pgrx_c_generated::Field_blockNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1068,7 +1101,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field677,
+                                                        $crate::__pgrx_c_generated::Field_blockNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1089,7 +1122,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $a)))
@@ -1098,7 +1131,7 @@ macro_rules! BUFFERTAGS_EQUAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $b)))
@@ -1131,6 +1164,17 @@ macro_rules! BUFFERTAGS_EQUAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
@@ -1249,8 +1293,26 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
 /// ```text
 /// #define BUF_STATE_GET_REFCOUNT( state ) ( ( state ) & BUF_REFCOUNT_MASK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BUF_STATE_GET_REFCOUNT {
+    (@__pgrx_emit_check_safety; $state:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $state);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $state:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BUF_STATE_GET_REFCOUNT!(@__pgrx_emit_value; $state)
@@ -1292,6 +1354,11 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
     (@__pgrx_emit_size; $state:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $state);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1352,6 +1419,17 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
@@ -1476,8 +1554,30 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
 /// ```text
 /// #define BUF_STATE_GET_USAGECOUNT( state ) ( ( ( state ) & BUF_USAGECOUNT_MASK ) >> BUF_USAGECOUNT_SHIFT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BUF_STATE_GET_USAGECOUNT {
+    (@__pgrx_emit_check_safety; $state:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $state);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $state:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BUF_STATE_GET_USAGECOUNT!(@__pgrx_emit_value; $state)
@@ -1533,6 +1633,11 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
     (@__pgrx_emit_size; $state:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $state);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1619,6 +1724,17 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufMappingPartitionLock {
@@ -1743,8 +1859,30 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
 /// ```text
 /// #define BufMappingPartitionLock( hashcode ) ( & MainLWLockArray [ BUFFER_MAPPING_LWLOCK_OFFSET + BufTableHashPartition ( hashcode ) ] . lock )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
+    (@__pgrx_emit_check_safety; $hashcode:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hashcode);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufMappingPartitionLock!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $hashcode:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufMappingPartitionLock!(@__pgrx_emit_value; $hashcode)
@@ -1756,7 +1894,7 @@ macro_rules! BufMappingPartitionLock {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2831,
+                        $crate::__pgrx_c_generated::Field_lock,
                         _,
                         _
                     >(
@@ -1838,12 +1976,17 @@ macro_rules! BufMappingPartitionLock {
         /* PGRX: BufTableHashPartition remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hashcode);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field2831,
+                                    $crate::__pgrx_c_generated::Field_lock,
                                     _,
                                     _
                                 >(
@@ -1937,7 +2080,7 @@ macro_rules! BufMappingPartitionLock {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2831,
+                        $crate::__pgrx_c_generated::Field_lock,
                         _,
                         _
                     >(
@@ -2016,6 +2159,17 @@ macro_rules! BufMappingPartitionLock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
@@ -2143,8 +2297,30 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
 /// ```text
 /// #define BufMappingPartitionLockByIndex( i ) ( & MainLWLockArray [ BUFFER_MAPPING_LWLOCK_OFFSET + ( i ) ] . lock )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufMappingPartitionLockByIndex {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufMappingPartitionLockByIndex!(@__pgrx_emit_value; $i)
@@ -2155,7 +2331,7 @@ macro_rules! BufMappingPartitionLockByIndex {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2831,
+                        $crate::__pgrx_c_generated::Field_lock,
                         _,
                         _
                     >(
@@ -2223,12 +2399,17 @@ macro_rules! BufMappingPartitionLockByIndex {
     (@__pgrx_emit_size; $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field2831,
+                                    $crate::__pgrx_c_generated::Field_lock,
                                     _,
                                     _
                                 >(
@@ -2300,7 +2481,7 @@ macro_rules! BufMappingPartitionLockByIndex {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2831,
+                        $crate::__pgrx_c_generated::Field_lock,
                         _,
                         _
                     >(
@@ -2363,6 +2544,17 @@ macro_rules! BufMappingPartitionLockByIndex {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufTableHashPartition {
@@ -2477,8 +2669,27 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
 /// ```text
 /// #define BufTableHashPartition( hashcode ) ( ( hashcode ) % NUM_BUFFER_PARTITIONS )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufTableHashPartition {
+    (@__pgrx_emit_check_safety; $hashcode:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hashcode);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufTableHashPartition!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $hashcode:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufTableHashPartition!(@__pgrx_emit_value; $hashcode)
@@ -2520,6 +2731,11 @@ macro_rules! BufTableHashPartition {
     (@__pgrx_emit_size; $hashcode:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hashcode);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2580,6 +2796,17 @@ macro_rules! BufTableHashPartition {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
@@ -2704,8 +2931,30 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
 /// ```text
 /// #define BufferDescriptorGetBuffer( bdesc ) ( ( bdesc ) -> buf_id + 1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
+    (@__pgrx_emit_check_safety; $bdesc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufferDescriptorGetBuffer!(@__pgrx_emit_value; $bdesc)
@@ -2718,7 +2967,7 @@ macro_rules! BufferDescriptorGetBuffer {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field744,
+                                $crate::__pgrx_c_generated::Field_buf_id,
                                 _,
                                 _
                             >(
@@ -2761,6 +3010,11 @@ macro_rules! BufferDescriptorGetBuffer {
     (@__pgrx_emit_size; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2772,7 +3026,7 @@ macro_rules! BufferDescriptorGetBuffer {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field744,
+                                            $crate::__pgrx_c_generated::Field_buf_id,
                                             _,
                                             _
                                         >(
@@ -2816,7 +3070,7 @@ macro_rules! BufferDescriptorGetBuffer {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field744,
+                                $crate::__pgrx_c_generated::Field_buf_id,
                                 _,
                                 _
                             >(
@@ -2854,6 +3108,17 @@ macro_rules! BufferDescriptorGetBuffer {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
@@ -2981,8 +3246,30 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
 /// ```text
 /// #define BufferDescriptorGetContentLock( bdesc ) ( ( LWLock * ) ( & ( bdesc ) -> content_lock ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
+    (@__pgrx_emit_check_safety; $bdesc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufferDescriptorGetContentLock!(@__pgrx_emit_value; $bdesc)
@@ -3003,7 +3290,7 @@ macro_rules! BufferDescriptorGetContentLock {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1065,
+                                    $crate::__pgrx_c_generated::Field_content_lock,
                                     _,
                                     _
                                 >(
@@ -3050,6 +3337,11 @@ macro_rules! BufferDescriptorGetContentLock {
     (@__pgrx_emit_size; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3065,7 +3357,7 @@ macro_rules! BufferDescriptorGetContentLock {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::address(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field1065,
+                                                $crate::__pgrx_c_generated::Field_content_lock,
                                                 _,
                                                 _
                                             >(
@@ -3116,7 +3408,7 @@ macro_rules! BufferDescriptorGetContentLock {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1065,
+                                    $crate::__pgrx_c_generated::Field_content_lock,
                                     _,
                                     _
                                 >(
@@ -3158,6 +3450,17 @@ macro_rules! BufferDescriptorGetContentLock {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
@@ -3282,8 +3585,26 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
 /// ```text
 /// #define BufferDescriptorGetIOCV( bdesc ) ( & ( BufferIOCVArray [ ( bdesc ) -> buf_id ] ) . cv )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
+    (@__pgrx_emit_check_safety; $bdesc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BufferDescriptorGetIOCV!(@__pgrx_emit_value; $bdesc)
@@ -3294,7 +3615,7 @@ macro_rules! BufferDescriptorGetIOCV {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1202,
+                        $crate::__pgrx_c_generated::Field_cv,
                         _,
                         _
                     >(
@@ -3314,7 +3635,7 @@ macro_rules! BufferDescriptorGetIOCV {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field744,
+                                            $crate::__pgrx_c_generated::Field_buf_id,
                                             _,
                                             _
                                         >(
@@ -3359,12 +3680,17 @@ macro_rules! BufferDescriptorGetIOCV {
     (@__pgrx_emit_size; $bdesc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $bdesc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1202,
+                                    $crate::__pgrx_c_generated::Field_cv,
                                     _,
                                     _
                                 >(
@@ -3394,7 +3720,7 @@ macro_rules! BufferDescriptorGetIOCV {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field744,
+                                                        $crate::__pgrx_c_generated::Field_buf_id,
                                                         _,
                                                         _
                                                     >(
@@ -3434,7 +3760,7 @@ macro_rules! BufferDescriptorGetIOCV {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1202,
+                        $crate::__pgrx_c_generated::Field_cv,
                         _,
                         _
                     >(
@@ -3454,7 +3780,7 @@ macro_rules! BufferDescriptorGetIOCV {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field744,
+                                            $crate::__pgrx_c_generated::Field_buf_id,
                                             _,
                                             _
                                         >(
@@ -3497,6 +3823,17 @@ macro_rules! BufferDescriptorGetIOCV {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
@@ -3606,8 +3943,23 @@ macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
 /// ```text
 /// #define CLEAR_BUFFERTAG( a ) ( ( a ) . rnode . spcNode = InvalidOid , ( a ) . rnode . dbNode = InvalidOid , ( a ) . rnode . relNode = InvalidOid , ( a ) . forkNum = InvalidForkNumber , ( a ) . blockNum = InvalidBlockNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! CLEAR_BUFFERTAG {
+    (@__pgrx_emit_check_safety; $a:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $a:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::CLEAR_BUFFERTAG!(@__pgrx_emit_value; $a)
@@ -3639,12 +3991,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::assign(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                             _,
                                                                             _
                                                                         >(
@@ -3676,12 +4028,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                         _,
                                                                         _
                                                                     >(
@@ -3715,12 +4067,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4671,
+                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                             _,
                                                             _
                                                         >(($crate::__pgrx_c_operand!(@place; $a)))
@@ -3744,7 +4096,7 @@ macro_rules! CLEAR_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -3764,7 +4116,7 @@ macro_rules! CLEAR_BUFFERTAG {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field677,
+                                $crate::__pgrx_c_generated::Field_blockNum,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -3798,6 +4150,11 @@ macro_rules! CLEAR_BUFFERTAG {
     (@__pgrx_emit_size; $a:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3827,12 +4184,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5081,
+                                                                                    $crate::__pgrx_c_generated::Field_spcNode,
                                                                                     _,
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -3864,12 +4221,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::assign(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field1255,
+                                                                                $crate::__pgrx_c_generated::Field_dbNode,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field4671,
+                                                                                    $crate::__pgrx_c_generated::Field_rnode,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -3903,12 +4260,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                         _,
                                                                         _
                                                                     >(
@@ -3942,7 +4299,7 @@ macro_rules! CLEAR_BUFFERTAG {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1815,
+                                                        $crate::__pgrx_c_generated::Field_forkNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -3964,7 +4321,7 @@ macro_rules! CLEAR_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field677,
+                                            $crate::__pgrx_c_generated::Field_blockNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -4017,12 +4374,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::assign(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5081,
+                                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                                         _,
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4671,
+                                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                                             _,
                                                                             _
                                                                         >(
@@ -4054,12 +4411,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::assign(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4671,
+                                                                        $crate::__pgrx_c_generated::Field_rnode,
                                                                         _,
                                                                         _
                                                                     >(
@@ -4093,12 +4450,12 @@ macro_rules! CLEAR_BUFFERTAG {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4671,
+                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                             _,
                                                             _
                                                         >(($crate::__pgrx_c_operand!(@place; $a)))
@@ -4122,7 +4479,7 @@ macro_rules! CLEAR_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -4142,7 +4499,7 @@ macro_rules! CLEAR_BUFFERTAG {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field677,
+                                $crate::__pgrx_c_generated::Field_blockNum,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -4174,6 +4531,17 @@ macro_rules! CLEAR_BUFFERTAG {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetBufferDescriptor {
@@ -4283,8 +4651,23 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
 /// ```text
 /// #define GetBufferDescriptor( id ) ( & BufferDescriptors [ ( id ) ] . bufferdesc )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GetBufferDescriptor {
+    (@__pgrx_emit_check_safety; $id:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $id);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetBufferDescriptor!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetBufferDescriptor!(@__pgrx_emit_value; $id)
@@ -4295,7 +4678,7 @@ macro_rules! GetBufferDescriptor {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field752,
+                        $crate::__pgrx_c_generated::Field_bufferdesc,
                         _,
                         _
                     >(
@@ -4340,12 +4723,17 @@ macro_rules! GetBufferDescriptor {
     (@__pgrx_emit_size; $id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $id);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field752,
+                                    $crate::__pgrx_c_generated::Field_bufferdesc,
                                     _,
                                     _
                                 >(
@@ -4393,7 +4781,7 @@ macro_rules! GetBufferDescriptor {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::address(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field752,
+                        $crate::__pgrx_c_generated::Field_bufferdesc,
                         _,
                         _
                     >(
@@ -4436,6 +4824,17 @@ macro_rules! GetBufferDescriptor {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
@@ -4560,8 +4959,26 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
 /// ```text
 /// #define GetLocalBufferDescriptor( id ) ( & LocalBufferDescriptors [ ( id ) ] )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
+    (@__pgrx_emit_check_safety; $id:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $id);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetLocalBufferDescriptor!(@__pgrx_emit_value; $id)
@@ -4614,6 +5031,11 @@ macro_rules! GetLocalBufferDescriptor {
     (@__pgrx_emit_size; $id:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $id);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4695,6 +5117,17 @@ macro_rules! GetLocalBufferDescriptor {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
@@ -4966,8 +5399,26 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
 /// ```text
 /// #define INIT_BUFFERTAG( a , xx_rnode , xx_forkNum , xx_blockNum ) ( ( a ) . rnode = ( xx_rnode ) , ( a ) . forkNum = ( xx_forkNum ) , ( a ) . blockNum = ( xx_blockNum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INIT_BUFFERTAG {
+    (@__pgrx_emit_check_safety; $a:tt, $xx_rnode:tt, $xx_forkNum:tt, $xx_blockNum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $xx_rnode);
+                $crate::__pgrx_c_operand!(@check_safety; $xx_forkNum);
+                $crate::__pgrx_c_operand!(@check_safety; $xx_blockNum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $a:tt, $xx_rnode:tt, $xx_forkNum:tt, $xx_blockNum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::INIT_BUFFERTAG!(@__pgrx_emit_value; $a, $xx_rnode, $xx_forkNum, $xx_blockNum)
@@ -4987,7 +5438,7 @@ macro_rules! INIT_BUFFERTAG {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4671,
+                                                $crate::__pgrx_c_generated::Field_rnode,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5008,7 +5459,7 @@ macro_rules! INIT_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5026,7 +5477,7 @@ macro_rules! INIT_BUFFERTAG {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field677,
+                                $crate::__pgrx_c_generated::Field_blockNum,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5059,6 +5510,14 @@ macro_rules! INIT_BUFFERTAG {
     (@__pgrx_emit_size; $a:tt, $xx_rnode:tt, $xx_forkNum:tt, $xx_blockNum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $xx_rnode);
+                        $crate::__pgrx_c_operand!(@check_safety; $xx_forkNum);
+                        $crate::__pgrx_c_operand!(@check_safety; $xx_blockNum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5076,7 +5535,7 @@ macro_rules! INIT_BUFFERTAG {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::assign(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4671,
+                                                            $crate::__pgrx_c_generated::Field_rnode,
                                                             _,
                                                             _
                                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5100,7 +5559,7 @@ macro_rules! INIT_BUFFERTAG {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::assign(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1815,
+                                                        $crate::__pgrx_c_generated::Field_forkNum,
                                                         _,
                                                         _
                                                     >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5123,7 +5582,7 @@ macro_rules! INIT_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field677,
+                                            $crate::__pgrx_c_generated::Field_blockNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5166,7 +5625,7 @@ macro_rules! INIT_BUFFERTAG {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4671,
+                                                $crate::__pgrx_c_generated::Field_rnode,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5187,7 +5646,7 @@ macro_rules! INIT_BUFFERTAG {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1815,
+                                            $crate::__pgrx_c_generated::Field_forkNum,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@place; $a))),
@@ -5205,7 +5664,7 @@ macro_rules! INIT_BUFFERTAG {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field677,
+                                $crate::__pgrx_c_generated::Field_blockNum,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),

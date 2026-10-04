@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE {
@@ -147,8 +158,28 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
 /// ```text
 /// #define SET_VARSIZE( PTR , len ) SET_VARSIZE_4B ( PTR , len )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE!(@__pgrx_emit_value; $PTR, $len)
@@ -160,12 +191,12 @@ macro_rules! SET_VARSIZE {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -248,17 +279,23 @@ macro_rules! SET_VARSIZE {
         /* PGRX: SET_VARSIZE remains expanded because SET_VARSIZE_4B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5983,
+                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                         _,
                                         _
                                     >(
@@ -355,12 +392,12 @@ macro_rules! SET_VARSIZE {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -440,6 +477,17 @@ macro_rules! SET_VARSIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
@@ -603,8 +651,28 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
 /// ```text
 /// #define SET_VARSIZE_1B( PTR , len ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header = ( ( ( uint8 ) ( len ) ) << 1 ) | 0x01 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_1B {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE_1B!(@__pgrx_emit_value; $PTR, $len)
@@ -615,7 +683,7 @@ macro_rules! SET_VARSIZE_1B {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
@@ -716,12 +784,18 @@ macro_rules! SET_VARSIZE_1B {
     (@__pgrx_emit_size; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -831,7 +905,7 @@ macro_rules! SET_VARSIZE_1B {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
@@ -930,6 +1004,17 @@ macro_rules! SET_VARSIZE_1B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
@@ -1093,8 +1178,28 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
 /// ```text
 /// #define SET_VARSIZE_4B( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_4B {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE_4B!(@__pgrx_emit_value; $PTR, $len)
@@ -1105,12 +1210,12 @@ macro_rules! SET_VARSIZE_4B {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -1192,17 +1297,23 @@ macro_rules! SET_VARSIZE_4B {
     (@__pgrx_emit_size; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5983,
+                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                         _,
                                         _
                                     >(
@@ -1298,12 +1409,12 @@ macro_rules! SET_VARSIZE_4B {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -1383,6 +1494,17 @@ macro_rules! SET_VARSIZE_4B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
@@ -1546,8 +1668,28 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
 /// ```text
 /// #define SET_VARSIZE_4B_C( PTR , len ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header = ( ( ( uint32 ) ( len ) ) << 2 ) | 0x02 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_4B_C {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE_4B_C!(@__pgrx_emit_value; $PTR, $len)
@@ -1558,12 +1700,12 @@ macro_rules! SET_VARSIZE_4B_C {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -1665,17 +1807,23 @@ macro_rules! SET_VARSIZE_4B_C {
     (@__pgrx_emit_size; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5983,
+                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                         _,
                                         _
                                     >(
@@ -1786,12 +1934,12 @@ macro_rules! SET_VARSIZE_4B_C {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -1891,6 +2039,17 @@ macro_rules! SET_VARSIZE_4B_C {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
@@ -2063,8 +2222,31 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
 /// ```text
 /// #define SET_VARSIZE_COMPRESSED( PTR , len ) SET_VARSIZE_4B_C ( PTR , len )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_COMPRESSED {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE_COMPRESSED!(@__pgrx_emit_value; $PTR, $len)
@@ -2076,12 +2258,12 @@ macro_rules! SET_VARSIZE_COMPRESSED {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -2184,17 +2366,23 @@ macro_rules! SET_VARSIZE_COMPRESSED {
         /* PGRX: SET_VARSIZE_COMPRESSED remains expanded because SET_VARSIZE_4B_C expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5983,
+                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                         _,
                                         _
                                     >(
@@ -2306,12 +2494,12 @@ macro_rules! SET_VARSIZE_COMPRESSED {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -2411,6 +2599,17 @@ macro_rules! SET_VARSIZE_COMPRESSED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
@@ -2574,8 +2773,28 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
 /// ```text
 /// #define SET_VARSIZE_SHORT( PTR , len ) SET_VARSIZE_1B ( PTR , len )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_SHORT {
+    (@__pgrx_emit_check_safety; $PTR:tt, $len:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $len:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARSIZE_SHORT!(@__pgrx_emit_value; $PTR, $len)
@@ -2587,7 +2806,7 @@ macro_rules! SET_VARSIZE_SHORT {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
@@ -2689,12 +2908,18 @@ macro_rules! SET_VARSIZE_SHORT {
         /* PGRX: SET_VARSIZE_SHORT remains expanded because SET_VARSIZE_1B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $len);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -2805,7 +3030,7 @@ macro_rules! SET_VARSIZE_SHORT {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5988,
+                        $crate::__pgrx_c_generated::Field_va_header,
                         _,
                         _
                     >(
@@ -2904,6 +3129,17 @@ macro_rules! SET_VARSIZE_SHORT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
@@ -3067,8 +3303,28 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
 /// ```text
 /// #define SET_VARTAG_1B_E( PTR , tag ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_header = 0x01 , ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag = ( tag ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARTAG_1B_E {
+    (@__pgrx_emit_check_safety; $PTR:tt, $tag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $tag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $tag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARTAG_1B_E!(@__pgrx_emit_value; $PTR, $tag)
@@ -3082,7 +3338,7 @@ macro_rules! SET_VARTAG_1B_E {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -3129,7 +3385,7 @@ macro_rules! SET_VARTAG_1B_E {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5990,
+                                $crate::__pgrx_c_generated::Field_va_tag,
                                 _,
                                 _
                             >(
@@ -3194,6 +3450,12 @@ macro_rules! SET_VARTAG_1B_E {
     (@__pgrx_emit_size; $PTR:tt, $tag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $tag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3205,7 +3467,7 @@ macro_rules! SET_VARTAG_1B_E {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5988,
+                                                $crate::__pgrx_c_generated::Field_va_header,
                                                 _,
                                                 _
                                             >(
@@ -3255,7 +3517,7 @@ macro_rules! SET_VARTAG_1B_E {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5990,
+                                            $crate::__pgrx_c_generated::Field_va_tag,
                                             _,
                                             _
                                         >(
@@ -3319,7 +3581,7 @@ macro_rules! SET_VARTAG_1B_E {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -3366,7 +3628,7 @@ macro_rules! SET_VARTAG_1B_E {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5990,
+                                $crate::__pgrx_c_generated::Field_va_tag,
                                 _,
                                 _
                             >(
@@ -3429,6 +3691,17 @@ macro_rules! SET_VARTAG_1B_E {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
@@ -3592,8 +3865,28 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
 /// ```text
 /// #define SET_VARTAG_EXTERNAL( PTR , tag ) SET_VARTAG_1B_E ( PTR , tag )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARTAG_EXTERNAL {
+    (@__pgrx_emit_check_safety; $PTR:tt, $tag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                $crate::__pgrx_c_operand!(@check_safety; $tag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt, $tag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SET_VARTAG_EXTERNAL!(@__pgrx_emit_value; $PTR, $tag)
@@ -3608,7 +3901,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -3655,7 +3948,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5990,
+                                $crate::__pgrx_c_generated::Field_va_tag,
                                 _,
                                 _
                             >(
@@ -3721,6 +4014,12 @@ macro_rules! SET_VARTAG_EXTERNAL {
         /* PGRX: SET_VARTAG_EXTERNAL remains expanded because SET_VARTAG_1B_E expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                        $crate::__pgrx_c_operand!(@check_safety; $tag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3732,7 +4031,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5988,
+                                                $crate::__pgrx_c_generated::Field_va_header,
                                                 _,
                                                 _
                                             >(
@@ -3782,7 +4081,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5990,
+                                            $crate::__pgrx_c_generated::Field_va_tag,
                                             _,
                                             _
                                         >(
@@ -3847,7 +4146,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -3894,7 +4193,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5990,
+                                $crate::__pgrx_c_generated::Field_va_tag,
                                 _,
                                 _
                             >(
@@ -3957,6 +4256,17 @@ macro_rules! SET_VARTAG_EXTERNAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
@@ -4071,8 +4381,27 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
 /// ```text
 /// #define VARATT_CAN_MAKE_SHORT( PTR ) ( VARATT_IS_4B_U ( PTR ) && ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT ) <= VARATT_SHORT_MAX )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_CAN_MAKE_SHORT {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_CAN_MAKE_SHORT!(@__pgrx_emit_value; $PTR)
@@ -4099,7 +4428,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5988,
+                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                             _,
                                                             _
                                                         >(
@@ -4197,12 +4526,12 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field5988,
+                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                         _,
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field5983,
+                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -4337,6 +4666,11 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
         /* PGRX: VARHDRSZ remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: VARHDRSZ_SHORT remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: VARATT_IS_4B_U remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_4B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4360,7 +4694,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5988,
+                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                         _,
                                                                         _
                                                                     >(
@@ -4464,12 +4798,12 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field5988,
+                                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field5983,
+                                                                                                        $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -4624,7 +4958,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5988,
+                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                             _,
                                                             _
                                                         >(
@@ -4722,12 +5056,12 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field5988,
+                                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                                         _,
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field5983,
+                                                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -4859,6 +5193,17 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
@@ -4983,8 +5328,30 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
 /// ```text
 /// #define VARATT_CONVERTED_SHORT_SIZE( PTR ) ( VARSIZE ( PTR ) - VARHDRSZ + VARHDRSZ_SHORT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_CONVERTED_SHORT_SIZE {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_CONVERTED_SHORT_SIZE!(@__pgrx_emit_value; $PTR)
@@ -5016,12 +5383,12 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5983,
+                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
                                                                     _,
                                                                     _
                                                                 >(
@@ -5136,6 +5503,11 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
         /* PGRX: VARHDRSZ remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: VARHDRSZ_SHORT remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: VARSIZE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARSIZE_4B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5168,12 +5540,12 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field5988,
+                                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                                             _,
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field5983,
+                                                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -5305,12 +5677,12 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5983,
+                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
                                                                     _,
                                                                     _
                                                                 >(
@@ -5422,6 +5794,17 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
@@ -5549,8 +5932,30 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
 /// ```text
 /// #define VARATT_EXTERNAL_GET_COMPRESS_METHOD( toast_pointer ) ( ( toast_pointer ) . va_extinfo >> VARLENA_EXTSIZE_BITS )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
+    (@__pgrx_emit_check_safety; $toast_pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $toast_pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_EXTERNAL_GET_COMPRESS_METHOD!(@__pgrx_emit_value; $toast_pointer)
@@ -5563,7 +5968,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5987,
+                                $crate::__pgrx_c_generated::Field_va_extinfo,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5605,6 +6010,11 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     (@__pgrx_emit_size; $toast_pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5612,7 +6022,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5987,
+                                            $crate::__pgrx_c_generated::Field_va_extinfo,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5645,7 +6055,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5987,
+                                $crate::__pgrx_c_generated::Field_va_extinfo,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5682,6 +6092,17 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
@@ -5806,8 +6227,26 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
 /// ```text
 /// #define VARATT_EXTERNAL_GET_EXTSIZE( toast_pointer ) ( ( toast_pointer ) . va_extinfo & VARLENA_EXTSIZE_MASK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
+    (@__pgrx_emit_check_safety; $toast_pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $toast_pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_EXTERNAL_GET_EXTSIZE!(@__pgrx_emit_value; $toast_pointer)
@@ -5820,7 +6259,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5987,
+                                $crate::__pgrx_c_generated::Field_va_extinfo,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5856,6 +6295,11 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
     (@__pgrx_emit_size; $toast_pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5863,7 +6307,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5987,
+                                            $crate::__pgrx_c_generated::Field_va_extinfo,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5893,7 +6337,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5987,
+                                $crate::__pgrx_c_generated::Field_va_extinfo,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -5927,6 +6371,17 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
@@ -6054,8 +6509,30 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
 /// ```text
 /// #define VARATT_EXTERNAL_IS_COMPRESSED( toast_pointer ) ( VARATT_EXTERNAL_GET_EXTSIZE ( toast_pointer ) < ( toast_pointer ) . va_rawsize - VARHDRSZ )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
+    (@__pgrx_emit_check_safety; $toast_pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $toast_pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_EXTERNAL_IS_COMPRESSED!(@__pgrx_emit_value; $toast_pointer)
@@ -6072,7 +6549,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5987,
+                                            $crate::__pgrx_c_generated::Field_va_extinfo,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -6095,7 +6572,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5989,
+                                        $crate::__pgrx_c_generated::Field_va_rawsize,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -6153,6 +6630,11 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
         /* PGRX: VARHDRSZ remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: VARATT_EXTERNAL_GET_EXTSIZE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6166,7 +6648,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5987,
+                                                        $crate::__pgrx_c_generated::Field_va_extinfo,
                                                         _,
                                                         _
                                                     >(
@@ -6202,7 +6684,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5989,
+                                                    $crate::__pgrx_c_generated::Field_va_rawsize,
                                                     _,
                                                     _
                                                 >(
@@ -6261,7 +6743,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5987,
+                                            $crate::__pgrx_c_generated::Field_va_extinfo,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -6284,7 +6766,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5989,
+                                        $crate::__pgrx_c_generated::Field_va_rawsize,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $toast_pointer)))
@@ -6336,6 +6818,17 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_1B {
@@ -6434,8 +6927,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
 /// ```text
 /// #define VARATT_IS_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x01 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_1B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_1B!(@__pgrx_emit_value; $PTR)
@@ -6451,7 +6963,7 @@ macro_rules! VARATT_IS_1B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -6524,6 +7036,11 @@ macro_rules! VARATT_IS_1B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6537,7 +7054,7 @@ macro_rules! VARATT_IS_1B {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -6613,7 +7130,7 @@ macro_rules! VARATT_IS_1B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -6684,6 +7201,17 @@ macro_rules! VARATT_IS_1B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
@@ -6793,8 +7321,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
 /// ```text
 /// #define VARATT_IS_1B_E( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header ) == 0x01 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_1B_E {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_1B_E!(@__pgrx_emit_value; $PTR)
@@ -6808,7 +7355,7 @@ macro_rules! VARATT_IS_1B_E {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -6874,6 +7421,11 @@ macro_rules! VARATT_IS_1B_E {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6882,7 +7434,7 @@ macro_rules! VARATT_IS_1B_E {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5988,
+                                                $crate::__pgrx_c_generated::Field_va_header,
                                                 _,
                                                 _
                                             >(
@@ -6946,7 +7498,7 @@ macro_rules! VARATT_IS_1B_E {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -7010,6 +7562,17 @@ macro_rules! VARATT_IS_1B_E {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_4B {
@@ -7108,8 +7671,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
 /// ```text
 /// #define VARATT_IS_4B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x01 ) == 0x00 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_4B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_4B!(@__pgrx_emit_value; $PTR)
@@ -7125,7 +7707,7 @@ macro_rules! VARATT_IS_4B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -7200,6 +7782,11 @@ macro_rules! VARATT_IS_4B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7213,7 +7800,7 @@ macro_rules! VARATT_IS_4B {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -7291,7 +7878,7 @@ macro_rules! VARATT_IS_4B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -7364,6 +7951,17 @@ macro_rules! VARATT_IS_4B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
@@ -7473,8 +8071,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
 /// ```text
 /// #define VARATT_IS_4B_C( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x02 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_4B_C {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_4B_C!(@__pgrx_emit_value; $PTR)
@@ -7490,7 +8107,7 @@ macro_rules! VARATT_IS_4B_C {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -7563,6 +8180,11 @@ macro_rules! VARATT_IS_4B_C {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7576,7 +8198,7 @@ macro_rules! VARATT_IS_4B_C {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -7652,7 +8274,7 @@ macro_rules! VARATT_IS_4B_C {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -7723,6 +8345,17 @@ macro_rules! VARATT_IS_4B_C {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
@@ -7832,8 +8465,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
 /// ```text
 /// #define VARATT_IS_4B_U( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header & 0x03 ) == 0x00 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_4B_U {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_4B_U!(@__pgrx_emit_value; $PTR)
@@ -7849,7 +8501,7 @@ macro_rules! VARATT_IS_4B_U {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -7924,6 +8576,11 @@ macro_rules! VARATT_IS_4B_U {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7937,7 +8594,7 @@ macro_rules! VARATT_IS_4B_U {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -8015,7 +8672,7 @@ macro_rules! VARATT_IS_4B_U {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -8088,6 +8745,17 @@ macro_rules! VARATT_IS_4B_U {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
@@ -8202,8 +8870,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
 /// ```text
 /// #define VARATT_IS_COMPRESSED( PTR ) VARATT_IS_4B_C ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_COMPRESSED {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_COMPRESSED!(@__pgrx_emit_value; $PTR)
@@ -8220,7 +8907,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -8294,6 +8981,11 @@ macro_rules! VARATT_IS_COMPRESSED {
         /* PGRX: VARATT_IS_COMPRESSED remains expanded because VARATT_IS_4B_C expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8307,7 +8999,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -8384,7 +9076,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -8455,6 +9147,17 @@ macro_rules! VARATT_IS_COMPRESSED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
@@ -8564,8 +9267,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
 /// ```text
 /// #define VARATT_IS_EXTENDED( PTR ) ( ! VARATT_IS_4B_U ( PTR ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTENDED {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTENDED!(@__pgrx_emit_value; $PTR)
@@ -8588,7 +9310,7 @@ macro_rules! VARATT_IS_EXTENDED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -8670,6 +9392,11 @@ macro_rules! VARATT_IS_EXTENDED {
         /* PGRX: VARATT_IS_4B_U remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8689,7 +9416,7 @@ macro_rules! VARATT_IS_EXTENDED {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5988,
+                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                     _,
                                                                     _
                                                                 >(
@@ -8782,7 +9509,7 @@ macro_rules! VARATT_IS_EXTENDED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -8861,6 +9588,17 @@ macro_rules! VARATT_IS_EXTENDED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
@@ -8970,8 +9708,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
 /// ```text
 /// #define VARATT_IS_EXTERNAL( PTR ) VARATT_IS_1B_E ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL!(@__pgrx_emit_value; $PTR)
@@ -8986,7 +9743,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -9053,6 +9810,11 @@ macro_rules! VARATT_IS_EXTERNAL {
         /* PGRX: VARATT_IS_EXTERNAL remains expanded because VARATT_IS_1B_E expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9061,7 +9823,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5988,
+                                                $crate::__pgrx_c_generated::Field_va_header,
                                                 _,
                                                 _
                                             >(
@@ -9126,7 +9888,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5988,
+                                    $crate::__pgrx_c_generated::Field_va_header,
                                     _,
                                     _
                                 >(
@@ -9190,6 +9952,17 @@ macro_rules! VARATT_IS_EXTERNAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
@@ -9314,8 +10087,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_EXPANDED!(@__pgrx_emit_value; $PTR)
@@ -9337,7 +10132,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -9402,7 +10197,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5990,
+                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                     _,
                                                                     _
                                                                 >(
@@ -9501,6 +10296,11 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_IS_EXPANDED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9519,7 +10319,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -9592,7 +10392,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field5990,
+                                                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -9698,7 +10498,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -9763,7 +10563,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5990,
+                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                     _,
                                                                     _
                                                                 >(
@@ -9859,6 +10659,17 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
@@ -9986,8 +10797,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RO( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RO )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_EXPANDED_RO!(@__pgrx_emit_value; $PTR)
@@ -10009,7 +10842,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -10063,7 +10896,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -10146,6 +10979,11 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10164,7 +11002,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -10226,7 +11064,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5990,
+                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                             _,
                                                             _
                                                         >(
@@ -10315,7 +11153,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -10369,7 +11207,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -10446,6 +11284,17 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
@@ -10573,8 +11422,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_EXPANDED_RW( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_EXPANDED_RW )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_EXPANDED_RW!(@__pgrx_emit_value; $PTR)
@@ -10596,7 +11467,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -10650,7 +11521,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -10733,6 +11604,11 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10751,7 +11627,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -10813,7 +11689,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5990,
+                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                             _,
                                                             _
                                                         >(
@@ -10902,7 +11778,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -10956,7 +11832,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -11033,6 +11909,17 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
@@ -11157,8 +12044,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_INDIRECT( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_INDIRECT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_INDIRECT!(@__pgrx_emit_value; $PTR)
@@ -11180,7 +12089,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -11234,7 +12143,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -11311,6 +12220,11 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11329,7 +12243,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -11391,7 +12305,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5990,
+                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                             _,
                                                             _
                                                         >(
@@ -11477,7 +12391,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -11531,7 +12445,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -11605,6 +12519,17 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
@@ -11732,8 +12657,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_NON_EXPANDED( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && ! VARTAG_IS_EXPANDED ( VARTAG_EXTERNAL ( PTR ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_NON_EXPANDED!(@__pgrx_emit_value; $PTR)
@@ -11755,7 +12702,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -11822,7 +12769,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field5990,
+                                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                                             _,
                                                                             _
                                                                         >(
@@ -11934,6 +12881,11 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_IS_EXPANDED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11952,7 +12904,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -12027,7 +12979,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field5990,
+                                                                                        $crate::__pgrx_c_generated::Field_va_tag,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -12138,7 +13090,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -12205,7 +13157,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field5990,
+                                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                                             _,
                                                                             _
                                                                         >(
@@ -12311,6 +13263,17 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
@@ -12435,8 +13398,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
 /// ```text
 /// #define VARATT_IS_EXTERNAL_ONDISK( PTR ) ( VARATT_IS_EXTERNAL ( PTR ) && VARTAG_EXTERNAL ( PTR ) == VARTAG_ONDISK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL_ONDISK {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXTERNAL_ONDISK!(@__pgrx_emit_value; $PTR)
@@ -12458,7 +13443,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -12512,7 +13497,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -12589,6 +13574,11 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
         /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -12607,7 +13597,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field5988,
+                                                                $crate::__pgrx_c_generated::Field_va_header,
                                                                 _,
                                                                 _
                                                             >(
@@ -12669,7 +13659,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5990,
+                                                            $crate::__pgrx_c_generated::Field_va_tag,
                                                             _,
                                                             _
                                                         >(
@@ -12755,7 +13745,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5988,
+                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                     _,
                                                     _
                                                 >(
@@ -12809,7 +13799,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5990,
+                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                 _,
                                                 _
                                             >(
@@ -12880,6 +13870,17 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
@@ -12989,8 +13990,27 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
 /// ```text
 /// #define VARATT_IS_SHORT( PTR ) VARATT_IS_1B ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_SHORT {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_SHORT!(@__pgrx_emit_value; $PTR)
@@ -13007,7 +14027,7 @@ macro_rules! VARATT_IS_SHORT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -13081,6 +14101,11 @@ macro_rules! VARATT_IS_SHORT {
         /* PGRX: VARATT_IS_SHORT remains expanded because VARATT_IS_1B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13094,7 +14119,7 @@ macro_rules! VARATT_IS_SHORT {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -13171,7 +14196,7 @@ macro_rules! VARATT_IS_SHORT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -13242,6 +14267,17 @@ macro_rules! VARATT_IS_SHORT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
@@ -13351,8 +14387,27 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
 /// ```text
 /// #define VARATT_NOT_PAD_BYTE( PTR ) ( * ( ( uint8 * ) ( PTR ) ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_NOT_PAD_BYTE {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_NOT_PAD_BYTE!(@__pgrx_emit_value; $PTR)
@@ -13414,6 +14469,11 @@ macro_rules! VARATT_NOT_PAD_BYTE {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13522,6 +14582,17 @@ macro_rules! VARATT_NOT_PAD_BYTE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA {
@@ -13612,8 +14683,27 @@ macro_rules! __pgrx_c_args_VARDATA {
 /// ```text
 /// #define VARDATA( PTR ) VARDATA_4B ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA!(@__pgrx_emit_value; $PTR)
@@ -13625,12 +14715,12 @@ macro_rules! VARDATA {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -13670,12 +14760,12 @@ macro_rules! VARDATA {
         /* PGRX: VARDATA remains expanded because VARDATA_4B expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5983,
+                    $crate::__pgrx_c_generated::Field_va_4byte,
                     _,
                     _
                 >(
@@ -13713,12 +14803,12 @@ macro_rules! VARDATA {
         /* PGRX: VARDATA remains expanded because VARDATA_4B expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5983,
+                    $crate::__pgrx_c_generated::Field_va_4byte,
                     _,
                     _
                 >(
@@ -13756,15 +14846,20 @@ macro_rules! VARDATA {
         /* PGRX: VARDATA remains expanded because VARDATA_4B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5983,
+                                $crate::__pgrx_c_generated::Field_va_4byte,
                                 _,
                                 _
                             >(
@@ -13817,12 +14912,12 @@ macro_rules! VARDATA {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -13871,6 +14966,17 @@ macro_rules! VARDATA {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_1B {
@@ -13966,8 +15072,27 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
 /// ```text
 /// #define VARDATA_1B( PTR ) ( ( ( varattrib_1b * ) ( PTR ) ) -> va_data )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_1B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_1B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_1B!(@__pgrx_emit_value; $PTR)
@@ -13978,7 +15103,7 @@ macro_rules! VARDATA_1B {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -14016,7 +15141,7 @@ macro_rules! VARDATA_1B {
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -14051,7 +15176,7 @@ macro_rules! VARDATA_1B {
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -14086,10 +15211,15 @@ macro_rules! VARDATA_1B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
@@ -14132,7 +15262,7 @@ macro_rules! VARDATA_1B {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -14180,6 +15310,17 @@ macro_rules! VARDATA_1B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_1B_E {
@@ -14278,8 +15419,27 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
 /// ```text
 /// #define VARDATA_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_data )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_1B_E {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_1B_E!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_1B_E!(@__pgrx_emit_value; $PTR)
@@ -14290,7 +15450,7 @@ macro_rules! VARDATA_1B_E {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -14328,7 +15488,7 @@ macro_rules! VARDATA_1B_E {
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -14363,7 +15523,7 @@ macro_rules! VARDATA_1B_E {
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -14398,10 +15558,15 @@ macro_rules! VARDATA_1B_E {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
@@ -14444,7 +15609,7 @@ macro_rules! VARDATA_1B_E {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -14492,6 +15657,17 @@ macro_rules! VARDATA_1B_E {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_4B {
@@ -14587,8 +15763,27 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
 /// ```text
 /// #define VARDATA_4B( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_data )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_4B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_4B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_4B!(@__pgrx_emit_value; $PTR)
@@ -14599,12 +15794,12 @@ macro_rules! VARDATA_4B {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -14643,12 +15838,12 @@ macro_rules! VARDATA_4B {
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5983,
+                    $crate::__pgrx_c_generated::Field_va_4byte,
                     _,
                     _
                 >(
@@ -14685,12 +15880,12 @@ macro_rules! VARDATA_4B {
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5983,
+                    $crate::__pgrx_c_generated::Field_va_4byte,
                     _,
                     _
                 >(
@@ -14727,15 +15922,20 @@ macro_rules! VARDATA_4B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5983,
+                                $crate::__pgrx_c_generated::Field_va_4byte,
                                 _,
                                 _
                             >(
@@ -14787,12 +15987,12 @@ macro_rules! VARDATA_4B {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5983,
+                            $crate::__pgrx_c_generated::Field_va_4byte,
                             _,
                             _
                         >(
@@ -14841,6 +16041,17 @@ macro_rules! VARDATA_4B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_4B_C {
@@ -14939,8 +16150,27 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
 /// ```text
 /// #define VARDATA_4B_C( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_data )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_4B_C {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_4B_C!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_4B_C!(@__pgrx_emit_value; $PTR)
@@ -14951,12 +16181,12 @@ macro_rules! VARDATA_4B_C {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5985,
+                            $crate::__pgrx_c_generated::Field_va_compressed,
                             _,
                             _
                         >(
@@ -14995,12 +16225,12 @@ macro_rules! VARDATA_4B_C {
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5985,
+                    $crate::__pgrx_c_generated::Field_va_compressed,
                     _,
                     _
                 >(
@@ -15037,12 +16267,12 @@ macro_rules! VARDATA_4B_C {
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field5985,
+                    $crate::__pgrx_c_generated::Field_va_compressed,
                     _,
                     _
                 >(
@@ -15079,15 +16309,20 @@ macro_rules! VARDATA_4B_C {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5985,
+                                $crate::__pgrx_c_generated::Field_va_compressed,
                                 _,
                                 _
                             >(
@@ -15139,12 +16374,12 @@ macro_rules! VARDATA_4B_C {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5985,
+                            $crate::__pgrx_c_generated::Field_va_compressed,
                             _,
                             _
                         >(
@@ -15193,6 +16428,17 @@ macro_rules! VARDATA_4B_C {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_ANY {
@@ -15288,8 +16534,27 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
 /// ```text
 /// #define VARDATA_ANY( PTR ) ( VARATT_IS_1B ( PTR ) ? VARDATA_1B ( PTR ) : VARDATA_4B ( PTR ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_ANY {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_ANY!(@__pgrx_emit_value; $PTR)
@@ -15316,7 +16581,7 @@ macro_rules! VARDATA_ANY {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5988,
+                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                             _,
                                                             _
                                                         >(
@@ -15381,7 +16646,7 @@ macro_rules! VARDATA_ANY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5986,
+                                            $crate::__pgrx_c_generated::Field_va_data,
                                             _,
                                             _
                                         >(
@@ -15427,12 +16692,12 @@ macro_rules! VARDATA_ANY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5986,
+                                            $crate::__pgrx_c_generated::Field_va_data,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -15497,6 +16762,11 @@ macro_rules! VARDATA_ANY {
         /* PGRX: VARATT_IS_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARDATA_1B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARDATA_4B remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15520,7 +16790,7 @@ macro_rules! VARDATA_ANY {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5988,
+                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                         _,
                                                                         _
                                                                     >(
@@ -15591,7 +16861,7 @@ macro_rules! VARDATA_ANY {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5986,
+                                                        $crate::__pgrx_c_generated::Field_va_data,
                                                         _,
                                                         _
                                                     >(
@@ -15640,12 +16910,12 @@ macro_rules! VARDATA_ANY {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5986,
+                                                        $crate::__pgrx_c_generated::Field_va_data,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5983,
+                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                             _,
                                                             _
                                                         >(
@@ -15722,7 +16992,7 @@ macro_rules! VARDATA_ANY {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5988,
+                                                            $crate::__pgrx_c_generated::Field_va_header,
                                                             _,
                                                             _
                                                         >(
@@ -15787,7 +17057,7 @@ macro_rules! VARDATA_ANY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5986,
+                                            $crate::__pgrx_c_generated::Field_va_data,
                                             _,
                                             _
                                         >(
@@ -15833,12 +17103,12 @@ macro_rules! VARDATA_ANY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5986,
+                                            $crate::__pgrx_c_generated::Field_va_data,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -15900,6 +17170,17 @@ macro_rules! VARDATA_ANY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
@@ -16030,8 +17311,30 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_COMPRESS_METHOD( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo >> VARLENA_EXTSIZE_BITS )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(@__pgrx_emit_value; $PTR)
@@ -16044,12 +17347,12 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5991,
+                                $crate::__pgrx_c_generated::Field_va_tcinfo,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5985,
+                                    $crate::__pgrx_c_generated::Field_va_compressed,
                                     _,
                                     _
                                 >(
@@ -16124,6 +17427,11 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -16131,12 +17439,12 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5991,
+                                            $crate::__pgrx_c_generated::Field_va_tcinfo,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5985,
+                                                $crate::__pgrx_c_generated::Field_va_compressed,
                                                 _,
                                                 _
                                             >(
@@ -16202,12 +17510,12 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5991,
+                                $crate::__pgrx_c_generated::Field_va_tcinfo,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5985,
+                                    $crate::__pgrx_c_generated::Field_va_compressed,
                                     _,
                                     _
                                 >(
@@ -16277,6 +17585,17 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
@@ -16404,8 +17723,30 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
 /// ```text
 /// #define VARDATA_COMPRESSED_GET_EXTSIZE( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_compressed . va_tcinfo & VARLENA_EXTSIZE_MASK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_COMPRESSED_GET_EXTSIZE!(@__pgrx_emit_value; $PTR)
@@ -16418,12 +17759,12 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5991,
+                                $crate::__pgrx_c_generated::Field_va_tcinfo,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5985,
+                                    $crate::__pgrx_c_generated::Field_va_compressed,
                                     _,
                                     _
                                 >(
@@ -16498,6 +17839,11 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -16505,12 +17851,12 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5991,
+                                            $crate::__pgrx_c_generated::Field_va_tcinfo,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5985,
+                                                $crate::__pgrx_c_generated::Field_va_compressed,
                                                 _,
                                                 _
                                             >(
@@ -16576,12 +17922,12 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5991,
+                                $crate::__pgrx_c_generated::Field_va_tcinfo,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5985,
+                                    $crate::__pgrx_c_generated::Field_va_compressed,
                                     _,
                                     _
                                 >(
@@ -16651,6 +17997,17 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
@@ -16760,8 +18117,27 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
 /// ```text
 /// #define VARDATA_EXTERNAL( PTR ) VARDATA_1B_E ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_EXTERNAL {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_EXTERNAL!(@__pgrx_emit_value; $PTR)
@@ -16773,7 +18149,7 @@ macro_rules! VARDATA_EXTERNAL {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -16812,7 +18188,7 @@ macro_rules! VARDATA_EXTERNAL {
         /* PGRX: VARDATA_EXTERNAL remains expanded because VARDATA_1B_E expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -16848,7 +18224,7 @@ macro_rules! VARDATA_EXTERNAL {
         /* PGRX: VARDATA_EXTERNAL remains expanded because VARDATA_1B_E expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -16884,10 +18260,15 @@ macro_rules! VARDATA_EXTERNAL {
         /* PGRX: VARDATA_EXTERNAL remains expanded because VARDATA_1B_E expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
@@ -16931,7 +18312,7 @@ macro_rules! VARDATA_EXTERNAL {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -16979,6 +18360,17 @@ macro_rules! VARDATA_EXTERNAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARDATA_SHORT {
@@ -17088,8 +18480,27 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
 /// ```text
 /// #define VARDATA_SHORT( PTR ) VARDATA_1B ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_SHORT {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARDATA_SHORT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARDATA_SHORT!(@__pgrx_emit_value; $PTR)
@@ -17101,7 +18512,7 @@ macro_rules! VARDATA_SHORT {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -17140,7 +18551,7 @@ macro_rules! VARDATA_SHORT {
         /* PGRX: VARDATA_SHORT remains expanded because VARDATA_1B expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -17176,7 +18587,7 @@ macro_rules! VARDATA_SHORT {
         /* PGRX: VARDATA_SHORT remains expanded because VARDATA_1B expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5986,
+                $crate::__pgrx_c_generated::Field_va_data,
                 _,
                 _
             >(
@@ -17212,10 +18623,15 @@ macro_rules! VARDATA_SHORT {
         /* PGRX: VARDATA_SHORT remains expanded because VARDATA_1B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5986,
+                            $crate::__pgrx_c_generated::Field_va_data,
                             _,
                             _
                         >(
@@ -17259,7 +18675,7 @@ macro_rules! VARDATA_SHORT {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5986,
+                        $crate::__pgrx_c_generated::Field_va_data,
                         _,
                         _
                     >(
@@ -17307,6 +18723,17 @@ macro_rules! VARDATA_SHORT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARSIZE {
@@ -17397,8 +18824,27 @@ macro_rules! __pgrx_c_args_VARSIZE {
 /// ```text
 /// #define VARSIZE( PTR ) VARSIZE_4B ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARSIZE!(@__pgrx_emit_value; $PTR)
@@ -17415,12 +18861,12 @@ macro_rules! VARSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -17495,6 +18941,11 @@ macro_rules! VARSIZE {
         /* PGRX: VARSIZE remains expanded because VARSIZE_4B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17508,12 +18959,12 @@ macro_rules! VARSIZE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5983,
+                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                             _,
                                                             _
                                                         >(
@@ -17593,12 +19044,12 @@ macro_rules! VARSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -17670,6 +19121,17 @@ macro_rules! VARSIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARSIZE_1B {
@@ -17765,8 +19227,27 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
 /// ```text
 /// #define VARSIZE_1B( PTR ) ( ( ( ( varattrib_1b * ) ( PTR ) ) -> va_header >> 1 ) & 0x7F )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_1B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARSIZE_1B!(@__pgrx_emit_value; $PTR)
@@ -17782,7 +19263,7 @@ macro_rules! VARSIZE_1B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -17855,6 +19336,11 @@ macro_rules! VARSIZE_1B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17868,7 +19354,7 @@ macro_rules! VARSIZE_1B {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -17944,7 +19430,7 @@ macro_rules! VARSIZE_1B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -18015,6 +19501,17 @@ macro_rules! VARSIZE_1B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARSIZE_4B {
@@ -18110,8 +19607,27 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
 /// ```text
 /// #define VARSIZE_4B( PTR ) ( ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header >> 2 ) & 0x3FFFFFFF )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_4B {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARSIZE_4B!(@__pgrx_emit_value; $PTR)
@@ -18127,12 +19643,12 @@ macro_rules! VARSIZE_4B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -18206,6 +19722,11 @@ macro_rules! VARSIZE_4B {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18219,12 +19740,12 @@ macro_rules! VARSIZE_4B {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5983,
+                                                            $crate::__pgrx_c_generated::Field_va_4byte,
                                                             _,
                                                             _
                                                         >(
@@ -18303,12 +19824,12 @@ macro_rules! VARSIZE_4B {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5983,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -18380,6 +19901,17 @@ macro_rules! VARSIZE_4B {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARSIZE_SHORT {
@@ -18489,8 +20021,27 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
 /// ```text
 /// #define VARSIZE_SHORT( PTR ) VARSIZE_1B ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_SHORT {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARSIZE_SHORT!(@__pgrx_emit_value; $PTR)
@@ -18507,7 +20058,7 @@ macro_rules! VARSIZE_SHORT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -18581,6 +20132,11 @@ macro_rules! VARSIZE_SHORT {
         /* PGRX: VARSIZE_SHORT remains expanded because VARSIZE_1B expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18594,7 +20150,7 @@ macro_rules! VARSIZE_SHORT {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5988,
+                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                         _,
                                                         _
                                                     >(
@@ -18671,7 +20227,7 @@ macro_rules! VARSIZE_SHORT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5988,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
@@ -18742,6 +20298,17 @@ macro_rules! VARSIZE_SHORT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARTAG_1B_E {
@@ -18837,8 +20404,27 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
 /// ```text
 /// #define VARTAG_1B_E( PTR ) ( ( ( varattrib_1b_e * ) ( PTR ) ) -> va_tag )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARTAG_1B_E {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARTAG_1B_E!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARTAG_1B_E!(@__pgrx_emit_value; $PTR)
@@ -18849,7 +20435,7 @@ macro_rules! VARTAG_1B_E {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5990,
+                        $crate::__pgrx_c_generated::Field_va_tag,
                         _,
                         _
                     >(
@@ -18887,7 +20473,7 @@ macro_rules! VARTAG_1B_E {
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5990,
+                $crate::__pgrx_c_generated::Field_va_tag,
                 _,
                 _
             >(
@@ -18922,7 +20508,7 @@ macro_rules! VARTAG_1B_E {
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5990,
+                $crate::__pgrx_c_generated::Field_va_tag,
                 _,
                 _
             >(
@@ -18957,10 +20543,15 @@ macro_rules! VARTAG_1B_E {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5990,
+                            $crate::__pgrx_c_generated::Field_va_tag,
                             _,
                             _
                         >(
@@ -19003,7 +20594,7 @@ macro_rules! VARTAG_1B_E {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5990,
+                        $crate::__pgrx_c_generated::Field_va_tag,
                         _,
                         _
                     >(
@@ -19051,6 +20642,17 @@ macro_rules! VARTAG_1B_E {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
@@ -19160,8 +20762,27 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
 /// ```text
 /// #define VARTAG_EXTERNAL( PTR ) VARTAG_1B_E ( PTR )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARTAG_EXTERNAL {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARTAG_EXTERNAL!(@__pgrx_emit_value; $PTR)
@@ -19173,7 +20794,7 @@ macro_rules! VARTAG_EXTERNAL {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5990,
+                        $crate::__pgrx_c_generated::Field_va_tag,
                         _,
                         _
                     >(
@@ -19212,7 +20833,7 @@ macro_rules! VARTAG_EXTERNAL {
         /* PGRX: VARTAG_EXTERNAL remains expanded because VARTAG_1B_E expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5990,
+                $crate::__pgrx_c_generated::Field_va_tag,
                 _,
                 _
             >(
@@ -19248,7 +20869,7 @@ macro_rules! VARTAG_EXTERNAL {
         /* PGRX: VARTAG_EXTERNAL remains expanded because VARTAG_1B_E expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field5990,
+                $crate::__pgrx_c_generated::Field_va_tag,
                 _,
                 _
             >(
@@ -19284,10 +20905,15 @@ macro_rules! VARTAG_EXTERNAL {
         /* PGRX: VARTAG_EXTERNAL remains expanded because VARTAG_1B_E expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5990,
+                            $crate::__pgrx_c_generated::Field_va_tag,
                             _,
                             _
                         >(
@@ -19331,7 +20957,7 @@ macro_rules! VARTAG_EXTERNAL {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field5990,
+                        $crate::__pgrx_c_generated::Field_va_tag,
                         _,
                         _
                     >(
@@ -19379,6 +21005,17 @@ macro_rules! VARTAG_EXTERNAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
@@ -19488,8 +21125,23 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
 /// ```text
 /// #define VARTAG_IS_EXPANDED( tag ) ( ( ( tag ) & ~ 1 ) == VARTAG_EXPANDED_RO )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! VARTAG_IS_EXPANDED {
+    (@__pgrx_emit_check_safety; $tag:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tag);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $tag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARTAG_IS_EXPANDED!(@__pgrx_emit_value; $tag)
@@ -19549,6 +21201,11 @@ macro_rules! VARTAG_IS_EXPANDED {
     (@__pgrx_emit_size; $tag:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tag);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

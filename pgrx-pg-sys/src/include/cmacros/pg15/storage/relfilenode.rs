@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
@@ -190,8 +201,27 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
 /// ```text
 /// #define RelFileNodeBackendEquals( node1 , node2 ) ( ( node1 ) . node . relNode == ( node2 ) . node . relNode && ( node1 ) . node . dbNode == ( node2 ) . node . dbNode && ( node1 ) . backend == ( node2 ) . backend && ( node1 ) . node . spcNode == ( node2 ) . node . spcNode )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileNodeBackendEquals {
+    (@__pgrx_emit_check_safety; $node1:tt, $node2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $node1);
+                $crate::__pgrx_c_operand!(@check_safety; $node2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileNodeBackendEquals!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $node1:tt, $node2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileNodeBackendEquals!(@__pgrx_emit_value; $node1, $node2)
@@ -221,12 +251,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -246,12 +276,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -279,12 +309,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -304,12 +334,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -341,7 +371,7 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field596,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -360,7 +390,7 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field596,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -388,12 +418,12 @@ macro_rules! RelFileNodeBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3316,
+                                                $crate::__pgrx_c_generated::Field_node,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $node1)))
@@ -403,12 +433,12 @@ macro_rules! RelFileNodeBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3316,
+                                                $crate::__pgrx_c_generated::Field_node,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $node2)))
@@ -447,6 +477,12 @@ macro_rules! RelFileNodeBackendEquals {
     (@__pgrx_emit_size; $node1:tt, $node2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $node1);
+                        $crate::__pgrx_c_operand!(@check_safety; $node2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -476,12 +512,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4354,
+                                                                                $crate::__pgrx_c_generated::Field_relNode,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3316,
+                                                                                    $crate::__pgrx_c_generated::Field_node,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -501,12 +537,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field4354,
+                                                                                $crate::__pgrx_c_generated::Field_relNode,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3316,
+                                                                                    $crate::__pgrx_c_generated::Field_node,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -534,12 +570,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field1255,
+                                                                                $crate::__pgrx_c_generated::Field_dbNode,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3316,
+                                                                                    $crate::__pgrx_c_generated::Field_node,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -559,12 +595,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field1255,
+                                                                                $crate::__pgrx_c_generated::Field_dbNode,
                                                                                 _,
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3316,
+                                                                                    $crate::__pgrx_c_generated::Field_node,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -599,7 +635,7 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field596,
+                                                                    $crate::__pgrx_c_generated::Field_backend,
                                                                     _,
                                                                     _
                                                                 >(
@@ -618,7 +654,7 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field596,
+                                                                    $crate::__pgrx_c_generated::Field_backend,
                                                                     _,
                                                                     _
                                                                 >(
@@ -649,12 +685,12 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5081,
+                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field3316,
+                                                            $crate::__pgrx_c_generated::Field_node,
                                                             _,
                                                             _
                                                         >(
@@ -674,12 +710,12 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5081,
+                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                         _,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field3316,
+                                                            $crate::__pgrx_c_generated::Field_node,
                                                             _,
                                                             _
                                                         >(
@@ -736,12 +772,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -761,12 +797,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -794,12 +830,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -819,12 +855,12 @@ macro_rules! RelFileNodeBackendEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3316,
+                                                                        $crate::__pgrx_c_generated::Field_node,
                                                                         _,
                                                                         _
                                                                     >(
@@ -856,7 +892,7 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field596,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -875,7 +911,7 @@ macro_rules! RelFileNodeBackendEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field596,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -903,12 +939,12 @@ macro_rules! RelFileNodeBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3316,
+                                                $crate::__pgrx_c_generated::Field_node,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $node1)))
@@ -918,12 +954,12 @@ macro_rules! RelFileNodeBackendEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3316,
+                                                $crate::__pgrx_c_generated::Field_node,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $node2)))
@@ -957,6 +993,17 @@ macro_rules! RelFileNodeBackendEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileNodeBackendIsTemp {
@@ -1081,8 +1128,26 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendIsTemp {
 /// ```text
 /// #define RelFileNodeBackendIsTemp( rnode ) ( ( rnode ) . backend != InvalidBackendId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileNodeBackendIsTemp {
+    (@__pgrx_emit_check_safety; $rnode:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rnode);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $rnode:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileNodeBackendIsTemp!(@__pgrx_emit_value; $rnode)
@@ -1095,7 +1160,7 @@ macro_rules! RelFileNodeBackendIsTemp {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field596,
+                                $crate::__pgrx_c_generated::Field_backend,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $rnode)))
@@ -1131,6 +1196,11 @@ macro_rules! RelFileNodeBackendIsTemp {
     (@__pgrx_emit_size; $rnode:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rnode);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1138,7 +1208,7 @@ macro_rules! RelFileNodeBackendIsTemp {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field596,
+                                            $crate::__pgrx_c_generated::Field_backend,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rnode)))
@@ -1168,7 +1238,7 @@ macro_rules! RelFileNodeBackendIsTemp {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field596,
+                                $crate::__pgrx_c_generated::Field_backend,
                                 _,
                                 _
                             >(($crate::__pgrx_c_operand!(@read_place; $rnode)))
@@ -1199,6 +1269,17 @@ macro_rules! RelFileNodeBackendIsTemp {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileNodeEquals {
@@ -1362,8 +1443,24 @@ macro_rules! __pgrx_c_args_RelFileNodeEquals {
 /// ```text
 /// #define RelFileNodeEquals( node1 , node2 ) ( ( node1 ) . relNode == ( node2 ) . relNode && ( node1 ) . dbNode == ( node2 ) . dbNode && ( node1 ) . spcNode == ( node2 ) . spcNode )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! RelFileNodeEquals {
+    (@__pgrx_emit_check_safety; $node1:tt, $node2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $node1);
+                $crate::__pgrx_c_operand!(@check_safety; $node2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileNodeEquals!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $node1:tt, $node2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileNodeEquals!(@__pgrx_emit_value; $node1, $node2)
@@ -1385,7 +1482,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
@@ -1404,7 +1501,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
@@ -1428,7 +1525,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1255,
+                                                        $crate::__pgrx_c_generated::Field_dbNode,
                                                         _,
                                                         _
                                                     >(
@@ -1447,7 +1544,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1255,
+                                                        $crate::__pgrx_c_generated::Field_dbNode,
                                                         _,
                                                         _
                                                     >(
@@ -1475,7 +1572,7 @@ macro_rules! RelFileNodeEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $node1)))
@@ -1484,7 +1581,7 @@ macro_rules! RelFileNodeEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $node2)))
@@ -1519,6 +1616,12 @@ macro_rules! RelFileNodeEquals {
     (@__pgrx_emit_size; $node1:tt, $node2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $node1);
+                        $crate::__pgrx_c_operand!(@check_safety; $node2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1540,7 +1643,7 @@ macro_rules! RelFileNodeEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1559,7 +1662,7 @@ macro_rules! RelFileNodeEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field4354,
+                                                                    $crate::__pgrx_c_generated::Field_relNode,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1586,7 +1689,7 @@ macro_rules! RelFileNodeEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1605,7 +1708,7 @@ macro_rules! RelFileNodeEquals {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1255,
+                                                                    $crate::__pgrx_c_generated::Field_dbNode,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1636,7 +1739,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5081,
+                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                         _,
                                                         _
                                                     >(
@@ -1655,7 +1758,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5081,
+                                                        $crate::__pgrx_c_generated::Field_spcNode,
                                                         _,
                                                         _
                                                     >(
@@ -1703,7 +1806,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
@@ -1722,7 +1825,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4354,
+                                                        $crate::__pgrx_c_generated::Field_relNode,
                                                         _,
                                                         _
                                                     >(
@@ -1746,7 +1849,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1255,
+                                                        $crate::__pgrx_c_generated::Field_dbNode,
                                                         _,
                                                         _
                                                     >(
@@ -1765,7 +1868,7 @@ macro_rules! RelFileNodeEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1255,
+                                                        $crate::__pgrx_c_generated::Field_dbNode,
                                                         _,
                                                         _
                                                     >(
@@ -1793,7 +1896,7 @@ macro_rules! RelFileNodeEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $node1)))
@@ -1802,7 +1905,7 @@ macro_rules! RelFileNodeEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5081,
+                                            $crate::__pgrx_c_generated::Field_spcNode,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $node2)))

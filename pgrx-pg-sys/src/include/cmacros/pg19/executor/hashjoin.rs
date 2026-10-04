@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
@@ -139,8 +150,30 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
 /// ```text
 /// #define EstimateParallelHashJoinBatch( hashtable ) ( MAXALIGN ( sizeof ( ParallelHashJoinBatch ) ) + MAXALIGN ( sts_estimate ( ( hashtable ) -> parallel_state -> nparticipants ) ) * 2 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! EstimateParallelHashJoinBatch {
+    (@__pgrx_emit_check_safety; $hashtable:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hashtable);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $hashtable:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EstimateParallelHashJoinBatch!(@__pgrx_emit_value; $hashtable)
@@ -328,7 +361,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field3749,
+                                                                                                    $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -339,7 +372,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4234,
+                                                                                                                    $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -505,6 +538,11 @@ macro_rules! EstimateParallelHashJoinBatch {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hashtable);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -699,7 +737,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field3749,
+                                                                                                                $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -710,7 +748,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field4234,
+                                                                                                                                $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -1041,7 +1079,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field3749,
+                                                                                                    $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -1052,7 +1090,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field4234,
+                                                                                                                    $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -1212,6 +1250,17 @@ macro_rules! EstimateParallelHashJoinBatch {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
@@ -1321,8 +1370,27 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
 /// ```text
 /// #define HASH_CHUNK_DATA( hc ) ( ( ( char * ) ( hc ) ) + HASH_CHUNK_HEADER_SIZE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HASH_CHUNK_DATA {
+    (@__pgrx_emit_check_safety; $hc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $hc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HASH_CHUNK_DATA!(@__pgrx_emit_value; $hc)
@@ -1496,6 +1564,11 @@ macro_rules! HASH_CHUNK_DATA {
         /* PGRX: HASH_CHUNK_HEADER_SIZE remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1828,6 +1901,17 @@ macro_rules! HASH_CHUNK_DATA {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
@@ -1937,8 +2021,27 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
 /// ```text
 /// #define HJTUPLE_MINTUPLE( hjtup ) ( ( MinimalTuple ) ( ( char * ) ( hjtup ) + HJTUPLE_OVERHEAD ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HJTUPLE_MINTUPLE {
+    (@__pgrx_emit_check_safety; $hjtup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hjtup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $hjtup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::HJTUPLE_MINTUPLE!(@__pgrx_emit_value; $hjtup)
@@ -2134,6 +2237,11 @@ macro_rules! HJTUPLE_MINTUPLE {
         /* PGRX: HJTUPLE_OVERHEAD remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hjtup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2514,6 +2622,17 @@ macro_rules! HJTUPLE_MINTUPLE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
@@ -2749,8 +2868,31 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
 ///
 ///
 /// Rust callers supply 3 arguments: the 2 original C parameters, followed by explicit caller-scope operands in this order: `hashtable`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! NthParallelHashJoinBatch {
+    (@__pgrx_emit_check_safety; $base:tt, $n:tt, $hashtable:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $base);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $hashtable);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $base:tt, $n:tt, $hashtable:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::NthParallelHashJoinBatch!(@__pgrx_emit_value; $base, $n, $hashtable)
@@ -3003,7 +3145,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field3749,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -3014,7 +3156,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field4234,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -3195,6 +3337,13 @@ macro_rules! NthParallelHashJoinBatch {
         /* PGRX: EstimateParallelHashJoinBatch remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $base);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $hashtable);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -3454,7 +3603,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                $crate::__pgrx_c_generated::Field3749,
+                                                                                                                                                $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                                                                 _,
                                                                                                                                                 _
                                                                                                                                             >(
@@ -3465,7 +3614,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                                $crate::__pgrx_c_generated::Field4234,
+                                                                                                                                                                $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                                                                 _,
                                                                                                                                                                 _
                                                                                                                                                             >(
@@ -3884,7 +4033,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field3749,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_nparticipants,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -3895,7 +4044,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                    $crate::__pgrx_c_generated::Field4234,
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_parallel_state,
                                                                                                                                                     _,
                                                                                                                                                     _
                                                                                                                                                 >(
@@ -4070,6 +4219,17 @@ macro_rules! NthParallelHashJoinBatch {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
@@ -4188,8 +4348,30 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
 /// ```text
 /// #define PHJ_GROW_BATCHES_PHASE( n ) ( ( n ) % 5 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PHJ_GROW_BATCHES_PHASE {
+    (@__pgrx_emit_check_safety; $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PHJ_GROW_BATCHES_PHASE!(@__pgrx_emit_value; $n)
@@ -4229,6 +4411,11 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
     (@__pgrx_emit_size; $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4287,6 +4474,17 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
@@ -4405,8 +4603,30 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
 /// ```text
 /// #define PHJ_GROW_BUCKETS_PHASE( n ) ( ( n ) % 3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PHJ_GROW_BUCKETS_PHASE {
+    (@__pgrx_emit_check_safety; $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PHJ_GROW_BUCKETS_PHASE!(@__pgrx_emit_value; $n)
@@ -4446,6 +4666,11 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
     (@__pgrx_emit_size; $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4504,6 +4729,17 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
@@ -4628,8 +4864,30 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
 /// ```text
 /// #define ParallelHashJoinBatchInner( batch ) ( ( SharedTuplestore * ) ( ( char * ) ( batch ) + MAXALIGN ( sizeof ( ParallelHashJoinBatch ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ParallelHashJoinBatchInner {
+    (@__pgrx_emit_check_safety; $batch:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $batch);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $batch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ParallelHashJoinBatchInner!(@__pgrx_emit_value; $batch)
@@ -4828,6 +5086,11 @@ macro_rules! ParallelHashJoinBatchInner {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $batch);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5208,6 +5471,17 @@ macro_rules! ParallelHashJoinBatchInner {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
@@ -5386,8 +5660,31 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
 /// ```text
 /// #define ParallelHashJoinBatchOuter( batch , nparticipants ) ( ( SharedTuplestore * ) ( ( char * ) ParallelHashJoinBatchInner ( batch ) + MAXALIGN ( sts_estimate ( nparticipants ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ParallelHashJoinBatchOuter {
+    (@__pgrx_emit_check_safety; $batch:tt, $nparticipants:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $batch);
+                $crate::__pgrx_c_operand!(@check_safety; $nparticipants);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $batch:tt, $nparticipants:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ParallelHashJoinBatchOuter!(@__pgrx_emit_value; $batch, $nparticipants)
@@ -5796,6 +6093,12 @@ macro_rules! ParallelHashJoinBatchOuter {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ParallelHashJoinBatchInner remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $batch);
+                        $crate::__pgrx_c_operand!(@check_safety; $nparticipants);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

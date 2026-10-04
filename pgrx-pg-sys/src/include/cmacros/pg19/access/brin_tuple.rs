@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinTupleDataOffset {
@@ -121,8 +132,27 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
 /// ```text
 /// #define BrinTupleDataOffset( tup ) ( ( Size ) ( ( ( BrinTuple * ) ( tup ) ) -> bt_info & BRIN_OFFSET_MASK ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinTupleDataOffset {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinTupleDataOffset!(@__pgrx_emit_value; $tup)
@@ -145,7 +175,7 @@ macro_rules! BrinTupleDataOffset {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field807,
+                                            $crate::__pgrx_c_generated::Field_bt_info,
                                             _,
                                             _
                                         >(
@@ -213,6 +243,11 @@ macro_rules! BrinTupleDataOffset {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -233,7 +268,7 @@ macro_rules! BrinTupleDataOffset {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field807,
+                                                        $crate::__pgrx_c_generated::Field_bt_info,
                                                         _,
                                                         _
                                                     >(
@@ -311,7 +346,7 @@ macro_rules! BrinTupleDataOffset {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field807,
+                                            $crate::__pgrx_c_generated::Field_bt_info,
                                             _,
                                             _
                                         >(
@@ -377,6 +412,17 @@ macro_rules! BrinTupleDataOffset {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinTupleHasNulls {
@@ -486,8 +532,27 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
 /// ```text
 /// #define BrinTupleHasNulls( tup ) ( ( ( ( ( BrinTuple * ) ( tup ) ) -> bt_info & BRIN_NULLS_MASK ) ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinTupleHasNulls {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinTupleHasNulls!(@__pgrx_emit_value; $tup)
@@ -504,7 +569,7 @@ macro_rules! BrinTupleHasNulls {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(
@@ -580,6 +645,11 @@ macro_rules! BrinTupleHasNulls {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -597,7 +667,7 @@ macro_rules! BrinTupleHasNulls {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field807,
+                                                            $crate::__pgrx_c_generated::Field_bt_info,
                                                             _,
                                                             _
                                                         >(
@@ -679,7 +749,7 @@ macro_rules! BrinTupleHasNulls {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(
@@ -753,6 +823,17 @@ macro_rules! BrinTupleHasNulls {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
@@ -867,8 +948,27 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
 /// ```text
 /// #define BrinTupleIsEmptyRange( tup ) ( ( ( ( ( BrinTuple * ) ( tup ) ) -> bt_info & BRIN_EMPTY_RANGE_MASK ) ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinTupleIsEmptyRange {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinTupleIsEmptyRange!(@__pgrx_emit_value; $tup)
@@ -885,7 +985,7 @@ macro_rules! BrinTupleIsEmptyRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(
@@ -961,6 +1061,11 @@ macro_rules! BrinTupleIsEmptyRange {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -978,7 +1083,7 @@ macro_rules! BrinTupleIsEmptyRange {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field807,
+                                                            $crate::__pgrx_c_generated::Field_bt_info,
                                                             _,
                                                             _
                                                         >(
@@ -1060,7 +1165,7 @@ macro_rules! BrinTupleIsEmptyRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(
@@ -1134,6 +1239,17 @@ macro_rules! BrinTupleIsEmptyRange {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
@@ -1252,8 +1368,30 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
 /// ```text
 /// #define BrinTupleIsPlaceholder( tup ) ( ( ( ( ( BrinTuple * ) ( tup ) ) -> bt_info & BRIN_PLACEHOLDER_MASK ) ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinTupleIsPlaceholder {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinTupleIsPlaceholder!(@__pgrx_emit_value; $tup)
@@ -1270,7 +1408,7 @@ macro_rules! BrinTupleIsPlaceholder {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(
@@ -1346,6 +1484,11 @@ macro_rules! BrinTupleIsPlaceholder {
     (@__pgrx_emit_size; $tup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1363,7 +1506,7 @@ macro_rules! BrinTupleIsPlaceholder {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field807,
+                                                            $crate::__pgrx_c_generated::Field_bt_info,
                                                             _,
                                                             _
                                                         >(
@@ -1445,7 +1588,7 @@ macro_rules! BrinTupleIsPlaceholder {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field807,
+                                                $crate::__pgrx_c_generated::Field_bt_info,
                                                 _,
                                                 _
                                             >(

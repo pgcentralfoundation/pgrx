@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinCategoryOffset {
@@ -175,8 +186,28 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
 /// ```text
 /// #define GinCategoryOffset( itup , ginstate ) ( IndexInfoFindDataOffset ( ( itup ) -> t_info ) + ( ( ginstate ) -> oneCol ? 0 : sizeof ( int16 ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinCategoryOffset {
+    (@__pgrx_emit_check_safety; $itup:tt, $ginstate:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+                $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinCategoryOffset!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt, $ginstate:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinCategoryOffset!(@__pgrx_emit_value; $itup, $ginstate)
@@ -210,7 +241,7 @@ macro_rules! GinCategoryOffset {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field5391,
+                                                                            $crate::__pgrx_c_generated::Field_t_info,
                                                                             _,
                                                                             _
                                                                         >(
@@ -590,7 +621,7 @@ macro_rules! GinCategoryOffset {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3557,
+                                                $crate::__pgrx_c_generated::Field_oneCol,
                                                 _,
                                                 _
                                             >(
@@ -661,6 +692,12 @@ macro_rules! GinCategoryOffset {
         /* PGRX: IndexInfoFindDataOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                        $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -692,7 +729,7 @@ macro_rules! GinCategoryOffset {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field5391,
+                                                                                        $crate::__pgrx_c_generated::Field_t_info,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -1075,7 +1112,7 @@ macro_rules! GinCategoryOffset {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field3557,
+                                                            $crate::__pgrx_c_generated::Field_oneCol,
                                                             _,
                                                             _
                                                         >(
@@ -1163,7 +1200,7 @@ macro_rules! GinCategoryOffset {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field5391,
+                                                                            $crate::__pgrx_c_generated::Field_t_info,
                                                                             _,
                                                                             _
                                                                         >(
@@ -1543,7 +1580,7 @@ macro_rules! GinCategoryOffset {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3557,
+                                                $crate::__pgrx_c_generated::Field_oneCol,
                                                 _,
                                                 _
                                             >(
@@ -1611,6 +1648,17 @@ macro_rules! GinCategoryOffset {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
@@ -1735,8 +1783,30 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
 /// ```text
 /// #define GinDataLeafPageGetFreeSpace( page ) PageGetExactFreeSpace ( page )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataLeafPageGetFreeSpace {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataLeafPageGetFreeSpace!(@__pgrx_emit_value; $page)
@@ -1754,13 +1824,19 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                 $crate::PageGetExactFreeSpace(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::CChar,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -1796,6 +1872,11 @@ macro_rules! GinDataLeafPageGetFreeSpace {
         /* PGRX: GinDataLeafPageGetFreeSpace remains expanded because PageGetExactFreeSpace is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1808,13 +1889,19 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                                 $crate::PageGetExactFreeSpace(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::CChar,
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
                                             _
@@ -1851,13 +1938,19 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                     $crate::PageGetExactFreeSpace(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -1891,6 +1984,17 @@ macro_rules! GinDataLeafPageGetFreeSpace {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
@@ -2021,8 +2125,29 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
 ///
 ///
 /// Call as `GinDataLeafPageGetPostingList!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `(GinDataLeafPageGetPostingList(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingList {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataLeafPageGetPostingList!(@__pgrx_emit_value; $page)
@@ -2386,6 +2511,11 @@ macro_rules! GinDataLeafPageGetPostingList {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3105,6 +3235,17 @@ macro_rules! GinDataLeafPageGetPostingList {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
@@ -3224,8 +3365,30 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
 /// ```text
 /// #define GinDataLeafPageGetPostingListSize( page ) ( ( ( PageHeader ) page ) -> pd_lower - MAXALIGN ( SizeOfPageHeaderData ) - MAXALIGN ( sizeof ( ItemPointerData ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingListSize {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataLeafPageGetPostingListSize!(@__pgrx_emit_value; $page)
@@ -3245,7 +3408,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field3884,
+                                        $crate::__pgrx_c_generated::Field_pd_lower,
                                         _,
                                         _
                                     >(
@@ -3574,6 +3737,11 @@ macro_rules! GinDataLeafPageGetPostingListSize {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3594,7 +3762,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3884,
+                                                    $crate::__pgrx_c_generated::Field_pd_lower,
                                                     _,
                                                     _
                                                 >(
@@ -3929,7 +4097,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field3884,
+                                        $crate::__pgrx_c_generated::Field_pd_lower,
                                         _,
                                         _
                                     >(
@@ -4252,6 +4420,17 @@ macro_rules! GinDataLeafPageGetPostingListSize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataPageGetData {
@@ -4361,8 +4540,27 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
 /// ```text
 /// #define GinDataPageGetData( page ) ( PageGetContents ( page ) + MAXALIGN ( sizeof ( ItemPointerData ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataPageGetData {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageGetData!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataPageGetData!(@__pgrx_emit_value; $page)
@@ -4681,6 +4879,11 @@ macro_rules! GinDataPageGetData {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5315,6 +5518,17 @@ macro_rules! GinDataPageGetData {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
@@ -5493,8 +5707,31 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
 /// ```text
 /// #define GinDataPageGetPostingItem( page , i ) ( ( PostingItem * ) ( GinDataPageGetData ( page ) + ( ( i ) - 1 ) * sizeof ( PostingItem ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataPageGetPostingItem {
+    (@__pgrx_emit_check_safety; $page:tt, $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $page:tt, $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataPageGetPostingItem!(@__pgrx_emit_value; $page, $i)
@@ -5921,6 +6158,12 @@ macro_rules! GinDataPageGetPostingItem {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: GinDataPageGetData remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -6754,6 +6997,17 @@ macro_rules! GinDataPageGetPostingItem {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
@@ -6878,8 +7132,30 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
 /// ```text
 /// #define GinDataPageGetRightBound( page ) ( ( ItemPointer ) PageGetContents ( page ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataPageGetRightBound {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageGetRightBound!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinDataPageGetRightBound!(@__pgrx_emit_value; $page)
@@ -7085,6 +7361,11 @@ macro_rules! GinDataPageGetRightBound {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7479,6 +7760,17 @@ macro_rules! GinDataPageGetRightBound {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetDownlink {
@@ -7588,8 +7880,27 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
 /// ```text
 /// #define GinGetDownlink( itup ) GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetDownlink {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetDownlink!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetDownlink!(@__pgrx_emit_value; $itup)
@@ -7625,7 +7936,7 @@ macro_rules! GinGetDownlink {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field648,
+                                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                                 _,
                                                                 _
                                                             >(
@@ -7637,7 +7948,7 @@ macro_rules! GinGetDownlink {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -7649,7 +7960,7 @@ macro_rules! GinGetDownlink {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -7708,7 +8019,7 @@ macro_rules! GinGetDownlink {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field649,
+                                                    $crate::__pgrx_c_generated::Field_bi_lo,
                                                     _,
                                                     _
                                                 >(
@@ -7720,7 +8031,7 @@ macro_rules! GinGetDownlink {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                         _,
                                                                         _
                                                                     >(
@@ -7732,7 +8043,7 @@ macro_rules! GinGetDownlink {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -7792,6 +8103,11 @@ macro_rules! GinGetDownlink {
         /* PGRX: GinGetDownlink remains expanded because GinItemPointerGetBlockNumber expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7819,7 +8135,7 @@ macro_rules! GinGetDownlink {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -7831,7 +8147,7 @@ macro_rules! GinGetDownlink {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -7843,7 +8159,7 @@ macro_rules! GinGetDownlink {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -7902,7 +8218,7 @@ macro_rules! GinGetDownlink {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -7914,7 +8230,7 @@ macro_rules! GinGetDownlink {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -7926,7 +8242,7 @@ macro_rules! GinGetDownlink {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -7998,7 +8314,7 @@ macro_rules! GinGetDownlink {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -8010,7 +8326,7 @@ macro_rules! GinGetDownlink {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -8022,7 +8338,7 @@ macro_rules! GinGetDownlink {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -8075,7 +8391,7 @@ macro_rules! GinGetDownlink {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -8087,7 +8403,7 @@ macro_rules! GinGetDownlink {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                 _,
                                                                 _
                                                             >(
@@ -8099,7 +8415,7 @@ macro_rules! GinGetDownlink {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -8154,6 +8470,17 @@ macro_rules! GinGetDownlink {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetNPosting {
@@ -8263,8 +8590,23 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
 /// ```text
 /// #define GinGetNPosting( itup ) GinItemPointerGetOffsetNumber ( & ( itup ) -> t_tid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GinGetNPosting {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetNPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetNPosting!(@__pgrx_emit_value; $itup)
@@ -8277,7 +8619,7 @@ macro_rules! GinGetNPosting {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2483,
+                            $crate::__pgrx_c_generated::Field_ip_posid,
                             _,
                             _
                         >(
@@ -8286,7 +8628,7 @@ macro_rules! GinGetNPosting {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::address(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5399,
+                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                 _,
                                                 _
                                             >(
@@ -8322,7 +8664,7 @@ macro_rules! GinGetNPosting {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2483,
+                    $crate::__pgrx_c_generated::Field_ip_posid,
                     _,
                     _
                 >(
@@ -8331,7 +8673,7 @@ macro_rules! GinGetNPosting {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::address(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5399,
+                                        $crate::__pgrx_c_generated::Field_t_tid,
                                         _,
                                         _
                                     >(
@@ -8360,7 +8702,7 @@ macro_rules! GinGetNPosting {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2483,
+                    $crate::__pgrx_c_generated::Field_ip_posid,
                     _,
                     _
                 >(
@@ -8369,7 +8711,7 @@ macro_rules! GinGetNPosting {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::address(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5399,
+                                        $crate::__pgrx_c_generated::Field_t_tid,
                                         _,
                                         _
                                     >(
@@ -8397,10 +8739,15 @@ macro_rules! GinGetNPosting {
         /* PGRX: GinGetNPosting remains expanded because GinItemPointerGetOffsetNumber expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2483,
+                            $crate::__pgrx_c_generated::Field_ip_posid,
                             _,
                             _
                         >(
@@ -8409,7 +8756,7 @@ macro_rules! GinGetNPosting {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::address(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5399,
+                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                 _,
                                                 _
                                             >(
@@ -8448,7 +8795,7 @@ macro_rules! GinGetNPosting {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2483,
+                        $crate::__pgrx_c_generated::Field_ip_posid,
                         _,
                         _
                     >(
@@ -8457,7 +8804,7 @@ macro_rules! GinGetNPosting {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::address(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5399,
+                                            $crate::__pgrx_c_generated::Field_t_tid,
                                             _,
                                             _
                                         >(
@@ -8500,6 +8847,17 @@ macro_rules! GinGetNPosting {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetNullCategory {
@@ -8663,8 +9021,28 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
 /// ```text
 /// #define GinGetNullCategory( itup , ginstate ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetNullCategory {
+    (@__pgrx_emit_check_safety; $itup:tt, $ginstate:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+                $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetNullCategory!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt, $ginstate:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetNullCategory!(@__pgrx_emit_value; $itup, $ginstate)
@@ -8752,7 +9130,7 @@ macro_rules! GinGetNullCategory {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field5391,
+                                                                                                                $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -9138,7 +9516,7 @@ macro_rules! GinGetNullCategory {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3557,
+                                                                                    $crate::__pgrx_c_generated::Field_oneCol,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -9285,7 +9663,7 @@ macro_rules! GinGetNullCategory {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field5391,
+                                                                                                            $crate::__pgrx_c_generated::Field_t_info,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -9671,7 +10049,7 @@ macro_rules! GinGetNullCategory {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3557,
+                                                                                $crate::__pgrx_c_generated::Field_oneCol,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -9817,7 +10195,7 @@ macro_rules! GinGetNullCategory {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field5391,
+                                                                                                            $crate::__pgrx_c_generated::Field_t_info,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -10203,7 +10581,7 @@ macro_rules! GinGetNullCategory {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3557,
+                                                                                $crate::__pgrx_c_generated::Field_oneCol,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -10272,6 +10650,12 @@ macro_rules! GinGetNullCategory {
         /* PGRX: GinCategoryOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: IndexInfoFindDataOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                        $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::pointee(
@@ -10355,7 +10739,7 @@ macro_rules! GinGetNullCategory {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field5391,
+                                                                                                                        $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -10741,7 +11125,7 @@ macro_rules! GinGetNullCategory {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field3557,
+                                                                                            $crate::__pgrx_c_generated::Field_oneCol,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -10895,7 +11279,7 @@ macro_rules! GinGetNullCategory {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field5391,
+                                                                                                                $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -11281,7 +11665,7 @@ macro_rules! GinGetNullCategory {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3557,
+                                                                                    $crate::__pgrx_c_generated::Field_oneCol,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -11360,6 +11744,17 @@ macro_rules! GinGetNullCategory {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetPosting {
@@ -11469,8 +11864,27 @@ macro_rules! __pgrx_c_args_GinGetPosting {
 /// ```text
 /// #define GinGetPosting( itup ) ( ( Pointer ) ( ( char * ) ( itup ) + GinGetPostingOffset ( itup ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPosting {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetPosting!(@__pgrx_emit_value; $itup)
@@ -11483,7 +11897,10 @@ macro_rules! GinGetPosting {
                 $crate::__pgrx_c_macros::expression::cast_as::<
                     $crate::Pointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -11548,7 +11965,7 @@ macro_rules! GinGetPosting {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -11560,7 +11977,7 @@ macro_rules! GinGetPosting {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -11572,7 +11989,7 @@ macro_rules! GinGetPosting {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -11634,7 +12051,7 @@ macro_rules! GinGetPosting {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field649,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -11646,7 +12063,7 @@ macro_rules! GinGetPosting {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -11658,7 +12075,7 @@ macro_rules! GinGetPosting {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -11746,13 +12163,21 @@ macro_rules! GinGetPosting {
         /* PGRX: BlockIdGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinGetPostingOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
                                 $crate::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -11828,7 +12253,7 @@ macro_rules! GinGetPosting {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field648,
+                                                                                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -11840,7 +12265,7 @@ macro_rules! GinGetPosting {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                                     _,
                                                                                                                                     _
                                                                                                                                 >(
@@ -11852,7 +12277,7 @@ macro_rules! GinGetPosting {
                                                                                                                                             >(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                                         _,
                                                                                                                                                         _
                                                                                                                                                     >(
@@ -11916,7 +12341,7 @@ macro_rules! GinGetPosting {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field649,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -11928,7 +12353,7 @@ macro_rules! GinGetPosting {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -11940,7 +12365,7 @@ macro_rules! GinGetPosting {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -12024,7 +12449,10 @@ macro_rules! GinGetPosting {
                 $crate::__pgrx_c_macros::expression::cast_as::<
                     $crate::Pointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -12089,7 +12517,7 @@ macro_rules! GinGetPosting {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -12101,7 +12529,7 @@ macro_rules! GinGetPosting {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -12113,7 +12541,7 @@ macro_rules! GinGetPosting {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -12175,7 +12603,7 @@ macro_rules! GinGetPosting {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field649,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -12187,7 +12615,7 @@ macro_rules! GinGetPosting {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -12199,7 +12627,7 @@ macro_rules! GinGetPosting {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -12284,6 +12712,17 @@ macro_rules! GinGetPosting {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetPostingOffset {
@@ -12393,8 +12832,27 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
 /// ```text
 /// #define GinGetPostingOffset( itup ) ( GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid ) & ( ~ GIN_ITUP_COMPRESSED ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPostingOffset {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetPostingOffset!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetPostingOffset!(@__pgrx_emit_value; $itup)
@@ -12436,7 +12894,7 @@ macro_rules! GinGetPostingOffset {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field648,
+                                                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                                                             _,
                                                                             _
                                                                         >(
@@ -12448,7 +12906,7 @@ macro_rules! GinGetPostingOffset {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -12460,7 +12918,7 @@ macro_rules! GinGetPostingOffset {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -12522,7 +12980,7 @@ macro_rules! GinGetPostingOffset {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field649,
+                                                                $crate::__pgrx_c_generated::Field_bi_lo,
                                                                 _,
                                                                 _
                                                             >(
@@ -12534,7 +12992,7 @@ macro_rules! GinGetPostingOffset {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -12546,7 +13004,7 @@ macro_rules! GinGetPostingOffset {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -12620,6 +13078,11 @@ macro_rules! GinGetPostingOffset {
         /* PGRX: BlockIdGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -12658,7 +13121,7 @@ macro_rules! GinGetPostingOffset {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -12670,7 +13133,7 @@ macro_rules! GinGetPostingOffset {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -12682,7 +13145,7 @@ macro_rules! GinGetPostingOffset {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -12744,7 +13207,7 @@ macro_rules! GinGetPostingOffset {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -12756,7 +13219,7 @@ macro_rules! GinGetPostingOffset {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -12768,7 +13231,7 @@ macro_rules! GinGetPostingOffset {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -12870,7 +13333,7 @@ macro_rules! GinGetPostingOffset {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field648,
+                                                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                                                             _,
                                                                             _
                                                                         >(
@@ -12882,7 +13345,7 @@ macro_rules! GinGetPostingOffset {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -12894,7 +13357,7 @@ macro_rules! GinGetPostingOffset {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -12956,7 +13419,7 @@ macro_rules! GinGetPostingOffset {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field649,
+                                                                $crate::__pgrx_c_generated::Field_bi_lo,
                                                                 _,
                                                                 _
                                                             >(
@@ -12968,7 +13431,7 @@ macro_rules! GinGetPostingOffset {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -12980,7 +13443,7 @@ macro_rules! GinGetPostingOffset {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -13051,6 +13514,17 @@ macro_rules! GinGetPostingOffset {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinGetPostingTree {
@@ -13160,8 +13634,27 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
 /// ```text
 /// #define GinGetPostingTree( itup ) GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPostingTree {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinGetPostingTree!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinGetPostingTree!(@__pgrx_emit_value; $itup)
@@ -13197,7 +13690,7 @@ macro_rules! GinGetPostingTree {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field648,
+                                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                                 _,
                                                                 _
                                                             >(
@@ -13209,7 +13702,7 @@ macro_rules! GinGetPostingTree {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -13221,7 +13714,7 @@ macro_rules! GinGetPostingTree {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -13280,7 +13773,7 @@ macro_rules! GinGetPostingTree {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field649,
+                                                    $crate::__pgrx_c_generated::Field_bi_lo,
                                                     _,
                                                     _
                                                 >(
@@ -13292,7 +13785,7 @@ macro_rules! GinGetPostingTree {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                         _,
                                                                         _
                                                                     >(
@@ -13304,7 +13797,7 @@ macro_rules! GinGetPostingTree {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -13364,6 +13857,11 @@ macro_rules! GinGetPostingTree {
         /* PGRX: GinGetPostingTree remains expanded because GinItemPointerGetBlockNumber expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13391,7 +13889,7 @@ macro_rules! GinGetPostingTree {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -13403,7 +13901,7 @@ macro_rules! GinGetPostingTree {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -13415,7 +13913,7 @@ macro_rules! GinGetPostingTree {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -13474,7 +13972,7 @@ macro_rules! GinGetPostingTree {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -13486,7 +13984,7 @@ macro_rules! GinGetPostingTree {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -13498,7 +13996,7 @@ macro_rules! GinGetPostingTree {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -13570,7 +14068,7 @@ macro_rules! GinGetPostingTree {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -13582,7 +14080,7 @@ macro_rules! GinGetPostingTree {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -13594,7 +14092,7 @@ macro_rules! GinGetPostingTree {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -13647,7 +14145,7 @@ macro_rules! GinGetPostingTree {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -13659,7 +14157,7 @@ macro_rules! GinGetPostingTree {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                 _,
                                                                 _
                                                             >(
@@ -13671,7 +14169,7 @@ macro_rules! GinGetPostingTree {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -13726,6 +14224,17 @@ macro_rules! GinGetPostingTree {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinIsPostingTree {
@@ -13835,8 +14344,23 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
 /// ```text
 /// #define GinIsPostingTree( itup ) ( GinGetNPosting ( itup ) == GIN_TREE_POSTING )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GinIsPostingTree {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinIsPostingTree!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinIsPostingTree!(@__pgrx_emit_value; $itup)
@@ -13852,7 +14376,7 @@ macro_rules! GinIsPostingTree {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2483,
+                                        $crate::__pgrx_c_generated::Field_ip_posid,
                                         _,
                                         _
                                     >(
@@ -13864,7 +14388,7 @@ macro_rules! GinIsPostingTree {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::address(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5399,
+                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                             _,
                                                             _
                                                         >(
@@ -13920,6 +14444,11 @@ macro_rules! GinIsPostingTree {
         /* PGRX: GinGetNPosting remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetOffsetNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetOffsetNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13932,7 +14461,7 @@ macro_rules! GinIsPostingTree {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2483,
+                                                    $crate::__pgrx_c_generated::Field_ip_posid,
                                                     _,
                                                     _
                                                 >(
@@ -13944,7 +14473,7 @@ macro_rules! GinIsPostingTree {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5399,
+                                                                        $crate::__pgrx_c_generated::Field_t_tid,
                                                                         _,
                                                                         _
                                                                     >(
@@ -14001,7 +14530,7 @@ macro_rules! GinIsPostingTree {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2483,
+                                        $crate::__pgrx_c_generated::Field_ip_posid,
                                         _,
                                         _
                                     >(
@@ -14013,7 +14542,7 @@ macro_rules! GinIsPostingTree {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::address(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5399,
+                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                             _,
                                                             _
                                                         >(
@@ -14066,6 +14595,17 @@ macro_rules! GinIsPostingTree {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
@@ -14193,8 +14733,30 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
 /// ```text
 /// #define GinItemPointerGetBlockNumber( pointer ) ( ItemPointerGetBlockNumberNoCheck ( pointer ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinItemPointerGetBlockNumber {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinItemPointerGetBlockNumber!(@__pgrx_emit_value; $pointer)
@@ -14230,7 +14792,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field648,
+                                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                                 _,
                                                                 _
                                                             >(
@@ -14242,7 +14804,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field2480,
+                                                                                    $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -14296,7 +14858,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field649,
+                                                    $crate::__pgrx_c_generated::Field_bi_lo,
                                                     _,
                                                     _
                                                 >(
@@ -14308,7 +14870,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                         _,
                                                                         _
                                                                     >(
@@ -14366,6 +14928,11 @@ macro_rules! GinItemPointerGetBlockNumber {
         /* PGRX: GinItemPointerGetBlockNumber remains expanded because ItemPointerGetBlockNumberNoCheck expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14393,7 +14960,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -14405,7 +14972,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -14459,7 +15026,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -14471,7 +15038,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14538,7 +15105,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -14550,7 +15117,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                             _,
                                                                             _
                                                                         >(
@@ -14598,7 +15165,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -14610,7 +15177,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                 _,
                                                                 _
                                                             >(
@@ -14664,6 +15231,17 @@ macro_rules! GinItemPointerGetBlockNumber {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
@@ -14791,8 +15369,26 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
 /// ```text
 /// #define GinItemPointerGetOffsetNumber( pointer ) ( ItemPointerGetOffsetNumberNoCheck ( pointer ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! GinItemPointerGetOffsetNumber {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinItemPointerGetOffsetNumber!(@__pgrx_emit_value; $pointer)
@@ -14805,7 +15401,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::load(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2483,
+                            $crate::__pgrx_c_generated::Field_ip_posid,
                             _,
                             _
                         >(
@@ -14833,7 +15429,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2483,
+                    $crate::__pgrx_c_generated::Field_ip_posid,
                     _,
                     _
                 >(
@@ -14859,7 +15455,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
         (
             (
                 $crate::__pgrx_c_macros::expression::project::<
-                    $crate::__pgrx_c_generated::Field2483,
+                    $crate::__pgrx_c_generated::Field_ip_posid,
                     _,
                     _
                 >(
@@ -14884,10 +15480,15 @@ macro_rules! GinItemPointerGetOffsetNumber {
         /* PGRX: GinItemPointerGetOffsetNumber remains expanded because ItemPointerGetOffsetNumberNoCheck expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2483,
+                            $crate::__pgrx_c_generated::Field_ip_posid,
                             _,
                             _
                         >(
@@ -14915,7 +15516,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2483,
+                        $crate::__pgrx_c_generated::Field_ip_posid,
                         _,
                         _
                     >(
@@ -14953,6 +15554,17 @@ macro_rules! GinItemPointerGetOffsetNumber {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinItupIsCompressed {
@@ -15062,8 +15674,27 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
 /// ```text
 /// #define GinItupIsCompressed( itup ) ( ( GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid ) & GIN_ITUP_COMPRESSED ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinItupIsCompressed {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinItupIsCompressed!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinItupIsCompressed!(@__pgrx_emit_value; $itup)
@@ -15111,7 +15742,7 @@ macro_rules! GinItupIsCompressed {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -15123,7 +15754,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -15135,7 +15766,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -15197,7 +15828,7 @@ macro_rules! GinItupIsCompressed {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -15209,7 +15840,7 @@ macro_rules! GinItupIsCompressed {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -15221,7 +15852,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -15299,6 +15930,11 @@ macro_rules! GinItupIsCompressed {
         /* PGRX: BlockIdGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15340,7 +15976,7 @@ macro_rules! GinItupIsCompressed {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -15352,7 +15988,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -15364,7 +16000,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                            $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                            $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                             _,
                                                                                                                                             _
                                                                                                                                         >(
@@ -15426,7 +16062,7 @@ macro_rules! GinItupIsCompressed {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field649,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -15438,7 +16074,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -15450,7 +16086,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -15562,7 +16198,7 @@ macro_rules! GinItupIsCompressed {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -15574,7 +16210,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -15586,7 +16222,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5399,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -15648,7 +16284,7 @@ macro_rules! GinItupIsCompressed {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -15660,7 +16296,7 @@ macro_rules! GinItupIsCompressed {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -15672,7 +16308,7 @@ macro_rules! GinItupIsCompressed {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::address(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5399,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -15747,6 +16383,17 @@ macro_rules! GinItupIsCompressed {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinNextPostingListSegment {
@@ -15871,8 +16518,30 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
 /// ```text
 /// #define GinNextPostingListSegment( cur ) ( ( GinPostingList * ) ( ( ( char * ) ( cur ) ) + SizeOfGinPostingList ( ( cur ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinNextPostingListSegment {
+    (@__pgrx_emit_check_safety; $cur:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cur);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinNextPostingListSegment!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $cur:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinNextPostingListSegment!(@__pgrx_emit_value; $cur)
@@ -15966,7 +16635,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3207,
+                                                                                                $crate::__pgrx_c_generated::Field_nbytes,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -16120,6 +16789,11 @@ macro_rules! GinNextPostingListSegment {
         /* PGRX: SHORTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: SizeOfGinPostingList remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cur);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -16223,7 +16897,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field3207,
+                                                                                                            $crate::__pgrx_c_generated::Field_nbytes,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -16453,7 +17127,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field3207,
+                                                                                                $crate::__pgrx_c_generated::Field_nbytes,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -16601,6 +17275,17 @@ macro_rules! GinNextPostingListSegment {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
@@ -16710,8 +17395,27 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
 /// ```text
 /// #define GinPageGetDeleteXid( page ) ( ( ( PageHeader ) ( page ) ) -> pd_prune_xid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinPageGetDeleteXid {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinPageGetDeleteXid!(@__pgrx_emit_value; $page)
@@ -16722,7 +17426,7 @@ macro_rules! GinPageGetDeleteXid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3887,
+                        $crate::__pgrx_c_generated::Field_pd_prune_xid,
                         _,
                         _
                     >(
@@ -16760,7 +17464,7 @@ macro_rules! GinPageGetDeleteXid {
     (@__pgrx_emit_place; $page:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3887,
+                $crate::__pgrx_c_generated::Field_pd_prune_xid,
                 _,
                 _
             >(
@@ -16795,7 +17499,7 @@ macro_rules! GinPageGetDeleteXid {
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3887,
+                $crate::__pgrx_c_generated::Field_pd_prune_xid,
                 _,
                 _
             >(
@@ -16830,10 +17534,15 @@ macro_rules! GinPageGetDeleteXid {
     (@__pgrx_emit_size; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3887,
+                            $crate::__pgrx_c_generated::Field_pd_prune_xid,
                             _,
                             _
                         >(
@@ -16876,7 +17585,7 @@ macro_rules! GinPageGetDeleteXid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3887,
+                        $crate::__pgrx_c_generated::Field_pd_prune_xid,
                         _,
                         _
                     >(
@@ -16924,6 +17633,17 @@ macro_rules! GinPageGetDeleteXid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinPageGetMeta {
@@ -17033,8 +17753,27 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
 /// ```text
 /// #define GinPageGetMeta( p ) ( ( GinMetaPageData * ) PageGetContents ( p ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinPageGetMeta {
+    (@__pgrx_emit_check_safety; $p:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $p);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinPageGetMeta!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $p:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinPageGetMeta!(@__pgrx_emit_value; $p)
@@ -17237,6 +17976,11 @@ macro_rules! GinPageGetMeta {
         /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetContents remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $p);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17631,6 +18375,17 @@ macro_rules! GinPageGetMeta {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
@@ -17791,8 +18546,28 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
 /// ```text
 /// #define GinPageSetDeleteXid( page , xid ) ( ( ( PageHeader ) ( page ) ) -> pd_prune_xid = xid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinPageSetDeleteXid {
+    (@__pgrx_emit_check_safety; $page:tt, $xid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $xid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinPageSetDeleteXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $page:tt, $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinPageSetDeleteXid!(@__pgrx_emit_value; $page, $xid)
@@ -17803,7 +18578,7 @@ macro_rules! GinPageSetDeleteXid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3887,
+                        $crate::__pgrx_c_generated::Field_pd_prune_xid,
                         _,
                         _
                     >(
@@ -17856,12 +18631,18 @@ macro_rules! GinPageSetDeleteXid {
     (@__pgrx_emit_size; $page:tt, $xid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                        $crate::__pgrx_c_operand!(@check_safety; $xid);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field3887,
+                                    $crate::__pgrx_c_generated::Field_pd_prune_xid,
                                     _,
                                     _
                                 >(
@@ -17917,7 +18698,7 @@ macro_rules! GinPageSetDeleteXid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3887,
+                        $crate::__pgrx_c_generated::Field_pd_prune_xid,
                         _,
                         _
                     >(
@@ -17968,6 +18749,17 @@ macro_rules! GinPageSetDeleteXid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GinSetNullCategory {
@@ -18185,8 +18977,29 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
 /// ```text
 /// #define GinSetNullCategory( itup , ginstate , c ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) = ( c ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinSetNullCategory {
+    (@__pgrx_emit_check_safety; $itup:tt, $ginstate:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+                $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinSetNullCategory!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $itup:tt, $ginstate:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GinSetNullCategory!(@__pgrx_emit_value; $itup, $ginstate, $c)
@@ -18278,7 +19091,7 @@ macro_rules! GinSetNullCategory {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5391,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -18664,7 +19477,7 @@ macro_rules! GinSetNullCategory {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field3557,
+                                                                                        $crate::__pgrx_c_generated::Field_oneCol,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -18752,6 +19565,13 @@ macro_rules! GinSetNullCategory {
         /* PGRX: GinCategoryOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: IndexInfoFindDataOffset remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                        $crate::__pgrx_c_operand!(@check_safety; $ginstate);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18840,7 +19660,7 @@ macro_rules! GinSetNullCategory {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                                $crate::__pgrx_c_generated::Field5391,
+                                                                                                                                $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                                 _,
                                                                                                                                 _
                                                                                                                             >(
@@ -19226,7 +20046,7 @@ macro_rules! GinSetNullCategory {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field3557,
+                                                                                                    $crate::__pgrx_c_generated::Field_oneCol,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -19391,7 +20211,7 @@ macro_rules! GinSetNullCategory {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                    $crate::__pgrx_c_generated::Field5391,
+                                                                                                                    $crate::__pgrx_c_generated::Field_t_info,
                                                                                                                     _,
                                                                                                                     _
                                                                                                                 >(
@@ -19777,7 +20597,7 @@ macro_rules! GinSetNullCategory {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field3557,
+                                                                                        $crate::__pgrx_c_generated::Field_oneCol,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -19862,6 +20682,17 @@ macro_rules! GinSetNullCategory {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
@@ -19980,8 +20811,30 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
 /// ```text
 /// #define ItemPointerIsLossyPage( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0xffff && GinItemPointerGetBlockNumber ( p ) != InvalidBlockNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIsLossyPage {
+    (@__pgrx_emit_check_safety; $p:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $p);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $p:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ItemPointerIsLossyPage!(@__pgrx_emit_value; $p)
@@ -20003,7 +20856,7 @@ macro_rules! ItemPointerIsLossyPage {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2483,
+                                                    $crate::__pgrx_c_generated::Field_ip_posid,
                                                     _,
                                                     _
                                                 >(
@@ -20080,7 +20933,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -20092,7 +20945,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -20149,7 +21002,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -20161,7 +21014,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -20232,6 +21085,11 @@ macro_rules! ItemPointerIsLossyPage {
         /* PGRX: BlockIdGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetOffsetNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetOffsetNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $p);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -20247,7 +21105,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2483,
+                                                                $crate::__pgrx_c_generated::Field_ip_posid,
                                                                 _,
                                                                 _
                                                             >(
@@ -20327,7 +21185,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -20339,7 +21197,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -20396,7 +21254,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field649,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -20408,7 +21266,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -20487,7 +21345,7 @@ macro_rules! ItemPointerIsLossyPage {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2483,
+                                                    $crate::__pgrx_c_generated::Field_ip_posid,
                                                     _,
                                                     _
                                                 >(
@@ -20564,7 +21422,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -20576,7 +21434,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -20633,7 +21491,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -20645,7 +21503,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -20713,6 +21571,17 @@ macro_rules! ItemPointerIsLossyPage {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ItemPointerIsMin {
@@ -20822,8 +21691,27 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
 /// ```text
 /// #define ItemPointerIsMin( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0 && GinItemPointerGetBlockNumber ( p ) == ( BlockNumber ) 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIsMin {
+    (@__pgrx_emit_check_safety; $p:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $p);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ItemPointerIsMin!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $p:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ItemPointerIsMin!(@__pgrx_emit_value; $p)
@@ -20845,7 +21733,7 @@ macro_rules! ItemPointerIsMin {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2483,
+                                                    $crate::__pgrx_c_generated::Field_ip_posid,
                                                     _,
                                                     _
                                                 >(
@@ -20926,7 +21814,7 @@ macro_rules! ItemPointerIsMin {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -20938,7 +21826,7 @@ macro_rules! ItemPointerIsMin {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -20995,7 +21883,7 @@ macro_rules! ItemPointerIsMin {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -21007,7 +21895,7 @@ macro_rules! ItemPointerIsMin {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -21092,6 +21980,11 @@ macro_rules! ItemPointerIsMin {
         /* PGRX: BlockIdGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetBlockNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: GinItemPointerGetOffsetNumber remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetBlockNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: ItemPointerGetOffsetNumberNoCheck remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $p);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -21107,7 +22000,7 @@ macro_rules! ItemPointerIsMin {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field2483,
+                                                                $crate::__pgrx_c_generated::Field_ip_posid,
                                                                 _,
                                                                 _
                                                             >(
@@ -21191,7 +22084,7 @@ macro_rules! ItemPointerIsMin {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -21203,7 +22096,7 @@ macro_rules! ItemPointerIsMin {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                        $crate::__pgrx_c_generated::Field2480,
+                                                                                                                        $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                                         _,
                                                                                                                         _
                                                                                                                     >(
@@ -21260,7 +22153,7 @@ macro_rules! ItemPointerIsMin {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field649,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -21272,7 +22165,7 @@ macro_rules! ItemPointerIsMin {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -21365,7 +22258,7 @@ macro_rules! ItemPointerIsMin {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field2483,
+                                                    $crate::__pgrx_c_generated::Field_ip_posid,
                                                     _,
                                                     _
                                                 >(
@@ -21446,7 +22339,7 @@ macro_rules! ItemPointerIsMin {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field648,
+                                                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -21458,7 +22351,7 @@ macro_rules! ItemPointerIsMin {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                                            $crate::__pgrx_c_generated::Field2480,
+                                                                                                            $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                             _,
                                                                                                             _
                                                                                                         >(
@@ -21515,7 +22408,7 @@ macro_rules! ItemPointerIsMin {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field649,
+                                                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                                                             _,
                                                                             _
                                                                         >(
@@ -21527,7 +22420,7 @@ macro_rules! ItemPointerIsMin {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::address(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field2480,
+                                                                                                $crate::__pgrx_c_generated::Field_ip_blkid,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -21609,6 +22502,17 @@ macro_rules! ItemPointerIsMin {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
@@ -21733,8 +22637,30 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
 /// ```text
 /// #define PostingItemGetBlockNumber( pointer ) BlockIdGetBlockNumber ( & ( pointer ) -> child_blkno )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PostingItemGetBlockNumber {
+    (@__pgrx_emit_check_safety; $pointer:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PostingItemGetBlockNumber!(@__pgrx_emit_value; $pointer)
@@ -21765,7 +22691,7 @@ macro_rules! PostingItemGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -21777,7 +22703,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field884,
+                                                                            $crate::__pgrx_c_generated::Field_child_blkno,
                                                                             _,
                                                                             _
                                                                         >(
@@ -21825,7 +22751,7 @@ macro_rules! PostingItemGetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -21837,7 +22763,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field884,
+                                                                $crate::__pgrx_c_generated::Field_child_blkno,
                                                                 _,
                                                                 _
                                                             >(
@@ -21891,6 +22817,11 @@ macro_rules! PostingItemGetBlockNumber {
         /* PGRX: PostingItemGetBlockNumber remains expanded because BlockIdGetBlockNumber expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -21918,7 +22849,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -21930,7 +22861,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::address(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field884,
+                                                                                        $crate::__pgrx_c_generated::Field_child_blkno,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -21984,7 +22915,7 @@ macro_rules! PostingItemGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -21996,7 +22927,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field884,
+                                                                            $crate::__pgrx_c_generated::Field_child_blkno,
                                                                             _,
                                                                             _
                                                                         >(
@@ -22063,7 +22994,7 @@ macro_rules! PostingItemGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -22075,7 +23006,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::address(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field884,
+                                                                            $crate::__pgrx_c_generated::Field_child_blkno,
                                                                             _,
                                                                             _
                                                                         >(
@@ -22123,7 +23054,7 @@ macro_rules! PostingItemGetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -22135,7 +23066,7 @@ macro_rules! PostingItemGetBlockNumber {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field884,
+                                                                $crate::__pgrx_c_generated::Field_child_blkno,
                                                                 _,
                                                                 _
                                                             >(
@@ -22183,6 +23114,17 @@ macro_rules! PostingItemGetBlockNumber {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
@@ -22361,8 +23303,31 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
 /// ```text
 /// #define PostingItemSetBlockNumber( pointer , blockNumber ) BlockIdSet ( & ( ( pointer ) -> child_blkno ) , ( blockNumber ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PostingItemSetBlockNumber {
+    (@__pgrx_emit_check_safety; $pointer:tt, $blockNumber:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $pointer:tt, $blockNumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PostingItemSetBlockNumber!(@__pgrx_emit_value; $pointer, $blockNumber)
@@ -22377,7 +23342,7 @@ macro_rules! PostingItemSetBlockNumber {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -22390,7 +23355,7 @@ macro_rules! PostingItemSetBlockNumber {
                                                 $crate::__pgrx_c_macros::expression::address(
                                                     (
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field884,
+                                                            $crate::__pgrx_c_generated::Field_child_blkno,
                                                             _,
                                                             _
                                                         >(
@@ -22445,7 +23410,7 @@ macro_rules! PostingItemSetBlockNumber {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -22458,7 +23423,7 @@ macro_rules! PostingItemSetBlockNumber {
                                             $crate::__pgrx_c_macros::expression::address(
                                                 (
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field884,
+                                                        $crate::__pgrx_c_generated::Field_child_blkno,
                                                         _,
                                                         _
                                                     >(
@@ -22532,6 +23497,12 @@ macro_rules! PostingItemSetBlockNumber {
         /* PGRX: PostingItemSetBlockNumber remains expanded because BlockIdSet expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pointer);
+                        $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -22543,7 +23514,7 @@ macro_rules! PostingItemSetBlockNumber {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field648,
+                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                 _,
                                                 _
                                             >(
@@ -22556,7 +23527,7 @@ macro_rules! PostingItemSetBlockNumber {
                                                             $crate::__pgrx_c_macros::expression::address(
                                                                 (
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field884,
+                                                                        $crate::__pgrx_c_generated::Field_child_blkno,
                                                                         _,
                                                                         _
                                                                     >(
@@ -22616,7 +23587,7 @@ macro_rules! PostingItemSetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -22629,7 +23600,7 @@ macro_rules! PostingItemSetBlockNumber {
                                                         $crate::__pgrx_c_macros::expression::address(
                                                             (
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field884,
+                                                                    $crate::__pgrx_c_generated::Field_child_blkno,
                                                                     _,
                                                                     _
                                                                 >(
@@ -22704,7 +23675,7 @@ macro_rules! PostingItemSetBlockNumber {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -22717,7 +23688,7 @@ macro_rules! PostingItemSetBlockNumber {
                                                 $crate::__pgrx_c_macros::expression::address(
                                                     (
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field884,
+                                                            $crate::__pgrx_c_generated::Field_child_blkno,
                                                             _,
                                                             _
                                                         >(
@@ -22772,7 +23743,7 @@ macro_rules! PostingItemSetBlockNumber {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -22785,7 +23756,7 @@ macro_rules! PostingItemSetBlockNumber {
                                             $crate::__pgrx_c_macros::expression::address(
                                                 (
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field884,
+                                                        $crate::__pgrx_c_generated::Field_child_blkno,
                                                         _,
                                                         _
                                                     >(
@@ -22853,6 +23824,17 @@ macro_rules! PostingItemSetBlockNumber {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SizeOfGinPostingList {
@@ -22967,8 +23949,27 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
 /// ```text
 /// #define SizeOfGinPostingList( plist ) ( offsetof ( GinPostingList , bytes ) + SHORTALIGN ( ( plist ) -> nbytes ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SizeOfGinPostingList {
+    (@__pgrx_emit_check_safety; $plist:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $plist);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SizeOfGinPostingList!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $plist:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SizeOfGinPostingList!(@__pgrx_emit_value; $plist)
@@ -23012,7 +24013,7 @@ macro_rules! SizeOfGinPostingList {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3207,
+                                                                        $crate::__pgrx_c_generated::Field_nbytes,
                                                                         _,
                                                                         _
                                                                     >(
@@ -23148,6 +24149,11 @@ macro_rules! SizeOfGinPostingList {
         /* PGRX: SHORTALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $plist);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -23194,7 +24200,7 @@ macro_rules! SizeOfGinPostingList {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3207,
+                                                                                    $crate::__pgrx_c_generated::Field_nbytes,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -23362,7 +24368,7 @@ macro_rules! SizeOfGinPostingList {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3207,
+                                                                        $crate::__pgrx_c_generated::Field_nbytes,
                                                                         _,
                                                                         _
                                                                     >(

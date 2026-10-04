@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BMR_GET_SMGR {
@@ -110,8 +121,27 @@ macro_rules! __pgrx_c_args_BMR_GET_SMGR {
 /// ```text
 /// #define BMR_GET_SMGR( bmr ) ( RelationIsValid ( ( bmr ) . rel ) ? RelationGetSmgr ( ( bmr ) . rel ) : ( bmr ) . smgr )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BMR_GET_SMGR {
+    (@__pgrx_emit_check_safety; $bmr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $bmr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BMR_GET_SMGR!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $bmr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BMR_GET_SMGR!(@__pgrx_emit_value; $bmr)
@@ -133,7 +163,7 @@ macro_rules! BMR_GET_SMGR {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4872,
+                                                    $crate::__pgrx_c_generated::Field_rel,
                                                     _,
                                                     _
                                                 >(($crate::__pgrx_c_operand!(@read_place; $bmr)))
@@ -181,7 +211,7 @@ macro_rules! BMR_GET_SMGR {
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_0505bdb61ebaeca9477373ab41228334(
+                                    $crate::RelationGetSmgr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -205,7 +235,7 @@ macro_rules! BMR_GET_SMGR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4872,
+                                                            $crate::__pgrx_c_generated::Field_rel,
                                                             _,
                                                             _
                                                         >(
@@ -229,7 +259,7 @@ macro_rules! BMR_GET_SMGR {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5627,
+                                        $crate::__pgrx_c_generated::Field_smgr,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $bmr)))
@@ -260,6 +290,11 @@ macro_rules! BMR_GET_SMGR {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: RelationIsValid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $bmr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -278,7 +313,7 @@ macro_rules! BMR_GET_SMGR {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field4872,
+                                                                $crate::__pgrx_c_generated::Field_rel,
                                                                 _,
                                                                 _
                                                             >(
@@ -336,7 +371,7 @@ macro_rules! BMR_GET_SMGR {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_0505bdb61ebaeca9477373ab41228334(
+                                                $crate::RelationGetSmgr(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -360,7 +395,7 @@ macro_rules! BMR_GET_SMGR {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field4872,
+                                                                        $crate::__pgrx_c_generated::Field_rel,
                                                                         _,
                                                                         _
                                                                     >(
@@ -387,7 +422,7 @@ macro_rules! BMR_GET_SMGR {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field5627,
+                                                    $crate::__pgrx_c_generated::Field_smgr,
                                                     _,
                                                     _
                                                 >(($crate::__pgrx_c_operand!(@read_place; $bmr)))
@@ -423,7 +458,7 @@ macro_rules! BMR_GET_SMGR {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field4872,
+                                                    $crate::__pgrx_c_generated::Field_rel,
                                                     _,
                                                     _
                                                 >(($crate::__pgrx_c_operand!(@read_place; $bmr)))
@@ -471,7 +506,7 @@ macro_rules! BMR_GET_SMGR {
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_0505bdb61ebaeca9477373ab41228334(
+                                    $crate::RelationGetSmgr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -495,7 +530,7 @@ macro_rules! BMR_GET_SMGR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4872,
+                                                            $crate::__pgrx_c_generated::Field_rel,
                                                             _,
                                                             _
                                                         >(
@@ -519,7 +554,7 @@ macro_rules! BMR_GET_SMGR {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5627,
+                                        $crate::__pgrx_c_generated::Field_smgr,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $bmr)))
@@ -547,6 +582,17 @@ macro_rules! BMR_GET_SMGR {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetNumberOfBlocks {
@@ -671,8 +717,30 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfBlocks {
 /// ```text
 /// #define RelationGetNumberOfBlocks( reln ) RelationGetNumberOfBlocksInFork ( reln , MAIN_FORKNUM )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetNumberOfBlocks {
+    (@__pgrx_emit_check_safety; $reln:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $reln);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetNumberOfBlocks!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $reln:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetNumberOfBlocks!(@__pgrx_emit_value; $reln)
@@ -682,7 +750,7 @@ macro_rules! RelationGetNumberOfBlocks {
         /* PGRX: RelationGetNumberOfBlocks remains expanded because RelationGetNumberOfBlocksInFork is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_d1c91f5e9bb5f036f257b57e4c35fe99(
+                $crate::__pgrx_c_generated::Inline_d440db73dabf2b2f8cb7ddfcb75e87ee(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::RelationData>,
@@ -751,13 +819,18 @@ macro_rules! RelationGetNumberOfBlocks {
         /* PGRX: RelationGetNumberOfBlocks remains expanded because RelationGetNumberOfBlocksInFork is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $reln);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_d1c91f5e9bb5f036f257b57e4c35fe99(
+                                $crate::__pgrx_c_generated::Inline_d440db73dabf2b2f8cb7ddfcb75e87ee(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -828,7 +901,7 @@ macro_rules! RelationGetNumberOfBlocks {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_d1c91f5e9bb5f036f257b57e4c35fe99(
+                    $crate::__pgrx_c_generated::Inline_d440db73dabf2b2f8cb7ddfcb75e87ee(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<$crate::RelationData>,

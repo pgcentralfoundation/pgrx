@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INTERVAL_IS_NOBEGIN {
@@ -121,8 +132,23 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOBEGIN {
 /// ```text
 /// #define INTERVAL_IS_NOBEGIN( i ) ( ( i ) -> month == PG_INT32_MIN && ( i ) -> day == PG_INT32_MIN && ( i ) -> time == PG_INT64_MIN )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INTERVAL_IS_NOBEGIN {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::INTERVAL_IS_NOBEGIN!(@__pgrx_emit_value; $i)
@@ -145,7 +171,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3197,
+                                                        $crate::__pgrx_c_generated::Field_month,
                                                         _,
                                                         _
                                                     >(
@@ -184,7 +210,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1304,
+                                                        $crate::__pgrx_c_generated::Field_day,
                                                         _,
                                                         _
                                                     >(
@@ -227,7 +253,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5741,
+                                            $crate::__pgrx_c_generated::Field_time,
                                             _,
                                             _
                                         >(
@@ -278,6 +304,11 @@ macro_rules! INTERVAL_IS_NOBEGIN {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -299,7 +330,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field3197,
+                                                                    $crate::__pgrx_c_generated::Field_month,
                                                                     _,
                                                                     _
                                                                 >(
@@ -341,7 +372,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1304,
+                                                                    $crate::__pgrx_c_generated::Field_day,
                                                                     _,
                                                                     _
                                                                 >(
@@ -387,7 +418,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5741,
+                                                        $crate::__pgrx_c_generated::Field_time,
                                                         _,
                                                         _
                                                     >(
@@ -452,7 +483,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3197,
+                                                        $crate::__pgrx_c_generated::Field_month,
                                                         _,
                                                         _
                                                     >(
@@ -491,7 +522,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1304,
+                                                        $crate::__pgrx_c_generated::Field_day,
                                                         _,
                                                         _
                                                     >(
@@ -534,7 +565,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5741,
+                                            $crate::__pgrx_c_generated::Field_time,
                                             _,
                                             _
                                         >(
@@ -582,6 +613,17 @@ macro_rules! INTERVAL_IS_NOBEGIN {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INTERVAL_IS_NOEND {
@@ -691,8 +733,23 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOEND {
 /// ```text
 /// #define INTERVAL_IS_NOEND( i ) ( ( i ) -> month == PG_INT32_MAX && ( i ) -> day == PG_INT32_MAX && ( i ) -> time == PG_INT64_MAX )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INTERVAL_IS_NOEND {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::INTERVAL_IS_NOEND!(@__pgrx_emit_value; $i)
@@ -715,7 +772,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3197,
+                                                        $crate::__pgrx_c_generated::Field_month,
                                                         _,
                                                         _
                                                     >(
@@ -754,7 +811,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1304,
+                                                        $crate::__pgrx_c_generated::Field_day,
                                                         _,
                                                         _
                                                     >(
@@ -797,7 +854,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5741,
+                                            $crate::__pgrx_c_generated::Field_time,
                                             _,
                                             _
                                         >(
@@ -848,6 +905,11 @@ macro_rules! INTERVAL_IS_NOEND {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -869,7 +931,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field3197,
+                                                                    $crate::__pgrx_c_generated::Field_month,
                                                                     _,
                                                                     _
                                                                 >(
@@ -911,7 +973,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1304,
+                                                                    $crate::__pgrx_c_generated::Field_day,
                                                                     _,
                                                                     _
                                                                 >(
@@ -957,7 +1019,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5741,
+                                                        $crate::__pgrx_c_generated::Field_time,
                                                         _,
                                                         _
                                                     >(
@@ -1022,7 +1084,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field3197,
+                                                        $crate::__pgrx_c_generated::Field_month,
                                                         _,
                                                         _
                                                     >(
@@ -1061,7 +1123,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1304,
+                                                        $crate::__pgrx_c_generated::Field_day,
                                                         _,
                                                         _
                                                     >(
@@ -1104,7 +1166,7 @@ macro_rules! INTERVAL_IS_NOEND {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5741,
+                                            $crate::__pgrx_c_generated::Field_time,
                                             _,
                                             _
                                         >(
@@ -1152,6 +1214,17 @@ macro_rules! INTERVAL_IS_NOEND {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INTERVAL_NOBEGIN {
@@ -1264,8 +1337,22 @@ macro_rules! __pgrx_c_args_INTERVAL_NOBEGIN {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INTERVAL_NOBEGIN {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INTERVAL_NOBEGIN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         {
             /* PGRX: INT64CONST remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -1273,7 +1360,7 @@ macro_rules! INTERVAL_NOBEGIN {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5741,
+                            $crate::__pgrx_c_generated::Field_time,
                             _,
                             _
                         >(
@@ -1298,7 +1385,7 @@ macro_rules! INTERVAL_NOBEGIN {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1304,
+                            $crate::__pgrx_c_generated::Field_day,
                             _,
                             _
                         >(
@@ -1322,7 +1409,7 @@ macro_rules! INTERVAL_NOBEGIN {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3197,
+                            $crate::__pgrx_c_generated::Field_month,
                             _,
                             _
                         >(
@@ -1366,6 +1453,17 @@ macro_rules! INTERVAL_NOBEGIN {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INTERVAL_NOEND {
@@ -1478,8 +1576,22 @@ macro_rules! __pgrx_c_args_INTERVAL_NOEND {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INTERVAL_NOEND {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INTERVAL_NOEND!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         {
             /* PGRX: INT64CONST remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -1487,7 +1599,7 @@ macro_rules! INTERVAL_NOEND {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5741,
+                            $crate::__pgrx_c_generated::Field_time,
                             _,
                             _
                         >(
@@ -1512,7 +1624,7 @@ macro_rules! INTERVAL_NOEND {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1304,
+                            $crate::__pgrx_c_generated::Field_day,
                             _,
                             _
                         >(
@@ -1536,7 +1648,7 @@ macro_rules! INTERVAL_NOEND {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3197,
+                            $crate::__pgrx_c_generated::Field_month,
                             _,
                             _
                         >(
@@ -1580,6 +1692,17 @@ macro_rules! INTERVAL_NOEND {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_INTERVAL_NOT_FINITE {
@@ -1689,8 +1812,23 @@ macro_rules! __pgrx_c_args_INTERVAL_NOT_FINITE {
 /// ```text
 /// #define INTERVAL_NOT_FINITE( i ) ( INTERVAL_IS_NOBEGIN ( i ) || INTERVAL_IS_NOEND ( i ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! INTERVAL_NOT_FINITE {
+    (@__pgrx_emit_check_safety; $i:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $i);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $i:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::INTERVAL_NOT_FINITE!(@__pgrx_emit_value; $i)
@@ -1725,7 +1863,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3197,
+                                                                        $crate::__pgrx_c_generated::Field_month,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1769,7 +1907,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1304,
+                                                                        $crate::__pgrx_c_generated::Field_day,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1820,7 +1958,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5741,
+                                                            $crate::__pgrx_c_generated::Field_time,
                                                             _,
                                                             _
                                                         >(
@@ -1883,7 +2021,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3197,
+                                                                        $crate::__pgrx_c_generated::Field_month,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1927,7 +2065,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1304,
+                                                                        $crate::__pgrx_c_generated::Field_day,
                                                                         _,
                                                                         _
                                                                     >(
@@ -1978,7 +2116,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5741,
+                                                            $crate::__pgrx_c_generated::Field_time,
                                                             _,
                                                             _
                                                         >(
@@ -2045,6 +2183,11 @@ macro_rules! INTERVAL_NOT_FINITE {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: INTERVAL_IS_NOBEGIN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: INTERVAL_IS_NOEND remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $i);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2078,7 +2221,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3197,
+                                                                                    $crate::__pgrx_c_generated::Field_month,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -2124,7 +2267,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1304,
+                                                                                    $crate::__pgrx_c_generated::Field_day,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -2177,7 +2320,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5741,
+                                                                        $crate::__pgrx_c_generated::Field_time,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2247,7 +2390,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field3197,
+                                                                                    $crate::__pgrx_c_generated::Field_month,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -2293,7 +2436,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1304,
+                                                                                    $crate::__pgrx_c_generated::Field_day,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -2346,7 +2489,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5741,
+                                                                        $crate::__pgrx_c_generated::Field_time,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2433,7 +2576,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3197,
+                                                                        $crate::__pgrx_c_generated::Field_month,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2477,7 +2620,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1304,
+                                                                        $crate::__pgrx_c_generated::Field_day,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2528,7 +2671,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5741,
+                                                            $crate::__pgrx_c_generated::Field_time,
                                                             _,
                                                             _
                                                         >(
@@ -2591,7 +2734,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field3197,
+                                                                        $crate::__pgrx_c_generated::Field_month,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2635,7 +2778,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1304,
+                                                                        $crate::__pgrx_c_generated::Field_day,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2686,7 +2829,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5741,
+                                                            $crate::__pgrx_c_generated::Field_time,
                                                             _,
                                                             _
                                                         >(
@@ -2750,6 +2893,17 @@ macro_rules! INTERVAL_NOT_FINITE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_VALID_DATE {
@@ -2859,8 +3013,27 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
 /// ```text
 /// #define IS_VALID_DATE( d ) ( ( DATETIME_MIN_JULIAN - POSTGRES_EPOCH_JDATE ) <= ( d ) && ( d ) < ( DATE_END_JULIAN - POSTGRES_EPOCH_JDATE ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IS_VALID_DATE {
+    (@__pgrx_emit_check_safety; $d:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $d);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_VALID_DATE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_VALID_DATE!(@__pgrx_emit_value; $d)
@@ -2971,6 +3144,11 @@ macro_rules! IS_VALID_DATE {
     (@__pgrx_emit_size; $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $d);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3183,6 +3361,17 @@ macro_rules! IS_VALID_DATE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
@@ -3332,8 +3521,24 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
 /// ```text
 /// #define IS_VALID_JULIAN( y , m , d ) ( ( ( y ) > JULIAN_MINYEAR || ( ( y ) == JULIAN_MINYEAR && ( ( m ) >= JULIAN_MINMONTH ) ) ) && ( ( y ) < JULIAN_MAXYEAR || ( ( y ) == JULIAN_MAXYEAR && ( ( m ) < JULIAN_MAXMONTH ) ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IS_VALID_JULIAN {
+    (@__pgrx_emit_check_safety; $y:tt, $m:tt, $d:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $y);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_VALID_JULIAN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $y:tt, $m:tt, $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_VALID_JULIAN!(@__pgrx_emit_value; $y, $m, $d)
@@ -3592,6 +3797,12 @@ macro_rules! IS_VALID_JULIAN {
     (@__pgrx_emit_size; $y:tt, $m:tt, $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $y);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4118,6 +4329,17 @@ macro_rules! IS_VALID_JULIAN {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
@@ -4227,8 +4449,23 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
 /// ```text
 /// #define IS_VALID_TIMESTAMP( t ) ( MIN_TIMESTAMP <= ( t ) && ( t ) < END_TIMESTAMP )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IS_VALID_TIMESTAMP {
+    (@__pgrx_emit_check_safety; $t:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $t);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $t:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_VALID_TIMESTAMP!(@__pgrx_emit_value; $t)
@@ -4299,6 +4536,11 @@ macro_rules! IS_VALID_TIMESTAMP {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $t);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4422,6 +4664,17 @@ macro_rules! IS_VALID_TIMESTAMP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
@@ -4536,8 +4789,23 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
 /// ```text
 /// #define TIMESTAMP_IS_NOBEGIN( j ) ( ( j ) == DT_NOBEGIN )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOBEGIN {
+    (@__pgrx_emit_check_safety; $j:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $j);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $j:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TIMESTAMP_IS_NOBEGIN!(@__pgrx_emit_value; $j)
@@ -4582,6 +4850,11 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $j);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4645,6 +4918,17 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
@@ -4754,8 +5038,23 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
 /// ```text
 /// #define TIMESTAMP_IS_NOEND( j ) ( ( j ) == DT_NOEND )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOEND {
+    (@__pgrx_emit_check_safety; $j:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $j);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $j:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TIMESTAMP_IS_NOEND!(@__pgrx_emit_value; $j)
@@ -4800,6 +5099,11 @@ macro_rules! TIMESTAMP_IS_NOEND {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $j);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4863,6 +5167,17 @@ macro_rules! TIMESTAMP_IS_NOEND {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
@@ -4975,8 +5290,22 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TIMESTAMP_NOBEGIN {
+    (@__pgrx_emit_check_safety; $j:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $j);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $j:tt $(,)?) => {
         {
             /* PGRX: INT64CONST remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -5017,6 +5346,17 @@ macro_rules! TIMESTAMP_NOBEGIN {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
@@ -5129,8 +5469,22 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TIMESTAMP_NOEND {
+    (@__pgrx_emit_check_safety; $j:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $j);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $j:tt $(,)?) => {
         {
             /* PGRX: INT64CONST remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -5171,6 +5525,17 @@ macro_rules! TIMESTAMP_NOEND {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
@@ -5285,8 +5650,23 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
 /// ```text
 /// #define TIMESTAMP_NOT_FINITE( j ) ( TIMESTAMP_IS_NOBEGIN ( j ) || TIMESTAMP_IS_NOEND ( j ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TIMESTAMP_NOT_FINITE {
+    (@__pgrx_emit_check_safety; $j:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $j);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $j:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TIMESTAMP_NOT_FINITE!(@__pgrx_emit_value; $j)
@@ -5363,6 +5743,11 @@ macro_rules! TIMESTAMP_NOT_FINITE {
         /* PGRX: INT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TIMESTAMP_IS_NOBEGIN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TIMESTAMP_IS_NOEND remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $j);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -37,11659 +37,11659 @@ macro_rules! __pgrx_c_field_marker {
         compile_error!("offsetof member path exceeds the 64-component bound")
     };
     (CanPartialClearThrough) => {
-        $crate::__pgrx_c_generated::Field11
+        $crate::__pgrx_c_generated::Field_CanPartialClearThrough
     };
     (DecodeRecPtr) => {
-        $crate::__pgrx_c_generated::Field23
+        $crate::__pgrx_c_generated::Field_DecodeRecPtr
     };
     (EndRecPtr) => {
-        $crate::__pgrx_c_generated::Field31
+        $crate::__pgrx_c_generated::Field_EndRecPtr
     };
     (FreezeLimit) => {
-        $crate::__pgrx_c_generated::Field51
+        $crate::__pgrx_c_generated::Field_FreezeLimit
     };
     (FreezePageRelfrozenXid) => {
-        $crate::__pgrx_c_generated::Field52
+        $crate::__pgrx_c_generated::Field_FreezePageRelfrozenXid
     };
     (FreezePageRelminMxid) => {
-        $crate::__pgrx_c_generated::Field53
+        $crate::__pgrx_c_generated::Field_FreezePageRelminMxid
     };
     (HavePartialClearedThrough) => {
-        $crate::__pgrx_c_generated::Field62
+        $crate::__pgrx_c_generated::Field_HavePartialClearedThrough
     };
     (LastSxactCommitSeqNo) => {
-        $crate::__pgrx_c_generated::Field75
+        $crate::__pgrx_c_generated::Field_LastSxactCommitSeqNo
     };
     (MaxConnections) => {
-        $crate::__pgrx_c_generated::Field77
+        $crate::__pgrx_c_generated::Field_MaxConnections
     };
     (MultiXactCutoff) => {
-        $crate::__pgrx_c_generated::Field78
+        $crate::__pgrx_c_generated::Field_MultiXactCutoff
     };
     (N) => {
-        $crate::__pgrx_c_generated::Field79
+        $crate::__pgrx_c_generated::Field_N
     };
     (NextRecPtr) => {
-        $crate::__pgrx_c_generated::Field80
+        $crate::__pgrx_c_generated::Field_NextRecPtr
     };
     (NoFreezePageRelfrozenXid) => {
-        $crate::__pgrx_c_generated::Field83
+        $crate::__pgrx_c_generated::Field_NoFreezePageRelfrozenXid
     };
     (NoFreezePageRelminMxid) => {
-        $crate::__pgrx_c_generated::Field84
+        $crate::__pgrx_c_generated::Field_NoFreezePageRelminMxid
     };
     (OldestMxact) => {
-        $crate::__pgrx_c_generated::Field86
+        $crate::__pgrx_c_generated::Field_OldestMxact
     };
     (OldestXmin) => {
-        $crate::__pgrx_c_generated::Field87
+        $crate::__pgrx_c_generated::Field_OldestXmin
     };
     (PrevRecPtr) => {
-        $crate::__pgrx_c_generated::Field92
+        $crate::__pgrx_c_generated::Field_PrevRecPtr
     };
     (PrevTimeLineID) => {
-        $crate::__pgrx_c_generated::Field93
+        $crate::__pgrx_c_generated::Field_PrevTimeLineID
     };
     (ReadRecPtr) => {
-        $crate::__pgrx_c_generated::Field98
+        $crate::__pgrx_c_generated::Field_ReadRecPtr
     };
     (SxactGlobalXmin) => {
-        $crate::__pgrx_c_generated::Field113
+        $crate::__pgrx_c_generated::Field_SxactGlobalXmin
     };
     (SxactGlobalXminCount) => {
-        $crate::__pgrx_c_generated::Field114
+        $crate::__pgrx_c_generated::Field_SxactGlobalXminCount
     };
     (ThisTimeLineID) => {
-        $crate::__pgrx_c_generated::Field116
+        $crate::__pgrx_c_generated::Field_ThisTimeLineID
     };
     (WritableSxactCount) => {
-        $crate::__pgrx_c_generated::Field118
+        $crate::__pgrx_c_generated::Field_WritableSxactCount
     };
     (__dd_fd) => {
-        $crate::__pgrx_c_generated::Field128
+        $crate::__pgrx_c_generated::Field___dd_fd
     };
     (__dd_flags) => {
-        $crate::__pgrx_c_generated::Field129
+        $crate::__pgrx_c_generated::Field___dd_flags
     };
     (__dd_len) => {
-        $crate::__pgrx_c_generated::Field130
+        $crate::__pgrx_c_generated::Field___dd_len
     };
     (__dd_loc) => {
-        $crate::__pgrx_c_generated::Field131
+        $crate::__pgrx_c_generated::Field___dd_loc
     };
     (__dd_seek) => {
-        $crate::__pgrx_c_generated::Field133
+        $crate::__pgrx_c_generated::Field___dd_seek
     };
     (__dd_size) => {
-        $crate::__pgrx_c_generated::Field134
+        $crate::__pgrx_c_generated::Field___dd_size
     };
     (__padding) => {
-        $crate::__pgrx_c_generated::Field169
+        $crate::__pgrx_c_generated::Field___padding
     };
     (__sig) => {
-        $crate::__pgrx_c_generated::Field180
+        $crate::__pgrx_c_generated::Field___sig
     };
     (__ss_align) => {
-        $crate::__pgrx_c_generated::Field186
+        $crate::__pgrx_c_generated::Field___ss_align
     };
     (_blksize) => {
-        $crate::__pgrx_c_generated::Field208
+        $crate::__pgrx_c_generated::Field__blksize
     };
     (_file) => {
-        $crate::__pgrx_c_generated::Field212
+        $crate::__pgrx_c_generated::Field__file
     };
     (_flags) => {
-        $crate::__pgrx_c_generated::Field213
+        $crate::__pgrx_c_generated::Field__flags
     };
     (_lbfsize) => {
-        $crate::__pgrx_c_generated::Field215
+        $crate::__pgrx_c_generated::Field__lbfsize
     };
     (_offset) => {
-        $crate::__pgrx_c_generated::Field218
+        $crate::__pgrx_c_generated::Field__offset
     };
     (_r) => {
-        $crate::__pgrx_c_generated::Field220
+        $crate::__pgrx_c_generated::Field__r
     };
     (_size) => {
-        $crate::__pgrx_c_generated::Field223
+        $crate::__pgrx_c_generated::Field__size
     };
     (_ur) => {
-        $crate::__pgrx_c_generated::Field226
+        $crate::__pgrx_c_generated::Field__ur
     };
     (_w) => {
-        $crate::__pgrx_c_generated::Field227
+        $crate::__pgrx_c_generated::Field__w
     };
     (abbreviate) => {
-        $crate::__pgrx_c_generated::Field232
+        $crate::__pgrx_c_generated::Field_abbreviate
     };
     (abort_lsn) => {
-        $crate::__pgrx_c_generated::Field236
+        $crate::__pgrx_c_generated::Field_abort_lsn
     };
     (abort_time) => {
-        $crate::__pgrx_c_generated::Field237
+        $crate::__pgrx_c_generated::Field_abort_time
     };
     (abortedRecPtr) => {
-        $crate::__pgrx_c_generated::Field238
+        $crate::__pgrx_c_generated::Field_abortedRecPtr
     };
     (absent_on_null) => {
-        $crate::__pgrx_c_generated::Field241
+        $crate::__pgrx_c_generated::Field_absent_on_null
     };
     (abytes) => {
-        $crate::__pgrx_c_generated::Field242
+        $crate::__pgrx_c_generated::Field_abytes
     };
     (accept_writes) => {
-        $crate::__pgrx_c_generated::Field243
+        $crate::__pgrx_c_generated::Field_accept_writes
     };
     (acl_ok) => {
-        $crate::__pgrx_c_generated::Field246
+        $crate::__pgrx_c_generated::Field_acl_ok
     };
     (action) => {
-        $crate::__pgrx_c_generated::Field247
+        $crate::__pgrx_c_generated::Field_action
     };
     (actions) => {
-        $crate::__pgrx_c_generated::Field248
+        $crate::__pgrx_c_generated::Field_actions
     };
     (activeSubid) => {
-        $crate::__pgrx_c_generated::Field250
+        $crate::__pgrx_c_generated::Field_activeSubid
     };
     (active_count) => {
-        $crate::__pgrx_c_generated::Field251
+        $crate::__pgrx_c_generated::Field_active_count
     };
     (active_pid) => {
-        $crate::__pgrx_c_generated::Field253
+        $crate::__pgrx_c_generated::Field_active_pid
     };
     (active_time) => {
-        $crate::__pgrx_c_generated::Field254
+        $crate::__pgrx_c_generated::Field_active_time
     };
     (addCatalog) => {
-        $crate::__pgrx_c_generated::Field259
+        $crate::__pgrx_c_generated::Field_addCatalog
     };
     (addTemp) => {
-        $crate::__pgrx_c_generated::Field261
+        $crate::__pgrx_c_generated::Field_addTemp
     };
     (additionalsize) => {
-        $crate::__pgrx_c_generated::Field263
+        $crate::__pgrx_c_generated::Field_additionalsize
     };
     (admin_option) => {
-        $crate::__pgrx_c_generated::Field266
+        $crate::__pgrx_c_generated::Field_admin_option
     };
     (adnum) => {
-        $crate::__pgrx_c_generated::Field267
+        $crate::__pgrx_c_generated::Field_adnum
     };
     (adrelid) => {
-        $crate::__pgrx_c_generated::Field268
+        $crate::__pgrx_c_generated::Field_adrelid
     };
     (aggCollation) => {
-        $crate::__pgrx_c_generated::Field269
+        $crate::__pgrx_c_generated::Field_aggCollation
     };
     (agg_distinct) => {
-        $crate::__pgrx_c_generated::Field272
+        $crate::__pgrx_c_generated::Field_agg_distinct
     };
     (agg_done) => {
-        $crate::__pgrx_c_generated::Field273
+        $crate::__pgrx_c_generated::Field_agg_done
     };
     (agg_order) => {
-        $crate::__pgrx_c_generated::Field276
+        $crate::__pgrx_c_generated::Field_agg_order
     };
     (agg_star) => {
-        $crate::__pgrx_c_generated::Field281
+        $crate::__pgrx_c_generated::Field_agg_star
     };
     (agg_within_group) => {
-        $crate::__pgrx_c_generated::Field285
+        $crate::__pgrx_c_generated::Field_agg_within_group
     };
     (aggargtypes) => {
-        $crate::__pgrx_c_generated::Field286
+        $crate::__pgrx_c_generated::Field_aggargtypes
     };
     (aggcollid) => {
-        $crate::__pgrx_c_generated::Field287
+        $crate::__pgrx_c_generated::Field_aggcollid
     };
     (aggcombinefn) => {
-        $crate::__pgrx_c_generated::Field288
+        $crate::__pgrx_c_generated::Field_aggcombinefn
     };
     (aggdeserialfn) => {
-        $crate::__pgrx_c_generated::Field291
+        $crate::__pgrx_c_generated::Field_aggdeserialfn
     };
     (aggdirectargs) => {
-        $crate::__pgrx_c_generated::Field292
+        $crate::__pgrx_c_generated::Field_aggdirectargs
     };
     (aggdistinct) => {
-        $crate::__pgrx_c_generated::Field293
+        $crate::__pgrx_c_generated::Field_aggdistinct
     };
     (aggfinalextra) => {
-        $crate::__pgrx_c_generated::Field295
+        $crate::__pgrx_c_generated::Field_aggfinalextra
     };
     (aggfinalfn) => {
-        $crate::__pgrx_c_generated::Field296
+        $crate::__pgrx_c_generated::Field_aggfinalfn
     };
     (aggfinalmodify) => {
-        $crate::__pgrx_c_generated::Field297
+        $crate::__pgrx_c_generated::Field_aggfinalmodify
     };
     (aggfnoid) => {
-        $crate::__pgrx_c_generated::Field298
+        $crate::__pgrx_c_generated::Field_aggfnoid
     };
     (agginfos) => {
-        $crate::__pgrx_c_generated::Field299
+        $crate::__pgrx_c_generated::Field_agginfos
     };
     (aggkind) => {
-        $crate::__pgrx_c_generated::Field300
+        $crate::__pgrx_c_generated::Field_aggkind
     };
     (agglevelsup) => {
-        $crate::__pgrx_c_generated::Field301
+        $crate::__pgrx_c_generated::Field_agglevelsup
     };
     (aggmfinalextra) => {
-        $crate::__pgrx_c_generated::Field302
+        $crate::__pgrx_c_generated::Field_aggmfinalextra
     };
     (aggmfinalfn) => {
-        $crate::__pgrx_c_generated::Field303
+        $crate::__pgrx_c_generated::Field_aggmfinalfn
     };
     (aggmfinalmodify) => {
-        $crate::__pgrx_c_generated::Field304
+        $crate::__pgrx_c_generated::Field_aggmfinalmodify
     };
     (aggminvtransfn) => {
-        $crate::__pgrx_c_generated::Field305
+        $crate::__pgrx_c_generated::Field_aggminvtransfn
     };
     (aggmtransfn) => {
-        $crate::__pgrx_c_generated::Field306
+        $crate::__pgrx_c_generated::Field_aggmtransfn
     };
     (aggmtransspace) => {
-        $crate::__pgrx_c_generated::Field307
+        $crate::__pgrx_c_generated::Field_aggmtransspace
     };
     (aggmtranstype) => {
-        $crate::__pgrx_c_generated::Field308
+        $crate::__pgrx_c_generated::Field_aggmtranstype
     };
     (aggno) => {
-        $crate::__pgrx_c_generated::Field309
+        $crate::__pgrx_c_generated::Field_aggno
     };
     (aggnumdirectargs) => {
-        $crate::__pgrx_c_generated::Field311
+        $crate::__pgrx_c_generated::Field_aggnumdirectargs
     };
     (aggorder) => {
-        $crate::__pgrx_c_generated::Field312
+        $crate::__pgrx_c_generated::Field_aggorder
     };
     (aggpresorted) => {
-        $crate::__pgrx_c_generated::Field313
+        $crate::__pgrx_c_generated::Field_aggpresorted
     };
     (aggrefs) => {
-        $crate::__pgrx_c_generated::Field315
+        $crate::__pgrx_c_generated::Field_aggrefs
     };
     (aggregatedbase) => {
-        $crate::__pgrx_c_generated::Field316
+        $crate::__pgrx_c_generated::Field_aggregatedbase
     };
     (aggregatedupto) => {
-        $crate::__pgrx_c_generated::Field317
+        $crate::__pgrx_c_generated::Field_aggregatedupto
     };
     (aggs) => {
-        $crate::__pgrx_c_generated::Field318
+        $crate::__pgrx_c_generated::Field_aggs
     };
     (aggserialfn) => {
-        $crate::__pgrx_c_generated::Field319
+        $crate::__pgrx_c_generated::Field_aggserialfn
     };
     (aggshared) => {
-        $crate::__pgrx_c_generated::Field320
+        $crate::__pgrx_c_generated::Field_aggshared
     };
     (aggsortop) => {
-        $crate::__pgrx_c_generated::Field321
+        $crate::__pgrx_c_generated::Field_aggsortop
     };
     (aggsortrequired) => {
-        $crate::__pgrx_c_generated::Field322
+        $crate::__pgrx_c_generated::Field_aggsortrequired
     };
     (aggsplit) => {
-        $crate::__pgrx_c_generated::Field323
+        $crate::__pgrx_c_generated::Field_aggsplit
     };
     (aggstar) => {
-        $crate::__pgrx_c_generated::Field324
+        $crate::__pgrx_c_generated::Field_aggstar
     };
     (aggstrategy) => {
-        $crate::__pgrx_c_generated::Field325
+        $crate::__pgrx_c_generated::Field_aggstrategy
     };
     (aggtransfn) => {
-        $crate::__pgrx_c_generated::Field326
+        $crate::__pgrx_c_generated::Field_aggtransfn
     };
     (aggtransinfos) => {
-        $crate::__pgrx_c_generated::Field327
+        $crate::__pgrx_c_generated::Field_aggtransinfos
     };
     (aggtransno) => {
-        $crate::__pgrx_c_generated::Field328
+        $crate::__pgrx_c_generated::Field_aggtransno
     };
     (aggtransspace) => {
-        $crate::__pgrx_c_generated::Field329
+        $crate::__pgrx_c_generated::Field_aggtransspace
     };
     (aggtranstype) => {
-        $crate::__pgrx_c_generated::Field330
+        $crate::__pgrx_c_generated::Field_aggtranstype
     };
     (aggtranstypmod) => {
-        $crate::__pgrx_c_generated::Field331
+        $crate::__pgrx_c_generated::Field_aggtranstypmod
     };
     (aggtype) => {
-        $crate::__pgrx_c_generated::Field332
+        $crate::__pgrx_c_generated::Field_aggtype
     };
     (aggvariadic) => {
-        $crate::__pgrx_c_generated::Field333
+        $crate::__pgrx_c_generated::Field_aggvariadic
     };
     (ai_grantee) => {
-        $crate::__pgrx_c_generated::Field339
+        $crate::__pgrx_c_generated::Field_ai_grantee
     };
     (ai_grantor) => {
-        $crate::__pgrx_c_generated::Field340
+        $crate::__pgrx_c_generated::Field_ai_grantor
     };
     (ai_privs) => {
-        $crate::__pgrx_c_generated::Field342
+        $crate::__pgrx_c_generated::Field_ai_privs
     };
     (aio_index) => {
-        $crate::__pgrx_c_generated::Field345
+        $crate::__pgrx_c_generated::Field_aio_index
     };
     (aitems) => {
-        $crate::__pgrx_c_generated::Field346
+        $crate::__pgrx_c_generated::Field_aitems
     };
     (alen) => {
-        $crate::__pgrx_c_generated::Field347
+        $crate::__pgrx_c_generated::Field_alen
     };
     (aliascolnames) => {
-        $crate::__pgrx_c_generated::Field349
+        $crate::__pgrx_c_generated::Field_aliascolnames
     };
     (aliases) => {
-        $crate::__pgrx_c_generated::Field350
+        $crate::__pgrx_c_generated::Field_aliases
     };
     (all) => {
-        $crate::__pgrx_c_generated::Field352
+        $crate::__pgrx_c_generated::Field_all
     };
     (allMarkTypes) => {
-        $crate::__pgrx_c_generated::Field353
+        $crate::__pgrx_c_generated::Field_allMarkTypes
     };
     (allProcCount) => {
-        $crate::__pgrx_c_generated::Field355
+        $crate::__pgrx_c_generated::Field_allProcCount
     };
     (allProcs) => {
-        $crate::__pgrx_c_generated::Field356
+        $crate::__pgrx_c_generated::Field_allProcs
     };
     (allTheSame) => {
-        $crate::__pgrx_c_generated::Field358
+        $crate::__pgrx_c_generated::Field_allTheSame
     };
     (all_cols_needed) => {
-        $crate::__pgrx_c_generated::Field360
+        $crate::__pgrx_c_generated::Field_all_cols_needed
     };
     (all_first) => {
-        $crate::__pgrx_c_generated::Field361
+        $crate::__pgrx_c_generated::Field_all_first
     };
     (all_frozen) => {
-        $crate::__pgrx_c_generated::Field362
+        $crate::__pgrx_c_generated::Field_all_frozen
     };
     (all_grouped_cols) => {
-        $crate::__pgrx_c_generated::Field363
+        $crate::__pgrx_c_generated::Field_all_grouped_cols
     };
     (all_privs) => {
-        $crate::__pgrx_c_generated::Field366
+        $crate::__pgrx_c_generated::Field_all_privs
     };
     (all_visible) => {
-        $crate::__pgrx_c_generated::Field369
+        $crate::__pgrx_c_generated::Field_all_visible
     };
     (allequalimage) => {
-        $crate::__pgrx_c_generated::Field370
+        $crate::__pgrx_c_generated::Field_allequalimage
     };
     (allocated) => {
-        $crate::__pgrx_c_generated::Field372
+        $crate::__pgrx_c_generated::Field_allocated
     };
     (allocatedMemory) => {
-        $crate::__pgrx_c_generated::Field373
+        $crate::__pgrx_c_generated::Field_allocatedMemory
     };
     (allocated_size) => {
-        $crate::__pgrx_c_generated::Field374
+        $crate::__pgrx_c_generated::Field_allocated_size
     };
     (alloced) => {
-        $crate::__pgrx_c_generated::Field375
+        $crate::__pgrx_c_generated::Field_alloced
     };
     (allocentries) => {
-        $crate::__pgrx_c_generated::Field376
+        $crate::__pgrx_c_generated::Field_allocentries
     };
     (allowInCritSection) => {
-        $crate::__pgrx_c_generated::Field377
+        $crate::__pgrx_c_generated::Field_allowInCritSection
     };
     (allow_nonatomic) => {
-        $crate::__pgrx_c_generated::Field378
+        $crate::__pgrx_c_generated::Field_allow_nonatomic
     };
     (allowedModes) => {
-        $crate::__pgrx_c_generated::Field379
+        $crate::__pgrx_c_generated::Field_allowedModes
     };
     (alltables) => {
-        $crate::__pgrx_c_generated::Field380
+        $crate::__pgrx_c_generated::Field_alltables
     };
     (already_executed) => {
-        $crate::__pgrx_c_generated::Field382
+        $crate::__pgrx_c_generated::Field_already_executed
     };
     (already_extended_by) => {
-        $crate::__pgrx_c_generated::Field383
+        $crate::__pgrx_c_generated::Field_already_extended_by
     };
     (alterDeferrability) => {
-        $crate::__pgrx_c_generated::Field384
+        $crate::__pgrx_c_generated::Field_alterDeferrability
     };
     (alterEnforceability) => {
-        $crate::__pgrx_c_generated::Field385
+        $crate::__pgrx_c_generated::Field_alterEnforceability
     };
     (alterInheritability) => {
-        $crate::__pgrx_c_generated::Field386
+        $crate::__pgrx_c_generated::Field_alterInheritability
     };
     (am_present) => {
-        $crate::__pgrx_c_generated::Field388
+        $crate::__pgrx_c_generated::Field_am_present
     };
     (am_value) => {
-        $crate::__pgrx_c_generated::Field389
+        $crate::__pgrx_c_generated::Field_am_value
     };
     (am_worker) => {
-        $crate::__pgrx_c_generated::Field390
+        $crate::__pgrx_c_generated::Field_am_worker
     };
     (amcanbackward) => {
-        $crate::__pgrx_c_generated::Field397
+        $crate::__pgrx_c_generated::Field_amcanbackward
     };
     (amcanbuildparallel) => {
-        $crate::__pgrx_c_generated::Field398
+        $crate::__pgrx_c_generated::Field_amcanbuildparallel
     };
     (amcanhash) => {
-        $crate::__pgrx_c_generated::Field399
+        $crate::__pgrx_c_generated::Field_amcanhash
     };
     (amcaninclude) => {
-        $crate::__pgrx_c_generated::Field400
+        $crate::__pgrx_c_generated::Field_amcaninclude
     };
     (amcanmarkpos) => {
-        $crate::__pgrx_c_generated::Field401
+        $crate::__pgrx_c_generated::Field_amcanmarkpos
     };
     (amcanmulticol) => {
-        $crate::__pgrx_c_generated::Field402
+        $crate::__pgrx_c_generated::Field_amcanmulticol
     };
     (amcanorder) => {
-        $crate::__pgrx_c_generated::Field403
+        $crate::__pgrx_c_generated::Field_amcanorder
     };
     (amcanorderbyop) => {
-        $crate::__pgrx_c_generated::Field404
+        $crate::__pgrx_c_generated::Field_amcanorderbyop
     };
     (amcanparallel) => {
-        $crate::__pgrx_c_generated::Field405
+        $crate::__pgrx_c_generated::Field_amcanparallel
     };
     (amcanunique) => {
-        $crate::__pgrx_c_generated::Field407
+        $crate::__pgrx_c_generated::Field_amcanunique
     };
     (amclusterable) => {
-        $crate::__pgrx_c_generated::Field408
+        $crate::__pgrx_c_generated::Field_amclusterable
     };
     (amconsistentequality) => {
-        $crate::__pgrx_c_generated::Field409
+        $crate::__pgrx_c_generated::Field_amconsistentequality
     };
     (amconsistentordering) => {
-        $crate::__pgrx_c_generated::Field410
+        $crate::__pgrx_c_generated::Field_amconsistentordering
     };
     (amflags) => {
-        $crate::__pgrx_c_generated::Field414
+        $crate::__pgrx_c_generated::Field_amflags
     };
     (amhandler) => {
-        $crate::__pgrx_c_generated::Field418
+        $crate::__pgrx_c_generated::Field_amhandler
     };
     (amhasgetbitmap) => {
-        $crate::__pgrx_c_generated::Field419
+        $crate::__pgrx_c_generated::Field_amhasgetbitmap
     };
     (amhasgettuple) => {
-        $crate::__pgrx_c_generated::Field420
+        $crate::__pgrx_c_generated::Field_amhasgettuple
     };
     (amkeytype) => {
-        $crate::__pgrx_c_generated::Field424
+        $crate::__pgrx_c_generated::Field_amkeytype
     };
     (amopfamily) => {
-        $crate::__pgrx_c_generated::Field427
+        $crate::__pgrx_c_generated::Field_amopfamily
     };
     (amoplefttype) => {
-        $crate::__pgrx_c_generated::Field428
+        $crate::__pgrx_c_generated::Field_amoplefttype
     };
     (amopmethod) => {
-        $crate::__pgrx_c_generated::Field429
+        $crate::__pgrx_c_generated::Field_amopmethod
     };
     (amopopr) => {
-        $crate::__pgrx_c_generated::Field430
+        $crate::__pgrx_c_generated::Field_amopopr
     };
     (amoppurpose) => {
-        $crate::__pgrx_c_generated::Field431
+        $crate::__pgrx_c_generated::Field_amoppurpose
     };
     (amoprighttype) => {
-        $crate::__pgrx_c_generated::Field432
+        $crate::__pgrx_c_generated::Field_amoprighttype
     };
     (amopsortfamily) => {
-        $crate::__pgrx_c_generated::Field433
+        $crate::__pgrx_c_generated::Field_amopsortfamily
     };
     (amopstrategy) => {
-        $crate::__pgrx_c_generated::Field434
+        $crate::__pgrx_c_generated::Field_amopstrategy
     };
     (amoptionalkey) => {
-        $crate::__pgrx_c_generated::Field435
+        $crate::__pgrx_c_generated::Field_amoptionalkey
     };
     (amoptsprocnum) => {
-        $crate::__pgrx_c_generated::Field437
+        $crate::__pgrx_c_generated::Field_amoptsprocnum
     };
     (amparallelvacuumoptions) => {
-        $crate::__pgrx_c_generated::Field439
+        $crate::__pgrx_c_generated::Field_amparallelvacuumoptions
     };
     (ampredlocks) => {
-        $crate::__pgrx_c_generated::Field440
+        $crate::__pgrx_c_generated::Field_ampredlocks
     };
     (amproc) => {
-        $crate::__pgrx_c_generated::Field441
+        $crate::__pgrx_c_generated::Field_amproc
     };
     (amprocfamily) => {
-        $crate::__pgrx_c_generated::Field442
+        $crate::__pgrx_c_generated::Field_amprocfamily
     };
     (amproclefttype) => {
-        $crate::__pgrx_c_generated::Field443
+        $crate::__pgrx_c_generated::Field_amproclefttype
     };
     (amprocnum) => {
-        $crate::__pgrx_c_generated::Field444
+        $crate::__pgrx_c_generated::Field_amprocnum
     };
     (amprocrighttype) => {
-        $crate::__pgrx_c_generated::Field445
+        $crate::__pgrx_c_generated::Field_amprocrighttype
     };
     (amsearcharray) => {
-        $crate::__pgrx_c_generated::Field449
+        $crate::__pgrx_c_generated::Field_amsearcharray
     };
     (amsearchnulls) => {
-        $crate::__pgrx_c_generated::Field450
+        $crate::__pgrx_c_generated::Field_amsearchnulls
     };
     (amstorage) => {
-        $crate::__pgrx_c_generated::Field452
+        $crate::__pgrx_c_generated::Field_amstorage
     };
     (amstrategies) => {
-        $crate::__pgrx_c_generated::Field453
+        $crate::__pgrx_c_generated::Field_amstrategies
     };
     (amsummarizing) => {
-        $crate::__pgrx_c_generated::Field454
+        $crate::__pgrx_c_generated::Field_amsummarizing
     };
     (amsupport) => {
-        $crate::__pgrx_c_generated::Field455
+        $crate::__pgrx_c_generated::Field_amsupport
     };
     (amtype) => {
-        $crate::__pgrx_c_generated::Field458
+        $crate::__pgrx_c_generated::Field_amtype
     };
     (amusemaintenanceworkmem) => {
-        $crate::__pgrx_c_generated::Field459
+        $crate::__pgrx_c_generated::Field_amusemaintenanceworkmem
     };
     (analyze) => {
-        $crate::__pgrx_c_generated::Field462
+        $crate::__pgrx_c_generated::Field_analyze
     };
     (analyze_count) => {
-        $crate::__pgrx_c_generated::Field463
+        $crate::__pgrx_c_generated::Field_analyze_count
     };
     (analyze_only) => {
-        $crate::__pgrx_c_generated::Field464
+        $crate::__pgrx_c_generated::Field_analyze_only
     };
     (analyze_threshold) => {
-        $crate::__pgrx_c_generated::Field466
+        $crate::__pgrx_c_generated::Field_analyze_threshold
     };
     (anynullkeys) => {
-        $crate::__pgrx_c_generated::Field470
+        $crate::__pgrx_c_generated::Field_anynullkeys
     };
     (api_version) => {
-        $crate::__pgrx_c_generated::Field471
+        $crate::__pgrx_c_generated::Field_api_version
     };
     (appendRelations) => {
-        $crate::__pgrx_c_generated::Field473
+        $crate::__pgrx_c_generated::Field_appendRelations
     };
     (append_rel_list) => {
-        $crate::__pgrx_c_generated::Field475
+        $crate::__pgrx_c_generated::Field_append_rel_list
     };
     (appendplans) => {
-        $crate::__pgrx_c_generated::Field476
+        $crate::__pgrx_c_generated::Field_appendplans
     };
     (applied) => {
-        $crate::__pgrx_c_generated::Field477
+        $crate::__pgrx_c_generated::Field_applied
     };
     (apply) => {
-        $crate::__pgrx_c_generated::Field478
+        $crate::__pgrx_c_generated::Field_apply
     };
     (applyLag) => {
-        $crate::__pgrx_c_generated::Field479
+        $crate::__pgrx_c_generated::Field_applyLag
     };
     (apply_error_count) => {
-        $crate::__pgrx_c_generated::Field481
+        $crate::__pgrx_c_generated::Field_apply_error_count
     };
     (apply_image) => {
-        $crate::__pgrx_c_generated::Field482
+        $crate::__pgrx_c_generated::Field_apply_image
     };
     (arbiterElems) => {
-        $crate::__pgrx_c_generated::Field485
+        $crate::__pgrx_c_generated::Field_arbiterElems
     };
     (arbiterIndexes) => {
-        $crate::__pgrx_c_generated::Field486
+        $crate::__pgrx_c_generated::Field_arbiterIndexes
     };
     (archived_count) => {
-        $crate::__pgrx_c_generated::Field488
+        $crate::__pgrx_c_generated::Field_archived_count
     };
     (arg) => {
-        $crate::__pgrx_c_generated::Field490
+        $crate::__pgrx_c_generated::Field_arg
     };
     (arg_names) => {
-        $crate::__pgrx_c_generated::Field494
+        $crate::__pgrx_c_generated::Field_arg_names
     };
     (argisrow) => {
-        $crate::__pgrx_c_generated::Field500
+        $crate::__pgrx_c_generated::Field_argisrow
     };
     (argnumber) => {
-        $crate::__pgrx_c_generated::Field504
+        $crate::__pgrx_c_generated::Field_argnumber
     };
     (args) => {
-        $crate::__pgrx_c_generated::Field507
+        $crate::__pgrx_c_generated::Field_args
     };
     (args_unspecified) => {
-        $crate::__pgrx_c_generated::Field508
+        $crate::__pgrx_c_generated::Field_args_unspecified
     };
     (argtype) => {
-        $crate::__pgrx_c_generated::Field509
+        $crate::__pgrx_c_generated::Field_argtype
     };
     (argtypes) => {
-        $crate::__pgrx_c_generated::Field510
+        $crate::__pgrx_c_generated::Field_argtypes
     };
     (arowMarks) => {
-        $crate::__pgrx_c_generated::Field512
+        $crate::__pgrx_c_generated::Field_arowMarks
     };
     (arrayBounds) => {
-        $crate::__pgrx_c_generated::Field514
+        $crate::__pgrx_c_generated::Field_arrayBounds
     };
     (array_collid) => {
-        $crate::__pgrx_c_generated::Field517
+        $crate::__pgrx_c_generated::Field_array_collid
     };
     (array_len) => {
-        $crate::__pgrx_c_generated::Field519
+        $crate::__pgrx_c_generated::Field_array_len
     };
     (array_type) => {
-        $crate::__pgrx_c_generated::Field520
+        $crate::__pgrx_c_generated::Field_array_type
     };
     (array_typeid) => {
-        $crate::__pgrx_c_generated::Field521
+        $crate::__pgrx_c_generated::Field_array_typeid
     };
     (arrived) => {
-        $crate::__pgrx_c_generated::Field525
+        $crate::__pgrx_c_generated::Field_arrived
     };
     (as_begun) => {
-        $crate::__pgrx_c_generated::Field529
+        $crate::__pgrx_c_generated::Field_as_begun
     };
     (as_first_partial_plan) => {
-        $crate::__pgrx_c_generated::Field531
+        $crate::__pgrx_c_generated::Field_as_first_partial_plan
     };
     (as_nasyncplans) => {
-        $crate::__pgrx_c_generated::Field532
+        $crate::__pgrx_c_generated::Field_as_nasyncplans
     };
     (as_nasyncremain) => {
-        $crate::__pgrx_c_generated::Field533
+        $crate::__pgrx_c_generated::Field_as_nasyncremain
     };
     (as_nasyncresults) => {
-        $crate::__pgrx_c_generated::Field534
+        $crate::__pgrx_c_generated::Field_as_nasyncresults
     };
     (as_nplans) => {
-        $crate::__pgrx_c_generated::Field536
+        $crate::__pgrx_c_generated::Field_as_nplans
     };
     (as_syncdone) => {
-        $crate::__pgrx_c_generated::Field539
+        $crate::__pgrx_c_generated::Field_as_syncdone
     };
     (as_valid_subplans_identified) => {
-        $crate::__pgrx_c_generated::Field542
+        $crate::__pgrx_c_generated::Field_as_valid_subplans_identified
     };
     (as_whichplan) => {
-        $crate::__pgrx_c_generated::Field543
+        $crate::__pgrx_c_generated::Field_as_whichplan
     };
     (async_capable) => {
-        $crate::__pgrx_c_generated::Field550
+        $crate::__pgrx_c_generated::Field_async_capable
     };
     (async_mode) => {
-        $crate::__pgrx_c_generated::Field551
+        $crate::__pgrx_c_generated::Field_async_mode
     };
     (atEnd) => {
-        $crate::__pgrx_c_generated::Field552
+        $crate::__pgrx_c_generated::Field_atEnd
     };
     (atStart) => {
-        $crate::__pgrx_c_generated::Field553
+        $crate::__pgrx_c_generated::Field_atStart
     };
     (at_least_one_chunk) => {
-        $crate::__pgrx_c_generated::Field554
+        $crate::__pgrx_c_generated::Field_at_least_one_chunk
     };
     (atomic) => {
-        $crate::__pgrx_c_generated::Field555
+        $crate::__pgrx_c_generated::Field_atomic
     };
     (attLabelType) => {
-        $crate::__pgrx_c_generated::Field557
+        $crate::__pgrx_c_generated::Field_attLabelType
     };
     (attLeafType) => {
-        $crate::__pgrx_c_generated::Field558
+        $crate::__pgrx_c_generated::Field_attLeafType
     };
     (attPrefixType) => {
-        $crate::__pgrx_c_generated::Field559
+        $crate::__pgrx_c_generated::Field_attPrefixType
     };
     (attType) => {
-        $crate::__pgrx_c_generated::Field560
+        $crate::__pgrx_c_generated::Field_attType
     };
     (attalign) => {
-        $crate::__pgrx_c_generated::Field561
+        $crate::__pgrx_c_generated::Field_attalign
     };
     (attalignby) => {
-        $crate::__pgrx_c_generated::Field562
+        $crate::__pgrx_c_generated::Field_attalignby
     };
     (attbyval) => {
-        $crate::__pgrx_c_generated::Field563
+        $crate::__pgrx_c_generated::Field_attbyval
     };
     (attcacheoff) => {
-        $crate::__pgrx_c_generated::Field564
+        $crate::__pgrx_c_generated::Field_attcacheoff
     };
     (attcollation) => {
-        $crate::__pgrx_c_generated::Field565
+        $crate::__pgrx_c_generated::Field_attcollation
     };
     (attcompression) => {
-        $crate::__pgrx_c_generated::Field566
+        $crate::__pgrx_c_generated::Field_attcompression
     };
     (attgenerated) => {
-        $crate::__pgrx_c_generated::Field567
+        $crate::__pgrx_c_generated::Field_attgenerated
     };
     (atthasdef) => {
-        $crate::__pgrx_c_generated::Field568
+        $crate::__pgrx_c_generated::Field_atthasdef
     };
     (atthasmissing) => {
-        $crate::__pgrx_c_generated::Field569
+        $crate::__pgrx_c_generated::Field_atthasmissing
     };
     (attidentity) => {
-        $crate::__pgrx_c_generated::Field570
+        $crate::__pgrx_c_generated::Field_attidentity
     };
     (attinhcount) => {
-        $crate::__pgrx_c_generated::Field572
+        $crate::__pgrx_c_generated::Field_attinhcount
     };
     (attisdropped) => {
-        $crate::__pgrx_c_generated::Field575
+        $crate::__pgrx_c_generated::Field_attisdropped
     };
     (attislocal) => {
-        $crate::__pgrx_c_generated::Field576
+        $crate::__pgrx_c_generated::Field_attislocal
     };
     (attispackable) => {
-        $crate::__pgrx_c_generated::Field577
+        $crate::__pgrx_c_generated::Field_attispackable
     };
     (attlen) => {
-        $crate::__pgrx_c_generated::Field579
+        $crate::__pgrx_c_generated::Field_attlen
     };
     (attlist) => {
-        $crate::__pgrx_c_generated::Field580
+        $crate::__pgrx_c_generated::Field_attlist
     };
     (attndims) => {
-        $crate::__pgrx_c_generated::Field583
+        $crate::__pgrx_c_generated::Field_attndims
     };
     (attno) => {
-        $crate::__pgrx_c_generated::Field584
+        $crate::__pgrx_c_generated::Field_attno
     };
     (attnotnull) => {
-        $crate::__pgrx_c_generated::Field585
+        $crate::__pgrx_c_generated::Field_attnotnull
     };
     (attnullability) => {
-        $crate::__pgrx_c_generated::Field586
+        $crate::__pgrx_c_generated::Field_attnullability
     };
     (attnum) => {
-        $crate::__pgrx_c_generated::Field587
+        $crate::__pgrx_c_generated::Field_attnum
     };
     (attnumlist) => {
-        $crate::__pgrx_c_generated::Field588
+        $crate::__pgrx_c_generated::Field_attnumlist
     };
     (attrcollid) => {
-        $crate::__pgrx_c_generated::Field594
+        $crate::__pgrx_c_generated::Field_attrcollid
     };
     (attrelid) => {
-        $crate::__pgrx_c_generated::Field595
+        $crate::__pgrx_c_generated::Field_attrelid
     };
     (attrnum) => {
-        $crate::__pgrx_c_generated::Field599
+        $crate::__pgrx_c_generated::Field_attrnum
     };
     (attrtypid) => {
-        $crate::__pgrx_c_generated::Field601
+        $crate::__pgrx_c_generated::Field_attrtypid
     };
     (attrtypmod) => {
-        $crate::__pgrx_c_generated::Field602
+        $crate::__pgrx_c_generated::Field_attrtypmod
     };
     (attstattarget) => {
-        $crate::__pgrx_c_generated::Field603
+        $crate::__pgrx_c_generated::Field_attstattarget
     };
     (attstorage) => {
-        $crate::__pgrx_c_generated::Field604
+        $crate::__pgrx_c_generated::Field_attstorage
     };
     (atttype) => {
-        $crate::__pgrx_c_generated::Field605
+        $crate::__pgrx_c_generated::Field_atttype
     };
     (atttypid) => {
-        $crate::__pgrx_c_generated::Field606
+        $crate::__pgrx_c_generated::Field_atttypid
     };
     (atttypmod) => {
-        $crate::__pgrx_c_generated::Field607
+        $crate::__pgrx_c_generated::Field_atttypmod
     };
     (auth_end) => {
-        $crate::__pgrx_c_generated::Field610
+        $crate::__pgrx_c_generated::Field_auth_end
     };
     (auth_start) => {
-        $crate::__pgrx_c_generated::Field611
+        $crate::__pgrx_c_generated::Field_auth_start
     };
     (autoHeld) => {
-        $crate::__pgrx_c_generated::Field613
+        $crate::__pgrx_c_generated::Field_autoHeld
     };
     (autoanalyze_count) => {
-        $crate::__pgrx_c_generated::Field614
+        $crate::__pgrx_c_generated::Field_autoanalyze_count
     };
     (autosummarize) => {
-        $crate::__pgrx_c_generated::Field615
+        $crate::__pgrx_c_generated::Field_autosummarize
     };
     (autovacuum_count) => {
-        $crate::__pgrx_c_generated::Field618
+        $crate::__pgrx_c_generated::Field_autovacuum_count
     };
     (auxiliary_id) => {
-        $crate::__pgrx_c_generated::Field619
+        $crate::__pgrx_c_generated::Field_auxiliary_id
     };
     (b1_lower) => {
-        $crate::__pgrx_c_generated::Field621
+        $crate::__pgrx_c_generated::Field_b1_lower
     };
     (b1_upper) => {
-        $crate::__pgrx_c_generated::Field622
+        $crate::__pgrx_c_generated::Field_b1_upper
     };
     (b1root) => {
-        $crate::__pgrx_c_generated::Field623
+        $crate::__pgrx_c_generated::Field_b1root
     };
     (b2_1_lower) => {
-        $crate::__pgrx_c_generated::Field624
+        $crate::__pgrx_c_generated::Field_b2_1_lower
     };
     (b2_1_upper) => {
-        $crate::__pgrx_c_generated::Field625
+        $crate::__pgrx_c_generated::Field_b2_1_upper
     };
     (b2_2_lower) => {
-        $crate::__pgrx_c_generated::Field626
+        $crate::__pgrx_c_generated::Field_b2_2_lower
     };
     (b2_2_upper) => {
-        $crate::__pgrx_c_generated::Field627
+        $crate::__pgrx_c_generated::Field_b2_2_upper
     };
     (b2root) => {
-        $crate::__pgrx_c_generated::Field628
+        $crate::__pgrx_c_generated::Field_b2root
     };
     (b3_1_lower) => {
-        $crate::__pgrx_c_generated::Field629
+        $crate::__pgrx_c_generated::Field_b3_1_lower
     };
     (b3_1_upper) => {
-        $crate::__pgrx_c_generated::Field630
+        $crate::__pgrx_c_generated::Field_b3_1_upper
     };
     (b3_2_lower) => {
-        $crate::__pgrx_c_generated::Field631
+        $crate::__pgrx_c_generated::Field_b3_2_lower
     };
     (b3_2_upper) => {
-        $crate::__pgrx_c_generated::Field632
+        $crate::__pgrx_c_generated::Field_b3_2_upper
     };
     (b3_3_lower) => {
-        $crate::__pgrx_c_generated::Field633
+        $crate::__pgrx_c_generated::Field_b3_3_lower
     };
     (b3_3_upper) => {
-        $crate::__pgrx_c_generated::Field634
+        $crate::__pgrx_c_generated::Field_b3_3_upper
     };
     (b3root) => {
-        $crate::__pgrx_c_generated::Field635
+        $crate::__pgrx_c_generated::Field_b3root
     };
     (b4_1_lower) => {
-        $crate::__pgrx_c_generated::Field636
+        $crate::__pgrx_c_generated::Field_b4_1_lower
     };
     (b4_1_upper) => {
-        $crate::__pgrx_c_generated::Field637
+        $crate::__pgrx_c_generated::Field_b4_1_upper
     };
     (b4_2_lower) => {
-        $crate::__pgrx_c_generated::Field638
+        $crate::__pgrx_c_generated::Field_b4_2_lower
     };
     (b4_2_upper) => {
-        $crate::__pgrx_c_generated::Field639
+        $crate::__pgrx_c_generated::Field_b4_2_upper
     };
     (b4_3_lower) => {
-        $crate::__pgrx_c_generated::Field640
+        $crate::__pgrx_c_generated::Field_b4_3_lower
     };
     (b4_3_upper) => {
-        $crate::__pgrx_c_generated::Field641
+        $crate::__pgrx_c_generated::Field_b4_3_upper
     };
     (b4_4_lower) => {
-        $crate::__pgrx_c_generated::Field642
+        $crate::__pgrx_c_generated::Field_b4_4_lower
     };
     (b4_4_upper) => {
-        $crate::__pgrx_c_generated::Field643
+        $crate::__pgrx_c_generated::Field_b4_4_upper
     };
     (b4root) => {
-        $crate::__pgrx_c_generated::Field644
+        $crate::__pgrx_c_generated::Field_b4root
     };
     (backend) => {
-        $crate::__pgrx_c_generated::Field645
+        $crate::__pgrx_c_generated::Field_backend
     };
     (backendPID) => {
-        $crate::__pgrx_c_generated::Field646
+        $crate::__pgrx_c_generated::Field_backendPID
     };
     (backend_hi) => {
-        $crate::__pgrx_c_generated::Field648
+        $crate::__pgrx_c_generated::Field_backend_hi
     };
     (backend_lo) => {
-        $crate::__pgrx_c_generated::Field649
+        $crate::__pgrx_c_generated::Field_backend_lo
     };
     (backend_state_count) => {
-        $crate::__pgrx_c_generated::Field651
+        $crate::__pgrx_c_generated::Field_backend_state_count
     };
     (backend_subxact_count) => {
-        $crate::__pgrx_c_generated::Field652
+        $crate::__pgrx_c_generated::Field_backend_subxact_count
     };
     (backend_subxact_overflowed) => {
-        $crate::__pgrx_c_generated::Field653
+        $crate::__pgrx_c_generated::Field_backend_subxact_overflowed
     };
     (backend_xid) => {
-        $crate::__pgrx_c_generated::Field654
+        $crate::__pgrx_c_generated::Field_backend_xid
     };
     (backend_xmin) => {
-        $crate::__pgrx_c_generated::Field655
+        $crate::__pgrx_c_generated::Field_backend_xmin
     };
     (backslash_quote) => {
-        $crate::__pgrx_c_generated::Field656
+        $crate::__pgrx_c_generated::Field_backslash_quote
     };
     (backupEndPoint) => {
-        $crate::__pgrx_c_generated::Field658
+        $crate::__pgrx_c_generated::Field_backupEndPoint
     };
     (backupEndRequired) => {
-        $crate::__pgrx_c_generated::Field659
+        $crate::__pgrx_c_generated::Field_backupEndRequired
     };
     (backupStartPoint) => {
-        $crate::__pgrx_c_generated::Field660
+        $crate::__pgrx_c_generated::Field_backupStartPoint
     };
     (backward) => {
-        $crate::__pgrx_c_generated::Field661
+        $crate::__pgrx_c_generated::Field_backward
     };
     (base_slot_size) => {
-        $crate::__pgrx_c_generated::Field666
+        $crate::__pgrx_c_generated::Field_base_slot_size
     };
     (base_snapshot_lsn) => {
-        $crate::__pgrx_c_generated::Field668
+        $crate::__pgrx_c_generated::Field_base_snapshot_lsn
     };
     (baseoff) => {
-        $crate::__pgrx_c_generated::Field670
+        $crate::__pgrx_c_generated::Field_baseoff
     };
     (baserestrict_min_security) => {
-        $crate::__pgrx_c_generated::Field671
+        $crate::__pgrx_c_generated::Field_baserestrict_min_security
     };
     (baserestrictinfo) => {
-        $crate::__pgrx_c_generated::Field673
+        $crate::__pgrx_c_generated::Field_baserestrictinfo
     };
     (basetupsize) => {
-        $crate::__pgrx_c_generated::Field674
+        $crate::__pgrx_c_generated::Field_basetupsize
     };
     (batches) => {
-        $crate::__pgrx_c_generated::Field677
+        $crate::__pgrx_c_generated::Field_batches
     };
     (bd_totalstored) => {
-        $crate::__pgrx_c_generated::Field682
+        $crate::__pgrx_c_generated::Field_bd_totalstored
     };
     (begin) => {
-        $crate::__pgrx_c_generated::Field684
+        $crate::__pgrx_c_generated::Field_begin
     };
     (begun) => {
-        $crate::__pgrx_c_generated::Field689
+        $crate::__pgrx_c_generated::Field_begun
     };
     (behavior) => {
-        $crate::__pgrx_c_generated::Field690
+        $crate::__pgrx_c_generated::Field_behavior
     };
     (bgw_flags) => {
-        $crate::__pgrx_c_generated::Field692
+        $crate::__pgrx_c_generated::Field_bgw_flags
     };
     (bgw_main_arg) => {
-        $crate::__pgrx_c_generated::Field695
+        $crate::__pgrx_c_generated::Field_bgw_main_arg
     };
     (bgw_notify_pid) => {
-        $crate::__pgrx_c_generated::Field697
+        $crate::__pgrx_c_generated::Field_bgw_notify_pid
     };
     (bgw_restart_time) => {
-        $crate::__pgrx_c_generated::Field698
+        $crate::__pgrx_c_generated::Field_bgw_restart_time
     };
     (bgw_start_time) => {
-        $crate::__pgrx_c_generated::Field699
+        $crate::__pgrx_c_generated::Field_bgw_start_time
     };
     (bgworker_notify) => {
-        $crate::__pgrx_c_generated::Field703
+        $crate::__pgrx_c_generated::Field_bgworker_notify
     };
     (bi_hi) => {
-        $crate::__pgrx_c_generated::Field704
+        $crate::__pgrx_c_generated::Field_bi_hi
     };
     (bi_lo) => {
-        $crate::__pgrx_c_generated::Field705
+        $crate::__pgrx_c_generated::Field_bi_lo
     };
     (bimg_info) => {
-        $crate::__pgrx_c_generated::Field706
+        $crate::__pgrx_c_generated::Field_bimg_info
     };
     (bimg_len) => {
-        $crate::__pgrx_c_generated::Field707
+        $crate::__pgrx_c_generated::Field_bimg_len
     };
     (binary) => {
-        $crate::__pgrx_c_generated::Field708
+        $crate::__pgrx_c_generated::Field_binary
     };
     (binary_mode) => {
-        $crate::__pgrx_c_generated::Field709
+        $crate::__pgrx_c_generated::Field_binary_mode
     };
     (biss_NumArrayKeys) => {
-        $crate::__pgrx_c_generated::Field712
+        $crate::__pgrx_c_generated::Field_biss_NumArrayKeys
     };
     (biss_NumRuntimeKeys) => {
-        $crate::__pgrx_c_generated::Field713
+        $crate::__pgrx_c_generated::Field_biss_NumRuntimeKeys
     };
     (biss_NumScanKeys) => {
-        $crate::__pgrx_c_generated::Field714
+        $crate::__pgrx_c_generated::Field_biss_NumScanKeys
     };
     (biss_RuntimeKeysReady) => {
-        $crate::__pgrx_c_generated::Field718
+        $crate::__pgrx_c_generated::Field_biss_RuntimeKeysReady
     };
     (bitmapplans) => {
-        $crate::__pgrx_c_generated::Field723
+        $crate::__pgrx_c_generated::Field_bitmapplans
     };
     (bkend_type) => {
-        $crate::__pgrx_c_generated::Field729
+        $crate::__pgrx_c_generated::Field_bkend_type
     };
     (blcksz) => {
-        $crate::__pgrx_c_generated::Field731
+        $crate::__pgrx_c_generated::Field_blcksz
     };
     (blk_read_time) => {
-        $crate::__pgrx_c_generated::Field732
+        $crate::__pgrx_c_generated::Field_blk_read_time
     };
     (blk_write_time) => {
-        $crate::__pgrx_c_generated::Field733
+        $crate::__pgrx_c_generated::Field_blk_write_time
     };
     (blkno) => {
-        $crate::__pgrx_c_generated::Field734
+        $crate::__pgrx_c_generated::Field_blkno
     };
     (block) => {
-        $crate::__pgrx_c_generated::Field735
+        $crate::__pgrx_c_generated::Field_block
     };
     (blockNum) => {
-        $crate::__pgrx_c_generated::Field736
+        $crate::__pgrx_c_generated::Field_blockNum
     };
     (blockno) => {
-        $crate::__pgrx_c_generated::Field737
+        $crate::__pgrx_c_generated::Field_blockno
     };
     (blocknum) => {
-        $crate::__pgrx_c_generated::Field738
+        $crate::__pgrx_c_generated::Field_blocknum
     };
     (blocks) => {
-        $crate::__pgrx_c_generated::Field739
+        $crate::__pgrx_c_generated::Field_blocks
     };
     (blocksCount) => {
-        $crate::__pgrx_c_generated::Field740
+        $crate::__pgrx_c_generated::Field_blocksCount
     };
     (blocks_exists) => {
-        $crate::__pgrx_c_generated::Field741
+        $crate::__pgrx_c_generated::Field_blocks_exists
     };
     (blocks_fetched) => {
-        $crate::__pgrx_c_generated::Field742
+        $crate::__pgrx_c_generated::Field_blocks_fetched
     };
     (blocks_hit) => {
-        $crate::__pgrx_c_generated::Field743
+        $crate::__pgrx_c_generated::Field_blocks_hit
     };
     (blocks_read) => {
-        $crate::__pgrx_c_generated::Field744
+        $crate::__pgrx_c_generated::Field_blocks_read
     };
     (blocks_written) => {
-        $crate::__pgrx_c_generated::Field745
+        $crate::__pgrx_c_generated::Field_blocks_written
     };
     (blocks_zeroed) => {
-        $crate::__pgrx_c_generated::Field746
+        $crate::__pgrx_c_generated::Field_blocks_zeroed
     };
     (bmpage_found) => {
-        $crate::__pgrx_c_generated::Field748
+        $crate::__pgrx_c_generated::Field_bmpage_found
     };
     (bmsize) => {
-        $crate::__pgrx_c_generated::Field749
+        $crate::__pgrx_c_generated::Field_bmsize
     };
     (body) => {
-        $crate::__pgrx_c_generated::Field750
+        $crate::__pgrx_c_generated::Field_body
     };
     (bool_val) => {
-        $crate::__pgrx_c_generated::Field752
+        $crate::__pgrx_c_generated::Field_bool_val
     };
     (boolean) => {
-        $crate::__pgrx_c_generated::Field753
+        $crate::__pgrx_c_generated::Field_boolean
     };
     (boolop) => {
-        $crate::__pgrx_c_generated::Field755
+        $crate::__pgrx_c_generated::Field_boolop
     };
     (booltesttype) => {
-        $crate::__pgrx_c_generated::Field756
+        $crate::__pgrx_c_generated::Field_booltesttype
     };
     (boolval) => {
-        $crate::__pgrx_c_generated::Field757
+        $crate::__pgrx_c_generated::Field_boolval
     };
     (boot_val) => {
-        $crate::__pgrx_c_generated::Field758
+        $crate::__pgrx_c_generated::Field_boot_val
     };
     (bottomup) => {
-        $crate::__pgrx_c_generated::Field759
+        $crate::__pgrx_c_generated::Field_bottomup
     };
     (bottomupfreespace) => {
-        $crate::__pgrx_c_generated::Field760
+        $crate::__pgrx_c_generated::Field_bottomupfreespace
     };
     (bound) => {
-        $crate::__pgrx_c_generated::Field761
+        $crate::__pgrx_c_generated::Field_bound
     };
     (bound_Done) => {
-        $crate::__pgrx_c_generated::Field763
+        $crate::__pgrx_c_generated::Field_bound_Done
     };
     (bounded) => {
-        $crate::__pgrx_c_generated::Field765
+        $crate::__pgrx_c_generated::Field_bounded
     };
     (bounded_Done) => {
-        $crate::__pgrx_c_generated::Field766
+        $crate::__pgrx_c_generated::Field_bounded_Done
     };
     (boundinfo) => {
-        $crate::__pgrx_c_generated::Field767
+        $crate::__pgrx_c_generated::Field_boundinfo
     };
     (bounds_valid) => {
-        $crate::__pgrx_c_generated::Field768
+        $crate::__pgrx_c_generated::Field_bounds_valid
     };
     (brinMagic) => {
-        $crate::__pgrx_c_generated::Field769
+        $crate::__pgrx_c_generated::Field_brinMagic
     };
     (brinVersion) => {
-        $crate::__pgrx_c_generated::Field770
+        $crate::__pgrx_c_generated::Field_brinVersion
     };
     (bt_blkno) => {
-        $crate::__pgrx_c_generated::Field773
+        $crate::__pgrx_c_generated::Field_bt_blkno
     };
     (bt_empty_range) => {
-        $crate::__pgrx_c_generated::Field776
+        $crate::__pgrx_c_generated::Field_bt_empty_range
     };
     (bt_info) => {
-        $crate::__pgrx_c_generated::Field778
+        $crate::__pgrx_c_generated::Field_bt_info
     };
     (bt_placeholder) => {
-        $crate::__pgrx_c_generated::Field779
+        $crate::__pgrx_c_generated::Field_bt_placeholder
     };
     (btm_allequalimage) => {
-        $crate::__pgrx_c_generated::Field781
+        $crate::__pgrx_c_generated::Field_btm_allequalimage
     };
     (btm_fastlevel) => {
-        $crate::__pgrx_c_generated::Field782
+        $crate::__pgrx_c_generated::Field_btm_fastlevel
     };
     (btm_fastroot) => {
-        $crate::__pgrx_c_generated::Field783
+        $crate::__pgrx_c_generated::Field_btm_fastroot
     };
     (btm_last_cleanup_num_delpages) => {
-        $crate::__pgrx_c_generated::Field784
+        $crate::__pgrx_c_generated::Field_btm_last_cleanup_num_delpages
     };
     (btm_level) => {
-        $crate::__pgrx_c_generated::Field786
+        $crate::__pgrx_c_generated::Field_btm_level
     };
     (btm_magic) => {
-        $crate::__pgrx_c_generated::Field787
+        $crate::__pgrx_c_generated::Field_btm_magic
     };
     (btm_root) => {
-        $crate::__pgrx_c_generated::Field788
+        $crate::__pgrx_c_generated::Field_btm_root
     };
     (btm_version) => {
-        $crate::__pgrx_c_generated::Field789
+        $crate::__pgrx_c_generated::Field_btm_version
     };
     (btpo_cycleid) => {
-        $crate::__pgrx_c_generated::Field790
+        $crate::__pgrx_c_generated::Field_btpo_cycleid
     };
     (btpo_flags) => {
-        $crate::__pgrx_c_generated::Field791
+        $crate::__pgrx_c_generated::Field_btpo_flags
     };
     (btpo_level) => {
-        $crate::__pgrx_c_generated::Field792
+        $crate::__pgrx_c_generated::Field_btpo_level
     };
     (btpo_next) => {
-        $crate::__pgrx_c_generated::Field793
+        $crate::__pgrx_c_generated::Field_btpo_next
     };
     (btpo_prev) => {
-        $crate::__pgrx_c_generated::Field794
+        $crate::__pgrx_c_generated::Field_btpo_prev
     };
     (btree_opf) => {
-        $crate::__pgrx_c_generated::Field796
+        $crate::__pgrx_c_generated::Field_btree_opf
     };
     (btree_opintype) => {
-        $crate::__pgrx_c_generated::Field797
+        $crate::__pgrx_c_generated::Field_btree_opintype
     };
     (bts_blkno) => {
-        $crate::__pgrx_c_generated::Field798
+        $crate::__pgrx_c_generated::Field_bts_blkno
     };
     (bts_offset) => {
-        $crate::__pgrx_c_generated::Field799
+        $crate::__pgrx_c_generated::Field_bts_offset
     };
     (btype) => {
-        $crate::__pgrx_c_generated::Field801
+        $crate::__pgrx_c_generated::Field_btype
     };
     (buckets) => {
-        $crate::__pgrx_c_generated::Field802
+        $crate::__pgrx_c_generated::Field_buckets
     };
     (buf) => {
-        $crate::__pgrx_c_generated::Field803
+        $crate::__pgrx_c_generated::Field_buf
     };
     (buf_alloc) => {
-        $crate::__pgrx_c_generated::Field804
+        $crate::__pgrx_c_generated::Field_buf_alloc
     };
     (buf_id) => {
-        $crate::__pgrx_c_generated::Field805
+        $crate::__pgrx_c_generated::Field_buf_id
     };
     (buf_written_clean) => {
-        $crate::__pgrx_c_generated::Field806
+        $crate::__pgrx_c_generated::Field_buf_written_clean
     };
     (buffer) => {
-        $crate::__pgrx_c_generated::Field807
+        $crate::__pgrx_c_generated::Field_buffer
     };
     (bufferEmptyingQueue) => {
-        $crate::__pgrx_c_generated::Field808
+        $crate::__pgrx_c_generated::Field_bufferEmptyingQueue
     };
     (buffering_mode) => {
-        $crate::__pgrx_c_generated::Field813
+        $crate::__pgrx_c_generated::Field_buffering_mode
     };
     (buffers) => {
-        $crate::__pgrx_c_generated::Field814
+        $crate::__pgrx_c_generated::Field_buffers
     };
     (buffersOnLevelsLen) => {
-        $crate::__pgrx_c_generated::Field816
+        $crate::__pgrx_c_generated::Field_buffersOnLevelsLen
     };
     (buffers_written) => {
-        $crate::__pgrx_c_generated::Field817
+        $crate::__pgrx_c_generated::Field_buffers_written
     };
     (bufsize) => {
-        $crate::__pgrx_c_generated::Field818
+        $crate::__pgrx_c_generated::Field_bufsize
     };
     (building_full_snapshot) => {
-        $crate::__pgrx_c_generated::Field823
+        $crate::__pgrx_c_generated::Field_building_full_snapshot
     };
     (bv_allnulls) => {
-        $crate::__pgrx_c_generated::Field825
+        $crate::__pgrx_c_generated::Field_bv_allnulls
     };
     (bv_attno) => {
-        $crate::__pgrx_c_generated::Field826
+        $crate::__pgrx_c_generated::Field_bv_attno
     };
     (bv_hasnulls) => {
-        $crate::__pgrx_c_generated::Field828
+        $crate::__pgrx_c_generated::Field_bv_hasnulls
     };
     (bv_mem_value) => {
-        $crate::__pgrx_c_generated::Field829
+        $crate::__pgrx_c_generated::Field_bv_mem_value
     };
     (by_txn_last_xid) => {
-        $crate::__pgrx_c_generated::Field834
+        $crate::__pgrx_c_generated::Field_by_txn_last_xid
     };
     (bytes) => {
-        $crate::__pgrx_c_generated::Field835
+        $crate::__pgrx_c_generated::Field_bytes
     };
     (bytesSent) => {
-        $crate::__pgrx_c_generated::Field836
+        $crate::__pgrx_c_generated::Field_bytesSent
     };
     (bytes_processed) => {
-        $crate::__pgrx_c_generated::Field837
+        $crate::__pgrx_c_generated::Field_bytes_processed
     };
     (cacheEntrySize) => {
-        $crate::__pgrx_c_generated::Field839
+        $crate::__pgrx_c_generated::Field_cacheEntrySize
     };
     (cacheId) => {
-        $crate::__pgrx_c_generated::Field840
+        $crate::__pgrx_c_generated::Field_cacheId
     };
     (cache_evictions) => {
-        $crate::__pgrx_c_generated::Field843
+        $crate::__pgrx_c_generated::Field_cache_evictions
     };
     (cache_hits) => {
-        $crate::__pgrx_c_generated::Field844
+        $crate::__pgrx_c_generated::Field_cache_hits
     };
     (cache_misses) => {
-        $crate::__pgrx_c_generated::Field845
+        $crate::__pgrx_c_generated::Field_cache_misses
     };
     (cache_overflows) => {
-        $crate::__pgrx_c_generated::Field846
+        $crate::__pgrx_c_generated::Field_cache_overflows
     };
     (call_cntr) => {
-        $crate::__pgrx_c_generated::Field851
+        $crate::__pgrx_c_generated::Field_call_cntr
     };
     (callback_pending) => {
-        $crate::__pgrx_c_generated::Field854
+        $crate::__pgrx_c_generated::Field_callback_pending
     };
     (canAcceptConnections) => {
-        $crate::__pgrx_c_generated::Field859
+        $crate::__pgrx_c_generated::Field_canAcceptConnections
     };
     (canReturnData) => {
-        $crate::__pgrx_c_generated::Field861
+        $crate::__pgrx_c_generated::Field_canReturnData
     };
     (canSetTag) => {
-        $crate::__pgrx_c_generated::Field862
+        $crate::__pgrx_c_generated::Field_canSetTag
     };
     (can_join) => {
-        $crate::__pgrx_c_generated::Field863
+        $crate::__pgrx_c_generated::Field_can_join
     };
     (cancelRequestCode) => {
-        $crate::__pgrx_c_generated::Field865
+        $crate::__pgrx_c_generated::Field_cancelRequestCode
     };
     (candidate_catalog_xmin) => {
-        $crate::__pgrx_c_generated::Field866
+        $crate::__pgrx_c_generated::Field_candidate_catalog_xmin
     };
     (candidate_restart_lsn) => {
-        $crate::__pgrx_c_generated::Field867
+        $crate::__pgrx_c_generated::Field_candidate_restart_lsn
     };
     (candidate_restart_valid) => {
-        $crate::__pgrx_c_generated::Field868
+        $crate::__pgrx_c_generated::Field_candidate_restart_valid
     };
     (candidate_xmin_lsn) => {
-        $crate::__pgrx_c_generated::Field869
+        $crate::__pgrx_c_generated::Field_candidate_xmin_lsn
     };
     (canon_pathkeys) => {
-        $crate::__pgrx_c_generated::Field870
+        $crate::__pgrx_c_generated::Field_canon_pathkeys
     };
     (cascade) => {
-        $crate::__pgrx_c_generated::Field872
+        $crate::__pgrx_c_generated::Field_cascade
     };
     (cascaded) => {
-        $crate::__pgrx_c_generated::Field873
+        $crate::__pgrx_c_generated::Field_cascaded
     };
     (caseValue_datum) => {
-        $crate::__pgrx_c_generated::Field874
+        $crate::__pgrx_c_generated::Field_caseValue_datum
     };
     (caseValue_isNull) => {
-        $crate::__pgrx_c_generated::Field875
+        $crate::__pgrx_c_generated::Field_caseValue_isNull
     };
     (case_when_list) => {
-        $crate::__pgrx_c_generated::Field876
+        $crate::__pgrx_c_generated::Field_case_when_list
     };
     (casecollid) => {
-        $crate::__pgrx_c_generated::Field877
+        $crate::__pgrx_c_generated::Field_casecollid
     };
     (casemap_full) => {
-        $crate::__pgrx_c_generated::Field878
+        $crate::__pgrx_c_generated::Field_casemap_full
     };
     (casetype) => {
-        $crate::__pgrx_c_generated::Field880
+        $crate::__pgrx_c_generated::Field_casetype
     };
     (castcontext) => {
-        $crate::__pgrx_c_generated::Field883
+        $crate::__pgrx_c_generated::Field_castcontext
     };
     (castfunc) => {
-        $crate::__pgrx_c_generated::Field884
+        $crate::__pgrx_c_generated::Field_castfunc
     };
     (castmethod) => {
-        $crate::__pgrx_c_generated::Field885
+        $crate::__pgrx_c_generated::Field_castmethod
     };
     (castsource) => {
-        $crate::__pgrx_c_generated::Field886
+        $crate::__pgrx_c_generated::Field_castsource
     };
     (casttarget) => {
-        $crate::__pgrx_c_generated::Field887
+        $crate::__pgrx_c_generated::Field_casttarget
     };
     (catId) => {
-        $crate::__pgrx_c_generated::Field889
+        $crate::__pgrx_c_generated::Field_catId
     };
     (catalog_version_no) => {
-        $crate::__pgrx_c_generated::Field890
+        $crate::__pgrx_c_generated::Field_catalog_version_no
     };
     (catalog_xmin) => {
-        $crate::__pgrx_c_generated::Field891
+        $crate::__pgrx_c_generated::Field_catalog_xmin
     };
     (category) => {
-        $crate::__pgrx_c_generated::Field896
+        $crate::__pgrx_c_generated::Field_category
     };
     (cc_indexoid) => {
-        $crate::__pgrx_c_generated::Field902
+        $crate::__pgrx_c_generated::Field_cc_indexoid
     };
     (cc_nbuckets) => {
-        $crate::__pgrx_c_generated::Field905
+        $crate::__pgrx_c_generated::Field_cc_nbuckets
     };
     (cc_nkeys) => {
-        $crate::__pgrx_c_generated::Field907
+        $crate::__pgrx_c_generated::Field_cc_nkeys
     };
     (cc_nlbuckets) => {
-        $crate::__pgrx_c_generated::Field908
+        $crate::__pgrx_c_generated::Field_cc_nlbuckets
     };
     (cc_nlist) => {
-        $crate::__pgrx_c_generated::Field909
+        $crate::__pgrx_c_generated::Field_cc_nlist
     };
     (cc_ntup) => {
-        $crate::__pgrx_c_generated::Field910
+        $crate::__pgrx_c_generated::Field_cc_ntup
     };
     (cc_relisshared) => {
-        $crate::__pgrx_c_generated::Field911
+        $crate::__pgrx_c_generated::Field_cc_relisshared
     };
     (cc_reloid) => {
-        $crate::__pgrx_c_generated::Field913
+        $crate::__pgrx_c_generated::Field_cc_reloid
     };
     (ccenforced) => {
-        $crate::__pgrx_c_generated::Field917
+        $crate::__pgrx_c_generated::Field_ccenforced
     };
     (ccnoinherit) => {
-        $crate::__pgrx_c_generated::Field919
+        $crate::__pgrx_c_generated::Field_ccnoinherit
     };
     (ccvalid) => {
-        $crate::__pgrx_c_generated::Field920
+        $crate::__pgrx_c_generated::Field_ccvalid
     };
     (cfgId) => {
-        $crate::__pgrx_c_generated::Field922
+        $crate::__pgrx_c_generated::Field_cfgId
     };
     (cfgname) => {
-        $crate::__pgrx_c_generated::Field923
+        $crate::__pgrx_c_generated::Field_cfgname
     };
     (cfgnamespace) => {
-        $crate::__pgrx_c_generated::Field924
+        $crate::__pgrx_c_generated::Field_cfgnamespace
     };
     (cfgowner) => {
-        $crate::__pgrx_c_generated::Field925
+        $crate::__pgrx_c_generated::Field_cfgowner
     };
     (cfgparser) => {
-        $crate::__pgrx_c_generated::Field926
+        $crate::__pgrx_c_generated::Field_cfgparser
     };
     (ch_ntup) => {
-        $crate::__pgrx_c_generated::Field929
+        $crate::__pgrx_c_generated::Field_ch_ntup
     };
     (chain) => {
-        $crate::__pgrx_c_generated::Field930
+        $crate::__pgrx_c_generated::Field_chain
     };
     (changed_tuples) => {
-        $crate::__pgrx_c_generated::Field933
+        $crate::__pgrx_c_generated::Field_changed_tuples
     };
     (cheapest_parameterized_paths) => {
-        $crate::__pgrx_c_generated::Field937
+        $crate::__pgrx_c_generated::Field_cheapest_parameterized_paths
     };
     (checkAsUser) => {
-        $crate::__pgrx_c_generated::Field942
+        $crate::__pgrx_c_generated::Field_checkAsUser
     };
     (checkPoint) => {
-        $crate::__pgrx_c_generated::Field943
+        $crate::__pgrx_c_generated::Field_checkPoint
     };
     (check_option) => {
-        $crate::__pgrx_c_generated::Field948
+        $crate::__pgrx_c_generated::Field_check_option
     };
     (checkflags) => {
-        $crate::__pgrx_c_generated::Field949
+        $crate::__pgrx_c_generated::Field_checkflags
     };
     (checkpointerProc) => {
-        $crate::__pgrx_c_generated::Field951
+        $crate::__pgrx_c_generated::Field_checkpointerProc
     };
     (checkpointloc) => {
-        $crate::__pgrx_c_generated::Field952
+        $crate::__pgrx_c_generated::Field_checkpointloc
     };
     (checksum) => {
-        $crate::__pgrx_c_generated::Field953
+        $crate::__pgrx_c_generated::Field_checksum
     };
     (checksum_failures) => {
-        $crate::__pgrx_c_generated::Field954
+        $crate::__pgrx_c_generated::Field_checksum_failures
     };
     (childLocks) => {
-        $crate::__pgrx_c_generated::Field958
+        $crate::__pgrx_c_generated::Field_childLocks
     };
     (childNodeN) => {
-        $crate::__pgrx_c_generated::Field959
+        $crate::__pgrx_c_generated::Field_childNodeN
     };
     (child_blkno) => {
-        $crate::__pgrx_c_generated::Field960
+        $crate::__pgrx_c_generated::Field_child_blkno
     };
     (child_relid) => {
-        $crate::__pgrx_c_generated::Field961
+        $crate::__pgrx_c_generated::Field_child_relid
     };
     (child_reltype) => {
-        $crate::__pgrx_c_generated::Field963
+        $crate::__pgrx_c_generated::Field_child_reltype
     };
     (child_slot) => {
-        $crate::__pgrx_c_generated::Field964
+        $crate::__pgrx_c_generated::Field_child_slot
     };
     (chunk_work_queue) => {
-        $crate::__pgrx_c_generated::Field967
+        $crate::__pgrx_c_generated::Field_chunk_work_queue
     };
     (chunks) => {
-        $crate::__pgrx_c_generated::Field968
+        $crate::__pgrx_c_generated::Field_chunks
     };
     (ckpt_agg_sync_time) => {
-        $crate::__pgrx_c_generated::Field969
+        $crate::__pgrx_c_generated::Field_ckpt_agg_sync_time
     };
     (ckpt_bufs_written) => {
-        $crate::__pgrx_c_generated::Field970
+        $crate::__pgrx_c_generated::Field_ckpt_bufs_written
     };
     (ckpt_end_t) => {
-        $crate::__pgrx_c_generated::Field971
+        $crate::__pgrx_c_generated::Field_ckpt_end_t
     };
     (ckpt_longest_sync) => {
-        $crate::__pgrx_c_generated::Field972
+        $crate::__pgrx_c_generated::Field_ckpt_longest_sync
     };
     (ckpt_segs_added) => {
-        $crate::__pgrx_c_generated::Field973
+        $crate::__pgrx_c_generated::Field_ckpt_segs_added
     };
     (ckpt_segs_recycled) => {
-        $crate::__pgrx_c_generated::Field974
+        $crate::__pgrx_c_generated::Field_ckpt_segs_recycled
     };
     (ckpt_segs_removed) => {
-        $crate::__pgrx_c_generated::Field975
+        $crate::__pgrx_c_generated::Field_ckpt_segs_removed
     };
     (ckpt_slru_written) => {
-        $crate::__pgrx_c_generated::Field976
+        $crate::__pgrx_c_generated::Field_ckpt_slru_written
     };
     (ckpt_start_t) => {
-        $crate::__pgrx_c_generated::Field977
+        $crate::__pgrx_c_generated::Field_ckpt_start_t
     };
     (ckpt_sync_end_t) => {
-        $crate::__pgrx_c_generated::Field978
+        $crate::__pgrx_c_generated::Field_ckpt_sync_end_t
     };
     (ckpt_sync_rels) => {
-        $crate::__pgrx_c_generated::Field979
+        $crate::__pgrx_c_generated::Field_ckpt_sync_rels
     };
     (ckpt_sync_t) => {
-        $crate::__pgrx_c_generated::Field980
+        $crate::__pgrx_c_generated::Field_ckpt_sync_t
     };
     (ckpt_write_t) => {
-        $crate::__pgrx_c_generated::Field981
+        $crate::__pgrx_c_generated::Field_ckpt_write_t
     };
     (cl_magic) => {
-        $crate::__pgrx_c_generated::Field982
+        $crate::__pgrx_c_generated::Field_cl_magic
     };
     (classId) => {
-        $crate::__pgrx_c_generated::Field983
+        $crate::__pgrx_c_generated::Field_classId
     };
     (class_args) => {
-        $crate::__pgrx_c_generated::Field984
+        $crate::__pgrx_c_generated::Field_class_args
     };
     (classid) => {
-        $crate::__pgrx_c_generated::Field985
+        $crate::__pgrx_c_generated::Field_classid
     };
     (classoid) => {
-        $crate::__pgrx_c_generated::Field986
+        $crate::__pgrx_c_generated::Field_classoid
     };
     (clauses) => {
-        $crate::__pgrx_c_generated::Field989
+        $crate::__pgrx_c_generated::Field_clauses
     };
     (clear_dead_marking) => {
-        $crate::__pgrx_c_generated::Field992
+        $crate::__pgrx_c_generated::Field_clear_dead_marking
     };
     (clear_toast_afterwards) => {
-        $crate::__pgrx_c_generated::Field993
+        $crate::__pgrx_c_generated::Field_clear_toast_afterwards
     };
     (clocations_buf_size) => {
-        $crate::__pgrx_c_generated::Field995
+        $crate::__pgrx_c_generated::Field_clocations_buf_size
     };
     (clocations_count) => {
-        $crate::__pgrx_c_generated::Field996
+        $crate::__pgrx_c_generated::Field_clocations_count
     };
     (clogGroupMember) => {
-        $crate::__pgrx_c_generated::Field998
+        $crate::__pgrx_c_generated::Field_clogGroupMember
     };
     (clogGroupMemberLsn) => {
-        $crate::__pgrx_c_generated::Field999
+        $crate::__pgrx_c_generated::Field_clogGroupMemberLsn
     };
     (clogGroupMemberPage) => {
-        $crate::__pgrx_c_generated::Field1000
+        $crate::__pgrx_c_generated::Field_clogGroupMemberPage
     };
     (clogGroupMemberXid) => {
-        $crate::__pgrx_c_generated::Field1001
+        $crate::__pgrx_c_generated::Field_clogGroupMemberXid
     };
     (clogGroupMemberXidStatus) => {
-        $crate::__pgrx_c_generated::Field1002
+        $crate::__pgrx_c_generated::Field_clogGroupMemberXidStatus
     };
     (clogGroupNext) => {
-        $crate::__pgrx_c_generated::Field1003
+        $crate::__pgrx_c_generated::Field_clogGroupNext
     };
     (closed) => {
-        $crate::__pgrx_c_generated::Field1004
+        $crate::__pgrx_c_generated::Field_closed
     };
     (cmax) => {
-        $crate::__pgrx_c_generated::Field1005
+        $crate::__pgrx_c_generated::Field_cmax
     };
     (cmd) => {
-        $crate::__pgrx_c_generated::Field1006
+        $crate::__pgrx_c_generated::Field_cmd
     };
     (cmd_type) => {
-        $crate::__pgrx_c_generated::Field1008
+        $crate::__pgrx_c_generated::Field_cmd_type
     };
     (cmds) => {
-        $crate::__pgrx_c_generated::Field1009
+        $crate::__pgrx_c_generated::Field_cmds
     };
     (cmin) => {
-        $crate::__pgrx_c_generated::Field1010
+        $crate::__pgrx_c_generated::Field_cmin
     };
     (cmp_proc) => {
-        $crate::__pgrx_c_generated::Field1015
+        $crate::__pgrx_c_generated::Field_cmp_proc
     };
     (cmpfns) => {
-        $crate::__pgrx_c_generated::Field1017
+        $crate::__pgrx_c_generated::Field_cmpfns
     };
     (cmptype) => {
-        $crate::__pgrx_c_generated::Field1018
+        $crate::__pgrx_c_generated::Field_cmptype
     };
     (coalescecollid) => {
-        $crate::__pgrx_c_generated::Field1022
+        $crate::__pgrx_c_generated::Field_coalescecollid
     };
     (coalescetype) => {
-        $crate::__pgrx_c_generated::Field1023
+        $crate::__pgrx_c_generated::Field_coalescetype
     };
     (code) => {
-        $crate::__pgrx_c_generated::Field1024
+        $crate::__pgrx_c_generated::Field_code
     };
     (coerce) => {
-        $crate::__pgrx_c_generated::Field1025
+        $crate::__pgrx_c_generated::Field_coerce
     };
     (coerceformat) => {
-        $crate::__pgrx_c_generated::Field1026
+        $crate::__pgrx_c_generated::Field_coerceformat
     };
     (coercionformat) => {
-        $crate::__pgrx_c_generated::Field1028
+        $crate::__pgrx_c_generated::Field_coercionformat
     };
     (colCollations) => {
-        $crate::__pgrx_c_generated::Field1029
+        $crate::__pgrx_c_generated::Field_colCollations
     };
     (colMax) => {
-        $crate::__pgrx_c_generated::Field1030
+        $crate::__pgrx_c_generated::Field_colMax
     };
     (colMin) => {
-        $crate::__pgrx_c_generated::Field1031
+        $crate::__pgrx_c_generated::Field_colMin
     };
     (colNames) => {
-        $crate::__pgrx_c_generated::Field1032
+        $crate::__pgrx_c_generated::Field_colNames
     };
     (colTypes) => {
-        $crate::__pgrx_c_generated::Field1033
+        $crate::__pgrx_c_generated::Field_colTypes
     };
     (colTypmods) => {
-        $crate::__pgrx_c_generated::Field1034
+        $crate::__pgrx_c_generated::Field_colTypmods
     };
     (col_privs) => {
-        $crate::__pgrx_c_generated::Field1035
+        $crate::__pgrx_c_generated::Field_col_privs
     };
     (colcollations) => {
-        $crate::__pgrx_c_generated::Field1036
+        $crate::__pgrx_c_generated::Field_colcollations
     };
     (coldefexprs) => {
-        $crate::__pgrx_c_generated::Field1038
+        $crate::__pgrx_c_generated::Field_coldefexprs
     };
     (coldeflist) => {
-        $crate::__pgrx_c_generated::Field1039
+        $crate::__pgrx_c_generated::Field_coldeflist
     };
     (colexprs) => {
-        $crate::__pgrx_c_generated::Field1041
+        $crate::__pgrx_c_generated::Field_colexprs
     };
     (collOid) => {
-        $crate::__pgrx_c_generated::Field1043
+        $crate::__pgrx_c_generated::Field_collOid
     };
     (collate_is_c) => {
-        $crate::__pgrx_c_generated::Field1045
+        $crate::__pgrx_c_generated::Field_collate_is_c
     };
     (collation) => {
-        $crate::__pgrx_c_generated::Field1046
+        $crate::__pgrx_c_generated::Field_collation
     };
     (collencoding) => {
-        $crate::__pgrx_c_generated::Field1048
+        $crate::__pgrx_c_generated::Field_collencoding
     };
     (collisdeterministic) => {
-        $crate::__pgrx_c_generated::Field1049
+        $crate::__pgrx_c_generated::Field_collisdeterministic
     };
     (collname) => {
-        $crate::__pgrx_c_generated::Field1050
+        $crate::__pgrx_c_generated::Field_collname
     };
     (collnamespace) => {
-        $crate::__pgrx_c_generated::Field1051
+        $crate::__pgrx_c_generated::Field_collnamespace
     };
     (collowner) => {
-        $crate::__pgrx_c_generated::Field1052
+        $crate::__pgrx_c_generated::Field_collowner
     };
     (collprovider) => {
-        $crate::__pgrx_c_generated::Field1053
+        $crate::__pgrx_c_generated::Field_collprovider
     };
     (colnames) => {
-        $crate::__pgrx_c_generated::Field1055
+        $crate::__pgrx_c_generated::Field_colnames
     };
     (colno) => {
-        $crate::__pgrx_c_generated::Field1056
+        $crate::__pgrx_c_generated::Field_colno
     };
     (color) => {
-        $crate::__pgrx_c_generated::Field1058
+        $crate::__pgrx_c_generated::Field_color
     };
     (cols) => {
-        $crate::__pgrx_c_generated::Field1059
+        $crate::__pgrx_c_generated::Field_cols
     };
     (cols_valid_for_delete) => {
-        $crate::__pgrx_c_generated::Field1060
+        $crate::__pgrx_c_generated::Field_cols_valid_for_delete
     };
     (cols_valid_for_update) => {
-        $crate::__pgrx_c_generated::Field1061
+        $crate::__pgrx_c_generated::Field_cols_valid_for_update
     };
     (coltype) => {
-        $crate::__pgrx_c_generated::Field1063
+        $crate::__pgrx_c_generated::Field_coltype
     };
     (coltypes) => {
-        $crate::__pgrx_c_generated::Field1064
+        $crate::__pgrx_c_generated::Field_coltypes
     };
     (coltypmods) => {
-        $crate::__pgrx_c_generated::Field1065
+        $crate::__pgrx_c_generated::Field_coltypmods
     };
     (columns) => {
-        $crate::__pgrx_c_generated::Field1067
+        $crate::__pgrx_c_generated::Field_columns
     };
     (colvalexprs) => {
-        $crate::__pgrx_c_generated::Field1068
+        $crate::__pgrx_c_generated::Field_colvalexprs
     };
     (combineOp) => {
-        $crate::__pgrx_c_generated::Field1070
+        $crate::__pgrx_c_generated::Field_combineOp
     };
     (combinefn_oid) => {
-        $crate::__pgrx_c_generated::Field1071
+        $crate::__pgrx_c_generated::Field_combinefn_oid
     };
     (combocid) => {
-        $crate::__pgrx_c_generated::Field1072
+        $crate::__pgrx_c_generated::Field_combocid
     };
     (commandTag) => {
-        $crate::__pgrx_c_generated::Field1073
+        $crate::__pgrx_c_generated::Field_commandTag
     };
     (commandType) => {
-        $crate::__pgrx_c_generated::Field1074
+        $crate::__pgrx_c_generated::Field_commandType
     };
     (command_id) => {
-        $crate::__pgrx_c_generated::Field1075
+        $crate::__pgrx_c_generated::Field_command_id
     };
     (commitSeqNo) => {
-        $crate::__pgrx_c_generated::Field1078
+        $crate::__pgrx_c_generated::Field_commitSeqNo
     };
     (commit_lsn) => {
-        $crate::__pgrx_c_generated::Field1080
+        $crate::__pgrx_c_generated::Field_commit_lsn
     };
     (commit_time) => {
-        $crate::__pgrx_c_generated::Field1083
+        $crate::__pgrx_c_generated::Field_commit_time
     };
     (committime) => {
-        $crate::__pgrx_c_generated::Field1085
+        $crate::__pgrx_c_generated::Field_committime
     };
     (compact_attrs) => {
-        $crate::__pgrx_c_generated::Field1090
+        $crate::__pgrx_c_generated::Field_compact_attrs
     };
     (con_relid) => {
-        $crate::__pgrx_c_generated::Field1103
+        $crate::__pgrx_c_generated::Field_con_relid
     };
     (concurrent) => {
-        $crate::__pgrx_c_generated::Field1104
+        $crate::__pgrx_c_generated::Field_concurrent
     };
     (condefault) => {
-        $crate::__pgrx_c_generated::Field1106
+        $crate::__pgrx_c_generated::Field_condefault
     };
     (condeferrable) => {
-        $crate::__pgrx_c_generated::Field1107
+        $crate::__pgrx_c_generated::Field_condeferrable
     };
     (condeferred) => {
-        $crate::__pgrx_c_generated::Field1108
+        $crate::__pgrx_c_generated::Field_condeferred
     };
     (conenforced) => {
-        $crate::__pgrx_c_generated::Field1114
+        $crate::__pgrx_c_generated::Field_conenforced
     };
     (confdeltype) => {
-        $crate::__pgrx_c_generated::Field1115
+        $crate::__pgrx_c_generated::Field_confdeltype
     };
     (config_size) => {
-        $crate::__pgrx_c_generated::Field1117
+        $crate::__pgrx_c_generated::Field_config_size
     };
     (confirmed_flush) => {
-        $crate::__pgrx_c_generated::Field1118
+        $crate::__pgrx_c_generated::Field_confirmed_flush
     };
     (conflict_bufferpin) => {
-        $crate::__pgrx_c_generated::Field1121
+        $crate::__pgrx_c_generated::Field_conflict_bufferpin
     };
     (conflict_lock) => {
-        $crate::__pgrx_c_generated::Field1123
+        $crate::__pgrx_c_generated::Field_conflict_lock
     };
     (conflict_logicalslot) => {
-        $crate::__pgrx_c_generated::Field1124
+        $crate::__pgrx_c_generated::Field_conflict_logicalslot
     };
     (conflict_snapshot) => {
-        $crate::__pgrx_c_generated::Field1125
+        $crate::__pgrx_c_generated::Field_conflict_snapshot
     };
     (conflict_startup_deadlock) => {
-        $crate::__pgrx_c_generated::Field1126
+        $crate::__pgrx_c_generated::Field_conflict_startup_deadlock
     };
     (conflict_tablespace) => {
-        $crate::__pgrx_c_generated::Field1127
+        $crate::__pgrx_c_generated::Field_conflict_tablespace
     };
     (confmatchtype) => {
-        $crate::__pgrx_c_generated::Field1128
+        $crate::__pgrx_c_generated::Field_confmatchtype
     };
     (conforencoding) => {
-        $crate::__pgrx_c_generated::Field1129
+        $crate::__pgrx_c_generated::Field_conforencoding
     };
     (confrelid) => {
-        $crate::__pgrx_c_generated::Field1130
+        $crate::__pgrx_c_generated::Field_confrelid
     };
     (confupdtype) => {
-        $crate::__pgrx_c_generated::Field1131
+        $crate::__pgrx_c_generated::Field_confupdtype
     };
     (conindid) => {
-        $crate::__pgrx_c_generated::Field1132
+        $crate::__pgrx_c_generated::Field_conindid
     };
     (coninhcount) => {
-        $crate::__pgrx_c_generated::Field1133
+        $crate::__pgrx_c_generated::Field_coninhcount
     };
     (conislocal) => {
-        $crate::__pgrx_c_generated::Field1134
+        $crate::__pgrx_c_generated::Field_conislocal
     };
     (connamespace) => {
-        $crate::__pgrx_c_generated::Field1137
+        $crate::__pgrx_c_generated::Field_connamespace
     };
     (connectSubid) => {
-        $crate::__pgrx_c_generated::Field1138
+        $crate::__pgrx_c_generated::Field_connectSubid
     };
     (connoinherit) => {
-        $crate::__pgrx_c_generated::Field1140
+        $crate::__pgrx_c_generated::Field_connoinherit
     };
     (conoid) => {
-        $crate::__pgrx_c_generated::Field1141
+        $crate::__pgrx_c_generated::Field_conoid
     };
     (conowner) => {
-        $crate::__pgrx_c_generated::Field1142
+        $crate::__pgrx_c_generated::Field_conowner
     };
     (conparentid) => {
-        $crate::__pgrx_c_generated::Field1143
+        $crate::__pgrx_c_generated::Field_conparentid
     };
     (conperiod) => {
-        $crate::__pgrx_c_generated::Field1144
+        $crate::__pgrx_c_generated::Field_conperiod
     };
     (conproc) => {
-        $crate::__pgrx_c_generated::Field1146
+        $crate::__pgrx_c_generated::Field_conproc
     };
     (conrelid) => {
-        $crate::__pgrx_c_generated::Field1147
+        $crate::__pgrx_c_generated::Field_conrelid
     };
     (consider_parallel) => {
-        $crate::__pgrx_c_generated::Field1148
+        $crate::__pgrx_c_generated::Field_consider_parallel
     };
     (consider_param_startup) => {
-        $crate::__pgrx_c_generated::Field1149
+        $crate::__pgrx_c_generated::Field_consider_param_startup
     };
     (consider_partitionwise_join) => {
-        $crate::__pgrx_c_generated::Field1150
+        $crate::__pgrx_c_generated::Field_consider_partitionwise_join
     };
     (consider_startup) => {
-        $crate::__pgrx_c_generated::Field1151
+        $crate::__pgrx_c_generated::Field_consider_startup
     };
     (constbyval) => {
-        $crate::__pgrx_c_generated::Field1154
+        $crate::__pgrx_c_generated::Field_constbyval
     };
     (constcollid) => {
-        $crate::__pgrx_c_generated::Field1155
+        $crate::__pgrx_c_generated::Field_constcollid
     };
     (constisnull) => {
-        $crate::__pgrx_c_generated::Field1156
+        $crate::__pgrx_c_generated::Field_constisnull
     };
     (constlen) => {
-        $crate::__pgrx_c_generated::Field1157
+        $crate::__pgrx_c_generated::Field_constlen
     };
     (constraint) => {
-        $crate::__pgrx_c_generated::Field1159
+        $crate::__pgrx_c_generated::Field_constraint
     };
     (constraintDeps) => {
-        $crate::__pgrx_c_generated::Field1160
+        $crate::__pgrx_c_generated::Field_constraintDeps
     };
     (constraints) => {
-        $crate::__pgrx_c_generated::Field1163
+        $crate::__pgrx_c_generated::Field_constraints
     };
     (constrainttype) => {
-        $crate::__pgrx_c_generated::Field1164
+        $crate::__pgrx_c_generated::Field_constrainttype
     };
     (consttype) => {
-        $crate::__pgrx_c_generated::Field1167
+        $crate::__pgrx_c_generated::Field_consttype
     };
     (consttypmod) => {
-        $crate::__pgrx_c_generated::Field1168
+        $crate::__pgrx_c_generated::Field_consttypmod
     };
     (constvalue) => {
-        $crate::__pgrx_c_generated::Field1170
+        $crate::__pgrx_c_generated::Field_constvalue
     };
     (content) => {
-        $crate::__pgrx_c_generated::Field1173
+        $crate::__pgrx_c_generated::Field_content
     };
     (context) => {
-        $crate::__pgrx_c_generated::Field1175
+        $crate::__pgrx_c_generated::Field_context
     };
     (continuescan) => {
-        $crate::__pgrx_c_generated::Field1178
+        $crate::__pgrx_c_generated::Field_continuescan
     };
     (contoencoding) => {
-        $crate::__pgrx_c_generated::Field1179
+        $crate::__pgrx_c_generated::Field_contoencoding
     };
     (contype) => {
-        $crate::__pgrx_c_generated::Field1180
+        $crate::__pgrx_c_generated::Field_contype
     };
     (contypid) => {
-        $crate::__pgrx_c_generated::Field1181
+        $crate::__pgrx_c_generated::Field_contypid
     };
     (convalidated) => {
-        $crate::__pgrx_c_generated::Field1182
+        $crate::__pgrx_c_generated::Field_convalidated
     };
     (conversion_name) => {
-        $crate::__pgrx_c_generated::Field1183
+        $crate::__pgrx_c_generated::Field_conversion_name
     };
     (conversion_proc) => {
-        $crate::__pgrx_c_generated::Field1184
+        $crate::__pgrx_c_generated::Field_conversion_proc
     };
     (convert_select) => {
-        $crate::__pgrx_c_generated::Field1186
+        $crate::__pgrx_c_generated::Field_convert_select
     };
     (convert_selectively) => {
-        $crate::__pgrx_c_generated::Field1188
+        $crate::__pgrx_c_generated::Field_convert_selectively
     };
     (convertformat) => {
-        $crate::__pgrx_c_generated::Field1189
+        $crate::__pgrx_c_generated::Field_convertformat
     };
     (copiable_size) => {
-        $crate::__pgrx_c_generated::Field1192
+        $crate::__pgrx_c_generated::Field_copiable_size
     };
     (copied) => {
-        $crate::__pgrx_c_generated::Field1193
+        $crate::__pgrx_c_generated::Field_copied
     };
     (copiedOrder) => {
-        $crate::__pgrx_c_generated::Field1194
+        $crate::__pgrx_c_generated::Field_copiedOrder
     };
     (copy_src) => {
-        $crate::__pgrx_c_generated::Field1199
+        $crate::__pgrx_c_generated::Field_copy_src
     };
     (costs) => {
-        $crate::__pgrx_c_generated::Field1203
+        $crate::__pgrx_c_generated::Field_costs
     };
     (count) => {
-        $crate::__pgrx_c_generated::Field1204
+        $crate::__pgrx_c_generated::Field_count
     };
     (count_est) => {
-        $crate::__pgrx_c_generated::Field1205
+        $crate::__pgrx_c_generated::Field_count_est
     };
     (counts) => {
-        $crate::__pgrx_c_generated::Field1207
+        $crate::__pgrx_c_generated::Field_counts
     };
     (crc) => {
-        $crate::__pgrx_c_generated::Field1210
+        $crate::__pgrx_c_generated::Field_crc
     };
     (createLevel) => {
-        $crate::__pgrx_c_generated::Field1211
+        $crate::__pgrx_c_generated::Field_createLevel
     };
     (createSubid) => {
-        $crate::__pgrx_c_generated::Field1212
+        $crate::__pgrx_c_generated::Field_createSubid
     };
     (created_functions) => {
-        $crate::__pgrx_c_generated::Field1213
+        $crate::__pgrx_c_generated::Field_created_functions
     };
     (creation_time) => {
-        $crate::__pgrx_c_generated::Field1215
+        $crate::__pgrx_c_generated::Field_creation_time
     };
     (creatorPID) => {
-        $crate::__pgrx_c_generated::Field1216
+        $crate::__pgrx_c_generated::Field_creatorPID
     };
     (creator_pid) => {
-        $crate::__pgrx_c_generated::Field1217
+        $crate::__pgrx_c_generated::Field_creator_pid
     };
     (csv_mode) => {
-        $crate::__pgrx_c_generated::Field1219
+        $crate::__pgrx_c_generated::Field_csv_mode
     };
     (ct_magic) => {
-        $crate::__pgrx_c_generated::Field1220
+        $crate::__pgrx_c_generated::Field_ct_magic
     };
     (cteList) => {
-        $crate::__pgrx_c_generated::Field1221
+        $crate::__pgrx_c_generated::Field_cteList
     };
     (cteParam) => {
-        $crate::__pgrx_c_generated::Field1222
+        $crate::__pgrx_c_generated::Field_cteParam
     };
     (ctePlanId) => {
-        $crate::__pgrx_c_generated::Field1223
+        $crate::__pgrx_c_generated::Field_ctePlanId
     };
     (cte_plan_ids) => {
-        $crate::__pgrx_c_generated::Field1224
+        $crate::__pgrx_c_generated::Field_cte_plan_ids
     };
     (ctecolcollations) => {
-        $crate::__pgrx_c_generated::Field1226
+        $crate::__pgrx_c_generated::Field_ctecolcollations
     };
     (ctecolnames) => {
-        $crate::__pgrx_c_generated::Field1227
+        $crate::__pgrx_c_generated::Field_ctecolnames
     };
     (ctecoltypes) => {
-        $crate::__pgrx_c_generated::Field1228
+        $crate::__pgrx_c_generated::Field_ctecoltypes
     };
     (ctecoltypmods) => {
-        $crate::__pgrx_c_generated::Field1229
+        $crate::__pgrx_c_generated::Field_ctecoltypmods
     };
     (ctelevelsup) => {
-        $crate::__pgrx_c_generated::Field1230
+        $crate::__pgrx_c_generated::Field_ctelevelsup
     };
     (ctematerialized) => {
-        $crate::__pgrx_c_generated::Field1231
+        $crate::__pgrx_c_generated::Field_ctematerialized
     };
     (ctequery) => {
-        $crate::__pgrx_c_generated::Field1234
+        $crate::__pgrx_c_generated::Field_ctequery
     };
     (cterecursive) => {
-        $crate::__pgrx_c_generated::Field1235
+        $crate::__pgrx_c_generated::Field_cterecursive
     };
     (cterefcount) => {
-        $crate::__pgrx_c_generated::Field1236
+        $crate::__pgrx_c_generated::Field_cterefcount
     };
     (ctes) => {
-        $crate::__pgrx_c_generated::Field1237
+        $crate::__pgrx_c_generated::Field_ctes
     };
     (ctidAttNo) => {
-        $crate::__pgrx_c_generated::Field1239
+        $crate::__pgrx_c_generated::Field_ctidAttNo
     };
     (ctype_is_c) => {
-        $crate::__pgrx_c_generated::Field1241
+        $crate::__pgrx_c_generated::Field_ctype_is_c
     };
     (cur) => {
-        $crate::__pgrx_c_generated::Field1242
+        $crate::__pgrx_c_generated::Field_cur
     };
     (curArray) => {
-        $crate::__pgrx_c_generated::Field1243
+        $crate::__pgrx_c_generated::Field_curArray
     };
     (curBlkno) => {
-        $crate::__pgrx_c_generated::Field1244
+        $crate::__pgrx_c_generated::Field_curBlkno
     };
     (curBucket) => {
-        $crate::__pgrx_c_generated::Field1245
+        $crate::__pgrx_c_generated::Field_curBucket
     };
     (curDataOffset) => {
-        $crate::__pgrx_c_generated::Field1247
+        $crate::__pgrx_c_generated::Field_curDataOffset
     };
     (curIndex) => {
-        $crate::__pgrx_c_generated::Field1249
+        $crate::__pgrx_c_generated::Field_curIndex
     };
     (curItemMatches) => {
-        $crate::__pgrx_c_generated::Field1251
+        $crate::__pgrx_c_generated::Field_curItemMatches
     };
     (curOuterParams) => {
-        $crate::__pgrx_c_generated::Field1252
+        $crate::__pgrx_c_generated::Field_curOuterParams
     };
     (curPageData) => {
-        $crate::__pgrx_c_generated::Field1254
+        $crate::__pgrx_c_generated::Field_curPageData
     };
     (curPageLSN) => {
-        $crate::__pgrx_c_generated::Field1255
+        $crate::__pgrx_c_generated::Field_curPageLSN
     };
     (curValueOffset) => {
-        $crate::__pgrx_c_generated::Field1257
+        $crate::__pgrx_c_generated::Field_curValueOffset
     };
     (cur_delay) => {
-        $crate::__pgrx_c_generated::Field1260
+        $crate::__pgrx_c_generated::Field_cur_delay
     };
     (cur_elem) => {
-        $crate::__pgrx_c_generated::Field1261
+        $crate::__pgrx_c_generated::Field_cur_elem
     };
     (cur_lineno) => {
-        $crate::__pgrx_c_generated::Field1267
+        $crate::__pgrx_c_generated::Field_cur_lineno
     };
     (curbatch) => {
-        $crate::__pgrx_c_generated::Field1270
+        $crate::__pgrx_c_generated::Field_curbatch
     };
     (curbucket) => {
-        $crate::__pgrx_c_generated::Field1271
+        $crate::__pgrx_c_generated::Field_curbucket
     };
     (curcid) => {
-        $crate::__pgrx_c_generated::Field1272
+        $crate::__pgrx_c_generated::Field_curcid
     };
     (curitem) => {
-        $crate::__pgrx_c_generated::Field1273
+        $crate::__pgrx_c_generated::Field_curitem
     };
     (curpartition) => {
-        $crate::__pgrx_c_generated::Field1275
+        $crate::__pgrx_c_generated::Field_curpartition
     };
     (currPage) => {
-        $crate::__pgrx_c_generated::Field1278
+        $crate::__pgrx_c_generated::Field_currPage
     };
     (currRecPtr) => {
-        $crate::__pgrx_c_generated::Field1280
+        $crate::__pgrx_c_generated::Field_currRecPtr
     };
     (currTLI) => {
-        $crate::__pgrx_c_generated::Field1281
+        $crate::__pgrx_c_generated::Field_currTLI
     };
     (currTLIValidUntil) => {
-        $crate::__pgrx_c_generated::Field1282
+        $crate::__pgrx_c_generated::Field_currTLIValidUntil
     };
     (curr_idx) => {
-        $crate::__pgrx_c_generated::Field1284
+        $crate::__pgrx_c_generated::Field_curr_idx
     };
     (current_blocknum) => {
-        $crate::__pgrx_c_generated::Field1287
+        $crate::__pgrx_c_generated::Field_current_blocknum
     };
     (current_buf) => {
-        $crate::__pgrx_c_generated::Field1288
+        $crate::__pgrx_c_generated::Field_current_buf
     };
     (current_chunk_shared) => {
-        $crate::__pgrx_c_generated::Field1291
+        $crate::__pgrx_c_generated::Field_current_chunk_shared
     };
     (current_list) => {
-        $crate::__pgrx_c_generated::Field1292
+        $crate::__pgrx_c_generated::Field_current_list
     };
     (current_phase) => {
-        $crate::__pgrx_c_generated::Field1293
+        $crate::__pgrx_c_generated::Field_current_phase
     };
     (current_ptr) => {
-        $crate::__pgrx_c_generated::Field1294
+        $crate::__pgrx_c_generated::Field_current_ptr
     };
     (current_relid) => {
-        $crate::__pgrx_c_generated::Field1295
+        $crate::__pgrx_c_generated::Field_current_relid
     };
     (current_restart_decoding_lsn) => {
-        $crate::__pgrx_c_generated::Field1296
+        $crate::__pgrx_c_generated::Field_current_restart_decoding_lsn
     };
     (current_set) => {
-        $crate::__pgrx_c_generated::Field1297
+        $crate::__pgrx_c_generated::Field_current_set
     };
     (currentgroup) => {
-        $crate::__pgrx_c_generated::Field1298
+        $crate::__pgrx_c_generated::Field_currentgroup
     };
     (currentpos) => {
-        $crate::__pgrx_c_generated::Field1299
+        $crate::__pgrx_c_generated::Field_currentpos
     };
     (cursor) => {
-        $crate::__pgrx_c_generated::Field1300
+        $crate::__pgrx_c_generated::Field_cursor
     };
     (cursorOptions) => {
-        $crate::__pgrx_c_generated::Field1301
+        $crate::__pgrx_c_generated::Field_cursorOptions
     };
     (cursor_explicit_argrow) => {
-        $crate::__pgrx_c_generated::Field1302
+        $crate::__pgrx_c_generated::Field_cursor_explicit_argrow
     };
     (cursor_options) => {
-        $crate::__pgrx_c_generated::Field1305
+        $crate::__pgrx_c_generated::Field_cursor_options
     };
     (cursor_param) => {
-        $crate::__pgrx_c_generated::Field1306
+        $crate::__pgrx_c_generated::Field_cursor_param
     };
     (cursorpos) => {
-        $crate::__pgrx_c_generated::Field1307
+        $crate::__pgrx_c_generated::Field_cursorpos
     };
     (curvar) => {
-        $crate::__pgrx_c_generated::Field1308
+        $crate::__pgrx_c_generated::Field_curvar
     };
     (curwords) => {
-        $crate::__pgrx_c_generated::Field1309
+        $crate::__pgrx_c_generated::Field_curwords
     };
     (custom_exprs) => {
-        $crate::__pgrx_c_generated::Field1310
+        $crate::__pgrx_c_generated::Field_custom_exprs
     };
     (custom_paths) => {
-        $crate::__pgrx_c_generated::Field1311
+        $crate::__pgrx_c_generated::Field_custom_paths
     };
     (custom_plans) => {
-        $crate::__pgrx_c_generated::Field1312
+        $crate::__pgrx_c_generated::Field_custom_plans
     };
     (custom_private) => {
-        $crate::__pgrx_c_generated::Field1313
+        $crate::__pgrx_c_generated::Field_custom_private
     };
     (custom_ps) => {
-        $crate::__pgrx_c_generated::Field1314
+        $crate::__pgrx_c_generated::Field_custom_ps
     };
     (custom_restrictinfo) => {
-        $crate::__pgrx_c_generated::Field1316
+        $crate::__pgrx_c_generated::Field_custom_restrictinfo
     };
     (custom_scan_tlist) => {
-        $crate::__pgrx_c_generated::Field1317
+        $crate::__pgrx_c_generated::Field_custom_scan_tlist
     };
     (cvWaitLink) => {
-        $crate::__pgrx_c_generated::Field1319
+        $crate::__pgrx_c_generated::Field_cvWaitLink
     };
     (cvarno) => {
-        $crate::__pgrx_c_generated::Field1320
+        $crate::__pgrx_c_generated::Field_cvarno
     };
     (cycle_col_list) => {
-        $crate::__pgrx_c_generated::Field1322
+        $crate::__pgrx_c_generated::Field_cycle_col_list
     };
     (cycle_mark_collation) => {
-        $crate::__pgrx_c_generated::Field1323
+        $crate::__pgrx_c_generated::Field_cycle_mark_collation
     };
     (cycle_mark_neop) => {
-        $crate::__pgrx_c_generated::Field1326
+        $crate::__pgrx_c_generated::Field_cycle_mark_neop
     };
     (cycle_mark_type) => {
-        $crate::__pgrx_c_generated::Field1327
+        $crate::__pgrx_c_generated::Field_cycle_mark_type
     };
     (cycle_mark_typmod) => {
-        $crate::__pgrx_c_generated::Field1328
+        $crate::__pgrx_c_generated::Field_cycle_mark_typmod
     };
     (cycleid) => {
-        $crate::__pgrx_c_generated::Field1331
+        $crate::__pgrx_c_generated::Field_cycleid
     };
     (d_ino) => {
-        $crate::__pgrx_c_generated::Field1333
+        $crate::__pgrx_c_generated::Field_d_ino
     };
     (d_namlen) => {
-        $crate::__pgrx_c_generated::Field1335
+        $crate::__pgrx_c_generated::Field_d_namlen
     };
     (d_reclen) => {
-        $crate::__pgrx_c_generated::Field1336
+        $crate::__pgrx_c_generated::Field_d_reclen
     };
     (d_seekoff) => {
-        $crate::__pgrx_c_generated::Field1337
+        $crate::__pgrx_c_generated::Field_d_seekoff
     };
     (d_type) => {
-        $crate::__pgrx_c_generated::Field1338
+        $crate::__pgrx_c_generated::Field_d_type
     };
     (data) => {
-        $crate::__pgrx_c_generated::Field1339
+        $crate::__pgrx_c_generated::Field_data
     };
     (data_bufsz) => {
-        $crate::__pgrx_c_generated::Field1341
+        $crate::__pgrx_c_generated::Field_data_bufsz
     };
     (data_checksum_version) => {
-        $crate::__pgrx_c_generated::Field1342
+        $crate::__pgrx_c_generated::Field_data_checksum_version
     };
     (data_len) => {
-        $crate::__pgrx_c_generated::Field1343
+        $crate::__pgrx_c_generated::Field_data_len
     };
     (data_length) => {
-        $crate::__pgrx_c_generated::Field1344
+        $crate::__pgrx_c_generated::Field_data_length
     };
     (database) => {
-        $crate::__pgrx_c_generated::Field1346
+        $crate::__pgrx_c_generated::Field_database
     };
     (databaseId) => {
-        $crate::__pgrx_c_generated::Field1347
+        $crate::__pgrx_c_generated::Field_databaseId
     };
     (datalen) => {
-        $crate::__pgrx_c_generated::Field1348
+        $crate::__pgrx_c_generated::Field_datalen
     };
     (datallowconn) => {
-        $crate::__pgrx_c_generated::Field1349
+        $crate::__pgrx_c_generated::Field_datallowconn
     };
     (dataoffset) => {
-        $crate::__pgrx_c_generated::Field1350
+        $crate::__pgrx_c_generated::Field_dataoffset
     };
     (datconnlimit) => {
-        $crate::__pgrx_c_generated::Field1353
+        $crate::__pgrx_c_generated::Field_datconnlimit
     };
     (datdba) => {
-        $crate::__pgrx_c_generated::Field1354
+        $crate::__pgrx_c_generated::Field_datdba
     };
     (datfrozenxid) => {
-        $crate::__pgrx_c_generated::Field1356
+        $crate::__pgrx_c_generated::Field_datfrozenxid
     };
     (dathasloginevt) => {
-        $crate::__pgrx_c_generated::Field1357
+        $crate::__pgrx_c_generated::Field_dathasloginevt
     };
     (datistemplate) => {
-        $crate::__pgrx_c_generated::Field1358
+        $crate::__pgrx_c_generated::Field_datistemplate
     };
     (datlocprovider) => {
-        $crate::__pgrx_c_generated::Field1359
+        $crate::__pgrx_c_generated::Field_datlocprovider
     };
     (datminmxid) => {
-        $crate::__pgrx_c_generated::Field1360
+        $crate::__pgrx_c_generated::Field_datminmxid
     };
     (dattablespace) => {
-        $crate::__pgrx_c_generated::Field1362
+        $crate::__pgrx_c_generated::Field_dattablespace
     };
     (datum) => {
-        $crate::__pgrx_c_generated::Field1363
+        $crate::__pgrx_c_generated::Field_datum
     };
     (datum1) => {
-        $crate::__pgrx_c_generated::Field1364
+        $crate::__pgrx_c_generated::Field_datum1
     };
     (datumSort) => {
-        $crate::__pgrx_c_generated::Field1365
+        $crate::__pgrx_c_generated::Field_datumSort
     };
     (datum_len_) => {
-        $crate::__pgrx_c_generated::Field1367
+        $crate::__pgrx_c_generated::Field_datum_len_
     };
     (datum_typeid) => {
-        $crate::__pgrx_c_generated::Field1368
+        $crate::__pgrx_c_generated::Field_datum_typeid
     };
     (datum_typmod) => {
-        $crate::__pgrx_c_generated::Field1369
+        $crate::__pgrx_c_generated::Field_datum_typmod
     };
     (day) => {
-        $crate::__pgrx_c_generated::Field1371
+        $crate::__pgrx_c_generated::Field_day
     };
     (dbId) => {
-        $crate::__pgrx_c_generated::Field1372
+        $crate::__pgrx_c_generated::Field_dbId
     };
     (dbOid) => {
-        $crate::__pgrx_c_generated::Field1373
+        $crate::__pgrx_c_generated::Field_dbOid
     };
     (db_id) => {
-        $crate::__pgrx_c_generated::Field1374
+        $crate::__pgrx_c_generated::Field_db_id
     };
     (dbid) => {
-        $crate::__pgrx_c_generated::Field1375
+        $crate::__pgrx_c_generated::Field_dbid
     };
     (dboid) => {
-        $crate::__pgrx_c_generated::Field1377
+        $crate::__pgrx_c_generated::Field_dboid
     };
     (dead) => {
-        $crate::__pgrx_c_generated::Field1380
+        $crate::__pgrx_c_generated::Field_dead
     };
     (dead_tuples) => {
-        $crate::__pgrx_c_generated::Field1382
+        $crate::__pgrx_c_generated::Field_dead_tuples
     };
     (deadlocks) => {
-        $crate::__pgrx_c_generated::Field1383
+        $crate::__pgrx_c_generated::Field_deadlocks
     };
     (decode_buffer_size) => {
-        $crate::__pgrx_c_generated::Field1388
+        $crate::__pgrx_c_generated::Field_decode_buffer_size
     };
     (deduplicate) => {
-        $crate::__pgrx_c_generated::Field1394
+        $crate::__pgrx_c_generated::Field_deduplicate
     };
     (deduplicate_items) => {
-        $crate::__pgrx_c_generated::Field1395
+        $crate::__pgrx_c_generated::Field_deduplicate_items
     };
     (def) => {
-        $crate::__pgrx_c_generated::Field1396
+        $crate::__pgrx_c_generated::Field_def
     };
     (defaclnamespace) => {
-        $crate::__pgrx_c_generated::Field1397
+        $crate::__pgrx_c_generated::Field_defaclnamespace
     };
     (defaclobjtype) => {
-        $crate::__pgrx_c_generated::Field1398
+        $crate::__pgrx_c_generated::Field_defaclobjtype
     };
     (defaclrole) => {
-        $crate::__pgrx_c_generated::Field1399
+        $crate::__pgrx_c_generated::Field_defaclrole
     };
     (defaction) => {
-        $crate::__pgrx_c_generated::Field1400
+        $crate::__pgrx_c_generated::Field_defaction
     };
     (default_char_signedness) => {
-        $crate::__pgrx_c_generated::Field1401
+        $crate::__pgrx_c_generated::Field_default_char_signedness
     };
     (default_index) => {
-        $crate::__pgrx_c_generated::Field1402
+        $crate::__pgrx_c_generated::Field_default_index
     };
     (default_isnull) => {
-        $crate::__pgrx_c_generated::Field1403
+        $crate::__pgrx_c_generated::Field_default_isnull
     };
     (default_len) => {
-        $crate::__pgrx_c_generated::Field1404
+        $crate::__pgrx_c_generated::Field_default_len
     };
     (default_print_len) => {
-        $crate::__pgrx_c_generated::Field1406
+        $crate::__pgrx_c_generated::Field_default_print_len
     };
     (default_val) => {
-        $crate::__pgrx_c_generated::Field1407
+        $crate::__pgrx_c_generated::Field_default_val
     };
     (deferrable) => {
-        $crate::__pgrx_c_generated::Field1409
+        $crate::__pgrx_c_generated::Field_deferrable
     };
     (deferred) => {
-        $crate::__pgrx_c_generated::Field1410
+        $crate::__pgrx_c_generated::Field_deferred
     };
     (definition) => {
-        $crate::__pgrx_c_generated::Field1413
+        $crate::__pgrx_c_generated::Field_definition
     };
     (defnames) => {
-        $crate::__pgrx_c_generated::Field1416
+        $crate::__pgrx_c_generated::Field_defnames
     };
     (delayChkptFlags) => {
-        $crate::__pgrx_c_generated::Field1423
+        $crate::__pgrx_c_generated::Field_delayChkptFlags
     };
     (delays) => {
-        $crate::__pgrx_c_generated::Field1424
+        $crate::__pgrx_c_generated::Field_delays
     };
     (deleteXid) => {
-        $crate::__pgrx_c_generated::Field1425
+        $crate::__pgrx_c_generated::Field_deleteXid
     };
     (deleted_pre_truncdrop) => {
-        $crate::__pgrx_c_generated::Field1427
+        $crate::__pgrx_c_generated::Field_deleted_pre_truncdrop
     };
     (delta_dead_tuples) => {
-        $crate::__pgrx_c_generated::Field1430
+        $crate::__pgrx_c_generated::Field_delta_dead_tuples
     };
     (delta_live_tuples) => {
-        $crate::__pgrx_c_generated::Field1431
+        $crate::__pgrx_c_generated::Field_delta_live_tuples
     };
     (deparse_cxt) => {
-        $crate::__pgrx_c_generated::Field1433
+        $crate::__pgrx_c_generated::Field_deparse_cxt
     };
     (dependsOnRLS) => {
-        $crate::__pgrx_c_generated::Field1434
+        $crate::__pgrx_c_generated::Field_dependsOnRLS
     };
     (dependsOnRole) => {
-        $crate::__pgrx_c_generated::Field1435
+        $crate::__pgrx_c_generated::Field_dependsOnRole
     };
     (deptype) => {
-        $crate::__pgrx_c_generated::Field1437
+        $crate::__pgrx_c_generated::Field_deptype
     };
     (deserialfn_oid) => {
-        $crate::__pgrx_c_generated::Field1444
+        $crate::__pgrx_c_generated::Field_deserialfn_oid
     };
     (detached_exist) => {
-        $crate::__pgrx_c_generated::Field1446
+        $crate::__pgrx_c_generated::Field_detached_exist
     };
     (details_wanted) => {
-        $crate::__pgrx_c_generated::Field1450
+        $crate::__pgrx_c_generated::Field_details_wanted
     };
     (deterministic) => {
-        $crate::__pgrx_c_generated::Field1451
+        $crate::__pgrx_c_generated::Field_deterministic
     };
     (device) => {
-        $crate::__pgrx_c_generated::Field1452
+        $crate::__pgrx_c_generated::Field_device
     };
     (diag_items) => {
-        $crate::__pgrx_c_generated::Field1453
+        $crate::__pgrx_c_generated::Field_diag_items
     };
     (dictId) => {
-        $crate::__pgrx_c_generated::Field1456
+        $crate::__pgrx_c_generated::Field_dictId
     };
     (dictname) => {
-        $crate::__pgrx_c_generated::Field1458
+        $crate::__pgrx_c_generated::Field_dictname
     };
     (dictnamespace) => {
-        $crate::__pgrx_c_generated::Field1459
+        $crate::__pgrx_c_generated::Field_dictnamespace
     };
     (dictowner) => {
-        $crate::__pgrx_c_generated::Field1460
+        $crate::__pgrx_c_generated::Field_dictowner
     };
     (dicts) => {
-        $crate::__pgrx_c_generated::Field1461
+        $crate::__pgrx_c_generated::Field_dicts
     };
     (dicttemplate) => {
-        $crate::__pgrx_c_generated::Field1462
+        $crate::__pgrx_c_generated::Field_dicttemplate
     };
     (dim1) => {
-        $crate::__pgrx_c_generated::Field1463
+        $crate::__pgrx_c_generated::Field_dim1
     };
     (dims) => {
-        $crate::__pgrx_c_generated::Field1464
+        $crate::__pgrx_c_generated::Field_dims
     };
     (dir) => {
-        $crate::__pgrx_c_generated::Field1465
+        $crate::__pgrx_c_generated::Field_dir
     };
     (direction) => {
-        $crate::__pgrx_c_generated::Field1467
+        $crate::__pgrx_c_generated::Field_direction
     };
     (dirty) => {
-        $crate::__pgrx_c_generated::Field1468
+        $crate::__pgrx_c_generated::Field_dirty
     };
     (disabled_nodes) => {
-        $crate::__pgrx_c_generated::Field1469
+        $crate::__pgrx_c_generated::Field_disabled_nodes
     };
     (disableonerr) => {
-        $crate::__pgrx_c_generated::Field1470
+        $crate::__pgrx_c_generated::Field_disableonerr
     };
     (distance) => {
-        $crate::__pgrx_c_generated::Field1471
+        $crate::__pgrx_c_generated::Field_distance
     };
     (distances) => {
-        $crate::__pgrx_c_generated::Field1473
+        $crate::__pgrx_c_generated::Field_distances
     };
     (distinctClause) => {
-        $crate::__pgrx_c_generated::Field1475
+        $crate::__pgrx_c_generated::Field_distinctClause
     };
     (distinctList) => {
-        $crate::__pgrx_c_generated::Field1476
+        $crate::__pgrx_c_generated::Field_distinctList
     };
     (distinct_pathkeys) => {
-        $crate::__pgrx_c_generated::Field1477
+        $crate::__pgrx_c_generated::Field_distinct_pathkeys
     };
     (dno) => {
-        $crate::__pgrx_c_generated::Field1480
+        $crate::__pgrx_c_generated::Field_dno
     };
     (dnulls) => {
-        $crate::__pgrx_c_generated::Field1481
+        $crate::__pgrx_c_generated::Field_dnulls
     };
     (do_exec_prune) => {
-        $crate::__pgrx_c_generated::Field1482
+        $crate::__pgrx_c_generated::Field_do_exec_prune
     };
     (do_initial_prune) => {
-        $crate::__pgrx_c_generated::Field1483
+        $crate::__pgrx_c_generated::Field_do_initial_prune
     };
     (domainBaseType) => {
-        $crate::__pgrx_c_generated::Field1487
+        $crate::__pgrx_c_generated::Field_domainBaseType
     };
     (domainBaseTypmod) => {
-        $crate::__pgrx_c_generated::Field1488
+        $crate::__pgrx_c_generated::Field_domainBaseTypmod
     };
     (domainValue_datum) => {
-        $crate::__pgrx_c_generated::Field1490
+        $crate::__pgrx_c_generated::Field_domainValue_datum
     };
     (domainValue_isNull) => {
-        $crate::__pgrx_c_generated::Field1491
+        $crate::__pgrx_c_generated::Field_domainValue_isNull
     };
     (domainname) => {
-        $crate::__pgrx_c_generated::Field1493
+        $crate::__pgrx_c_generated::Field_domainname
     };
     (done) => {
-        $crate::__pgrx_c_generated::Field1494
+        $crate::__pgrx_c_generated::Field_done
     };
     (donetuples) => {
-        $crate::__pgrx_c_generated::Field1495
+        $crate::__pgrx_c_generated::Field_donetuples
     };
     (downlinkOffset) => {
-        $crate::__pgrx_c_generated::Field1497
+        $crate::__pgrx_c_generated::Field_downlinkOffset
     };
     (downlinkoffnum) => {
-        $crate::__pgrx_c_generated::Field1498
+        $crate::__pgrx_c_generated::Field_downlinkoffnum
     };
     (dropPin) => {
-        $crate::__pgrx_c_generated::Field1499
+        $crate::__pgrx_c_generated::Field_dropPin
     };
     (dropflags) => {
-        $crate::__pgrx_c_generated::Field1500
+        $crate::__pgrx_c_generated::Field_dropflags
     };
     (dsize) => {
-        $crate::__pgrx_c_generated::Field1501
+        $crate::__pgrx_c_generated::Field_dsize
     };
     (dsm_control) => {
-        $crate::__pgrx_c_generated::Field1502
+        $crate::__pgrx_c_generated::Field_dsm_control
     };
     (dtype) => {
-        $crate::__pgrx_c_generated::Field1507
+        $crate::__pgrx_c_generated::Field_dtype
     };
     (dummy) => {
-        $crate::__pgrx_c_generated::Field1508
+        $crate::__pgrx_c_generated::Field_dummy
     };
     (dummypp) => {
-        $crate::__pgrx_c_generated::Field1509
+        $crate::__pgrx_c_generated::Field_dummypp
     };
     (dvalues) => {
-        $crate::__pgrx_c_generated::Field1513
+        $crate::__pgrx_c_generated::Field_dvalues
     };
     (dvalueslen) => {
-        $crate::__pgrx_c_generated::Field1514
+        $crate::__pgrx_c_generated::Field_dvalueslen
     };
     (ea_magic) => {
-        $crate::__pgrx_c_generated::Field1516
+        $crate::__pgrx_c_generated::Field_ea_magic
     };
     (earliestOutConflictCommit) => {
-        $crate::__pgrx_c_generated::Field1517
+        $crate::__pgrx_c_generated::Field_earliestOutConflictCommit
     };
     (eas_used) => {
-        $crate::__pgrx_c_generated::Field1518
+        $crate::__pgrx_c_generated::Field_eas_used
     };
     (ec_broken) => {
-        $crate::__pgrx_c_generated::Field1520
+        $crate::__pgrx_c_generated::Field_ec_broken
     };
     (ec_childmembers_size) => {
-        $crate::__pgrx_c_generated::Field1522
+        $crate::__pgrx_c_generated::Field_ec_childmembers_size
     };
     (ec_collation) => {
-        $crate::__pgrx_c_generated::Field1523
+        $crate::__pgrx_c_generated::Field_ec_collation
     };
     (ec_derives_list) => {
-        $crate::__pgrx_c_generated::Field1525
+        $crate::__pgrx_c_generated::Field_ec_derives_list
     };
     (ec_has_const) => {
-        $crate::__pgrx_c_generated::Field1526
+        $crate::__pgrx_c_generated::Field_ec_has_const
     };
     (ec_has_volatile) => {
-        $crate::__pgrx_c_generated::Field1527
+        $crate::__pgrx_c_generated::Field_ec_has_volatile
     };
     (ec_max_security) => {
-        $crate::__pgrx_c_generated::Field1528
+        $crate::__pgrx_c_generated::Field_ec_max_security
     };
     (ec_members) => {
-        $crate::__pgrx_c_generated::Field1529
+        $crate::__pgrx_c_generated::Field_ec_members
     };
     (ec_merging_done) => {
-        $crate::__pgrx_c_generated::Field1531
+        $crate::__pgrx_c_generated::Field_ec_merging_done
     };
     (ec_min_security) => {
-        $crate::__pgrx_c_generated::Field1532
+        $crate::__pgrx_c_generated::Field_ec_min_security
     };
     (ec_opfamilies) => {
-        $crate::__pgrx_c_generated::Field1533
+        $crate::__pgrx_c_generated::Field_ec_opfamilies
     };
     (ec_sortref) => {
-        $crate::__pgrx_c_generated::Field1535
+        $crate::__pgrx_c_generated::Field_ec_sortref
     };
     (ec_sources) => {
-        $crate::__pgrx_c_generated::Field1536
+        $crate::__pgrx_c_generated::Field_ec_sources
     };
     (ecxt_per_tuple_memory) => {
-        $crate::__pgrx_c_generated::Field1551
+        $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory
     };
     (effective_catalog_xmin) => {
-        $crate::__pgrx_c_generated::Field1554
+        $crate::__pgrx_c_generated::Field_effective_catalog_xmin
     };
     (effective_io_concurrency) => {
-        $crate::__pgrx_c_generated::Field1555
+        $crate::__pgrx_c_generated::Field_effective_io_concurrency
     };
     (effective_xmin) => {
-        $crate::__pgrx_c_generated::Field1556
+        $crate::__pgrx_c_generated::Field_effective_xmin
     };
     (eflags) => {
-        $crate::__pgrx_c_generated::Field1557
+        $crate::__pgrx_c_generated::Field_eflags
     };
     (elected) => {
-        $crate::__pgrx_c_generated::Field1558
+        $crate::__pgrx_c_generated::Field_elected
     };
     (elemalign) => {
-        $crate::__pgrx_c_generated::Field1562
+        $crate::__pgrx_c_generated::Field_elemalign
     };
     (elembyval) => {
-        $crate::__pgrx_c_generated::Field1563
+        $crate::__pgrx_c_generated::Field_elembyval
     };
     (element_type) => {
-        $crate::__pgrx_c_generated::Field1566
+        $crate::__pgrx_c_generated::Field_element_type
     };
     (element_typeid) => {
-        $crate::__pgrx_c_generated::Field1567
+        $crate::__pgrx_c_generated::Field_element_typeid
     };
     (elements) => {
-        $crate::__pgrx_c_generated::Field1568
+        $crate::__pgrx_c_generated::Field_elements
     };
     (elemlength) => {
-        $crate::__pgrx_c_generated::Field1572
+        $crate::__pgrx_c_generated::Field_elemlength
     };
     (elemtype) => {
-        $crate::__pgrx_c_generated::Field1575
+        $crate::__pgrx_c_generated::Field_elemtype
     };
     (elevel) => {
-        $crate::__pgrx_c_generated::Field1577
+        $crate::__pgrx_c_generated::Field_elevel
     };
     (elog_level) => {
-        $crate::__pgrx_c_generated::Field1579
+        $crate::__pgrx_c_generated::Field_elog_level
     };
     (else_body) => {
-        $crate::__pgrx_c_generated::Field1580
+        $crate::__pgrx_c_generated::Field_else_body
     };
     (else_stmts) => {
-        $crate::__pgrx_c_generated::Field1581
+        $crate::__pgrx_c_generated::Field_else_stmts
     };
     (elsif_list) => {
-        $crate::__pgrx_c_generated::Field1582
+        $crate::__pgrx_c_generated::Field_elsif_list
     };
     (em_datatype) => {
-        $crate::__pgrx_c_generated::Field1583
+        $crate::__pgrx_c_generated::Field_em_datatype
     };
     (em_is_child) => {
-        $crate::__pgrx_c_generated::Field1585
+        $crate::__pgrx_c_generated::Field_em_is_child
     };
     (em_is_const) => {
-        $crate::__pgrx_c_generated::Field1586
+        $crate::__pgrx_c_generated::Field_em_is_const
     };
     (enabled) => {
-        $crate::__pgrx_c_generated::Field1592
+        $crate::__pgrx_c_generated::Field_enabled
     };
     (encoding) => {
-        $crate::__pgrx_c_generated::Field1593
+        $crate::__pgrx_c_generated::Field_encoding
     };
     (end) => {
-        $crate::__pgrx_c_generated::Field1594
+        $crate::__pgrx_c_generated::Field_end
     };
     (endInRangeFunc) => {
-        $crate::__pgrx_c_generated::Field1595
+        $crate::__pgrx_c_generated::Field_endInRangeFunc
     };
     (endOfLog) => {
-        $crate::__pgrx_c_generated::Field1596
+        $crate::__pgrx_c_generated::Field_endOfLog
     };
     (endOfLogTLI) => {
-        $crate::__pgrx_c_generated::Field1597
+        $crate::__pgrx_c_generated::Field_endOfLogTLI
     };
     (endOffsetValue) => {
-        $crate::__pgrx_c_generated::Field1599
+        $crate::__pgrx_c_generated::Field_endOffsetValue
     };
     (endOid) => {
-        $crate::__pgrx_c_generated::Field1600
+        $crate::__pgrx_c_generated::Field_endOid
     };
     (endTruncMemb) => {
-        $crate::__pgrx_c_generated::Field1601
+        $crate::__pgrx_c_generated::Field_endTruncMemb
     };
     (endTruncOff) => {
-        $crate::__pgrx_c_generated::Field1602
+        $crate::__pgrx_c_generated::Field_endTruncOff
     };
     (end_lsn) => {
-        $crate::__pgrx_c_generated::Field1603
+        $crate::__pgrx_c_generated::Field_end_lsn
     };
     (end_of_wal) => {
-        $crate::__pgrx_c_generated::Field1604
+        $crate::__pgrx_c_generated::Field_end_of_wal
     };
     (end_time) => {
-        $crate::__pgrx_c_generated::Field1605
+        $crate::__pgrx_c_generated::Field_end_time
     };
     (end_xact) => {
-        $crate::__pgrx_c_generated::Field1606
+        $crate::__pgrx_c_generated::Field_end_xact
     };
     (endptr) => {
-        $crate::__pgrx_c_generated::Field1607
+        $crate::__pgrx_c_generated::Field_endptr
     };
     (enrtype) => {
-        $crate::__pgrx_c_generated::Field1610
+        $crate::__pgrx_c_generated::Field_enrtype
     };
     (entries) => {
-        $crate::__pgrx_c_generated::Field1611
+        $crate::__pgrx_c_generated::Field_entries
     };
     (entryAttnum) => {
-        $crate::__pgrx_c_generated::Field1613
+        $crate::__pgrx_c_generated::Field_entryAttnum
     };
     (entryCategory) => {
-        $crate::__pgrx_c_generated::Field1614
+        $crate::__pgrx_c_generated::Field_entryCategory
     };
     (entryKey) => {
-        $crate::__pgrx_c_generated::Field1615
+        $crate::__pgrx_c_generated::Field_entryKey
     };
     (entry_size) => {
-        $crate::__pgrx_c_generated::Field1617
+        $crate::__pgrx_c_generated::Field_entry_size
     };
     (entrysize) => {
-        $crate::__pgrx_c_generated::Field1619
+        $crate::__pgrx_c_generated::Field_entrysize
     };
     (enum_val) => {
-        $crate::__pgrx_c_generated::Field1621
+        $crate::__pgrx_c_generated::Field_enum_val
     };
     (enumtypid) => {
-        $crate::__pgrx_c_generated::Field1624
+        $crate::__pgrx_c_generated::Field_enumtypid
     };
     (enumval) => {
-        $crate::__pgrx_c_generated::Field1625
+        $crate::__pgrx_c_generated::Field_enumval
     };
     (eof_cte) => {
-        $crate::__pgrx_c_generated::Field1626
+        $crate::__pgrx_c_generated::Field_eof_cte
     };
     (eof_underlying) => {
-        $crate::__pgrx_c_generated::Field1627
+        $crate::__pgrx_c_generated::Field_eof_underlying
     };
     (eoh_context) => {
-        $crate::__pgrx_c_generated::Field1628
+        $crate::__pgrx_c_generated::Field_eoh_context
     };
     (eol_type) => {
-        $crate::__pgrx_c_generated::Field1633
+        $crate::__pgrx_c_generated::Field_eol_type
     };
     (epqParam) => {
-        $crate::__pgrx_c_generated::Field1634
+        $crate::__pgrx_c_generated::Field_epqParam
     };
     (eq_classes) => {
-        $crate::__pgrx_c_generated::Field1635
+        $crate::__pgrx_c_generated::Field_eq_classes
     };
     (eq_opr) => {
-        $crate::__pgrx_c_generated::Field1636
+        $crate::__pgrx_c_generated::Field_eq_opr
     };
     (eqfunc) => {
-        $crate::__pgrx_c_generated::Field1638
+        $crate::__pgrx_c_generated::Field_eqfunc
     };
     (eqop) => {
-        $crate::__pgrx_c_generated::Field1642
+        $crate::__pgrx_c_generated::Field_eqop
     };
     (eqopr) => {
-        $crate::__pgrx_c_generated::Field1643
+        $crate::__pgrx_c_generated::Field_eqopr
     };
     (er_decltypeid) => {
-        $crate::__pgrx_c_generated::Field1647
+        $crate::__pgrx_c_generated::Field_er_decltypeid
     };
     (er_magic) => {
-        $crate::__pgrx_c_generated::Field1650
+        $crate::__pgrx_c_generated::Field_er_magic
     };
     (er_tupdesc_id) => {
-        $crate::__pgrx_c_generated::Field1654
+        $crate::__pgrx_c_generated::Field_er_tupdesc_id
     };
     (er_typeid) => {
-        $crate::__pgrx_c_generated::Field1655
+        $crate::__pgrx_c_generated::Field_er_typeid
     };
     (er_typmod) => {
-        $crate::__pgrx_c_generated::Field1656
+        $crate::__pgrx_c_generated::Field_er_typmod
     };
     (ereport_on_violation) => {
-        $crate::__pgrx_c_generated::Field1658
+        $crate::__pgrx_c_generated::Field_ereport_on_violation
     };
     (ermActive) => {
-        $crate::__pgrx_c_generated::Field1660
+        $crate::__pgrx_c_generated::Field_ermActive
     };
     (errorOnError) => {
-        $crate::__pgrx_c_generated::Field1669
+        $crate::__pgrx_c_generated::Field_errorOnError
     };
     (error_data) => {
-        $crate::__pgrx_c_generated::Field1672
+        $crate::__pgrx_c_generated::Field_error_data
     };
     (error_occurred) => {
-        $crate::__pgrx_c_generated::Field1675
+        $crate::__pgrx_c_generated::Field_error_occurred
     };
     (errormsg_deferred) => {
-        $crate::__pgrx_c_generated::Field1677
+        $crate::__pgrx_c_generated::Field_errormsg_deferred
     };
     (es_auxmodifytables) => {
-        $crate::__pgrx_c_generated::Field1678
+        $crate::__pgrx_c_generated::Field_es_auxmodifytables
     };
     (es_direction) => {
-        $crate::__pgrx_c_generated::Field1680
+        $crate::__pgrx_c_generated::Field_es_direction
     };
     (es_exprcontexts) => {
-        $crate::__pgrx_c_generated::Field1682
+        $crate::__pgrx_c_generated::Field_es_exprcontexts
     };
     (es_finished) => {
-        $crate::__pgrx_c_generated::Field1683
+        $crate::__pgrx_c_generated::Field_es_finished
     };
     (es_insert_pending_modifytables) => {
-        $crate::__pgrx_c_generated::Field1684
+        $crate::__pgrx_c_generated::Field_es_insert_pending_modifytables
     };
     (es_insert_pending_result_relations) => {
-        $crate::__pgrx_c_generated::Field1685
+        $crate::__pgrx_c_generated::Field_es_insert_pending_result_relations
     };
     (es_instrument) => {
-        $crate::__pgrx_c_generated::Field1686
+        $crate::__pgrx_c_generated::Field_es_instrument
     };
     (es_jit_flags) => {
-        $crate::__pgrx_c_generated::Field1688
+        $crate::__pgrx_c_generated::Field_es_jit_flags
     };
     (es_opened_result_relations) => {
-        $crate::__pgrx_c_generated::Field1691
+        $crate::__pgrx_c_generated::Field_es_opened_result_relations
     };
     (es_output_cid) => {
-        $crate::__pgrx_c_generated::Field1692
+        $crate::__pgrx_c_generated::Field_es_output_cid
     };
     (es_parallel_workers_launched) => {
-        $crate::__pgrx_c_generated::Field1693
+        $crate::__pgrx_c_generated::Field_es_parallel_workers_launched
     };
     (es_parallel_workers_to_launch) => {
-        $crate::__pgrx_c_generated::Field1694
+        $crate::__pgrx_c_generated::Field_es_parallel_workers_to_launch
     };
     (es_part_prune_infos) => {
-        $crate::__pgrx_c_generated::Field1697
+        $crate::__pgrx_c_generated::Field_es_part_prune_infos
     };
     (es_part_prune_results) => {
-        $crate::__pgrx_c_generated::Field1698
+        $crate::__pgrx_c_generated::Field_es_part_prune_results
     };
     (es_part_prune_states) => {
-        $crate::__pgrx_c_generated::Field1699
+        $crate::__pgrx_c_generated::Field_es_part_prune_states
     };
     (es_per_tuple_exprcontext) => {
-        $crate::__pgrx_c_generated::Field1701
+        $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext
     };
     (es_processed) => {
-        $crate::__pgrx_c_generated::Field1703
+        $crate::__pgrx_c_generated::Field_es_processed
     };
     (es_range_table) => {
-        $crate::__pgrx_c_generated::Field1707
+        $crate::__pgrx_c_generated::Field_es_range_table
     };
     (es_range_table_size) => {
-        $crate::__pgrx_c_generated::Field1708
+        $crate::__pgrx_c_generated::Field_es_range_table_size
     };
     (es_rteperminfos) => {
-        $crate::__pgrx_c_generated::Field1712
+        $crate::__pgrx_c_generated::Field_es_rteperminfos
     };
     (es_subplanstates) => {
-        $crate::__pgrx_c_generated::Field1715
+        $crate::__pgrx_c_generated::Field_es_subplanstates
     };
     (es_top_eflags) => {
-        $crate::__pgrx_c_generated::Field1716
+        $crate::__pgrx_c_generated::Field_es_top_eflags
     };
     (es_total_processed) => {
-        $crate::__pgrx_c_generated::Field1717
+        $crate::__pgrx_c_generated::Field_es_total_processed
     };
     (es_trig_target_relations) => {
-        $crate::__pgrx_c_generated::Field1718
+        $crate::__pgrx_c_generated::Field_es_trig_target_relations
     };
     (es_tupleTable) => {
-        $crate::__pgrx_c_generated::Field1719
+        $crate::__pgrx_c_generated::Field_es_tupleTable
     };
     (es_tuple_routing_result_relations) => {
-        $crate::__pgrx_c_generated::Field1720
+        $crate::__pgrx_c_generated::Field_es_tuple_routing_result_relations
     };
     (es_use_parallel_mode) => {
-        $crate::__pgrx_c_generated::Field1722
+        $crate::__pgrx_c_generated::Field_es_use_parallel_mode
     };
     (escape_string_warning) => {
-        $crate::__pgrx_c_generated::Field1724
+        $crate::__pgrx_c_generated::Field_escape_string_warning
     };
     (est_entries) => {
-        $crate::__pgrx_c_generated::Field1726
+        $crate::__pgrx_c_generated::Field_est_entries
     };
     (estimated_count) => {
-        $crate::__pgrx_c_generated::Field1728
+        $crate::__pgrx_c_generated::Field_estimated_count
     };
     (estimated_size) => {
-        $crate::__pgrx_c_generated::Field1729
+        $crate::__pgrx_c_generated::Field_estimated_size
     };
     (ev_class) => {
-        $crate::__pgrx_c_generated::Field1731
+        $crate::__pgrx_c_generated::Field_ev_class
     };
     (ev_enabled) => {
-        $crate::__pgrx_c_generated::Field1732
+        $crate::__pgrx_c_generated::Field_ev_enabled
     };
     (ev_type) => {
-        $crate::__pgrx_c_generated::Field1733
+        $crate::__pgrx_c_generated::Field_ev_type
     };
     (eval_processed) => {
-        $crate::__pgrx_c_generated::Field1737
+        $crate::__pgrx_c_generated::Field_eval_processed
     };
     (evaltrans_cache) => {
-        $crate::__pgrx_c_generated::Field1742
+        $crate::__pgrx_c_generated::Field_evaltrans_cache
     };
     (event) => {
-        $crate::__pgrx_c_generated::Field1743
+        $crate::__pgrx_c_generated::Field_event
     };
     (events) => {
-        $crate::__pgrx_c_generated::Field1745
+        $crate::__pgrx_c_generated::Field_events
     };
     (evtenabled) => {
-        $crate::__pgrx_c_generated::Field1746
+        $crate::__pgrx_c_generated::Field_evtenabled
     };
     (evtfoid) => {
-        $crate::__pgrx_c_generated::Field1748
+        $crate::__pgrx_c_generated::Field_evtfoid
     };
     (evtowner) => {
-        $crate::__pgrx_c_generated::Field1750
+        $crate::__pgrx_c_generated::Field_evtowner
     };
     (exact_pages) => {
-        $crate::__pgrx_c_generated::Field1752
+        $crate::__pgrx_c_generated::Field_exact_pages
     };
     (exc_list) => {
-        $crate::__pgrx_c_generated::Field1753
+        $crate::__pgrx_c_generated::Field_exc_list
     };
     (exclRelIndex) => {
-        $crate::__pgrx_c_generated::Field1755
+        $crate::__pgrx_c_generated::Field_exclRelIndex
     };
     (exclRelRTI) => {
-        $crate::__pgrx_c_generated::Field1756
+        $crate::__pgrx_c_generated::Field_exclRelRTI
     };
     (exclRelTlist) => {
-        $crate::__pgrx_c_generated::Field1757
+        $crate::__pgrx_c_generated::Field_exclRelTlist
     };
     (excludeOnly) => {
-        $crate::__pgrx_c_generated::Field1758
+        $crate::__pgrx_c_generated::Field_excludeOnly
     };
     (excludeOpNames) => {
-        $crate::__pgrx_c_generated::Field1759
+        $crate::__pgrx_c_generated::Field_excludeOpNames
     };
     (exclusions) => {
-        $crate::__pgrx_c_generated::Field1760
+        $crate::__pgrx_c_generated::Field_exclusions
     };
     (exclusive) => {
-        $crate::__pgrx_c_generated::Field1761
+        $crate::__pgrx_c_generated::Field_exclusive
     };
     (execSubid) => {
-        $crate::__pgrx_c_generated::Field1765
+        $crate::__pgrx_c_generated::Field_execSubid
     };
     (exec_pruning_steps) => {
-        $crate::__pgrx_c_generated::Field1767
+        $crate::__pgrx_c_generated::Field_exec_pruning_steps
     };
     (execution_status) => {
-        $crate::__pgrx_c_generated::Field1770
+        $crate::__pgrx_c_generated::Field_execution_status
     };
     (exists_cast_to_int) => {
-        $crate::__pgrx_c_generated::Field1771
+        $crate::__pgrx_c_generated::Field_exists_cast_to_int
     };
     (exists_check_domain) => {
-        $crate::__pgrx_c_generated::Field1772
+        $crate::__pgrx_c_generated::Field_exists_check_domain
     };
     (exists_coerce) => {
-        $crate::__pgrx_c_generated::Field1773
+        $crate::__pgrx_c_generated::Field_exists_coerce
     };
     (expr_rwopt) => {
-        $crate::__pgrx_c_generated::Field1778
+        $crate::__pgrx_c_generated::Field_expr_rwopt
     };
     (expr_simple_in_use) => {
-        $crate::__pgrx_c_generated::Field1780
+        $crate::__pgrx_c_generated::Field_expr_simple_in_use
     };
     (expr_simple_lxid) => {
-        $crate::__pgrx_c_generated::Field1781
+        $crate::__pgrx_c_generated::Field_expr_simple_lxid
     };
     (expr_simple_mutable) => {
-        $crate::__pgrx_c_generated::Field1782
+        $crate::__pgrx_c_generated::Field_expr_simple_mutable
     };
     (expr_simple_plan_lxid) => {
-        $crate::__pgrx_c_generated::Field1784
+        $crate::__pgrx_c_generated::Field_expr_simple_plan_lxid
     };
     (expr_simple_type) => {
-        $crate::__pgrx_c_generated::Field1787
+        $crate::__pgrx_c_generated::Field_expr_simple_type
     };
     (expr_simple_typmod) => {
-        $crate::__pgrx_c_generated::Field1788
+        $crate::__pgrx_c_generated::Field_expr_simple_typmod
     };
     (exprs) => {
-        $crate::__pgrx_c_generated::Field1792
+        $crate::__pgrx_c_generated::Field_exprs
     };
     (extension_state_allocated) => {
-        $crate::__pgrx_c_generated::Field1799
+        $crate::__pgrx_c_generated::Field_extension_state_allocated
     };
     (extern_param) => {
-        $crate::__pgrx_c_generated::Field1800
+        $crate::__pgrx_c_generated::Field_extern_param
     };
     (extnamespace) => {
-        $crate::__pgrx_c_generated::Field1802
+        $crate::__pgrx_c_generated::Field_extnamespace
     };
     (extowner) => {
-        $crate::__pgrx_c_generated::Field1804
+        $crate::__pgrx_c_generated::Field_extowner
     };
     (extra_clauses) => {
-        $crate::__pgrx_c_generated::Field1806
+        $crate::__pgrx_c_generated::Field_extra_clauses
     };
     (extra_errors) => {
-        $crate::__pgrx_c_generated::Field1808
+        $crate::__pgrx_c_generated::Field_extra_errors
     };
     (extra_warnings) => {
-        $crate::__pgrx_c_generated::Field1809
+        $crate::__pgrx_c_generated::Field_extra_warnings
     };
     (extrelocatable) => {
-        $crate::__pgrx_c_generated::Field1812
+        $crate::__pgrx_c_generated::Field_extrelocatable
     };
     (failed_count) => {
-        $crate::__pgrx_c_generated::Field1813
+        $crate::__pgrx_c_generated::Field_failed_count
     };
     (failover) => {
-        $crate::__pgrx_c_generated::Field1814
+        $crate::__pgrx_c_generated::Field_failover
     };
     (family) => {
-        $crate::__pgrx_c_generated::Field1815
+        $crate::__pgrx_c_generated::Field_family
     };
     (fast_forward) => {
-        $crate::__pgrx_c_generated::Field1816
+        $crate::__pgrx_c_generated::Field_fast_forward
     };
     (fastlevel) => {
-        $crate::__pgrx_c_generated::Field1817
+        $crate::__pgrx_c_generated::Field_fastlevel
     };
     (fastpath) => {
-        $crate::__pgrx_c_generated::Field1818
+        $crate::__pgrx_c_generated::Field_fastpath
     };
     (fastroot) => {
-        $crate::__pgrx_c_generated::Field1819
+        $crate::__pgrx_c_generated::Field_fastroot
     };
     (fcollation) => {
-        $crate::__pgrx_c_generated::Field1825
+        $crate::__pgrx_c_generated::Field_fcollation
     };
     (fd) => {
-        $crate::__pgrx_c_generated::Field1826
+        $crate::__pgrx_c_generated::Field_fd
     };
     (fdwPrivLists) => {
-        $crate::__pgrx_c_generated::Field1829
+        $crate::__pgrx_c_generated::Field_fdwPrivLists
     };
     (fdw_exprs) => {
-        $crate::__pgrx_c_generated::Field1830
+        $crate::__pgrx_c_generated::Field_fdw_exprs
     };
     (fdw_private) => {
-        $crate::__pgrx_c_generated::Field1832
+        $crate::__pgrx_c_generated::Field_fdw_private
     };
     (fdw_recheck_quals) => {
-        $crate::__pgrx_c_generated::Field1833
+        $crate::__pgrx_c_generated::Field_fdw_recheck_quals
     };
     (fdw_scan_tlist) => {
-        $crate::__pgrx_c_generated::Field1835
+        $crate::__pgrx_c_generated::Field_fdw_scan_tlist
     };
     (fdwhandler) => {
-        $crate::__pgrx_c_generated::Field1837
+        $crate::__pgrx_c_generated::Field_fdwhandler
     };
     (fdwid) => {
-        $crate::__pgrx_c_generated::Field1838
+        $crate::__pgrx_c_generated::Field_fdwid
     };
     (fdwoptions) => {
-        $crate::__pgrx_c_generated::Field1840
+        $crate::__pgrx_c_generated::Field_fdwoptions
     };
     (fdwowner) => {
-        $crate::__pgrx_c_generated::Field1841
+        $crate::__pgrx_c_generated::Field_fdwowner
     };
     (fdwvalidator) => {
-        $crate::__pgrx_c_generated::Field1843
+        $crate::__pgrx_c_generated::Field_fdwvalidator
     };
     (fetch_leakproof) => {
-        $crate::__pgrx_c_generated::Field1849
+        $crate::__pgrx_c_generated::Field_fetch_leakproof
     };
     (fetch_strict) => {
-        $crate::__pgrx_c_generated::Field1850
+        $crate::__pgrx_c_generated::Field_fetch_strict
     };
     (ffactor) => {
-        $crate::__pgrx_c_generated::Field1851
+        $crate::__pgrx_c_generated::Field_ffactor
     };
     (fieldnum) => {
-        $crate::__pgrx_c_generated::Field1857
+        $crate::__pgrx_c_generated::Field_fieldnum
     };
     (fieldnums) => {
-        $crate::__pgrx_c_generated::Field1858
+        $crate::__pgrx_c_generated::Field_fieldnums
     };
     (fields) => {
-        $crate::__pgrx_c_generated::Field1859
+        $crate::__pgrx_c_generated::Field_fields
     };
     (file_encoding) => {
-        $crate::__pgrx_c_generated::Field1863
+        $crate::__pgrx_c_generated::Field_file_encoding
     };
     (fileset_state) => {
-        $crate::__pgrx_c_generated::Field1866
+        $crate::__pgrx_c_generated::Field_fileset_state
     };
     (filler) => {
-        $crate::__pgrx_c_generated::Field1869
+        $crate::__pgrx_c_generated::Field_filler
     };
     (fillfactor) => {
-        $crate::__pgrx_c_generated::Field1870
+        $crate::__pgrx_c_generated::Field_fillfactor
     };
     (final_lsn) => {
-        $crate::__pgrx_c_generated::Field1874
+        $crate::__pgrx_c_generated::Field_final_lsn
     };
     (finalfn_oid) => {
-        $crate::__pgrx_c_generated::Field1876
+        $crate::__pgrx_c_generated::Field_finalfn_oid
     };
     (finalrowmarks) => {
-        $crate::__pgrx_c_generated::Field1877
+        $crate::__pgrx_c_generated::Field_finalrowmarks
     };
     (finalrtable) => {
-        $crate::__pgrx_c_generated::Field1878
+        $crate::__pgrx_c_generated::Field_finalrtable
     };
     (finalrteperminfos) => {
-        $crate::__pgrx_c_generated::Field1879
+        $crate::__pgrx_c_generated::Field_finalrteperminfos
     };
     (finished) => {
-        $crate::__pgrx_c_generated::Field1888
+        $crate::__pgrx_c_generated::Field_finished
     };
     (finishedBefore) => {
-        $crate::__pgrx_c_generated::Field1889
+        $crate::__pgrx_c_generated::Field_finishedBefore
     };
     (fireBSTriggers) => {
-        $crate::__pgrx_c_generated::Field1891
+        $crate::__pgrx_c_generated::Field_fireBSTriggers
     };
     (first) => {
-        $crate::__pgrx_c_generated::Field1892
+        $crate::__pgrx_c_generated::Field_first
     };
     (firstCall) => {
-        $crate::__pgrx_c_generated::Field1893
+        $crate::__pgrx_c_generated::Field_firstCall
     };
     (firstColCollation) => {
-        $crate::__pgrx_c_generated::Field1894
+        $crate::__pgrx_c_generated::Field_firstColCollation
     };
     (firstColType) => {
-        $crate::__pgrx_c_generated::Field1895
+        $crate::__pgrx_c_generated::Field_firstColType
     };
     (firstColTypmod) => {
-        $crate::__pgrx_c_generated::Field1896
+        $crate::__pgrx_c_generated::Field_firstColTypmod
     };
     (firstItem) => {
-        $crate::__pgrx_c_generated::Field1897
+        $crate::__pgrx_c_generated::Field_firstItem
     };
     (firstPlaceholder) => {
-        $crate::__pgrx_c_generated::Field1898
+        $crate::__pgrx_c_generated::Field_firstPlaceholder
     };
     (first_child) => {
-        $crate::__pgrx_c_generated::Field1901
+        $crate::__pgrx_c_generated::Field_first_child
     };
     (first_lock) => {
-        $crate::__pgrx_c_generated::Field1902
+        $crate::__pgrx_c_generated::Field_first_lock
     };
     (first_lsn) => {
-        $crate::__pgrx_c_generated::Field1903
+        $crate::__pgrx_c_generated::Field_first_lsn
     };
     (first_partial_path) => {
-        $crate::__pgrx_c_generated::Field1905
+        $crate::__pgrx_c_generated::Field_first_partial_path
     };
     (first_partial_plan) => {
-        $crate::__pgrx_c_generated::Field1906
+        $crate::__pgrx_c_generated::Field_first_partial_plan
     };
     (first_success_by) => {
-        $crate::__pgrx_c_generated::Field1907
+        $crate::__pgrx_c_generated::Field_first_success_by
     };
     (first_waiter) => {
-        $crate::__pgrx_c_generated::Field1908
+        $crate::__pgrx_c_generated::Field_first_waiter
     };
     (firstblocknumber) => {
-        $crate::__pgrx_c_generated::Field1909
+        $crate::__pgrx_c_generated::Field_firstblocknumber
     };
     (firstfield) => {
-        $crate::__pgrx_c_generated::Field1911
+        $crate::__pgrx_c_generated::Field_firstfield
     };
     (firstpage) => {
-        $crate::__pgrx_c_generated::Field1912
+        $crate::__pgrx_c_generated::Field_firstpage
     };
     (firstrightoff) => {
-        $crate::__pgrx_c_generated::Field1913
+        $crate::__pgrx_c_generated::Field_firstrightoff
     };
     (fixed) => {
-        $crate::__pgrx_c_generated::Field1915
+        $crate::__pgrx_c_generated::Field_fixed
     };
     (fixed_result) => {
-        $crate::__pgrx_c_generated::Field1916
+        $crate::__pgrx_c_generated::Field_fixed_result
     };
     (fk_attrs) => {
-        $crate::__pgrx_c_generated::Field1917
+        $crate::__pgrx_c_generated::Field_fk_attrs
     };
     (fk_del_action) => {
-        $crate::__pgrx_c_generated::Field1919
+        $crate::__pgrx_c_generated::Field_fk_del_action
     };
     (fk_del_set_cols) => {
-        $crate::__pgrx_c_generated::Field1920
+        $crate::__pgrx_c_generated::Field_fk_del_set_cols
     };
     (fk_matchtype) => {
-        $crate::__pgrx_c_generated::Field1922
+        $crate::__pgrx_c_generated::Field_fk_matchtype
     };
     (fk_table) => {
-        $crate::__pgrx_c_generated::Field1923
+        $crate::__pgrx_c_generated::Field_fk_table
     };
     (fk_upd_action) => {
-        $crate::__pgrx_c_generated::Field1924
+        $crate::__pgrx_c_generated::Field_fk_upd_action
     };
     (fk_with_period) => {
-        $crate::__pgrx_c_generated::Field1925
+        $crate::__pgrx_c_generated::Field_fk_with_period
     };
     (fkey_list) => {
-        $crate::__pgrx_c_generated::Field1926
+        $crate::__pgrx_c_generated::Field_fkey_list
     };
     (flags) => {
-        $crate::__pgrx_c_generated::Field1928
+        $crate::__pgrx_c_generated::Field_flags
     };
     (flat_size) => {
-        $crate::__pgrx_c_generated::Field1929
+        $crate::__pgrx_c_generated::Field_flat_size
     };
     (flinfo) => {
-        $crate::__pgrx_c_generated::Field1931
+        $crate::__pgrx_c_generated::Field_flinfo
     };
     (float8ByVal) => {
-        $crate::__pgrx_c_generated::Field1932
+        $crate::__pgrx_c_generated::Field_float8ByVal
     };
     (float8byval) => {
-        $crate::__pgrx_c_generated::Field1933
+        $crate::__pgrx_c_generated::Field_float8byval
     };
     (flush) => {
-        $crate::__pgrx_c_generated::Field1936
+        $crate::__pgrx_c_generated::Field_flush
     };
     (flushLag) => {
-        $crate::__pgrx_c_generated::Field1937
+        $crate::__pgrx_c_generated::Field_flushLag
     };
     (flushedUpto) => {
-        $crate::__pgrx_c_generated::Field1938
+        $crate::__pgrx_c_generated::Field_flushedUpto
     };
     (fn_addr) => {
-        $crate::__pgrx_c_generated::Field1939
+        $crate::__pgrx_c_generated::Field_fn_addr
     };
     (fn_expr) => {
-        $crate::__pgrx_c_generated::Field1942
+        $crate::__pgrx_c_generated::Field_fn_expr
     };
     (fn_extra) => {
-        $crate::__pgrx_c_generated::Field1943
+        $crate::__pgrx_c_generated::Field_fn_extra
     };
     (fn_input_collation) => {
-        $crate::__pgrx_c_generated::Field1945
+        $crate::__pgrx_c_generated::Field_fn_input_collation
     };
     (fn_is_trigger) => {
-        $crate::__pgrx_c_generated::Field1946
+        $crate::__pgrx_c_generated::Field_fn_is_trigger
     };
     (fn_nargs) => {
-        $crate::__pgrx_c_generated::Field1948
+        $crate::__pgrx_c_generated::Field_fn_nargs
     };
     (fn_oid) => {
-        $crate::__pgrx_c_generated::Field1949
+        $crate::__pgrx_c_generated::Field_fn_oid
     };
     (fn_prokind) => {
-        $crate::__pgrx_c_generated::Field1950
+        $crate::__pgrx_c_generated::Field_fn_prokind
     };
     (fn_readonly) => {
-        $crate::__pgrx_c_generated::Field1951
+        $crate::__pgrx_c_generated::Field_fn_readonly
     };
     (fn_retbyval) => {
-        $crate::__pgrx_c_generated::Field1952
+        $crate::__pgrx_c_generated::Field_fn_retbyval
     };
     (fn_retisdomain) => {
-        $crate::__pgrx_c_generated::Field1953
+        $crate::__pgrx_c_generated::Field_fn_retisdomain
     };
     (fn_retistuple) => {
-        $crate::__pgrx_c_generated::Field1954
+        $crate::__pgrx_c_generated::Field_fn_retistuple
     };
     (fn_retset) => {
-        $crate::__pgrx_c_generated::Field1955
+        $crate::__pgrx_c_generated::Field_fn_retset
     };
     (fn_rettype) => {
-        $crate::__pgrx_c_generated::Field1956
+        $crate::__pgrx_c_generated::Field_fn_rettype
     };
     (fn_rettyplen) => {
-        $crate::__pgrx_c_generated::Field1957
+        $crate::__pgrx_c_generated::Field_fn_rettyplen
     };
     (fn_stats) => {
-        $crate::__pgrx_c_generated::Field1959
+        $crate::__pgrx_c_generated::Field_fn_stats
     };
     (fn_strict) => {
-        $crate::__pgrx_c_generated::Field1960
+        $crate::__pgrx_c_generated::Field_fn_strict
     };
     (fn_xmin) => {
-        $crate::__pgrx_c_generated::Field1962
+        $crate::__pgrx_c_generated::Field_fn_xmin
     };
     (fncollation) => {
-        $crate::__pgrx_c_generated::Field1964
+        $crate::__pgrx_c_generated::Field_fncollation
     };
     (fnumber) => {
-        $crate::__pgrx_c_generated::Field1965
+        $crate::__pgrx_c_generated::Field_fnumber
     };
     (for_all_tables) => {
-        $crate::__pgrx_c_generated::Field1966
+        $crate::__pgrx_c_generated::Field_for_all_tables
     };
     (for_identity) => {
-        $crate::__pgrx_c_generated::Field1968
+        $crate::__pgrx_c_generated::Field_for_identity
     };
     (for_ordinality) => {
-        $crate::__pgrx_c_generated::Field1969
+        $crate::__pgrx_c_generated::Field_for_ordinality
     };
     (force) => {
-        $crate::__pgrx_c_generated::Field1970
+        $crate::__pgrx_c_generated::Field_force
     };
     (force_align_i64) => {
-        $crate::__pgrx_c_generated::Field1972
+        $crate::__pgrx_c_generated::Field_force_align_i64
     };
     (force_notnull) => {
-        $crate::__pgrx_c_generated::Field1973
+        $crate::__pgrx_c_generated::Field_force_notnull
     };
     (force_notnull_all) => {
-        $crate::__pgrx_c_generated::Field1974
+        $crate::__pgrx_c_generated::Field_force_notnull_all
     };
     (force_null) => {
-        $crate::__pgrx_c_generated::Field1976
+        $crate::__pgrx_c_generated::Field_force_null
     };
     (force_null_all) => {
-        $crate::__pgrx_c_generated::Field1977
+        $crate::__pgrx_c_generated::Field_force_null_all
     };
     (force_quote) => {
-        $crate::__pgrx_c_generated::Field1979
+        $crate::__pgrx_c_generated::Field_force_quote
     };
     (force_quote_all) => {
-        $crate::__pgrx_c_generated::Field1980
+        $crate::__pgrx_c_generated::Field_force_quote_all
     };
     (force_reply) => {
-        $crate::__pgrx_c_generated::Field1982
+        $crate::__pgrx_c_generated::Field_force_reply
     };
     (forcenonrequired) => {
-        $crate::__pgrx_c_generated::Field1983
+        $crate::__pgrx_c_generated::Field_forcenonrequired
     };
     (forkNum) => {
-        $crate::__pgrx_c_generated::Field1984
+        $crate::__pgrx_c_generated::Field_forkNum
     };
     (fork_end) => {
-        $crate::__pgrx_c_generated::Field1985
+        $crate::__pgrx_c_generated::Field_fork_end
     };
     (fork_flags) => {
-        $crate::__pgrx_c_generated::Field1986
+        $crate::__pgrx_c_generated::Field_fork_flags
     };
     (fork_start) => {
-        $crate::__pgrx_c_generated::Field1987
+        $crate::__pgrx_c_generated::Field_fork_start
     };
     (fork_started) => {
-        $crate::__pgrx_c_generated::Field1988
+        $crate::__pgrx_c_generated::Field_fork_started
     };
     (forknum) => {
-        $crate::__pgrx_c_generated::Field1989
+        $crate::__pgrx_c_generated::Field_forknum
     };
     (format) => {
-        $crate::__pgrx_c_generated::Field1990
+        $crate::__pgrx_c_generated::Field_format
     };
     (format_type) => {
-        $crate::__pgrx_c_generated::Field1991
+        $crate::__pgrx_c_generated::Field_format_type
     };
     (found_varno) => {
-        $crate::__pgrx_c_generated::Field1994
+        $crate::__pgrx_c_generated::Field_found_varno
     };
     (fpInfoLock) => {
-        $crate::__pgrx_c_generated::Field1996
+        $crate::__pgrx_c_generated::Field_fpInfoLock
     };
     (fpLocalTransactionId) => {
-        $crate::__pgrx_c_generated::Field1997
+        $crate::__pgrx_c_generated::Field_fpLocalTransactionId
     };
     (fpLockBits) => {
-        $crate::__pgrx_c_generated::Field1998
+        $crate::__pgrx_c_generated::Field_fpLockBits
     };
     (fpRelId) => {
-        $crate::__pgrx_c_generated::Field1999
+        $crate::__pgrx_c_generated::Field_fpRelId
     };
     (fpVXIDLock) => {
-        $crate::__pgrx_c_generated::Field2000
+        $crate::__pgrx_c_generated::Field_fpVXIDLock
     };
     (fp_next_slot) => {
-        $crate::__pgrx_c_generated::Field2003
+        $crate::__pgrx_c_generated::Field_fp_next_slot
     };
     (fpi_len) => {
-        $crate::__pgrx_c_generated::Field2006
+        $crate::__pgrx_c_generated::Field_fpi_len
     };
     (frac_digits) => {
-        $crate::__pgrx_c_generated::Field2007
+        $crate::__pgrx_c_generated::Field_frac_digits
     };
     (fragdelimlen) => {
-        $crate::__pgrx_c_generated::Field2009
+        $crate::__pgrx_c_generated::Field_fragdelimlen
     };
     (frameOptions) => {
-        $crate::__pgrx_c_generated::Field2010
+        $crate::__pgrx_c_generated::Field_frameOptions
     };
     (framehead_ptr) => {
-        $crate::__pgrx_c_generated::Field2011
+        $crate::__pgrx_c_generated::Field_framehead_ptr
     };
     (framehead_valid) => {
-        $crate::__pgrx_c_generated::Field2013
+        $crate::__pgrx_c_generated::Field_framehead_valid
     };
     (frameheadgroup) => {
-        $crate::__pgrx_c_generated::Field2014
+        $crate::__pgrx_c_generated::Field_frameheadgroup
     };
     (frameheadpos) => {
-        $crate::__pgrx_c_generated::Field2015
+        $crate::__pgrx_c_generated::Field_frameheadpos
     };
     (frametail_ptr) => {
-        $crate::__pgrx_c_generated::Field2016
+        $crate::__pgrx_c_generated::Field_frametail_ptr
     };
     (frametail_valid) => {
-        $crate::__pgrx_c_generated::Field2018
+        $crate::__pgrx_c_generated::Field_frametail_valid
     };
     (frametailgroup) => {
-        $crate::__pgrx_c_generated::Field2019
+        $crate::__pgrx_c_generated::Field_frametailgroup
     };
     (frametailpos) => {
-        $crate::__pgrx_c_generated::Field2020
+        $crate::__pgrx_c_generated::Field_frametailpos
     };
     (freeBlocksLen) => {
-        $crate::__pgrx_c_generated::Field2022
+        $crate::__pgrx_c_generated::Field_freeBlocksLen
     };
     (freeNext) => {
-        $crate::__pgrx_c_generated::Field2023
+        $crate::__pgrx_c_generated::Field_freeNext
     };
     (freeSpace) => {
-        $crate::__pgrx_c_generated::Field2025
+        $crate::__pgrx_c_generated::Field_freeSpace
     };
     (free_decode_buffer) => {
-        $crate::__pgrx_c_generated::Field2026
+        $crate::__pgrx_c_generated::Field_free_decode_buffer
     };
     (freechunks) => {
-        $crate::__pgrx_c_generated::Field2028
+        $crate::__pgrx_c_generated::Field_freechunks
     };
     (freefunc) => {
-        $crate::__pgrx_c_generated::Field2029
+        $crate::__pgrx_c_generated::Field_freefunc
     };
     (freeoffset) => {
-        $crate::__pgrx_c_generated::Field2030
+        $crate::__pgrx_c_generated::Field_freeoffset
     };
     (freespace) => {
-        $crate::__pgrx_c_generated::Field2031
+        $crate::__pgrx_c_generated::Field_freespace
     };
     (freeval) => {
-        $crate::__pgrx_c_generated::Field2033
+        $crate::__pgrx_c_generated::Field_freeval
     };
     (freeze) => {
-        $crate::__pgrx_c_generated::Field2034
+        $crate::__pgrx_c_generated::Field_freeze
     };
     (freeze_max_age) => {
-        $crate::__pgrx_c_generated::Field2035
+        $crate::__pgrx_c_generated::Field_freeze_max_age
     };
     (freeze_min_age) => {
-        $crate::__pgrx_c_generated::Field2036
+        $crate::__pgrx_c_generated::Field_freeze_min_age
     };
     (freeze_required) => {
-        $crate::__pgrx_c_generated::Field2037
+        $crate::__pgrx_c_generated::Field_freeze_required
     };
     (freeze_table_age) => {
-        $crate::__pgrx_c_generated::Field2038
+        $crate::__pgrx_c_generated::Field_freeze_table_age
     };
     (fromClause) => {
-        $crate::__pgrx_c_generated::Field2040
+        $crate::__pgrx_c_generated::Field_fromClause
     };
     (from_sql) => {
-        $crate::__pgrx_c_generated::Field2041
+        $crate::__pgrx_c_generated::Field_from_sql
     };
     (fromlist) => {
-        $crate::__pgrx_c_generated::Field2042
+        $crate::__pgrx_c_generated::Field_fromlist
     };
     (frzflags) => {
-        $crate::__pgrx_c_generated::Field2044
+        $crate::__pgrx_c_generated::Field_frzflags
     };
     (fsSystemCol) => {
-        $crate::__pgrx_c_generated::Field2046
+        $crate::__pgrx_c_generated::Field_fsSystemCol
     };
     (fs_server) => {
-        $crate::__pgrx_c_generated::Field2056
+        $crate::__pgrx_c_generated::Field_fs_server
     };
     (ftrelid) => {
-        $crate::__pgrx_c_generated::Field2072
+        $crate::__pgrx_c_generated::Field_ftrelid
     };
     (ftserver) => {
-        $crate::__pgrx_c_generated::Field2073
+        $crate::__pgrx_c_generated::Field_ftserver
     };
     (ftypeid) => {
-        $crate::__pgrx_c_generated::Field2074
+        $crate::__pgrx_c_generated::Field_ftypeid
     };
     (ftypmod) => {
-        $crate::__pgrx_c_generated::Field2075
+        $crate::__pgrx_c_generated::Field_ftypmod
     };
     (fullPageWrites) => {
-        $crate::__pgrx_c_generated::Field2076
+        $crate::__pgrx_c_generated::Field_fullPageWrites
     };
     (fullScan) => {
-        $crate::__pgrx_c_generated::Field2077
+        $crate::__pgrx_c_generated::Field_fullScan
     };
     (full_join_clauses) => {
-        $crate::__pgrx_c_generated::Field2078
+        $crate::__pgrx_c_generated::Field_full_join_clauses
     };
     (funcOid) => {
-        $crate::__pgrx_c_generated::Field2082
+        $crate::__pgrx_c_generated::Field_funcOid
     };
     (funcReturnsSet) => {
-        $crate::__pgrx_c_generated::Field2086
+        $crate::__pgrx_c_generated::Field_funcReturnsSet
     };
     (funcReturnsTuple) => {
-        $crate::__pgrx_c_generated::Field2087
+        $crate::__pgrx_c_generated::Field_funcReturnsTuple
     };
     (func_name) => {
-        $crate::__pgrx_c_generated::Field2090
+        $crate::__pgrx_c_generated::Field_func_name
     };
     (func_options) => {
-        $crate::__pgrx_c_generated::Field2091
+        $crate::__pgrx_c_generated::Field_func_options
     };
     (func_variadic) => {
-        $crate::__pgrx_c_generated::Field2093
+        $crate::__pgrx_c_generated::Field_func_variadic
     };
     (funccolcollations) => {
-        $crate::__pgrx_c_generated::Field2095
+        $crate::__pgrx_c_generated::Field_funccolcollations
     };
     (funccolcount) => {
-        $crate::__pgrx_c_generated::Field2096
+        $crate::__pgrx_c_generated::Field_funccolcount
     };
     (funccollid) => {
-        $crate::__pgrx_c_generated::Field2097
+        $crate::__pgrx_c_generated::Field_funccollid
     };
     (funccolnames) => {
-        $crate::__pgrx_c_generated::Field2098
+        $crate::__pgrx_c_generated::Field_funccolnames
     };
     (funccoltypes) => {
-        $crate::__pgrx_c_generated::Field2099
+        $crate::__pgrx_c_generated::Field_funccoltypes
     };
     (funccoltypmods) => {
-        $crate::__pgrx_c_generated::Field2100
+        $crate::__pgrx_c_generated::Field_funccoltypmods
     };
     (funcformat) => {
-        $crate::__pgrx_c_generated::Field2102
+        $crate::__pgrx_c_generated::Field_funcformat
     };
     (funcid) => {
-        $crate::__pgrx_c_generated::Field2103
+        $crate::__pgrx_c_generated::Field_funcid
     };
     (funcmaxargs) => {
-        $crate::__pgrx_c_generated::Field2104
+        $crate::__pgrx_c_generated::Field_funcmaxargs
     };
     (funcname) => {
-        $crate::__pgrx_c_generated::Field2105
+        $crate::__pgrx_c_generated::Field_funcname
     };
     (funcordinality) => {
-        $crate::__pgrx_c_generated::Field2106
+        $crate::__pgrx_c_generated::Field_funcordinality
     };
     (funcresulttype) => {
-        $crate::__pgrx_c_generated::Field2108
+        $crate::__pgrx_c_generated::Field_funcresulttype
     };
     (funcretset) => {
-        $crate::__pgrx_c_generated::Field2109
+        $crate::__pgrx_c_generated::Field_funcretset
     };
     (funcs) => {
-        $crate::__pgrx_c_generated::Field2110
+        $crate::__pgrx_c_generated::Field_funcs
     };
     (functions) => {
-        $crate::__pgrx_c_generated::Field2114
+        $crate::__pgrx_c_generated::Field_functions
     };
     (functionset) => {
-        $crate::__pgrx_c_generated::Field2115
+        $crate::__pgrx_c_generated::Field_functionset
     };
     (functype) => {
-        $crate::__pgrx_c_generated::Field2116
+        $crate::__pgrx_c_generated::Field_functype
     };
     (funcvariadic) => {
-        $crate::__pgrx_c_generated::Field2117
+        $crate::__pgrx_c_generated::Field_funcvariadic
     };
     (fval) => {
-        $crate::__pgrx_c_generated::Field2119
+        $crate::__pgrx_c_generated::Field_fval
     };
     (fvalue) => {
-        $crate::__pgrx_c_generated::Field2120
+        $crate::__pgrx_c_generated::Field_fvalue
     };
     (gencols_valid_for_delete) => {
-        $crate::__pgrx_c_generated::Field2122
+        $crate::__pgrx_c_generated::Field_gencols_valid_for_delete
     };
     (gencols_valid_for_update) => {
-        $crate::__pgrx_c_generated::Field2123
+        $crate::__pgrx_c_generated::Field_gencols_valid_for_update
     };
     (generated) => {
-        $crate::__pgrx_c_generated::Field2124
+        $crate::__pgrx_c_generated::Field_generated
     };
     (generated_kind) => {
-        $crate::__pgrx_c_generated::Field2125
+        $crate::__pgrx_c_generated::Field_generated_kind
     };
     (generated_when) => {
-        $crate::__pgrx_c_generated::Field2126
+        $crate::__pgrx_c_generated::Field_generated_when
     };
     (generation) => {
-        $crate::__pgrx_c_generated::Field2127
+        $crate::__pgrx_c_generated::Field_generation
     };
     (generation_lower) => {
-        $crate::__pgrx_c_generated::Field2129
+        $crate::__pgrx_c_generated::Field_generation_lower
     };
     (generation_upper) => {
-        $crate::__pgrx_c_generated::Field2130
+        $crate::__pgrx_c_generated::Field_generation_upper
     };
     (generic) => {
-        $crate::__pgrx_c_generated::Field2131
+        $crate::__pgrx_c_generated::Field_generic
     };
     (getnext) => {
-        $crate::__pgrx_c_generated::Field2141
+        $crate::__pgrx_c_generated::Field_getnext
     };
     (gidlen) => {
-        $crate::__pgrx_c_generated::Field2145
+        $crate::__pgrx_c_generated::Field_gidlen
     };
     (ginVersion) => {
-        $crate::__pgrx_c_generated::Field2146
+        $crate::__pgrx_c_generated::Field_ginVersion
     };
     (gist_page_id) => {
-        $crate::__pgrx_c_generated::Field2148
+        $crate::__pgrx_c_generated::Field_gist_page_id
     };
     (glob) => {
-        $crate::__pgrx_c_generated::Field2150
+        $crate::__pgrx_c_generated::Field_glob
     };
     (gm_initialized) => {
-        $crate::__pgrx_c_generated::Field2152
+        $crate::__pgrx_c_generated::Field_gm_initialized
     };
     (gm_nkeys) => {
-        $crate::__pgrx_c_generated::Field2153
+        $crate::__pgrx_c_generated::Field_gm_nkeys
     };
     (grantMask) => {
-        $crate::__pgrx_c_generated::Field2161
+        $crate::__pgrx_c_generated::Field_grantMask
     };
     (grant_option) => {
-        $crate::__pgrx_c_generated::Field2162
+        $crate::__pgrx_c_generated::Field_grant_option
     };
     (granted_roles) => {
-        $crate::__pgrx_c_generated::Field2164
+        $crate::__pgrx_c_generated::Field_granted_roles
     };
     (grantee_roles) => {
-        $crate::__pgrx_c_generated::Field2165
+        $crate::__pgrx_c_generated::Field_grantee_roles
     };
     (grantees) => {
-        $crate::__pgrx_c_generated::Field2166
+        $crate::__pgrx_c_generated::Field_grantees
     };
     (grantor) => {
-        $crate::__pgrx_c_generated::Field2167
+        $crate::__pgrx_c_generated::Field_grantor
     };
     (group) => {
-        $crate::__pgrx_c_generated::Field2168
+        $crate::__pgrx_c_generated::Field_group
     };
     (groupClause) => {
-        $crate::__pgrx_c_generated::Field2169
+        $crate::__pgrx_c_generated::Field_groupClause
     };
     (groupClauses) => {
-        $crate::__pgrx_c_generated::Field2170
+        $crate::__pgrx_c_generated::Field_groupClauses
     };
     (groupCount) => {
-        $crate::__pgrx_c_generated::Field2171
+        $crate::__pgrx_c_generated::Field_groupCount
     };
     (groupDistinct) => {
-        $crate::__pgrx_c_generated::Field2172
+        $crate::__pgrx_c_generated::Field_groupDistinct
     };
     (groupList) => {
-        $crate::__pgrx_c_generated::Field2174
+        $crate::__pgrx_c_generated::Field_groupList
     };
     (group_pathkeys) => {
-        $crate::__pgrx_c_generated::Field2176
+        $crate::__pgrx_c_generated::Field_group_pathkeys
     };
     (group_rtindex) => {
-        $crate::__pgrx_c_generated::Field2178
+        $crate::__pgrx_c_generated::Field_group_rtindex
     };
     (groupexprs) => {
-        $crate::__pgrx_c_generated::Field2180
+        $crate::__pgrx_c_generated::Field_groupexprs
     };
     (groupheadpos) => {
-        $crate::__pgrx_c_generated::Field2181
+        $crate::__pgrx_c_generated::Field_groupheadpos
     };
     (groupingSets) => {
-        $crate::__pgrx_c_generated::Field2183
+        $crate::__pgrx_c_generated::Field_groupingSets
     };
     (grouping_stack) => {
-        $crate::__pgrx_c_generated::Field2186
+        $crate::__pgrx_c_generated::Field_grouping_stack
     };
     (grouptail_ptr) => {
-        $crate::__pgrx_c_generated::Field2187
+        $crate::__pgrx_c_generated::Field_grouptail_ptr
     };
     (grouptail_valid) => {
-        $crate::__pgrx_c_generated::Field2188
+        $crate::__pgrx_c_generated::Field_grouptail_valid
     };
     (grouptailpos) => {
-        $crate::__pgrx_c_generated::Field2189
+        $crate::__pgrx_c_generated::Field_grouptailpos
     };
     (growEnabled) => {
-        $crate::__pgrx_c_generated::Field2190
+        $crate::__pgrx_c_generated::Field_growEnabled
     };
     (grow_threshold) => {
-        $crate::__pgrx_c_generated::Field2193
+        $crate::__pgrx_c_generated::Field_grow_threshold
     };
     (growth) => {
-        $crate::__pgrx_c_generated::Field2194
+        $crate::__pgrx_c_generated::Field_growth
     };
     (grp_done) => {
-        $crate::__pgrx_c_generated::Field2198
+        $crate::__pgrx_c_generated::Field_grp_done
     };
     (gsets) => {
-        $crate::__pgrx_c_generated::Field2201
+        $crate::__pgrx_c_generated::Field_gsets
     };
     (gsets_data) => {
-        $crate::__pgrx_c_generated::Field2202
+        $crate::__pgrx_c_generated::Field_gsets_data
     };
     (gss_auth) => {
-        $crate::__pgrx_c_generated::Field2206
+        $crate::__pgrx_c_generated::Field_gss_auth
     };
     (gss_delegation) => {
-        $crate::__pgrx_c_generated::Field2207
+        $crate::__pgrx_c_generated::Field_gss_delegation
     };
     (gss_enc) => {
-        $crate::__pgrx_c_generated::Field2208
+        $crate::__pgrx_c_generated::Field_gss_enc
     };
     (gt_opr) => {
-        $crate::__pgrx_c_generated::Field2210
+        $crate::__pgrx_c_generated::Field_gt_opr
     };
     (handle_data_len) => {
-        $crate::__pgrx_c_generated::Field2218
+        $crate::__pgrx_c_generated::Field_handle_data_len
     };
     (handler) => {
-        $crate::__pgrx_c_generated::Field2219
+        $crate::__pgrx_c_generated::Field_handler
     };
     (handler_name) => {
-        $crate::__pgrx_c_generated::Field2220
+        $crate::__pgrx_c_generated::Field_handler_name
     };
     (hasAggs) => {
-        $crate::__pgrx_c_generated::Field2221
+        $crate::__pgrx_c_generated::Field_hasAggs
     };
     (hasAlternativeSubPlans) => {
-        $crate::__pgrx_c_generated::Field2222
+        $crate::__pgrx_c_generated::Field_hasAlternativeSubPlans
     };
     (hasDistinctOn) => {
-        $crate::__pgrx_c_generated::Field2223
+        $crate::__pgrx_c_generated::Field_hasDistinctOn
     };
     (hasForUpdate) => {
-        $crate::__pgrx_c_generated::Field2224
+        $crate::__pgrx_c_generated::Field_hasForUpdate
     };
     (hasGroupRTE) => {
-        $crate::__pgrx_c_generated::Field2225
+        $crate::__pgrx_c_generated::Field_hasGroupRTE
     };
     (hasHashvalue) => {
-        $crate::__pgrx_c_generated::Field2226
+        $crate::__pgrx_c_generated::Field_hasHashvalue
     };
     (hasHavingQual) => {
-        $crate::__pgrx_c_generated::Field2227
+        $crate::__pgrx_c_generated::Field_hasHavingQual
     };
     (hasJoinRTEs) => {
-        $crate::__pgrx_c_generated::Field2228
+        $crate::__pgrx_c_generated::Field_hasJoinRTEs
     };
     (hasLateralRTEs) => {
-        $crate::__pgrx_c_generated::Field2229
+        $crate::__pgrx_c_generated::Field_hasLateralRTEs
     };
     (hasModifyingCTE) => {
-        $crate::__pgrx_c_generated::Field2230
+        $crate::__pgrx_c_generated::Field_hasModifyingCTE
     };
     (hasNonPartialAggs) => {
-        $crate::__pgrx_c_generated::Field2232
+        $crate::__pgrx_c_generated::Field_hasNonPartialAggs
     };
     (hasNonSerialAggs) => {
-        $crate::__pgrx_c_generated::Field2233
+        $crate::__pgrx_c_generated::Field_hasNonSerialAggs
     };
     (hasPrefix) => {
-        $crate::__pgrx_c_generated::Field2234
+        $crate::__pgrx_c_generated::Field_hasPrefix
     };
     (hasPseudoConstantQuals) => {
-        $crate::__pgrx_c_generated::Field2236
+        $crate::__pgrx_c_generated::Field_hasPseudoConstantQuals
     };
     (hasRecursion) => {
-        $crate::__pgrx_c_generated::Field2237
+        $crate::__pgrx_c_generated::Field_hasRecursion
     };
     (hasRecursive) => {
-        $crate::__pgrx_c_generated::Field2238
+        $crate::__pgrx_c_generated::Field_hasRecursive
     };
     (hasReturning) => {
-        $crate::__pgrx_c_generated::Field2239
+        $crate::__pgrx_c_generated::Field_hasReturning
     };
     (hasRowSecurity) => {
-        $crate::__pgrx_c_generated::Field2240
+        $crate::__pgrx_c_generated::Field_hasRowSecurity
     };
     (hasSubLinks) => {
-        $crate::__pgrx_c_generated::Field2241
+        $crate::__pgrx_c_generated::Field_hasSubLinks
     };
     (hasTargetSRFs) => {
-        $crate::__pgrx_c_generated::Field2242
+        $crate::__pgrx_c_generated::Field_hasTargetSRFs
     };
     (hasWindowFuncs) => {
-        $crate::__pgrx_c_generated::Field2243
+        $crate::__pgrx_c_generated::Field_hasWindowFuncs
     };
     (has_clone) => {
-        $crate::__pgrx_c_generated::Field2244
+        $crate::__pgrx_c_generated::Field_has_clone
     };
     (has_data) => {
-        $crate::__pgrx_c_generated::Field2245
+        $crate::__pgrx_c_generated::Field_has_data
     };
     (has_eclass_joins) => {
-        $crate::__pgrx_c_generated::Field2246
+        $crate::__pgrx_c_generated::Field_has_eclass_joins
     };
     (has_exception_block) => {
-        $crate::__pgrx_c_generated::Field2247
+        $crate::__pgrx_c_generated::Field_has_exception_block
     };
     (has_generated_stored) => {
-        $crate::__pgrx_c_generated::Field2248
+        $crate::__pgrx_c_generated::Field_has_generated_stored
     };
     (has_generated_virtual) => {
-        $crate::__pgrx_c_generated::Field2249
+        $crate::__pgrx_c_generated::Field_has_generated_virtual
     };
     (has_image) => {
-        $crate::__pgrx_c_generated::Field2250
+        $crate::__pgrx_c_generated::Field_has_image
     };
     (has_not_null) => {
-        $crate::__pgrx_c_generated::Field2251
+        $crate::__pgrx_c_generated::Field_has_not_null
     };
     (has_nulls) => {
-        $crate::__pgrx_c_generated::Field2252
+        $crate::__pgrx_c_generated::Field_has_nulls
     };
     (has_squashed_lists) => {
-        $crate::__pgrx_c_generated::Field2253
+        $crate::__pgrx_c_generated::Field_has_squashed_lists
     };
     (has_version) => {
-        $crate::__pgrx_c_generated::Field2254
+        $crate::__pgrx_c_generated::Field_has_version
     };
     (has_volatile) => {
-        $crate::__pgrx_c_generated::Field2255
+        $crate::__pgrx_c_generated::Field_has_volatile
     };
     (has_volatile_expr) => {
-        $crate::__pgrx_c_generated::Field2256
+        $crate::__pgrx_c_generated::Field_has_volatile_expr
     };
     (hash) => {
-        $crate::__pgrx_c_generated::Field2257
+        $crate::__pgrx_c_generated::Field_hash
     };
     (hashValue) => {
-        $crate::__pgrx_c_generated::Field2262
+        $crate::__pgrx_c_generated::Field_hashValue
     };
     (hash_batches) => {
-        $crate::__pgrx_c_generated::Field2263
+        $crate::__pgrx_c_generated::Field_hash_batches
     };
     (hash_batches_used) => {
-        $crate::__pgrx_c_generated::Field2264
+        $crate::__pgrx_c_generated::Field_hash_batches_used
     };
     (hash_disk_used) => {
-        $crate::__pgrx_c_generated::Field2265
+        $crate::__pgrx_c_generated::Field_hash_disk_used
     };
     (hash_ever_spilled) => {
-        $crate::__pgrx_c_generated::Field2266
+        $crate::__pgrx_c_generated::Field_hash_ever_spilled
     };
     (hash_extended_proc) => {
-        $crate::__pgrx_c_generated::Field2268
+        $crate::__pgrx_c_generated::Field_hash_extended_proc
     };
     (hash_mem_limit) => {
-        $crate::__pgrx_c_generated::Field2271
+        $crate::__pgrx_c_generated::Field_hash_mem_limit
     };
     (hash_mem_peak) => {
-        $crate::__pgrx_c_generated::Field2272
+        $crate::__pgrx_c_generated::Field_hash_mem_peak
     };
     (hash_ngroups_current) => {
-        $crate::__pgrx_c_generated::Field2274
+        $crate::__pgrx_c_generated::Field_hash_ngroups_current
     };
     (hash_ngroups_limit) => {
-        $crate::__pgrx_c_generated::Field2275
+        $crate::__pgrx_c_generated::Field_hash_ngroups_limit
     };
     (hash_operators) => {
-        $crate::__pgrx_c_generated::Field2276
+        $crate::__pgrx_c_generated::Field_hash_operators
     };
     (hash_opf) => {
-        $crate::__pgrx_c_generated::Field2277
+        $crate::__pgrx_c_generated::Field_hash_opf
     };
     (hash_opintype) => {
-        $crate::__pgrx_c_generated::Field2278
+        $crate::__pgrx_c_generated::Field_hash_opintype
     };
     (hash_planned_partitions) => {
-        $crate::__pgrx_c_generated::Field2280
+        $crate::__pgrx_c_generated::Field_hash_planned_partitions
     };
     (hash_proc) => {
-        $crate::__pgrx_c_generated::Field2281
+        $crate::__pgrx_c_generated::Field_hash_proc
     };
     (hash_spill_mode) => {
-        $crate::__pgrx_c_generated::Field2283
+        $crate::__pgrx_c_generated::Field_hash_spill_mode
     };
     (hash_value) => {
-        $crate::__pgrx_c_generated::Field2290
+        $crate::__pgrx_c_generated::Field_hash_value
     };
     (hashable) => {
-        $crate::__pgrx_c_generated::Field2291
+        $crate::__pgrx_c_generated::Field_hashable
     };
     (hashcode) => {
-        $crate::__pgrx_c_generated::Field2293
+        $crate::__pgrx_c_generated::Field_hashcode
     };
     (hashfuncid) => {
-        $crate::__pgrx_c_generated::Field2300
+        $crate::__pgrx_c_generated::Field_hashfuncid
     };
     (hashjoinoperator) => {
-        $crate::__pgrx_c_generated::Field2303
+        $crate::__pgrx_c_generated::Field_hashjoinoperator
     };
     (hashkeys) => {
-        $crate::__pgrx_c_generated::Field2305
+        $crate::__pgrx_c_generated::Field_hashkeys
     };
     (hashm_bmshift) => {
-        $crate::__pgrx_c_generated::Field2306
+        $crate::__pgrx_c_generated::Field_hashm_bmshift
     };
     (hashm_bmsize) => {
-        $crate::__pgrx_c_generated::Field2307
+        $crate::__pgrx_c_generated::Field_hashm_bmsize
     };
     (hashm_bsize) => {
-        $crate::__pgrx_c_generated::Field2308
+        $crate::__pgrx_c_generated::Field_hashm_bsize
     };
     (hashm_ffactor) => {
-        $crate::__pgrx_c_generated::Field2309
+        $crate::__pgrx_c_generated::Field_hashm_ffactor
     };
     (hashm_firstfree) => {
-        $crate::__pgrx_c_generated::Field2310
+        $crate::__pgrx_c_generated::Field_hashm_firstfree
     };
     (hashm_highmask) => {
-        $crate::__pgrx_c_generated::Field2311
+        $crate::__pgrx_c_generated::Field_hashm_highmask
     };
     (hashm_lowmask) => {
-        $crate::__pgrx_c_generated::Field2312
+        $crate::__pgrx_c_generated::Field_hashm_lowmask
     };
     (hashm_magic) => {
-        $crate::__pgrx_c_generated::Field2313
+        $crate::__pgrx_c_generated::Field_hashm_magic
     };
     (hashm_maxbucket) => {
-        $crate::__pgrx_c_generated::Field2315
+        $crate::__pgrx_c_generated::Field_hashm_maxbucket
     };
     (hashm_nmaps) => {
-        $crate::__pgrx_c_generated::Field2316
+        $crate::__pgrx_c_generated::Field_hashm_nmaps
     };
     (hashm_ovflpoint) => {
-        $crate::__pgrx_c_generated::Field2318
+        $crate::__pgrx_c_generated::Field_hashm_ovflpoint
     };
     (hashm_procid) => {
-        $crate::__pgrx_c_generated::Field2319
+        $crate::__pgrx_c_generated::Field_hashm_procid
     };
     (hashm_spares) => {
-        $crate::__pgrx_c_generated::Field2320
+        $crate::__pgrx_c_generated::Field_hashm_spares
     };
     (hashm_version) => {
-        $crate::__pgrx_c_generated::Field2321
+        $crate::__pgrx_c_generated::Field_hashm_version
     };
     (hasho_bucket) => {
-        $crate::__pgrx_c_generated::Field2323
+        $crate::__pgrx_c_generated::Field_hasho_bucket
     };
     (hasho_flag) => {
-        $crate::__pgrx_c_generated::Field2324
+        $crate::__pgrx_c_generated::Field_hasho_flag
     };
     (hasho_nextblkno) => {
-        $crate::__pgrx_c_generated::Field2325
+        $crate::__pgrx_c_generated::Field_hasho_nextblkno
     };
     (hasho_page_id) => {
-        $crate::__pgrx_c_generated::Field2326
+        $crate::__pgrx_c_generated::Field_hasho_page_id
     };
     (hasho_prevblkno) => {
-        $crate::__pgrx_c_generated::Field2327
+        $crate::__pgrx_c_generated::Field_hasho_prevblkno
     };
     (hashso_buc_populated) => {
-        $crate::__pgrx_c_generated::Field2331
+        $crate::__pgrx_c_generated::Field_hashso_buc_populated
     };
     (hashso_buc_split) => {
-        $crate::__pgrx_c_generated::Field2332
+        $crate::__pgrx_c_generated::Field_hashso_buc_split
     };
     (hashso_bucket_buf) => {
-        $crate::__pgrx_c_generated::Field2333
+        $crate::__pgrx_c_generated::Field_hashso_bucket_buf
     };
     (hashso_sk_hash) => {
-        $crate::__pgrx_c_generated::Field2334
+        $crate::__pgrx_c_generated::Field_hashso_sk_hash
     };
     (hashso_split_bucket_buf) => {
-        $crate::__pgrx_c_generated::Field2335
+        $crate::__pgrx_c_generated::Field_hashso_split_bucket_buf
     };
     (hashtab) => {
-        $crate::__pgrx_c_generated::Field2336
+        $crate::__pgrx_c_generated::Field_hashtab
     };
     (hashvalue) => {
-        $crate::__pgrx_c_generated::Field2340
+        $crate::__pgrx_c_generated::Field_hashvalue
     };
     (haslast) => {
-        $crate::__pgrx_c_generated::Field2341
+        $crate::__pgrx_c_generated::Field_haslast
     };
     (hasnull) => {
-        $crate::__pgrx_c_generated::Field2342
+        $crate::__pgrx_c_generated::Field_hasnull
     };
     (haspos) => {
-        $crate::__pgrx_c_generated::Field2343
+        $crate::__pgrx_c_generated::Field_haspos
     };
     (hassublinks) => {
-        $crate::__pgrx_c_generated::Field2344
+        $crate::__pgrx_c_generated::Field_hassublinks
     };
     (hastup) => {
-        $crate::__pgrx_c_generated::Field2345
+        $crate::__pgrx_c_generated::Field_hastup
     };
     (haveDatum1) => {
-        $crate::__pgrx_c_generated::Field2346
+        $crate::__pgrx_c_generated::Field_haveDatum1
     };
     (have_else) => {
-        $crate::__pgrx_c_generated::Field2347
+        $crate::__pgrx_c_generated::Field_have_else
     };
     (haveblock) => {
-        $crate::__pgrx_c_generated::Field2348
+        $crate::__pgrx_c_generated::Field_haveblock
     };
     (havehashrows) => {
-        $crate::__pgrx_c_generated::Field2349
+        $crate::__pgrx_c_generated::Field_havehashrows
     };
     (havenullrows) => {
-        $crate::__pgrx_c_generated::Field2350
+        $crate::__pgrx_c_generated::Field_havenullrows
     };
     (hdr) => {
-        $crate::__pgrx_c_generated::Field2355
+        $crate::__pgrx_c_generated::Field_hdr
     };
     (head) => {
-        $crate::__pgrx_c_generated::Field2357
+        $crate::__pgrx_c_generated::Field_head
     };
     (header) => {
-        $crate::__pgrx_c_generated::Field2358
+        $crate::__pgrx_c_generated::Field_header
     };
     (header_line) => {
-        $crate::__pgrx_c_generated::Field2359
+        $crate::__pgrx_c_generated::Field_header_line
     };
     (headlineOid) => {
-        $crate::__pgrx_c_generated::Field2361
+        $crate::__pgrx_c_generated::Field_headlineOid
     };
     (heapBlk) => {
-        $crate::__pgrx_c_generated::Field2363
+        $crate::__pgrx_c_generated::Field_heapBlk
     };
     (heapkeyspace) => {
-        $crate::__pgrx_c_generated::Field2371
+        $crate::__pgrx_c_generated::Field_heapkeyspace
     };
     (held) => {
-        $crate::__pgrx_c_generated::Field2373
+        $crate::__pgrx_c_generated::Field_held
     };
     (heldLocks) => {
-        $crate::__pgrx_c_generated::Field2374
+        $crate::__pgrx_c_generated::Field_heldLocks
     };
     (hidden) => {
-        $crate::__pgrx_c_generated::Field2375
+        $crate::__pgrx_c_generated::Field_hidden
     };
     (hide_ctx) => {
-        $crate::__pgrx_c_generated::Field2376
+        $crate::__pgrx_c_generated::Field_hide_ctx
     };
     (hide_stmt) => {
-        $crate::__pgrx_c_generated::Field2377
+        $crate::__pgrx_c_generated::Field_hide_stmt
     };
     (hide_workers) => {
-        $crate::__pgrx_c_generated::Field2378
+        $crate::__pgrx_c_generated::Field_hide_workers
     };
     (high_elem) => {
-        $crate::__pgrx_c_generated::Field2381
+        $crate::__pgrx_c_generated::Field_high_elem
     };
     (highest_extern_param_id) => {
-        $crate::__pgrx_c_generated::Field2382
+        $crate::__pgrx_c_generated::Field_highest_extern_param_id
     };
     (hj_CurBucketNo) => {
-        $crate::__pgrx_c_generated::Field2385
+        $crate::__pgrx_c_generated::Field_hj_CurBucketNo
     };
     (hj_CurHashValue) => {
-        $crate::__pgrx_c_generated::Field2386
+        $crate::__pgrx_c_generated::Field_hj_CurHashValue
     };
     (hj_CurSkewBucketNo) => {
-        $crate::__pgrx_c_generated::Field2387
+        $crate::__pgrx_c_generated::Field_hj_CurSkewBucketNo
     };
     (hj_JoinState) => {
-        $crate::__pgrx_c_generated::Field2392
+        $crate::__pgrx_c_generated::Field_hj_JoinState
     };
     (hj_MatchedOuter) => {
-        $crate::__pgrx_c_generated::Field2393
+        $crate::__pgrx_c_generated::Field_hj_MatchedOuter
     };
     (hj_OuterNotEmpty) => {
-        $crate::__pgrx_c_generated::Field2397
+        $crate::__pgrx_c_generated::Field_hj_OuterNotEmpty
     };
     (hoff) => {
-        $crate::__pgrx_c_generated::Field2399
+        $crate::__pgrx_c_generated::Field_hoff
     };
     (holdMask) => {
-        $crate::__pgrx_c_generated::Field2401
+        $crate::__pgrx_c_generated::Field_holdMask
     };
     (holdsStrongLockCount) => {
-        $crate::__pgrx_c_generated::Field2404
+        $crate::__pgrx_c_generated::Field_holdsStrongLockCount
     };
     (hole_length) => {
-        $crate::__pgrx_c_generated::Field2405
+        $crate::__pgrx_c_generated::Field_hole_length
     };
     (hole_offset) => {
-        $crate::__pgrx_c_generated::Field2406
+        $crate::__pgrx_c_generated::Field_hole_offset
     };
     (howMany) => {
-        $crate::__pgrx_c_generated::Field2407
+        $crate::__pgrx_c_generated::Field_howMany
     };
     (how_many) => {
-        $crate::__pgrx_c_generated::Field2408
+        $crate::__pgrx_c_generated::Field_how_many
     };
     (hypothetical) => {
-        $crate::__pgrx_c_generated::Field2411
+        $crate::__pgrx_c_generated::Field_hypothetical
     };
     (i) => {
-        $crate::__pgrx_c_generated::Field2412
+        $crate::__pgrx_c_generated::Field_i
     };
     (i1) => {
-        $crate::__pgrx_c_generated::Field2413
+        $crate::__pgrx_c_generated::Field_i1
     };
     (i2) => {
-        $crate::__pgrx_c_generated::Field2414
+        $crate::__pgrx_c_generated::Field_i2
     };
     (iPtr) => {
-        $crate::__pgrx_c_generated::Field2415
+        $crate::__pgrx_c_generated::Field_iPtr
     };
     (iblknum) => {
-        $crate::__pgrx_c_generated::Field2416
+        $crate::__pgrx_c_generated::Field_iblknum
     };
     (id) => {
-        $crate::__pgrx_c_generated::Field2418
+        $crate::__pgrx_c_generated::Field_id
     };
     (identity) => {
-        $crate::__pgrx_c_generated::Field2420
+        $crate::__pgrx_c_generated::Field_identity
     };
     (identity_type) => {
-        $crate::__pgrx_c_generated::Field2422
+        $crate::__pgrx_c_generated::Field_identity_type
     };
     (idents) => {
-        $crate::__pgrx_c_generated::Field2423
+        $crate::__pgrx_c_generated::Field_idents
     };
     (idle_in_transaction_time) => {
-        $crate::__pgrx_c_generated::Field2424
+        $crate::__pgrx_c_generated::Field_idle_in_transaction_time
     };
     (idxoffnum) => {
-        $crate::__pgrx_c_generated::Field2428
+        $crate::__pgrx_c_generated::Field_idxoffnum
     };
     (if_not_exists) => {
-        $crate::__pgrx_c_generated::Field2429
+        $crate::__pgrx_c_generated::Field_if_not_exists
     };
     (ignore) => {
-        $crate::__pgrx_c_generated::Field2430
+        $crate::__pgrx_c_generated::Field_ignore
     };
     (ignore_killed_tuples) => {
-        $crate::__pgrx_c_generated::Field2431
+        $crate::__pgrx_c_generated::Field_ignore_killed_tuples
     };
     (ii_Am) => {
-        $crate::__pgrx_c_generated::Field2432
+        $crate::__pgrx_c_generated::Field_ii_Am
     };
     (ii_BrokenHotChain) => {
-        $crate::__pgrx_c_generated::Field2434
+        $crate::__pgrx_c_generated::Field_ii_BrokenHotChain
     };
     (ii_CheckedUnchanged) => {
-        $crate::__pgrx_c_generated::Field2435
+        $crate::__pgrx_c_generated::Field_ii_CheckedUnchanged
     };
     (ii_Concurrent) => {
-        $crate::__pgrx_c_generated::Field2436
+        $crate::__pgrx_c_generated::Field_ii_Concurrent
     };
     (ii_Expressions) => {
-        $crate::__pgrx_c_generated::Field2441
+        $crate::__pgrx_c_generated::Field_ii_Expressions
     };
     (ii_ExpressionsState) => {
-        $crate::__pgrx_c_generated::Field2442
+        $crate::__pgrx_c_generated::Field_ii_ExpressionsState
     };
     (ii_IndexUnchanged) => {
-        $crate::__pgrx_c_generated::Field2444
+        $crate::__pgrx_c_generated::Field_ii_IndexUnchanged
     };
     (ii_NullsNotDistinct) => {
-        $crate::__pgrx_c_generated::Field2445
+        $crate::__pgrx_c_generated::Field_ii_NullsNotDistinct
     };
     (ii_NumIndexAttrs) => {
-        $crate::__pgrx_c_generated::Field2446
+        $crate::__pgrx_c_generated::Field_ii_NumIndexAttrs
     };
     (ii_NumIndexKeyAttrs) => {
-        $crate::__pgrx_c_generated::Field2447
+        $crate::__pgrx_c_generated::Field_ii_NumIndexKeyAttrs
     };
     (ii_ParallelWorkers) => {
-        $crate::__pgrx_c_generated::Field2448
+        $crate::__pgrx_c_generated::Field_ii_ParallelWorkers
     };
     (ii_Predicate) => {
-        $crate::__pgrx_c_generated::Field2449
+        $crate::__pgrx_c_generated::Field_ii_Predicate
     };
     (ii_ReadyForInserts) => {
-        $crate::__pgrx_c_generated::Field2451
+        $crate::__pgrx_c_generated::Field_ii_ReadyForInserts
     };
     (ii_Summarizing) => {
-        $crate::__pgrx_c_generated::Field2452
+        $crate::__pgrx_c_generated::Field_ii_Summarizing
     };
     (ii_Unique) => {
-        $crate::__pgrx_c_generated::Field2453
+        $crate::__pgrx_c_generated::Field_ii_Unique
     };
     (ii_WithoutOverlaps) => {
-        $crate::__pgrx_c_generated::Field2457
+        $crate::__pgrx_c_generated::Field_ii_WithoutOverlaps
     };
     (immediate) => {
-        $crate::__pgrx_c_generated::Field2458
+        $crate::__pgrx_c_generated::Field_immediate
     };
     (inFromCl) => {
-        $crate::__pgrx_c_generated::Field2466
+        $crate::__pgrx_c_generated::Field_inFromCl
     };
     (inRangeAsc) => {
-        $crate::__pgrx_c_generated::Field2468
+        $crate::__pgrx_c_generated::Field_inRangeAsc
     };
     (inRangeColl) => {
-        $crate::__pgrx_c_generated::Field2469
+        $crate::__pgrx_c_generated::Field_inRangeColl
     };
     (inRangeNullsFirst) => {
-        $crate::__pgrx_c_generated::Field2470
+        $crate::__pgrx_c_generated::Field_inRangeNullsFirst
     };
     (in_batchmode) => {
-        $crate::__pgrx_c_generated::Field2471
+        $crate::__pgrx_c_generated::Field_in_batchmode
     };
     (in_extension) => {
-        $crate::__pgrx_c_generated::Field2472
+        $crate::__pgrx_c_generated::Field_in_extension
     };
     (in_operators) => {
-        $crate::__pgrx_c_generated::Field2476
+        $crate::__pgrx_c_generated::Field_in_operators
     };
     (in_slot_creation) => {
-        $crate::__pgrx_c_generated::Field2477
+        $crate::__pgrx_c_generated::Field_in_slot_creation
     };
     (in_streaming) => {
-        $crate::__pgrx_c_generated::Field2478
+        $crate::__pgrx_c_generated::Field_in_streaming
     };
     (in_use) => {
-        $crate::__pgrx_c_generated::Field2479
+        $crate::__pgrx_c_generated::Field_in_use
     };
     (inactive_since) => {
-        $crate::__pgrx_c_generated::Field2480
+        $crate::__pgrx_c_generated::Field_inactive_since
     };
     (inclause) => {
-        $crate::__pgrx_c_generated::Field2482
+        $crate::__pgrx_c_generated::Field_inclause
     };
     (includes_all_transactions) => {
-        $crate::__pgrx_c_generated::Field2483
+        $crate::__pgrx_c_generated::Field_includes_all_transactions
     };
     (including) => {
-        $crate::__pgrx_c_generated::Field2484
+        $crate::__pgrx_c_generated::Field_including
     };
     (inclusive) => {
-        $crate::__pgrx_c_generated::Field2485
+        $crate::__pgrx_c_generated::Field_inclusive
     };
     (indcheckxmin) => {
-        $crate::__pgrx_c_generated::Field2489
+        $crate::__pgrx_c_generated::Field_indcheckxmin
     };
     (indent) => {
-        $crate::__pgrx_c_generated::Field2490
+        $crate::__pgrx_c_generated::Field_indent
     };
     (indexCollation) => {
-        $crate::__pgrx_c_generated::Field2493
+        $crate::__pgrx_c_generated::Field_indexCollation
     };
     (indexElems) => {
-        $crate::__pgrx_c_generated::Field2495
+        $crate::__pgrx_c_generated::Field_indexElems
     };
     (indexIncludingParams) => {
-        $crate::__pgrx_c_generated::Field2496
+        $crate::__pgrx_c_generated::Field_indexIncludingParams
     };
     (indexMaxKeys) => {
-        $crate::__pgrx_c_generated::Field2497
+        $crate::__pgrx_c_generated::Field_indexMaxKeys
     };
     (indexOffset) => {
-        $crate::__pgrx_c_generated::Field2498
+        $crate::__pgrx_c_generated::Field_indexOffset
     };
     (indexOid) => {
-        $crate::__pgrx_c_generated::Field2499
+        $crate::__pgrx_c_generated::Field_indexOid
     };
     (indexParams) => {
-        $crate::__pgrx_c_generated::Field2500
+        $crate::__pgrx_c_generated::Field_indexParams
     };
     (index_cleanup) => {
-        $crate::__pgrx_c_generated::Field2506
+        $crate::__pgrx_c_generated::Field_index_cleanup
     };
     (indexarg) => {
-        $crate::__pgrx_c_generated::Field2514
+        $crate::__pgrx_c_generated::Field_indexarg
     };
     (indexclauses) => {
-        $crate::__pgrx_c_generated::Field2515
+        $crate::__pgrx_c_generated::Field_indexclauses
     };
     (indexcol) => {
-        $crate::__pgrx_c_generated::Field2516
+        $crate::__pgrx_c_generated::Field_indexcol
     };
     (indexcollation) => {
-        $crate::__pgrx_c_generated::Field2517
+        $crate::__pgrx_c_generated::Field_indexcollation
     };
     (indexcols) => {
-        $crate::__pgrx_c_generated::Field2520
+        $crate::__pgrx_c_generated::Field_indexcols
     };
     (indexid) => {
-        $crate::__pgrx_c_generated::Field2522
+        $crate::__pgrx_c_generated::Field_indexid
     };
     (indexlist) => {
-        $crate::__pgrx_c_generated::Field2525
+        $crate::__pgrx_c_generated::Field_indexlist
     };
     (indexmaxkeys) => {
-        $crate::__pgrx_c_generated::Field2526
+        $crate::__pgrx_c_generated::Field_indexmaxkeys
     };
     (indexoid) => {
-        $crate::__pgrx_c_generated::Field2528
+        $crate::__pgrx_c_generated::Field_indexoid
     };
     (indexorderby) => {
-        $crate::__pgrx_c_generated::Field2529
+        $crate::__pgrx_c_generated::Field_indexorderby
     };
     (indexorderbycols) => {
-        $crate::__pgrx_c_generated::Field2530
+        $crate::__pgrx_c_generated::Field_indexorderbycols
     };
     (indexorderbyops) => {
-        $crate::__pgrx_c_generated::Field2531
+        $crate::__pgrx_c_generated::Field_indexorderbyops
     };
     (indexorderbyorig) => {
-        $crate::__pgrx_c_generated::Field2532
+        $crate::__pgrx_c_generated::Field_indexorderbyorig
     };
     (indexorderbys) => {
-        $crate::__pgrx_c_generated::Field2533
+        $crate::__pgrx_c_generated::Field_indexorderbys
     };
     (indexorderdir) => {
-        $crate::__pgrx_c_generated::Field2534
+        $crate::__pgrx_c_generated::Field_indexorderdir
     };
     (indexprs) => {
-        $crate::__pgrx_c_generated::Field2535
+        $crate::__pgrx_c_generated::Field_indexprs
     };
     (indexqual) => {
-        $crate::__pgrx_c_generated::Field2536
+        $crate::__pgrx_c_generated::Field_indexqual
     };
     (indexqualorig) => {
-        $crate::__pgrx_c_generated::Field2537
+        $crate::__pgrx_c_generated::Field_indexqualorig
     };
     (indexquals) => {
-        $crate::__pgrx_c_generated::Field2538
+        $crate::__pgrx_c_generated::Field_indexquals
     };
     (indexrelid) => {
-        $crate::__pgrx_c_generated::Field2539
+        $crate::__pgrx_c_generated::Field_indexrelid
     };
     (indexscandir) => {
-        $crate::__pgrx_c_generated::Field2540
+        $crate::__pgrx_c_generated::Field_indexscandir
     };
     (indextlist) => {
-        $crate::__pgrx_c_generated::Field2543
+        $crate::__pgrx_c_generated::Field_indextlist
     };
     (indimmediate) => {
-        $crate::__pgrx_c_generated::Field2545
+        $crate::__pgrx_c_generated::Field_indimmediate
     };
     (indirection) => {
-        $crate::__pgrx_c_generated::Field2546
+        $crate::__pgrx_c_generated::Field_indirection
     };
     (indisclustered) => {
-        $crate::__pgrx_c_generated::Field2547
+        $crate::__pgrx_c_generated::Field_indisclustered
     };
     (indisexclusion) => {
-        $crate::__pgrx_c_generated::Field2548
+        $crate::__pgrx_c_generated::Field_indisexclusion
     };
     (indislive) => {
-        $crate::__pgrx_c_generated::Field2549
+        $crate::__pgrx_c_generated::Field_indislive
     };
     (indisprimary) => {
-        $crate::__pgrx_c_generated::Field2550
+        $crate::__pgrx_c_generated::Field_indisprimary
     };
     (indisready) => {
-        $crate::__pgrx_c_generated::Field2551
+        $crate::__pgrx_c_generated::Field_indisready
     };
     (indisreplident) => {
-        $crate::__pgrx_c_generated::Field2552
+        $crate::__pgrx_c_generated::Field_indisreplident
     };
     (indisunique) => {
-        $crate::__pgrx_c_generated::Field2553
+        $crate::__pgrx_c_generated::Field_indisunique
     };
     (indisvalid) => {
-        $crate::__pgrx_c_generated::Field2554
+        $crate::__pgrx_c_generated::Field_indisvalid
     };
     (indnatts) => {
-        $crate::__pgrx_c_generated::Field2556
+        $crate::__pgrx_c_generated::Field_indnatts
     };
     (indnkeyatts) => {
-        $crate::__pgrx_c_generated::Field2557
+        $crate::__pgrx_c_generated::Field_indnkeyatts
     };
     (indnullsnotdistinct) => {
-        $crate::__pgrx_c_generated::Field2558
+        $crate::__pgrx_c_generated::Field_indnullsnotdistinct
     };
     (indpred) => {
-        $crate::__pgrx_c_generated::Field2559
+        $crate::__pgrx_c_generated::Field_indpred
     };
     (indrelid) => {
-        $crate::__pgrx_c_generated::Field2560
+        $crate::__pgrx_c_generated::Field_indrelid
     };
     (indrestrictinfo) => {
-        $crate::__pgrx_c_generated::Field2561
+        $crate::__pgrx_c_generated::Field_indrestrictinfo
     };
     (infercollid) => {
-        $crate::__pgrx_c_generated::Field2564
+        $crate::__pgrx_c_generated::Field_infercollid
     };
     (inferopclass) => {
-        $crate::__pgrx_c_generated::Field2565
+        $crate::__pgrx_c_generated::Field_inferopclass
     };
     (infinite) => {
-        $crate::__pgrx_c_generated::Field2566
+        $crate::__pgrx_c_generated::Field_infinite
     };
     (infobits_set) => {
-        $crate::__pgrx_c_generated::Field2568
+        $crate::__pgrx_c_generated::Field_infobits_set
     };
     (inh) => {
-        $crate::__pgrx_c_generated::Field2569
+        $crate::__pgrx_c_generated::Field_inh
     };
     (inhRelations) => {
-        $crate::__pgrx_c_generated::Field2570
+        $crate::__pgrx_c_generated::Field_inhRelations
     };
     (inhcount) => {
-        $crate::__pgrx_c_generated::Field2571
+        $crate::__pgrx_c_generated::Field_inhcount
     };
     (inhdetachpending) => {
-        $crate::__pgrx_c_generated::Field2572
+        $crate::__pgrx_c_generated::Field_inhdetachpending
     };
     (inherit) => {
-        $crate::__pgrx_c_generated::Field2573
+        $crate::__pgrx_c_generated::Field_inherit
     };
     (inherit_option) => {
-        $crate::__pgrx_c_generated::Field2574
+        $crate::__pgrx_c_generated::Field_inherit_option
     };
     (inhparent) => {
-        $crate::__pgrx_c_generated::Field2575
+        $crate::__pgrx_c_generated::Field_inhparent
     };
     (inhrelid) => {
-        $crate::__pgrx_c_generated::Field2576
+        $crate::__pgrx_c_generated::Field_inhrelid
     };
     (inhseqno) => {
-        $crate::__pgrx_c_generated::Field2577
+        $crate::__pgrx_c_generated::Field_inhseqno
     };
     (initDest) => {
-        $crate::__pgrx_c_generated::Field2580
+        $crate::__pgrx_c_generated::Field_initDest
     };
     (initInner) => {
-        $crate::__pgrx_c_generated::Field2581
+        $crate::__pgrx_c_generated::Field_initInner
     };
     (initPlan) => {
-        $crate::__pgrx_c_generated::Field2583
+        $crate::__pgrx_c_generated::Field_initPlan
     };
     (initSrc) => {
-        $crate::__pgrx_c_generated::Field2584
+        $crate::__pgrx_c_generated::Field_initSrc
     };
     (initValue) => {
-        $crate::__pgrx_c_generated::Field2585
+        $crate::__pgrx_c_generated::Field_initValue
     };
     (initValueIsNull) => {
-        $crate::__pgrx_c_generated::Field2586
+        $crate::__pgrx_c_generated::Field_initValueIsNull
     };
     (init_plans) => {
-        $crate::__pgrx_c_generated::Field2588
+        $crate::__pgrx_c_generated::Field_init_plans
     };
     (init_value) => {
-        $crate::__pgrx_c_generated::Field2589
+        $crate::__pgrx_c_generated::Field_init_value
     };
     (initdeferred) => {
-        $crate::__pgrx_c_generated::Field2590
+        $crate::__pgrx_c_generated::Field_initdeferred
     };
     (initfileinval) => {
-        $crate::__pgrx_c_generated::Field2591
+        $crate::__pgrx_c_generated::Field_initfileinval
     };
     (initial_pruning_steps) => {
-        $crate::__pgrx_c_generated::Field2594
+        $crate::__pgrx_c_generated::Field_initial_pruning_steps
     };
     (initial_rels) => {
-        $crate::__pgrx_c_generated::Field2595
+        $crate::__pgrx_c_generated::Field_initial_rels
     };
     (initial_xmin_horizon) => {
-        $crate::__pgrx_c_generated::Field2596
+        $crate::__pgrx_c_generated::Field_initial_xmin_horizon
     };
     (initialized) => {
-        $crate::__pgrx_c_generated::Field2597
+        $crate::__pgrx_c_generated::Field_initialized
     };
     (initially_valid) => {
-        $crate::__pgrx_c_generated::Field2598
+        $crate::__pgrx_c_generated::Field_initially_valid
     };
     (initiated_io) => {
-        $crate::__pgrx_c_generated::Field2599
+        $crate::__pgrx_c_generated::Field_initiated_io
     };
     (innerIsParent) => {
-        $crate::__pgrx_c_generated::Field2604
+        $crate::__pgrx_c_generated::Field_innerIsParent
     };
     (inner_unique) => {
-        $crate::__pgrx_c_generated::Field2611
+        $crate::__pgrx_c_generated::Field_inner_unique
     };
     (inneropsfixed) => {
-        $crate::__pgrx_c_generated::Field2619
+        $crate::__pgrx_c_generated::Field_inneropsfixed
     };
     (inneropsset) => {
-        $crate::__pgrx_c_generated::Field2620
+        $crate::__pgrx_c_generated::Field_inneropsset
     };
     (innersortkeys) => {
-        $crate::__pgrx_c_generated::Field2621
+        $crate::__pgrx_c_generated::Field_innersortkeys
     };
     (inode) => {
-        $crate::__pgrx_c_generated::Field2622
+        $crate::__pgrx_c_generated::Field_inode
     };
     (inout) => {
-        $crate::__pgrx_c_generated::Field2623
+        $crate::__pgrx_c_generated::Field_inout
     };
     (inputCollation) => {
-        $crate::__pgrx_c_generated::Field2625
+        $crate::__pgrx_c_generated::Field_inputCollation
     };
     (input_buf_index) => {
-        $crate::__pgrx_c_generated::Field2627
+        $crate::__pgrx_c_generated::Field_input_buf_index
     };
     (input_buf_len) => {
-        $crate::__pgrx_c_generated::Field2628
+        $crate::__pgrx_c_generated::Field_input_buf_len
     };
     (input_done) => {
-        $crate::__pgrx_c_generated::Field2629
+        $crate::__pgrx_c_generated::Field_input_done
     };
     (input_reached_eof) => {
-        $crate::__pgrx_c_generated::Field2631
+        $crate::__pgrx_c_generated::Field_input_reached_eof
     };
     (input_reached_error) => {
-        $crate::__pgrx_c_generated::Field2632
+        $crate::__pgrx_c_generated::Field_input_reached_error
     };
     (inputcollid) => {
-        $crate::__pgrx_c_generated::Field2633
+        $crate::__pgrx_c_generated::Field_inputcollid
     };
     (inputcollids) => {
-        $crate::__pgrx_c_generated::Field2634
+        $crate::__pgrx_c_generated::Field_inputcollids
     };
     (inputtype) => {
-        $crate::__pgrx_c_generated::Field2636
+        $crate::__pgrx_c_generated::Field_inputtype
     };
     (inputtypeByVal) => {
-        $crate::__pgrx_c_generated::Field2637
+        $crate::__pgrx_c_generated::Field_inputtypeByVal
     };
     (inputtypeLen) => {
-        $crate::__pgrx_c_generated::Field2638
+        $crate::__pgrx_c_generated::Field_inputtypeLen
     };
     (ins_since_vacuum) => {
-        $crate::__pgrx_c_generated::Field2639
+        $crate::__pgrx_c_generated::Field_ins_since_vacuum
     };
     (inserted_pre_truncdrop) => {
-        $crate::__pgrx_c_generated::Field2642
+        $crate::__pgrx_c_generated::Field_inserted_pre_truncdrop
     };
     (inserted_sublink) => {
-        $crate::__pgrx_c_generated::Field2643
+        $crate::__pgrx_c_generated::Field_inserted_sublink
     };
     (instead) => {
-        $crate::__pgrx_c_generated::Field2644
+        $crate::__pgrx_c_generated::Field_instead
     };
     (instrument) => {
-        $crate::__pgrx_c_generated::Field2646
+        $crate::__pgrx_c_generated::Field_instrument
     };
     (instrument_options) => {
-        $crate::__pgrx_c_generated::Field2647
+        $crate::__pgrx_c_generated::Field_instrument_options
     };
     (int_frac_digits) => {
-        $crate::__pgrx_c_generated::Field2650
+        $crate::__pgrx_c_generated::Field_int_frac_digits
     };
     (int_n_cs_precedes) => {
-        $crate::__pgrx_c_generated::Field2651
+        $crate::__pgrx_c_generated::Field_int_n_cs_precedes
     };
     (int_n_sep_by_space) => {
-        $crate::__pgrx_c_generated::Field2652
+        $crate::__pgrx_c_generated::Field_int_n_sep_by_space
     };
     (int_n_sign_posn) => {
-        $crate::__pgrx_c_generated::Field2653
+        $crate::__pgrx_c_generated::Field_int_n_sign_posn
     };
     (int_p_cs_precedes) => {
-        $crate::__pgrx_c_generated::Field2654
+        $crate::__pgrx_c_generated::Field_int_p_cs_precedes
     };
     (int_p_sep_by_space) => {
-        $crate::__pgrx_c_generated::Field2655
+        $crate::__pgrx_c_generated::Field_int_p_sep_by_space
     };
     (int_p_sign_posn) => {
-        $crate::__pgrx_c_generated::Field2656
+        $crate::__pgrx_c_generated::Field_int_p_sign_posn
     };
     (int_val) => {
-        $crate::__pgrx_c_generated::Field2657
+        $crate::__pgrx_c_generated::Field_int_val
     };
     (int_value) => {
-        $crate::__pgrx_c_generated::Field2658
+        $crate::__pgrx_c_generated::Field_int_value
     };
     (intermediate_empty) => {
-        $crate::__pgrx_c_generated::Field2660
+        $crate::__pgrx_c_generated::Field_intermediate_empty
     };
     (internal_xact) => {
-        $crate::__pgrx_c_generated::Field2663
+        $crate::__pgrx_c_generated::Field_internal_xact
     };
     (internalpos) => {
-        $crate::__pgrx_c_generated::Field2664
+        $crate::__pgrx_c_generated::Field_internalpos
     };
     (into) => {
-        $crate::__pgrx_c_generated::Field2667
+        $crate::__pgrx_c_generated::Field_into
     };
     (intval) => {
-        $crate::__pgrx_c_generated::Field2669
+        $crate::__pgrx_c_generated::Field_intval
     };
     (invalItems) => {
-        $crate::__pgrx_c_generated::Field2671
+        $crate::__pgrx_c_generated::Field_invalItems
     };
     (invalidated) => {
-        $crate::__pgrx_c_generated::Field2672
+        $crate::__pgrx_c_generated::Field_invalidated
     };
     (invisible) => {
-        $crate::__pgrx_c_generated::Field2676
+        $crate::__pgrx_c_generated::Field_invisible
     };
     (io_handle_count) => {
-        $crate::__pgrx_c_generated::Field2677
+        $crate::__pgrx_c_generated::Field_io_handle_count
     };
     (io_handle_off) => {
-        $crate::__pgrx_c_generated::Field2678
+        $crate::__pgrx_c_generated::Field_io_handle_off
     };
     (ioss_NameCStringCount) => {
-        $crate::__pgrx_c_generated::Field2687
+        $crate::__pgrx_c_generated::Field_ioss_NameCStringCount
     };
     (ioss_NumOrderByKeys) => {
-        $crate::__pgrx_c_generated::Field2688
+        $crate::__pgrx_c_generated::Field_ioss_NumOrderByKeys
     };
     (ioss_NumRuntimeKeys) => {
-        $crate::__pgrx_c_generated::Field2689
+        $crate::__pgrx_c_generated::Field_ioss_NumRuntimeKeys
     };
     (ioss_NumScanKeys) => {
-        $crate::__pgrx_c_generated::Field2690
+        $crate::__pgrx_c_generated::Field_ioss_NumScanKeys
     };
     (ioss_PscanLen) => {
-        $crate::__pgrx_c_generated::Field2692
+        $crate::__pgrx_c_generated::Field_ioss_PscanLen
     };
     (ioss_RuntimeKeysReady) => {
-        $crate::__pgrx_c_generated::Field2696
+        $crate::__pgrx_c_generated::Field_ioss_RuntimeKeysReady
     };
     (ioss_VMBuffer) => {
-        $crate::__pgrx_c_generated::Field2701
+        $crate::__pgrx_c_generated::Field_ioss_VMBuffer
     };
     (iov_len) => {
-        $crate::__pgrx_c_generated::Field2703
+        $crate::__pgrx_c_generated::Field_iov_len
     };
     (iov_length) => {
-        $crate::__pgrx_c_generated::Field2704
+        $crate::__pgrx_c_generated::Field_iov_length
     };
     (iovec_count) => {
-        $crate::__pgrx_c_generated::Field2705
+        $crate::__pgrx_c_generated::Field_iovec_count
     };
     (iovec_off) => {
-        $crate::__pgrx_c_generated::Field2706
+        $crate::__pgrx_c_generated::Field_iovec_off
     };
     (ip_posid) => {
-        $crate::__pgrx_c_generated::Field2713
+        $crate::__pgrx_c_generated::Field_ip_posid
     };
     (isBuild) => {
-        $crate::__pgrx_c_generated::Field2725
+        $crate::__pgrx_c_generated::Field_isBuild
     };
     (isCatalogRel) => {
-        $crate::__pgrx_c_generated::Field2726
+        $crate::__pgrx_c_generated::Field_isCatalogRel
     };
     (isData) => {
-        $crate::__pgrx_c_generated::Field2727
+        $crate::__pgrx_c_generated::Field_isData
     };
     (isDefault) => {
-        $crate::__pgrx_c_generated::Field2728
+        $crate::__pgrx_c_generated::Field_isDefault
     };
     (isDelete) => {
-        $crate::__pgrx_c_generated::Field2729
+        $crate::__pgrx_c_generated::Field_isDelete
     };
     (isDone) => {
-        $crate::__pgrx_c_generated::Field2730
+        $crate::__pgrx_c_generated::Field_isDone
     };
     (isDrop) => {
-        $crate::__pgrx_c_generated::Field2731
+        $crate::__pgrx_c_generated::Field_isDrop
     };
     (isEventTrigger) => {
-        $crate::__pgrx_c_generated::Field2732
+        $crate::__pgrx_c_generated::Field_isEventTrigger
     };
     (isFinished) => {
-        $crate::__pgrx_c_generated::Field2733
+        $crate::__pgrx_c_generated::Field_isFinished
     };
     (isInstead) => {
-        $crate::__pgrx_c_generated::Field2734
+        $crate::__pgrx_c_generated::Field_isInstead
     };
     (isLeaf) => {
-        $crate::__pgrx_c_generated::Field2735
+        $crate::__pgrx_c_generated::Field_isLeaf
     };
     (isNatural) => {
-        $crate::__pgrx_c_generated::Field2737
+        $crate::__pgrx_c_generated::Field_isNatural
     };
     (isNew) => {
-        $crate::__pgrx_c_generated::Field2738
+        $crate::__pgrx_c_generated::Field_isNew
     };
     (isNull) => {
-        $crate::__pgrx_c_generated::Field2739
+        $crate::__pgrx_c_generated::Field_isNull
     };
     (isParent) => {
-        $crate::__pgrx_c_generated::Field2740
+        $crate::__pgrx_c_generated::Field_isParent
     };
     (isPartialMatch) => {
-        $crate::__pgrx_c_generated::Field2741
+        $crate::__pgrx_c_generated::Field_isPartialMatch
     };
     (isRegularBackend) => {
-        $crate::__pgrx_c_generated::Field2742
+        $crate::__pgrx_c_generated::Field_isRegularBackend
     };
     (isReset) => {
-        $crate::__pgrx_c_generated::Field2743
+        $crate::__pgrx_c_generated::Field_isReset
     };
     (isReturn) => {
-        $crate::__pgrx_c_generated::Field2744
+        $crate::__pgrx_c_generated::Field_isReturn
     };
     (isRootSplit) => {
-        $crate::__pgrx_c_generated::Field2745
+        $crate::__pgrx_c_generated::Field_isRootSplit
     };
     (isScalar) => {
-        $crate::__pgrx_c_generated::Field2746
+        $crate::__pgrx_c_generated::Field_isScalar
     };
     (isTable) => {
-        $crate::__pgrx_c_generated::Field2747
+        $crate::__pgrx_c_generated::Field_isTable
     };
     (isTemp) => {
-        $crate::__pgrx_c_generated::Field2748
+        $crate::__pgrx_c_generated::Field_isTemp
     };
     (isTrigger) => {
-        $crate::__pgrx_c_generated::Field2749
+        $crate::__pgrx_c_generated::Field_isTrigger
     };
     (isVoidRes) => {
-        $crate::__pgrx_c_generated::Field2751
+        $crate::__pgrx_c_generated::Field_isVoidRes
     };
     (isWorker) => {
-        $crate::__pgrx_c_generated::Field2752
+        $crate::__pgrx_c_generated::Field_isWorker
     };
     (is_array) => {
-        $crate::__pgrx_c_generated::Field2753
+        $crate::__pgrx_c_generated::Field_is_array
     };
     (is_build) => {
-        $crate::__pgrx_c_generated::Field2754
+        $crate::__pgrx_c_generated::Field_is_build
     };
     (is_call) => {
-        $crate::__pgrx_c_generated::Field2755
+        $crate::__pgrx_c_generated::Field_is_call
     };
     (is_called) => {
-        $crate::__pgrx_c_generated::Field2756
+        $crate::__pgrx_c_generated::Field_is_called
     };
     (is_clone) => {
-        $crate::__pgrx_c_generated::Field2757
+        $crate::__pgrx_c_generated::Field_is_clone
     };
     (is_complete) => {
-        $crate::__pgrx_c_generated::Field2758
+        $crate::__pgrx_c_generated::Field_is_complete
     };
     (is_default) => {
-        $crate::__pgrx_c_generated::Field2760
+        $crate::__pgrx_c_generated::Field_is_default
     };
     (is_enforced) => {
-        $crate::__pgrx_c_generated::Field2762
+        $crate::__pgrx_c_generated::Field_is_enforced
     };
     (is_exit) => {
-        $crate::__pgrx_c_generated::Field2763
+        $crate::__pgrx_c_generated::Field_is_exit
     };
     (is_from) => {
-        $crate::__pgrx_c_generated::Field2764
+        $crate::__pgrx_c_generated::Field_is_from
     };
     (is_from_type) => {
-        $crate::__pgrx_c_generated::Field2765
+        $crate::__pgrx_c_generated::Field_is_from_type
     };
     (is_func) => {
-        $crate::__pgrx_c_generated::Field2766
+        $crate::__pgrx_c_generated::Field_is_func
     };
     (is_grant) => {
-        $crate::__pgrx_c_generated::Field2767
+        $crate::__pgrx_c_generated::Field_is_grant
     };
     (is_hashed) => {
-        $crate::__pgrx_c_generated::Field2768
+        $crate::__pgrx_c_generated::Field_is_hashed
     };
     (is_instead) => {
-        $crate::__pgrx_c_generated::Field2769
+        $crate::__pgrx_c_generated::Field_is_instead
     };
     (is_internal) => {
-        $crate::__pgrx_c_generated::Field2770
+        $crate::__pgrx_c_generated::Field_is_internal
     };
     (is_join) => {
-        $crate::__pgrx_c_generated::Field2771
+        $crate::__pgrx_c_generated::Field_is_join
     };
     (is_local) => {
-        $crate::__pgrx_c_generated::Field2774
+        $crate::__pgrx_c_generated::Field_is_local
     };
     (is_me) => {
-        $crate::__pgrx_c_generated::Field2775
+        $crate::__pgrx_c_generated::Field_is_me
     };
     (is_move) => {
-        $crate::__pgrx_c_generated::Field2776
+        $crate::__pgrx_c_generated::Field_is_move
     };
     (is_no_inherit) => {
-        $crate::__pgrx_c_generated::Field2777
+        $crate::__pgrx_c_generated::Field_is_no_inherit
     };
     (is_not_null) => {
-        $crate::__pgrx_c_generated::Field2778
+        $crate::__pgrx_c_generated::Field_is_not_null
     };
     (is_oneshot) => {
-        $crate::__pgrx_c_generated::Field2779
+        $crate::__pgrx_c_generated::Field_is_oneshot
     };
     (is_opt) => {
-        $crate::__pgrx_c_generated::Field2780
+        $crate::__pgrx_c_generated::Field_is_opt
     };
     (is_over) => {
-        $crate::__pgrx_c_generated::Field2781
+        $crate::__pgrx_c_generated::Field_is_over
     };
     (is_prev_bucket_same_wrt) => {
-        $crate::__pgrx_c_generated::Field2782
+        $crate::__pgrx_c_generated::Field_is_prev_bucket_same_wrt
     };
     (is_prim_bucket_same_wrt) => {
-        $crate::__pgrx_c_generated::Field2783
+        $crate::__pgrx_c_generated::Field_is_prim_bucket_same_wrt
     };
     (is_primary_bucket_page) => {
-        $crate::__pgrx_c_generated::Field2784
+        $crate::__pgrx_c_generated::Field_is_primary_bucket_page
     };
     (is_procedure) => {
-        $crate::__pgrx_c_generated::Field2785
+        $crate::__pgrx_c_generated::Field_is_procedure
     };
     (is_program) => {
-        $crate::__pgrx_c_generated::Field2786
+        $crate::__pgrx_c_generated::Field_is_program
     };
     (is_pushed_down) => {
-        $crate::__pgrx_c_generated::Field2787
+        $crate::__pgrx_c_generated::Field_is_pushed_down
     };
     (is_rowsfrom) => {
-        $crate::__pgrx_c_generated::Field2788
+        $crate::__pgrx_c_generated::Field_is_rowsfrom
     };
     (is_saved) => {
-        $crate::__pgrx_c_generated::Field2789
+        $crate::__pgrx_c_generated::Field_is_saved
     };
     (is_select_into) => {
-        $crate::__pgrx_c_generated::Field2790
+        $crate::__pgrx_c_generated::Field_is_select_into
     };
     (is_set) => {
-        $crate::__pgrx_c_generated::Field2791
+        $crate::__pgrx_c_generated::Field_is_set
     };
     (is_shared) => {
-        $crate::__pgrx_c_generated::Field2792
+        $crate::__pgrx_c_generated::Field_is_shared
     };
     (is_slice) => {
-        $crate::__pgrx_c_generated::Field2793
+        $crate::__pgrx_c_generated::Field_is_slice
     };
     (is_stacked) => {
-        $crate::__pgrx_c_generated::Field2794
+        $crate::__pgrx_c_generated::Field_is_stacked
     };
     (is_temp_slot) => {
-        $crate::__pgrx_c_generated::Field2796
+        $crate::__pgrx_c_generated::Field_is_temp_slot
     };
     (is_vacuumcmd) => {
-        $crate::__pgrx_c_generated::Field2797
+        $crate::__pgrx_c_generated::Field_is_vacuumcmd
     };
     (is_valid) => {
-        $crate::__pgrx_c_generated::Field2798
+        $crate::__pgrx_c_generated::Field_is_valid
     };
     (is_wraparound) => {
-        $crate::__pgrx_c_generated::Field2799
+        $crate::__pgrx_c_generated::Field_is_wraparound
     };
     (isall) => {
-        $crate::__pgrx_c_generated::Field2800
+        $crate::__pgrx_c_generated::Field_isall
     };
     (isassignment) => {
-        $crate::__pgrx_c_generated::Field2801
+        $crate::__pgrx_c_generated::Field_isassignment
     };
     (isconst) => {
-        $crate::__pgrx_c_generated::Field2803
+        $crate::__pgrx_c_generated::Field_isconst
     };
     (isconstraint) => {
-        $crate::__pgrx_c_generated::Field2804
+        $crate::__pgrx_c_generated::Field_isconstraint
     };
     (isend) => {
-        $crate::__pgrx_c_generated::Field2805
+        $crate::__pgrx_c_generated::Field_isend
     };
     (ismove) => {
-        $crate::__pgrx_c_generated::Field2806
+        $crate::__pgrx_c_generated::Field_ismove
     };
     (isnull) => {
-        $crate::__pgrx_c_generated::Field2807
+        $crate::__pgrx_c_generated::Field_isnull
     };
     (isnull1) => {
-        $crate::__pgrx_c_generated::Field2808
+        $crate::__pgrx_c_generated::Field_isnull1
     };
     (iss_NumOrderByKeys) => {
-        $crate::__pgrx_c_generated::Field2810
+        $crate::__pgrx_c_generated::Field_iss_NumOrderByKeys
     };
     (iss_NumRuntimeKeys) => {
-        $crate::__pgrx_c_generated::Field2811
+        $crate::__pgrx_c_generated::Field_iss_NumRuntimeKeys
     };
     (iss_NumScanKeys) => {
-        $crate::__pgrx_c_generated::Field2812
+        $crate::__pgrx_c_generated::Field_iss_NumScanKeys
     };
     (iss_PscanLen) => {
-        $crate::__pgrx_c_generated::Field2818
+        $crate::__pgrx_c_generated::Field_iss_PscanLen
     };
     (iss_ReachedEnd) => {
-        $crate::__pgrx_c_generated::Field2819
+        $crate::__pgrx_c_generated::Field_iss_ReachedEnd
     };
     (iss_RuntimeKeysReady) => {
-        $crate::__pgrx_c_generated::Field2824
+        $crate::__pgrx_c_generated::Field_iss_RuntimeKeysReady
     };
     (isset) => {
-        $crate::__pgrx_c_generated::Field2829
+        $crate::__pgrx_c_generated::Field_isset
     };
     (isset_offset) => {
-        $crate::__pgrx_c_generated::Field2830
+        $crate::__pgrx_c_generated::Field_isset_offset
     };
     (isshared) => {
-        $crate::__pgrx_c_generated::Field2831
+        $crate::__pgrx_c_generated::Field_isshared
     };
     (istartpoint) => {
-        $crate::__pgrx_c_generated::Field2832
+        $crate::__pgrx_c_generated::Field_istartpoint
     };
     (istarttli) => {
-        $crate::__pgrx_c_generated::Field2833
+        $crate::__pgrx_c_generated::Field_istarttli
     };
     (isunique) => {
-        $crate::__pgrx_c_generated::Field2835
+        $crate::__pgrx_c_generated::Field_isunique
     };
     (isvalid) => {
-        $crate::__pgrx_c_generated::Field2836
+        $crate::__pgrx_c_generated::Field_isvalid
     };
     (iswithoutoverlaps) => {
-        $crate::__pgrx_c_generated::Field2837
+        $crate::__pgrx_c_generated::Field_iswithoutoverlaps
     };
     (itemIndex) => {
-        $crate::__pgrx_c_generated::Field2839
+        $crate::__pgrx_c_generated::Field_itemIndex
     };
     (item_type) => {
-        $crate::__pgrx_c_generated::Field2840
+        $crate::__pgrx_c_generated::Field_item_type
     };
     (itemno) => {
-        $crate::__pgrx_c_generated::Field2841
+        $crate::__pgrx_c_generated::Field_itemno
     };
     (items) => {
-        $crate::__pgrx_c_generated::Field2843
+        $crate::__pgrx_c_generated::Field_items
     };
     (itemsz) => {
-        $crate::__pgrx_c_generated::Field2844
+        $crate::__pgrx_c_generated::Field_itemsz
     };
     (itemtype) => {
-        $crate::__pgrx_c_generated::Field2845
+        $crate::__pgrx_c_generated::Field_itemtype
     };
     (ival) => {
-        $crate::__pgrx_c_generated::Field2850
+        $crate::__pgrx_c_generated::Field_ival
     };
     (jf_targetList) => {
-        $crate::__pgrx_c_generated::Field2856
+        $crate::__pgrx_c_generated::Field_jf_targetList
     };
     (jitFlags) => {
-        $crate::__pgrx_c_generated::Field2857
+        $crate::__pgrx_c_generated::Field_jitFlags
     };
     (join_cur_level) => {
-        $crate::__pgrx_c_generated::Field2862
+        $crate::__pgrx_c_generated::Field_join_cur_level
     };
     (join_domains) => {
-        $crate::__pgrx_c_generated::Field2863
+        $crate::__pgrx_c_generated::Field_join_domains
     };
     (join_info_list) => {
-        $crate::__pgrx_c_generated::Field2864
+        $crate::__pgrx_c_generated::Field_join_info_list
     };
     (join_rel_list) => {
-        $crate::__pgrx_c_generated::Field2867
+        $crate::__pgrx_c_generated::Field_join_rel_list
     };
     (joinaliasvars) => {
-        $crate::__pgrx_c_generated::Field2870
+        $crate::__pgrx_c_generated::Field_joinaliasvars
     };
     (joininfo) => {
-        $crate::__pgrx_c_generated::Field2871
+        $crate::__pgrx_c_generated::Field_joininfo
     };
     (joinleftcols) => {
-        $crate::__pgrx_c_generated::Field2872
+        $crate::__pgrx_c_generated::Field_joinleftcols
     };
     (joinmergedcols) => {
-        $crate::__pgrx_c_generated::Field2873
+        $crate::__pgrx_c_generated::Field_joinmergedcols
     };
     (joinqual) => {
-        $crate::__pgrx_c_generated::Field2874
+        $crate::__pgrx_c_generated::Field_joinqual
     };
     (joinrestrictinfo) => {
-        $crate::__pgrx_c_generated::Field2875
+        $crate::__pgrx_c_generated::Field_joinrestrictinfo
     };
     (joinrightcols) => {
-        $crate::__pgrx_c_generated::Field2876
+        $crate::__pgrx_c_generated::Field_joinrightcols
     };
     (jointype) => {
-        $crate::__pgrx_c_generated::Field2878
+        $crate::__pgrx_c_generated::Field_jointype
     };
     (jumble_args) => {
-        $crate::__pgrx_c_generated::Field2888
+        $crate::__pgrx_c_generated::Field_jumble_args
     };
     (jumble_len) => {
-        $crate::__pgrx_c_generated::Field2889
+        $crate::__pgrx_c_generated::Field_jumble_len
     };
     (jump_empty) => {
-        $crate::__pgrx_c_generated::Field2891
+        $crate::__pgrx_c_generated::Field_jump_empty
     };
     (jump_end) => {
-        $crate::__pgrx_c_generated::Field2892
+        $crate::__pgrx_c_generated::Field_jump_end
     };
     (jump_error) => {
-        $crate::__pgrx_c_generated::Field2893
+        $crate::__pgrx_c_generated::Field_jump_error
     };
     (jump_eval_coercion) => {
-        $crate::__pgrx_c_generated::Field2894
+        $crate::__pgrx_c_generated::Field_jump_eval_coercion
     };
     (jumpdistinct) => {
-        $crate::__pgrx_c_generated::Field2895
+        $crate::__pgrx_c_generated::Field_jumpdistinct
     };
     (jumpdone) => {
-        $crate::__pgrx_c_generated::Field2896
+        $crate::__pgrx_c_generated::Field_jumpdone
     };
     (jumpnull) => {
-        $crate::__pgrx_c_generated::Field2897
+        $crate::__pgrx_c_generated::Field_jumpnull
     };
     (just_dirtied) => {
-        $crate::__pgrx_c_generated::Field2899
+        $crate::__pgrx_c_generated::Field_just_dirtied
     };
     (key) => {
-        $crate::__pgrx_c_generated::Field2900
+        $crate::__pgrx_c_generated::Field_key
     };
     (key_size) => {
-        $crate::__pgrx_c_generated::Field2905
+        $crate::__pgrx_c_generated::Field_key_size
     };
     (key_toastable) => {
-        $crate::__pgrx_c_generated::Field2906
+        $crate::__pgrx_c_generated::Field_key_toastable
     };
     (keylen) => {
-        $crate::__pgrx_c_generated::Field2908
+        $crate::__pgrx_c_generated::Field_keylen
     };
     (keys) => {
-        $crate::__pgrx_c_generated::Field2910
+        $crate::__pgrx_c_generated::Field_keys
     };
     (keysize) => {
-        $crate::__pgrx_c_generated::Field2911
+        $crate::__pgrx_c_generated::Field_keysize
     };
     (keysz) => {
-        $crate::__pgrx_c_generated::Field2912
+        $crate::__pgrx_c_generated::Field_keysz
     };
     (kill_prior_tuple) => {
-        $crate::__pgrx_c_generated::Field2916
+        $crate::__pgrx_c_generated::Field_kill_prior_tuple
     };
     (kind) => {
-        $crate::__pgrx_c_generated::Field2918
+        $crate::__pgrx_c_generated::Field_kind
     };
     (kinds) => {
-        $crate::__pgrx_c_generated::Field2919
+        $crate::__pgrx_c_generated::Field_kinds
     };
     (knowndeletable) => {
-        $crate::__pgrx_c_generated::Field2922
+        $crate::__pgrx_c_generated::Field_knowndeletable
     };
     (l) => {
-        $crate::__pgrx_c_generated::Field2925
+        $crate::__pgrx_c_generated::Field_l
     };
     (l1) => {
-        $crate::__pgrx_c_generated::Field2926
+        $crate::__pgrx_c_generated::Field_l1
     };
     (l2) => {
-        $crate::__pgrx_c_generated::Field2927
+        $crate::__pgrx_c_generated::Field_l2
     };
     (l3) => {
-        $crate::__pgrx_c_generated::Field2931
+        $crate::__pgrx_c_generated::Field_l3
     };
     (l4) => {
-        $crate::__pgrx_c_generated::Field2932
+        $crate::__pgrx_c_generated::Field_l4
     };
     (l5) => {
-        $crate::__pgrx_c_generated::Field2933
+        $crate::__pgrx_c_generated::Field_l5
     };
     (labelType) => {
-        $crate::__pgrx_c_generated::Field2942
+        $crate::__pgrx_c_generated::Field_labelType
     };
     (langIsTrusted) => {
-        $crate::__pgrx_c_generated::Field2944
+        $crate::__pgrx_c_generated::Field_langIsTrusted
     };
     (langOid) => {
-        $crate::__pgrx_c_generated::Field2945
+        $crate::__pgrx_c_generated::Field_langOid
     };
     (laninline) => {
-        $crate::__pgrx_c_generated::Field2946
+        $crate::__pgrx_c_generated::Field_laninline
     };
     (lanispl) => {
-        $crate::__pgrx_c_generated::Field2947
+        $crate::__pgrx_c_generated::Field_lanispl
     };
     (lanowner) => {
-        $crate::__pgrx_c_generated::Field2949
+        $crate::__pgrx_c_generated::Field_lanowner
     };
     (lanplcallfoid) => {
-        $crate::__pgrx_c_generated::Field2950
+        $crate::__pgrx_c_generated::Field_lanplcallfoid
     };
     (lanpltrusted) => {
-        $crate::__pgrx_c_generated::Field2951
+        $crate::__pgrx_c_generated::Field_lanpltrusted
     };
     (lanvalidator) => {
-        $crate::__pgrx_c_generated::Field2952
+        $crate::__pgrx_c_generated::Field_lanvalidator
     };
     (largestGrpColIdx) => {
-        $crate::__pgrx_c_generated::Field2954
+        $crate::__pgrx_c_generated::Field_largestGrpColIdx
     };
     (largs) => {
-        $crate::__pgrx_c_generated::Field2955
+        $crate::__pgrx_c_generated::Field_largs
     };
     (lastCommitBeforeSnapshot) => {
-        $crate::__pgrx_c_generated::Field2956
+        $crate::__pgrx_c_generated::Field_lastCommitBeforeSnapshot
     };
     (lastItem) => {
-        $crate::__pgrx_c_generated::Field2957
+        $crate::__pgrx_c_generated::Field_lastItem
     };
     (lastMsgReceiptTime) => {
-        $crate::__pgrx_c_generated::Field2958
+        $crate::__pgrx_c_generated::Field_lastMsgReceiptTime
     };
     (lastMsgSendTime) => {
-        $crate::__pgrx_c_generated::Field2959
+        $crate::__pgrx_c_generated::Field_lastMsgSendTime
     };
     (lastPHId) => {
-        $crate::__pgrx_c_generated::Field2960
+        $crate::__pgrx_c_generated::Field_lastPHId
     };
     (lastPageBeginPtr) => {
-        $crate::__pgrx_c_generated::Field2962
+        $crate::__pgrx_c_generated::Field_lastPageBeginPtr
     };
     (lastPlanNodeId) => {
-        $crate::__pgrx_c_generated::Field2963
+        $crate::__pgrx_c_generated::Field_lastPlanNodeId
     };
     (lastRec) => {
-        $crate::__pgrx_c_generated::Field2964
+        $crate::__pgrx_c_generated::Field_lastRec
     };
     (lastRecTLI) => {
-        $crate::__pgrx_c_generated::Field2965
+        $crate::__pgrx_c_generated::Field_lastRecTLI
     };
     (lastRevmapPage) => {
-        $crate::__pgrx_c_generated::Field2966
+        $crate::__pgrx_c_generated::Field_lastRevmapPage
     };
     (lastRowMarkId) => {
-        $crate::__pgrx_c_generated::Field2967
+        $crate::__pgrx_c_generated::Field_lastRowMarkId
     };
     (last_analyze_time) => {
-        $crate::__pgrx_c_generated::Field2969
+        $crate::__pgrx_c_generated::Field_last_analyze_time
     };
     (last_archived_timestamp) => {
-        $crate::__pgrx_c_generated::Field2970
+        $crate::__pgrx_c_generated::Field_last_archived_timestamp
     };
     (last_autoanalyze_time) => {
-        $crate::__pgrx_c_generated::Field2972
+        $crate::__pgrx_c_generated::Field_last_autoanalyze_time
     };
     (last_autovac_time) => {
-        $crate::__pgrx_c_generated::Field2973
+        $crate::__pgrx_c_generated::Field_last_autovac_time
     };
     (last_autovacuum_time) => {
-        $crate::__pgrx_c_generated::Field2974
+        $crate::__pgrx_c_generated::Field_last_autovacuum_time
     };
     (last_checksum_failure) => {
-        $crate::__pgrx_c_generated::Field2975
+        $crate::__pgrx_c_generated::Field_last_checksum_failure
     };
     (last_cleanup_num_delpages) => {
-        $crate::__pgrx_c_generated::Field2976
+        $crate::__pgrx_c_generated::Field_last_cleanup_num_delpages
     };
     (last_commit_end) => {
-        $crate::__pgrx_c_generated::Field2977
+        $crate::__pgrx_c_generated::Field_last_commit_end
     };
     (last_exclusive) => {
-        $crate::__pgrx_c_generated::Field2978
+        $crate::__pgrx_c_generated::Field_last_exclusive
     };
     (last_failed_timestamp) => {
-        $crate::__pgrx_c_generated::Field2979
+        $crate::__pgrx_c_generated::Field_last_failed_timestamp
     };
     (last_found_count) => {
-        $crate::__pgrx_c_generated::Field2981
+        $crate::__pgrx_c_generated::Field_last_found_count
     };
     (last_found_datum_index) => {
-        $crate::__pgrx_c_generated::Field2982
+        $crate::__pgrx_c_generated::Field_last_found_datum_index
     };
     (last_found_part_index) => {
-        $crate::__pgrx_c_generated::Field2983
+        $crate::__pgrx_c_generated::Field_last_found_part_index
     };
     (last_free) => {
-        $crate::__pgrx_c_generated::Field2984
+        $crate::__pgrx_c_generated::Field_last_free
     };
     (last_lsn) => {
-        $crate::__pgrx_c_generated::Field2985
+        $crate::__pgrx_c_generated::Field_last_lsn
     };
     (last_recv_time) => {
-        $crate::__pgrx_c_generated::Field2986
+        $crate::__pgrx_c_generated::Field_last_recv_time
     };
     (last_rinfo_serial) => {
-        $crate::__pgrx_c_generated::Field2988
+        $crate::__pgrx_c_generated::Field_last_rinfo_serial
     };
     (last_saved_confirmed_flush) => {
-        $crate::__pgrx_c_generated::Field2989
+        $crate::__pgrx_c_generated::Field_last_saved_confirmed_flush
     };
     (last_saved_restart_lsn) => {
-        $crate::__pgrx_c_generated::Field2990
+        $crate::__pgrx_c_generated::Field_last_saved_restart_lsn
     };
     (last_send_time) => {
-        $crate::__pgrx_c_generated::Field2991
+        $crate::__pgrx_c_generated::Field_last_send_time
     };
     (last_serialized_snapshot) => {
-        $crate::__pgrx_c_generated::Field2992
+        $crate::__pgrx_c_generated::Field_last_serialized_snapshot
     };
     (last_vacuum_time) => {
-        $crate::__pgrx_c_generated::Field2995
+        $crate::__pgrx_c_generated::Field_last_vacuum_time
     };
     (last_value) => {
-        $crate::__pgrx_c_generated::Field2996
+        $crate::__pgrx_c_generated::Field_last_value
     };
     (last_var) => {
-        $crate::__pgrx_c_generated::Field2997
+        $crate::__pgrx_c_generated::Field_last_var
     };
     (lastdatum) => {
-        $crate::__pgrx_c_generated::Field2999
+        $crate::__pgrx_c_generated::Field_lastdatum
     };
     (lastisnull) => {
-        $crate::__pgrx_c_generated::Field3000
+        $crate::__pgrx_c_generated::Field_lastisnull
     };
     (lastscan) => {
-        $crate::__pgrx_c_generated::Field3001
+        $crate::__pgrx_c_generated::Field_lastscan
     };
     (lateral) => {
-        $crate::__pgrx_c_generated::Field3002
+        $crate::__pgrx_c_generated::Field_lateral
     };
     (lateral_vars) => {
-        $crate::__pgrx_c_generated::Field3005
+        $crate::__pgrx_c_generated::Field_lateral_vars
     };
     (latestChunkStart) => {
-        $crate::__pgrx_c_generated::Field3006
+        $crate::__pgrx_c_generated::Field_latestChunkStart
     };
     (latestCompletedXid) => {
-        $crate::__pgrx_c_generated::Field3007
+        $crate::__pgrx_c_generated::Field_latestCompletedXid
     };
     (latestPagePtr) => {
-        $crate::__pgrx_c_generated::Field3008
+        $crate::__pgrx_c_generated::Field_latestPagePtr
     };
     (latestPageTLI) => {
-        $crate::__pgrx_c_generated::Field3009
+        $crate::__pgrx_c_generated::Field_latestPageTLI
     };
     (latestWalEnd) => {
-        $crate::__pgrx_c_generated::Field3010
+        $crate::__pgrx_c_generated::Field_latestWalEnd
     };
     (latestWalEndTime) => {
-        $crate::__pgrx_c_generated::Field3011
+        $crate::__pgrx_c_generated::Field_latestWalEndTime
     };
     (launch_time) => {
-        $crate::__pgrx_c_generated::Field3013
+        $crate::__pgrx_c_generated::Field_launch_time
     };
     (lbound) => {
-        $crate::__pgrx_c_generated::Field3014
+        $crate::__pgrx_c_generated::Field_lbound
     };
     (lbound1) => {
-        $crate::__pgrx_c_generated::Field3015
+        $crate::__pgrx_c_generated::Field_lbound1
     };
     (leaderPid) => {
-        $crate::__pgrx_c_generated::Field3018
+        $crate::__pgrx_c_generated::Field_leaderPid
     };
     (leader_pid) => {
-        $crate::__pgrx_c_generated::Field3019
+        $crate::__pgrx_c_generated::Field_leader_pid
     };
     (leafDatum) => {
-        $crate::__pgrx_c_generated::Field3021
+        $crate::__pgrx_c_generated::Field_leafDatum
     };
     (leafType) => {
-        $crate::__pgrx_c_generated::Field3026
+        $crate::__pgrx_c_generated::Field_leafType
     };
     (leafValue) => {
-        $crate::__pgrx_c_generated::Field3027
+        $crate::__pgrx_c_generated::Field_leafValue
     };
     (leafblk) => {
-        $crate::__pgrx_c_generated::Field3029
+        $crate::__pgrx_c_generated::Field_leafblk
     };
     (leafkey) => {
-        $crate::__pgrx_c_generated::Field3030
+        $crate::__pgrx_c_generated::Field_leafkey
     };
     (leafleftsib) => {
-        $crate::__pgrx_c_generated::Field3031
+        $crate::__pgrx_c_generated::Field_leafleftsib
     };
     (leafrightsib) => {
-        $crate::__pgrx_c_generated::Field3033
+        $crate::__pgrx_c_generated::Field_leafrightsib
     };
     (leaftopparent) => {
-        $crate::__pgrx_c_generated::Field3034
+        $crate::__pgrx_c_generated::Field_leaftopparent
     };
     (leakproof) => {
-        $crate::__pgrx_c_generated::Field3035
+        $crate::__pgrx_c_generated::Field_leakproof
     };
     (left) => {
-        $crate::__pgrx_c_generated::Field3036
+        $crate::__pgrx_c_generated::Field_left
     };
     (leftChildBlkno) => {
-        $crate::__pgrx_c_generated::Field3037
+        $crate::__pgrx_c_generated::Field_leftChildBlkno
     };
     (left_hasheqoperator) => {
-        $crate::__pgrx_c_generated::Field3042
+        $crate::__pgrx_c_generated::Field_left_hasheqoperator
     };
     (left_join_clauses) => {
-        $crate::__pgrx_c_generated::Field3043
+        $crate::__pgrx_c_generated::Field_left_join_clauses
     };
     (leftblk) => {
-        $crate::__pgrx_c_generated::Field3046
+        $crate::__pgrx_c_generated::Field_leftblk
     };
     (leftsib) => {
-        $crate::__pgrx_c_generated::Field3049
+        $crate::__pgrx_c_generated::Field_leftsib
     };
     (lefttree) => {
-        $crate::__pgrx_c_generated::Field3051
+        $crate::__pgrx_c_generated::Field_lefttree
     };
     (lefttype) => {
-        $crate::__pgrx_c_generated::Field3052
+        $crate::__pgrx_c_generated::Field_lefttype
     };
     (len) => {
-        $crate::__pgrx_c_generated::Field3053
+        $crate::__pgrx_c_generated::Field_len
     };
     (length) => {
-        $crate::__pgrx_c_generated::Field3054
+        $crate::__pgrx_c_generated::Field_length
     };
     (lenlist) => {
-        $crate::__pgrx_c_generated::Field3055
+        $crate::__pgrx_c_generated::Field_lenlist
     };
     (lenmap) => {
-        $crate::__pgrx_c_generated::Field3056
+        $crate::__pgrx_c_generated::Field_lenmap
     };
     (lentuples) => {
-        $crate::__pgrx_c_generated::Field3057
+        $crate::__pgrx_c_generated::Field_lentuples
     };
     (lenwords) => {
-        $crate::__pgrx_c_generated::Field3058
+        $crate::__pgrx_c_generated::Field_lenwords
     };
     (level) => {
-        $crate::__pgrx_c_generated::Field3059
+        $crate::__pgrx_c_generated::Field_level
     };
     (levelAdd) => {
-        $crate::__pgrx_c_generated::Field3060
+        $crate::__pgrx_c_generated::Field_levelAdd
     };
     (levelStep) => {
-        $crate::__pgrx_c_generated::Field3062
+        $crate::__pgrx_c_generated::Field_levelStep
     };
     (lexid) => {
-        $crate::__pgrx_c_generated::Field3064
+        $crate::__pgrx_c_generated::Field_lexid
     };
     (lexizeOid) => {
-        $crate::__pgrx_c_generated::Field3066
+        $crate::__pgrx_c_generated::Field_lexizeOid
     };
     (lextypeOid) => {
-        $crate::__pgrx_c_generated::Field3068
+        $crate::__pgrx_c_generated::Field_lextypeOid
     };
     (lhs_strict) => {
-        $crate::__pgrx_c_generated::Field3070
+        $crate::__pgrx_c_generated::Field_lhs_strict
     };
     (limitOption) => {
-        $crate::__pgrx_c_generated::Field3076
+        $crate::__pgrx_c_generated::Field_limitOption
     };
     (limit_needed) => {
-        $crate::__pgrx_c_generated::Field3077
+        $crate::__pgrx_c_generated::Field_limit_needed
     };
     (line) => {
-        $crate::__pgrx_c_generated::Field3079
+        $crate::__pgrx_c_generated::Field_line
     };
     (line_buf_valid) => {
-        $crate::__pgrx_c_generated::Field3081
+        $crate::__pgrx_c_generated::Field_line_buf_valid
     };
     (lineno) => {
-        $crate::__pgrx_c_generated::Field3082
+        $crate::__pgrx_c_generated::Field_lineno
     };
     (links) => {
-        $crate::__pgrx_c_generated::Field3084
+        $crate::__pgrx_c_generated::Field_links
     };
     (list_end) => {
-        $crate::__pgrx_c_generated::Field3086
+        $crate::__pgrx_c_generated::Field_list_end
     };
     (list_start) => {
-        $crate::__pgrx_c_generated::Field3087
+        $crate::__pgrx_c_generated::Field_list_start
     };
     (list_type) => {
-        $crate::__pgrx_c_generated::Field3088
+        $crate::__pgrx_c_generated::Field_list_type
     };
     (listdatums) => {
-        $crate::__pgrx_c_generated::Field3089
+        $crate::__pgrx_c_generated::Field_listdatums
     };
     (literalalloc) => {
-        $crate::__pgrx_c_generated::Field3090
+        $crate::__pgrx_c_generated::Field_literalalloc
     };
     (literallen) => {
-        $crate::__pgrx_c_generated::Field3092
+        $crate::__pgrx_c_generated::Field_literallen
     };
     (live_tuples) => {
-        $crate::__pgrx_c_generated::Field3094
+        $crate::__pgrx_c_generated::Field_live_tuples
     };
     (loadedBuffersCount) => {
-        $crate::__pgrx_c_generated::Field3096
+        $crate::__pgrx_c_generated::Field_loadedBuffersCount
     };
     (loadedBuffersLen) => {
-        $crate::__pgrx_c_generated::Field3097
+        $crate::__pgrx_c_generated::Field_loadedBuffersLen
     };
     (loblksize) => {
-        $crate::__pgrx_c_generated::Field3098
+        $crate::__pgrx_c_generated::Field_loblksize
     };
     (localTransactionId) => {
-        $crate::__pgrx_c_generated::Field3099
+        $crate::__pgrx_c_generated::Field_localTransactionId
     };
     (local_blks_dirtied) => {
-        $crate::__pgrx_c_generated::Field3102
+        $crate::__pgrx_c_generated::Field_local_blks_dirtied
     };
     (local_blks_hit) => {
-        $crate::__pgrx_c_generated::Field3103
+        $crate::__pgrx_c_generated::Field_local_blks_hit
     };
     (local_blks_read) => {
-        $crate::__pgrx_c_generated::Field3104
+        $crate::__pgrx_c_generated::Field_local_blks_read
     };
     (local_blks_written) => {
-        $crate::__pgrx_c_generated::Field3105
+        $crate::__pgrx_c_generated::Field_local_blks_written
     };
     (localindexoid) => {
-        $crate::__pgrx_c_generated::Field3108
+        $crate::__pgrx_c_generated::Field_localindexoid
     };
     (localreloid) => {
-        $crate::__pgrx_c_generated::Field3110
+        $crate::__pgrx_c_generated::Field_localreloid
     };
     (localrelvalid) => {
-        $crate::__pgrx_c_generated::Field3111
+        $crate::__pgrx_c_generated::Field_localrelvalid
     };
     (location) => {
-        $crate::__pgrx_c_generated::Field3112
+        $crate::__pgrx_c_generated::Field_location
     };
     (locator) => {
-        $crate::__pgrx_c_generated::Field3113
+        $crate::__pgrx_c_generated::Field_locator
     };
     (lock) => {
-        $crate::__pgrx_c_generated::Field3114
+        $crate::__pgrx_c_generated::Field_lock
     };
     (lockCleared) => {
-        $crate::__pgrx_c_generated::Field3115
+        $crate::__pgrx_c_generated::Field_lockCleared
     };
     (lockGroupLeader) => {
-        $crate::__pgrx_c_generated::Field3116
+        $crate::__pgrx_c_generated::Field_lockGroupLeader
     };
     (lockGroupLink) => {
-        $crate::__pgrx_c_generated::Field3117
+        $crate::__pgrx_c_generated::Field_lockGroupLink
     };
     (lockGroupMembers) => {
-        $crate::__pgrx_c_generated::Field3118
+        $crate::__pgrx_c_generated::Field_lockGroupMembers
     };
     (lockedRels) => {
-        $crate::__pgrx_c_generated::Field3124
+        $crate::__pgrx_c_generated::Field_lockedRels
     };
     (lockingClause) => {
-        $crate::__pgrx_c_generated::Field3125
+        $crate::__pgrx_c_generated::Field_lockingClause
     };
     (lockmode) => {
-        $crate::__pgrx_c_generated::Field3126
+        $crate::__pgrx_c_generated::Field_lockmode
     };
     (locktag_field1) => {
-        $crate::__pgrx_c_generated::Field3129
+        $crate::__pgrx_c_generated::Field_locktag_field1
     };
     (locktag_field2) => {
-        $crate::__pgrx_c_generated::Field3130
+        $crate::__pgrx_c_generated::Field_locktag_field2
     };
     (locktag_field3) => {
-        $crate::__pgrx_c_generated::Field3131
+        $crate::__pgrx_c_generated::Field_locktag_field3
     };
     (locktag_field4) => {
-        $crate::__pgrx_c_generated::Field3132
+        $crate::__pgrx_c_generated::Field_locktag_field4
     };
     (locktag_lockmethodid) => {
-        $crate::__pgrx_c_generated::Field3133
+        $crate::__pgrx_c_generated::Field_locktag_lockmethodid
     };
     (locktag_type) => {
-        $crate::__pgrx_c_generated::Field3134
+        $crate::__pgrx_c_generated::Field_locktag_type
     };
     (log2_nbuckets) => {
-        $crate::__pgrx_c_generated::Field3136
+        $crate::__pgrx_c_generated::Field_log2_nbuckets
     };
     (log2_nbuckets_optimal) => {
-        $crate::__pgrx_c_generated::Field3137
+        $crate::__pgrx_c_generated::Field_log2_nbuckets_optimal
     };
     (log_cnt) => {
-        $crate::__pgrx_c_generated::Field3138
+        $crate::__pgrx_c_generated::Field_log_cnt
     };
     (log_min_duration) => {
-        $crate::__pgrx_c_generated::Field3139
+        $crate::__pgrx_c_generated::Field_log_min_duration
     };
     (log_verbosity) => {
-        $crate::__pgrx_c_generated::Field3140
+        $crate::__pgrx_c_generated::Field_log_verbosity
     };
     (logicalrep_worker_generation) => {
-        $crate::__pgrx_c_generated::Field3142
+        $crate::__pgrx_c_generated::Field_logicalrep_worker_generation
     };
     (logicalrep_worker_slot_no) => {
-        $crate::__pgrx_c_generated::Field3143
+        $crate::__pgrx_c_generated::Field_logicalrep_worker_slot_no
     };
     (loid) => {
-        $crate::__pgrx_c_generated::Field3144
+        $crate::__pgrx_c_generated::Field_loid
     };
     (lomowner) => {
-        $crate::__pgrx_c_generated::Field3145
+        $crate::__pgrx_c_generated::Field_lomowner
     };
     (longValuesOK) => {
-        $crate::__pgrx_c_generated::Field3146
+        $crate::__pgrx_c_generated::Field_longValuesOK
     };
     (long_segment_names) => {
-        $crate::__pgrx_c_generated::Field3148
+        $crate::__pgrx_c_generated::Field_long_segment_names
     };
     (lossy) => {
-        $crate::__pgrx_c_generated::Field3149
+        $crate::__pgrx_c_generated::Field_lossy
     };
     (lossy_pages) => {
-        $crate::__pgrx_c_generated::Field3150
+        $crate::__pgrx_c_generated::Field_lossy_pages
     };
     (low) => {
-        $crate::__pgrx_c_generated::Field3151
+        $crate::__pgrx_c_generated::Field_low
     };
     (low_elem) => {
-        $crate::__pgrx_c_generated::Field3153
+        $crate::__pgrx_c_generated::Field_low_elem
     };
     (lower) => {
-        $crate::__pgrx_c_generated::Field3154
+        $crate::__pgrx_c_generated::Field_lower
     };
     (lowerdatums) => {
-        $crate::__pgrx_c_generated::Field3155
+        $crate::__pgrx_c_generated::Field_lowerdatums
     };
     (lp_flags) => {
-        $crate::__pgrx_c_generated::Field3159
+        $crate::__pgrx_c_generated::Field_lp_flags
     };
     (lp_len) => {
-        $crate::__pgrx_c_generated::Field3160
+        $crate::__pgrx_c_generated::Field_lp_len
     };
     (lp_off) => {
-        $crate::__pgrx_c_generated::Field3161
+        $crate::__pgrx_c_generated::Field_lp_off
     };
     (lpdead_items) => {
-        $crate::__pgrx_c_generated::Field3162
+        $crate::__pgrx_c_generated::Field_lpdead_items
     };
     (lsn) => {
-        $crate::__pgrx_c_generated::Field3167
+        $crate::__pgrx_c_generated::Field_lsn
     };
     (lsn_groups_per_page) => {
-        $crate::__pgrx_c_generated::Field3168
+        $crate::__pgrx_c_generated::Field_lsn_groups_per_page
     };
     (lstate) => {
-        $crate::__pgrx_c_generated::Field3169
+        $crate::__pgrx_c_generated::Field_lstate
     };
     (lt_opr) => {
-        $crate::__pgrx_c_generated::Field3171
+        $crate::__pgrx_c_generated::Field_lt_opr
     };
     (ltopr) => {
-        $crate::__pgrx_c_generated::Field3172
+        $crate::__pgrx_c_generated::Field_ltopr
     };
     (lwWaitLink) => {
-        $crate::__pgrx_c_generated::Field3176
+        $crate::__pgrx_c_generated::Field_lwWaitLink
     };
     (lwWaitMode) => {
-        $crate::__pgrx_c_generated::Field3177
+        $crate::__pgrx_c_generated::Field_lwWaitMode
     };
     (lwWaiting) => {
-        $crate::__pgrx_c_generated::Field3178
+        $crate::__pgrx_c_generated::Field_lwWaiting
     };
     (lxid) => {
-        $crate::__pgrx_c_generated::Field3179
+        $crate::__pgrx_c_generated::Field_lxid
     };
     (m) => {
-        $crate::__pgrx_c_generated::Field3180
+        $crate::__pgrx_c_generated::Field_m
     };
     (magic) => {
-        $crate::__pgrx_c_generated::Field3181
+        $crate::__pgrx_c_generated::Field_magic
     };
     (magicNumber) => {
-        $crate::__pgrx_c_generated::Field3182
+        $crate::__pgrx_c_generated::Field_magicNumber
     };
     (main_data) => {
-        $crate::__pgrx_c_generated::Field3183
+        $crate::__pgrx_c_generated::Field_main_data
     };
     (main_data_len) => {
-        $crate::__pgrx_c_generated::Field3184
+        $crate::__pgrx_c_generated::Field_main_data_len
     };
     (maintenance_io_concurrency) => {
-        $crate::__pgrx_c_generated::Field3186
+        $crate::__pgrx_c_generated::Field_maintenance_io_concurrency
     };
     (mainxid) => {
-        $crate::__pgrx_c_generated::Field3187
+        $crate::__pgrx_c_generated::Field_mainxid
     };
     (make_ro) => {
-        $crate::__pgrx_c_generated::Field3189
+        $crate::__pgrx_c_generated::Field_make_ro
     };
     (mapcfg) => {
-        $crate::__pgrx_c_generated::Field3192
+        $crate::__pgrx_c_generated::Field_mapcfg
     };
     (mapdict) => {
-        $crate::__pgrx_c_generated::Field3193
+        $crate::__pgrx_c_generated::Field_mapdict
     };
     (maplen) => {
-        $crate::__pgrx_c_generated::Field3194
+        $crate::__pgrx_c_generated::Field_maplen
     };
     (mapped_db) => {
-        $crate::__pgrx_c_generated::Field3195
+        $crate::__pgrx_c_generated::Field_mapped_db
     };
     (mapped_rel) => {
-        $crate::__pgrx_c_generated::Field3196
+        $crate::__pgrx_c_generated::Field_mapped_rel
     };
     (mapped_xid) => {
-        $crate::__pgrx_c_generated::Field3197
+        $crate::__pgrx_c_generated::Field_mapped_xid
     };
     (mapseqno) => {
-        $crate::__pgrx_c_generated::Field3198
+        $crate::__pgrx_c_generated::Field_mapseqno
     };
     (maptokentype) => {
-        $crate::__pgrx_c_generated::Field3199
+        $crate::__pgrx_c_generated::Field_maptokentype
     };
     (markItemIndex) => {
-        $crate::__pgrx_c_generated::Field3200
+        $crate::__pgrx_c_generated::Field_markItemIndex
     };
     (markType) => {
-        $crate::__pgrx_c_generated::Field3203
+        $crate::__pgrx_c_generated::Field_markType
     };
     (markfollowright) => {
-        $crate::__pgrx_c_generated::Field3204
+        $crate::__pgrx_c_generated::Field_markfollowright
     };
     (masked_scontext) => {
-        $crate::__pgrx_c_generated::Field3209
+        $crate::__pgrx_c_generated::Field_masked_scontext
     };
     (masked_srole) => {
-        $crate::__pgrx_c_generated::Field3210
+        $crate::__pgrx_c_generated::Field_masked_srole
     };
     (matchKind) => {
-        $crate::__pgrx_c_generated::Field3214
+        $crate::__pgrx_c_generated::Field_matchKind
     };
     (matchNtuples) => {
-        $crate::__pgrx_c_generated::Field3216
+        $crate::__pgrx_c_generated::Field_matchNtuples
     };
     (match_size_drop) => {
-        $crate::__pgrx_c_generated::Field3220
+        $crate::__pgrx_c_generated::Field_match_size_drop
     };
     (match_size_good) => {
-        $crate::__pgrx_c_generated::Field3221
+        $crate::__pgrx_c_generated::Field_match_size_good
     };
     (materialize_inner) => {
-        $crate::__pgrx_c_generated::Field3223
+        $crate::__pgrx_c_generated::Field_materialize_inner
     };
     (max) => {
-        $crate::__pgrx_c_generated::Field3224
+        $crate::__pgrx_c_generated::Field_max
     };
     (maxAlign) => {
-        $crate::__pgrx_c_generated::Field3225
+        $crate::__pgrx_c_generated::Field_maxAlign
     };
     (maxDiskSpaceUsed) => {
-        $crate::__pgrx_c_generated::Field3226
+        $crate::__pgrx_c_generated::Field_maxDiskSpaceUsed
     };
     (maxLockOwners) => {
-        $crate::__pgrx_c_generated::Field3227
+        $crate::__pgrx_c_generated::Field_maxLockOwners
     };
     (maxMemorySpaceUsed) => {
-        $crate::__pgrx_c_generated::Field3228
+        $crate::__pgrx_c_generated::Field_maxMemorySpaceUsed
     };
     (maxParallelHazard) => {
-        $crate::__pgrx_c_generated::Field3229
+        $crate::__pgrx_c_generated::Field_maxParallelHazard
     };
     (maxWinRef) => {
-        $crate::__pgrx_c_generated::Field3230
+        $crate::__pgrx_c_generated::Field_maxWinRef
     };
     (max_attr) => {
-        $crate::__pgrx_c_generated::Field3231
+        $crate::__pgrx_c_generated::Field_max_attr
     };
     (max_block_id) => {
-        $crate::__pgrx_c_generated::Field3232
+        $crate::__pgrx_c_generated::Field_max_block_id
     };
     (max_bytes) => {
-        $crate::__pgrx_c_generated::Field3233
+        $crate::__pgrx_c_generated::Field_max_bytes
     };
     (max_calls) => {
-        $crate::__pgrx_c_generated::Field3234
+        $crate::__pgrx_c_generated::Field_max_calls
     };
     (max_colno_needed) => {
-        $crate::__pgrx_c_generated::Field3235
+        $crate::__pgrx_c_generated::Field_max_colno_needed
     };
     (max_d) => {
-        $crate::__pgrx_c_generated::Field3236
+        $crate::__pgrx_c_generated::Field_max_d
     };
     (max_dsize) => {
-        $crate::__pgrx_c_generated::Field3237
+        $crate::__pgrx_c_generated::Field_max_dsize
     };
     (max_fields) => {
-        $crate::__pgrx_c_generated::Field3239
+        $crate::__pgrx_c_generated::Field_max_fields
     };
     (max_input_size) => {
-        $crate::__pgrx_c_generated::Field3240
+        $crate::__pgrx_c_generated::Field_max_input_size
     };
     (max_kw_len) => {
-        $crate::__pgrx_c_generated::Field3241
+        $crate::__pgrx_c_generated::Field_max_kw_len
     };
     (max_length) => {
-        $crate::__pgrx_c_generated::Field3242
+        $crate::__pgrx_c_generated::Field_max_length
     };
     (max_locks_per_xact) => {
-        $crate::__pgrx_c_generated::Field3243
+        $crate::__pgrx_c_generated::Field_max_locks_per_xact
     };
     (max_prepared_xacts) => {
-        $crate::__pgrx_c_generated::Field3245
+        $crate::__pgrx_c_generated::Field_max_prepared_xacts
     };
     (max_wal_senders) => {
-        $crate::__pgrx_c_generated::Field3246
+        $crate::__pgrx_c_generated::Field_max_wal_senders
     };
     (max_worker_processes) => {
-        $crate::__pgrx_c_generated::Field3247
+        $crate::__pgrx_c_generated::Field_max_worker_processes
     };
     (maxbufsize) => {
-        $crate::__pgrx_c_generated::Field3248
+        $crate::__pgrx_c_generated::Field_maxbufsize
     };
     (maxcount) => {
-        $crate::__pgrx_c_generated::Field3249
+        $crate::__pgrx_c_generated::Field_maxcount
     };
     (maxlen) => {
-        $crate::__pgrx_c_generated::Field3250
+        $crate::__pgrx_c_generated::Field_maxlen
     };
     (maxlocks) => {
-        $crate::__pgrx_c_generated::Field3251
+        $crate::__pgrx_c_generated::Field_maxlocks
     };
     (maxmblen) => {
-        $crate::__pgrx_c_generated::Field3252
+        $crate::__pgrx_c_generated::Field_maxmblen
     };
     (maxoff) => {
-        $crate::__pgrx_c_generated::Field3253
+        $crate::__pgrx_c_generated::Field_maxoff
     };
     (maxpids) => {
-        $crate::__pgrx_c_generated::Field3254
+        $crate::__pgrx_c_generated::Field_maxpids
     };
     (maxpostingsize) => {
-        $crate::__pgrx_c_generated::Field3255
+        $crate::__pgrx_c_generated::Field_maxpostingsize
     };
     (maxprocs) => {
-        $crate::__pgrx_c_generated::Field3256
+        $crate::__pgrx_c_generated::Field_maxprocs
     };
     (maxsets) => {
-        $crate::__pgrx_c_generated::Field3257
+        $crate::__pgrx_c_generated::Field_maxsets
     };
     (maxwritten_clean) => {
-        $crate::__pgrx_c_generated::Field3258
+        $crate::__pgrx_c_generated::Field_maxwritten_clean
     };
     (maybe_sleeping) => {
-        $crate::__pgrx_c_generated::Field3259
+        $crate::__pgrx_c_generated::Field_maybe_sleeping
     };
     (mem_allocated) => {
-        $crate::__pgrx_c_generated::Field3268
+        $crate::__pgrx_c_generated::Field_mem_allocated
     };
     (mem_limit) => {
-        $crate::__pgrx_c_generated::Field3269
+        $crate::__pgrx_c_generated::Field_mem_limit
     };
     (mem_peak) => {
-        $crate::__pgrx_c_generated::Field3270
+        $crate::__pgrx_c_generated::Field_mem_peak
     };
     (mem_used) => {
-        $crate::__pgrx_c_generated::Field3271
+        $crate::__pgrx_c_generated::Field_mem_used
     };
     (member) => {
-        $crate::__pgrx_c_generated::Field3272
+        $crate::__pgrx_c_generated::Field_member
     };
     (members) => {
-        $crate::__pgrx_c_generated::Field3274
+        $crate::__pgrx_c_generated::Field_members
     };
     (memory) => {
-        $crate::__pgrx_c_generated::Field3275
+        $crate::__pgrx_c_generated::Field_memory
     };
     (mergeActionList) => {
-        $crate::__pgrx_c_generated::Field3276
+        $crate::__pgrx_c_generated::Field_mergeActionList
     };
     (mergeActionLists) => {
-        $crate::__pgrx_c_generated::Field3277
+        $crate::__pgrx_c_generated::Field_mergeActionLists
     };
     (mergeJoinConditions) => {
-        $crate::__pgrx_c_generated::Field3281
+        $crate::__pgrx_c_generated::Field_mergeJoinConditions
     };
     (mergeTargetRelation) => {
-        $crate::__pgrx_c_generated::Field3284
+        $crate::__pgrx_c_generated::Field_mergeTargetRelation
     };
     (mergeWhenClauses) => {
-        $crate::__pgrx_c_generated::Field3285
+        $crate::__pgrx_c_generated::Field_mergeWhenClauses
     };
     (mergeclause_list) => {
-        $crate::__pgrx_c_generated::Field3286
+        $crate::__pgrx_c_generated::Field_mergeclause_list
     };
     (mergeclauses) => {
-        $crate::__pgrx_c_generated::Field3287
+        $crate::__pgrx_c_generated::Field_mergeclauses
     };
     (mergeopfamilies) => {
-        $crate::__pgrx_c_generated::Field3288
+        $crate::__pgrx_c_generated::Field_mergeopfamilies
     };
     (mergeplans) => {
-        $crate::__pgrx_c_generated::Field3289
+        $crate::__pgrx_c_generated::Field_mergeplans
     };
     (message_level) => {
-        $crate::__pgrx_c_generated::Field3293
+        $crate::__pgrx_c_generated::Field_message_level
     };
     (message_size) => {
-        $crate::__pgrx_c_generated::Field3294
+        $crate::__pgrx_c_generated::Field_message_size
     };
     (messages) => {
-        $crate::__pgrx_c_generated::Field3295
+        $crate::__pgrx_c_generated::Field_messages
     };
     (method) => {
-        $crate::__pgrx_c_generated::Field3297
+        $crate::__pgrx_c_generated::Field_method
     };
     (mid) => {
-        $crate::__pgrx_c_generated::Field3299
+        $crate::__pgrx_c_generated::Field_mid
     };
     (min) => {
-        $crate::__pgrx_c_generated::Field3300
+        $crate::__pgrx_c_generated::Field_min
     };
     (minRecoveryPoint) => {
-        $crate::__pgrx_c_generated::Field3301
+        $crate::__pgrx_c_generated::Field_minRecoveryPoint
     };
     (minRecoveryPointTLI) => {
-        $crate::__pgrx_c_generated::Field3302
+        $crate::__pgrx_c_generated::Field_minRecoveryPointTLI
     };
     (min_attr) => {
-        $crate::__pgrx_c_generated::Field3303
+        $crate::__pgrx_c_generated::Field_min_attr
     };
     (min_comp_rate) => {
-        $crate::__pgrx_c_generated::Field3304
+        $crate::__pgrx_c_generated::Field_min_comp_rate
     };
     (min_d) => {
-        $crate::__pgrx_c_generated::Field3305
+        $crate::__pgrx_c_generated::Field_min_d
     };
     (min_input_size) => {
-        $crate::__pgrx_c_generated::Field3306
+        $crate::__pgrx_c_generated::Field_min_input_size
     };
     (minmax_aggs) => {
-        $crate::__pgrx_c_generated::Field3311
+        $crate::__pgrx_c_generated::Field_minmax_aggs
     };
     (minmaxcollid) => {
-        $crate::__pgrx_c_generated::Field3312
+        $crate::__pgrx_c_generated::Field_minmaxcollid
     };
     (minmaxtype) => {
-        $crate::__pgrx_c_generated::Field3313
+        $crate::__pgrx_c_generated::Field_minmaxtype
     };
     (minoff) => {
-        $crate::__pgrx_c_generated::Field3314
+        $crate::__pgrx_c_generated::Field_minoff
     };
     (minrows) => {
-        $crate::__pgrx_c_generated::Field3315
+        $crate::__pgrx_c_generated::Field_minrows
     };
     (missingContrecPtr) => {
-        $crate::__pgrx_c_generated::Field3318
+        $crate::__pgrx_c_generated::Field_missingContrecPtr
     };
     (missing_ok) => {
-        $crate::__pgrx_c_generated::Field3319
+        $crate::__pgrx_c_generated::Field_missing_ok
     };
     (mj_ConstFalseJoin) => {
-        $crate::__pgrx_c_generated::Field3321
+        $crate::__pgrx_c_generated::Field_mj_ConstFalseJoin
     };
     (mj_ExtraMarks) => {
-        $crate::__pgrx_c_generated::Field3322
+        $crate::__pgrx_c_generated::Field_mj_ExtraMarks
     };
     (mj_FillInner) => {
-        $crate::__pgrx_c_generated::Field3323
+        $crate::__pgrx_c_generated::Field_mj_FillInner
     };
     (mj_FillOuter) => {
-        $crate::__pgrx_c_generated::Field3324
+        $crate::__pgrx_c_generated::Field_mj_FillOuter
     };
     (mj_JoinState) => {
-        $crate::__pgrx_c_generated::Field3327
+        $crate::__pgrx_c_generated::Field_mj_JoinState
     };
     (mj_MatchedInner) => {
-        $crate::__pgrx_c_generated::Field3329
+        $crate::__pgrx_c_generated::Field_mj_MatchedInner
     };
     (mj_MatchedOuter) => {
-        $crate::__pgrx_c_generated::Field3330
+        $crate::__pgrx_c_generated::Field_mj_MatchedOuter
     };
     (mj_NumClauses) => {
-        $crate::__pgrx_c_generated::Field3333
+        $crate::__pgrx_c_generated::Field_mj_NumClauses
     };
     (mj_SkipMarkRestore) => {
-        $crate::__pgrx_c_generated::Field3336
+        $crate::__pgrx_c_generated::Field_mj_SkipMarkRestore
     };
     (mod_since_analyze) => {
-        $crate::__pgrx_c_generated::Field3339
+        $crate::__pgrx_c_generated::Field_mod_since_analyze
     };
     (mod_stmt) => {
-        $crate::__pgrx_c_generated::Field3340
+        $crate::__pgrx_c_generated::Field_mod_stmt
     };
     (mod_stmt_set) => {
-        $crate::__pgrx_c_generated::Field3341
+        $crate::__pgrx_c_generated::Field_mod_stmt_set
     };
     (mode) => {
-        $crate::__pgrx_c_generated::Field3342
+        $crate::__pgrx_c_generated::Field_mode
     };
     (modulus) => {
-        $crate::__pgrx_c_generated::Field3343
+        $crate::__pgrx_c_generated::Field_modulus
     };
     (moff) => {
-        $crate::__pgrx_c_generated::Field3344
+        $crate::__pgrx_c_generated::Field_moff
     };
     (monotonic) => {
-        $crate::__pgrx_c_generated::Field3348
+        $crate::__pgrx_c_generated::Field_monotonic
     };
     (month) => {
-        $crate::__pgrx_c_generated::Field3349
+        $crate::__pgrx_c_generated::Field_month
     };
     (moreLeft) => {
-        $crate::__pgrx_c_generated::Field3350
+        $crate::__pgrx_c_generated::Field_moreLeft
     };
     (moreRight) => {
-        $crate::__pgrx_c_generated::Field3351
+        $crate::__pgrx_c_generated::Field_moreRight
     };
     (more_partitions) => {
-        $crate::__pgrx_c_generated::Field3352
+        $crate::__pgrx_c_generated::Field_more_partitions
     };
     (ms_initialized) => {
-        $crate::__pgrx_c_generated::Field3356
+        $crate::__pgrx_c_generated::Field_ms_initialized
     };
     (ms_nkeys) => {
-        $crate::__pgrx_c_generated::Field3357
+        $crate::__pgrx_c_generated::Field_ms_nkeys
     };
     (ms_nplans) => {
-        $crate::__pgrx_c_generated::Field3358
+        $crate::__pgrx_c_generated::Field_ms_nplans
     };
     (msfcollid) => {
-        $crate::__pgrx_c_generated::Field3363
+        $crate::__pgrx_c_generated::Field_msfcollid
     };
     (msftype) => {
-        $crate::__pgrx_c_generated::Field3369
+        $crate::__pgrx_c_generated::Field_msftype
     };
     (mstatus) => {
-        $crate::__pgrx_c_generated::Field3379
+        $crate::__pgrx_c_generated::Field_mstatus
     };
     (mt_done) => {
-        $crate::__pgrx_c_generated::Field3380
+        $crate::__pgrx_c_generated::Field_mt_done
     };
     (mt_lastResultIndex) => {
-        $crate::__pgrx_c_generated::Field3382
+        $crate::__pgrx_c_generated::Field_mt_lastResultIndex
     };
     (mt_lastResultOid) => {
-        $crate::__pgrx_c_generated::Field3383
+        $crate::__pgrx_c_generated::Field_mt_lastResultOid
     };
     (mt_mergeActionLists) => {
-        $crate::__pgrx_c_generated::Field3384
+        $crate::__pgrx_c_generated::Field_mt_mergeActionLists
     };
     (mt_mergeJoinConditions) => {
-        $crate::__pgrx_c_generated::Field3385
+        $crate::__pgrx_c_generated::Field_mt_mergeJoinConditions
     };
     (mt_merge_subcommands) => {
-        $crate::__pgrx_c_generated::Field3390
+        $crate::__pgrx_c_generated::Field_mt_merge_subcommands
     };
     (mt_nrels) => {
-        $crate::__pgrx_c_generated::Field3392
+        $crate::__pgrx_c_generated::Field_mt_nrels
     };
     (mt_resultOidAttno) => {
-        $crate::__pgrx_c_generated::Field3396
+        $crate::__pgrx_c_generated::Field_mt_resultOidAttno
     };
     (mt_updateColnosLists) => {
-        $crate::__pgrx_c_generated::Field3400
+        $crate::__pgrx_c_generated::Field_mt_updateColnosLists
     };
     (multidims) => {
-        $crate::__pgrx_c_generated::Field3403
+        $crate::__pgrx_c_generated::Field_multidims
     };
     (multiexpr_params) => {
-        $crate::__pgrx_c_generated::Field3404
+        $crate::__pgrx_c_generated::Field_multiexpr_params
     };
     (multixact_freeze_max_age) => {
-        $crate::__pgrx_c_generated::Field3405
+        $crate::__pgrx_c_generated::Field_multixact_freeze_max_age
     };
     (multixact_freeze_min_age) => {
-        $crate::__pgrx_c_generated::Field3406
+        $crate::__pgrx_c_generated::Field_multixact_freeze_min_age
     };
     (multixact_freeze_table_age) => {
-        $crate::__pgrx_c_generated::Field3407
+        $crate::__pgrx_c_generated::Field_multixact_freeze_table_age
     };
     (must_return_tuples) => {
-        $crate::__pgrx_c_generated::Field3408
+        $crate::__pgrx_c_generated::Field_must_return_tuples
     };
     (mutex) => {
-        $crate::__pgrx_c_generated::Field3409
+        $crate::__pgrx_c_generated::Field_mutex
     };
     (myLock) => {
-        $crate::__pgrx_c_generated::Field3410
+        $crate::__pgrx_c_generated::Field_myLock
     };
     (myProcLocks) => {
-        $crate::__pgrx_c_generated::Field3412
+        $crate::__pgrx_c_generated::Field_myProcLocks
     };
     (mydest) => {
-        $crate::__pgrx_c_generated::Field3416
+        $crate::__pgrx_c_generated::Field_mydest
     };
     (n) => {
-        $crate::__pgrx_c_generated::Field3417
+        $crate::__pgrx_c_generated::Field_n
     };
     (nChain) => {
-        $crate::__pgrx_c_generated::Field3418
+        $crate::__pgrx_c_generated::Field_nChain
     };
     (nDataPages) => {
-        $crate::__pgrx_c_generated::Field3419
+        $crate::__pgrx_c_generated::Field_nDataPages
     };
     (nDead) => {
-        $crate::__pgrx_c_generated::Field3420
+        $crate::__pgrx_c_generated::Field_nDead
     };
     (nDelete) => {
-        $crate::__pgrx_c_generated::Field3421
+        $crate::__pgrx_c_generated::Field_nDelete
     };
     (nElems) => {
-        $crate::__pgrx_c_generated::Field3422
+        $crate::__pgrx_c_generated::Field_nElems
     };
     (nEntries) => {
-        $crate::__pgrx_c_generated::Field3423
+        $crate::__pgrx_c_generated::Field_nEntries
     };
     (nEntryPages) => {
-        $crate::__pgrx_c_generated::Field3424
+        $crate::__pgrx_c_generated::Field_nEntryPages
     };
     (nFileBlocks) => {
-        $crate::__pgrx_c_generated::Field3425
+        $crate::__pgrx_c_generated::Field_nFileBlocks
     };
     (nFreeBlocks) => {
-        $crate::__pgrx_c_generated::Field3426
+        $crate::__pgrx_c_generated::Field_nFreeBlocks
     };
     (nGranted) => {
-        $crate::__pgrx_c_generated::Field3427
+        $crate::__pgrx_c_generated::Field_nGranted
     };
     (nInsert) => {
-        $crate::__pgrx_c_generated::Field3428
+        $crate::__pgrx_c_generated::Field_nInsert
     };
     (nKeys) => {
-        $crate::__pgrx_c_generated::Field3429
+        $crate::__pgrx_c_generated::Field_nKeys
     };
     (nLocks) => {
-        $crate::__pgrx_c_generated::Field3430
+        $crate::__pgrx_c_generated::Field_nLocks
     };
     (nMove) => {
-        $crate::__pgrx_c_generated::Field3431
+        $crate::__pgrx_c_generated::Field_nMove
     };
     (nMoves) => {
-        $crate::__pgrx_c_generated::Field3432
+        $crate::__pgrx_c_generated::Field_nMoves
     };
     (nNodes) => {
-        $crate::__pgrx_c_generated::Field3433
+        $crate::__pgrx_c_generated::Field_nNodes
     };
     (nPageData) => {
-        $crate::__pgrx_c_generated::Field3434
+        $crate::__pgrx_c_generated::Field_nPageData
     };
     (nPairs) => {
-        $crate::__pgrx_c_generated::Field3435
+        $crate::__pgrx_c_generated::Field_nPairs
     };
     (nParticipants) => {
-        $crate::__pgrx_c_generated::Field3436
+        $crate::__pgrx_c_generated::Field_nParticipants
     };
     (nPendingHeapTuples) => {
-        $crate::__pgrx_c_generated::Field3437
+        $crate::__pgrx_c_generated::Field_nPendingHeapTuples
     };
     (nPendingPages) => {
-        $crate::__pgrx_c_generated::Field3438
+        $crate::__pgrx_c_generated::Field_nPendingPages
     };
     (nPlaceholder) => {
-        $crate::__pgrx_c_generated::Field3439
+        $crate::__pgrx_c_generated::Field_nPlaceholder
     };
     (nPresortedCols) => {
-        $crate::__pgrx_c_generated::Field3440
+        $crate::__pgrx_c_generated::Field_nPresortedCols
     };
     (nPtrs) => {
-        $crate::__pgrx_c_generated::Field3441
+        $crate::__pgrx_c_generated::Field_nPtrs
     };
     (nRedirection) => {
-        $crate::__pgrx_c_generated::Field3442
+        $crate::__pgrx_c_generated::Field_nRedirection
     };
     (nRequested) => {
-        $crate::__pgrx_c_generated::Field3443
+        $crate::__pgrx_c_generated::Field_nRequested
     };
     (nSkewBuckets) => {
-        $crate::__pgrx_c_generated::Field3444
+        $crate::__pgrx_c_generated::Field_nSkewBuckets
     };
     (nToPlaceholder) => {
-        $crate::__pgrx_c_generated::Field3445
+        $crate::__pgrx_c_generated::Field_nToPlaceholder
     };
     (nTotalPages) => {
-        $crate::__pgrx_c_generated::Field3446
+        $crate::__pgrx_c_generated::Field_nTotalPages
     };
     (nTuples) => {
-        $crate::__pgrx_c_generated::Field3447
+        $crate::__pgrx_c_generated::Field_nTuples
     };
     (n_cs_precedes) => {
-        $crate::__pgrx_c_generated::Field3450
+        $crate::__pgrx_c_generated::Field_n_cs_precedes
     };
     (n_fullsort_remaining) => {
-        $crate::__pgrx_c_generated::Field3451
+        $crate::__pgrx_c_generated::Field_n_fullsort_remaining
     };
     (n_initvars) => {
-        $crate::__pgrx_c_generated::Field3452
+        $crate::__pgrx_c_generated::Field_n_initvars
     };
     (n_members) => {
-        $crate::__pgrx_c_generated::Field3453
+        $crate::__pgrx_c_generated::Field_n_members
     };
     (n_sep_by_space) => {
-        $crate::__pgrx_c_generated::Field3456
+        $crate::__pgrx_c_generated::Field_n_sep_by_space
     };
     (n_sign_posn) => {
-        $crate::__pgrx_c_generated::Field3457
+        $crate::__pgrx_c_generated::Field_n_sign_posn
     };
     (nabortrels) => {
-        $crate::__pgrx_c_generated::Field3458
+        $crate::__pgrx_c_generated::Field_nabortrels
     };
     (nabortstats) => {
-        $crate::__pgrx_c_generated::Field3459
+        $crate::__pgrx_c_generated::Field_nabortstats
     };
     (nactions) => {
-        $crate::__pgrx_c_generated::Field3460
+        $crate::__pgrx_c_generated::Field_nactions
     };
     (nadditional) => {
-        $crate::__pgrx_c_generated::Field3461
+        $crate::__pgrx_c_generated::Field_nadditional
     };
     (name) => {
-        $crate::__pgrx_c_generated::Field3462
+        $crate::__pgrx_c_generated::Field_name
     };
     (nameDataLen) => {
-        $crate::__pgrx_c_generated::Field3463
+        $crate::__pgrx_c_generated::Field_nameDataLen
     };
     (name_location) => {
-        $crate::__pgrx_c_generated::Field3464
+        $crate::__pgrx_c_generated::Field_name_location
     };
     (named_args) => {
-        $crate::__pgrx_c_generated::Field3466
+        $crate::__pgrx_c_generated::Field_named_args
     };
     (namedatalen) => {
-        $crate::__pgrx_c_generated::Field3468
+        $crate::__pgrx_c_generated::Field_namedatalen
     };
     (namelen) => {
-        $crate::__pgrx_c_generated::Field3469
+        $crate::__pgrx_c_generated::Field_namelen
     };
     (names) => {
-        $crate::__pgrx_c_generated::Field3470
+        $crate::__pgrx_c_generated::Field_names
     };
     (namespaces) => {
-        $crate::__pgrx_c_generated::Field3471
+        $crate::__pgrx_c_generated::Field_namespaces
     };
     (nargs) => {
-        $crate::__pgrx_c_generated::Field3472
+        $crate::__pgrx_c_generated::Field_nargs
     };
     (nasyncplans) => {
-        $crate::__pgrx_c_generated::Field3473
+        $crate::__pgrx_c_generated::Field_nasyncplans
     };
     (nattnums) => {
-        $crate::__pgrx_c_generated::Field3474
+        $crate::__pgrx_c_generated::Field_nattnums
     };
     (nattributes) => {
-        $crate::__pgrx_c_generated::Field3475
+        $crate::__pgrx_c_generated::Field_nattributes
     };
     (natts) => {
-        $crate::__pgrx_c_generated::Field3476
+        $crate::__pgrx_c_generated::Field_natts
     };
     (nbanks) => {
-        $crate::__pgrx_c_generated::Field3477
+        $crate::__pgrx_c_generated::Field_nbanks
     };
     (nbatch) => {
-        $crate::__pgrx_c_generated::Field3478
+        $crate::__pgrx_c_generated::Field_nbatch
     };
     (nbatch_original) => {
-        $crate::__pgrx_c_generated::Field3479
+        $crate::__pgrx_c_generated::Field_nbatch_original
     };
     (nbatch_outstart) => {
-        $crate::__pgrx_c_generated::Field3480
+        $crate::__pgrx_c_generated::Field_nbatch_outstart
     };
     (nblocks) => {
-        $crate::__pgrx_c_generated::Field3481
+        $crate::__pgrx_c_generated::Field_nblocks
     };
     (nblocks_done) => {
-        $crate::__pgrx_c_generated::Field3482
+        $crate::__pgrx_c_generated::Field_nblocks_done
     };
     (nbuckets) => {
-        $crate::__pgrx_c_generated::Field3483
+        $crate::__pgrx_c_generated::Field_nbuckets
     };
     (nbuckets_optimal) => {
-        $crate::__pgrx_c_generated::Field3484
+        $crate::__pgrx_c_generated::Field_nbuckets_optimal
     };
     (nbuckets_original) => {
-        $crate::__pgrx_c_generated::Field3485
+        $crate::__pgrx_c_generated::Field_nbuckets_original
     };
     (nbytes) => {
-        $crate::__pgrx_c_generated::Field3486
+        $crate::__pgrx_c_generated::Field_nbytes
     };
     (nbytes_aligned) => {
-        $crate::__pgrx_c_generated::Field3487
+        $crate::__pgrx_c_generated::Field_nbytes_aligned
     };
     (nchild) => {
-        $crate::__pgrx_c_generated::Field3488
+        $crate::__pgrx_c_generated::Field_nchild
     };
     (ncols) => {
-        $crate::__pgrx_c_generated::Field3489
+        $crate::__pgrx_c_generated::Field_ncols
     };
     (ncolumns) => {
-        $crate::__pgrx_c_generated::Field3490
+        $crate::__pgrx_c_generated::Field_ncolumns
     };
     (ncommitrels) => {
-        $crate::__pgrx_c_generated::Field3491
+        $crate::__pgrx_c_generated::Field_ncommitrels
     };
     (ncommitstats) => {
-        $crate::__pgrx_c_generated::Field3492
+        $crate::__pgrx_c_generated::Field_ncommitstats
     };
     (nconst_ec) => {
-        $crate::__pgrx_c_generated::Field3493
+        $crate::__pgrx_c_generated::Field_nconst_ec
     };
     (ndargs) => {
-        $crate::__pgrx_c_generated::Field3494
+        $crate::__pgrx_c_generated::Field_ndargs
     };
     (ndatums) => {
-        $crate::__pgrx_c_generated::Field3495
+        $crate::__pgrx_c_generated::Field_ndatums
     };
     (ndeleted) => {
-        $crate::__pgrx_c_generated::Field3496
+        $crate::__pgrx_c_generated::Field_ndeleted
     };
     (ndeletedtids) => {
-        $crate::__pgrx_c_generated::Field3497
+        $crate::__pgrx_c_generated::Field_ndeletedtids
     };
     (ndeltids) => {
-        $crate::__pgrx_c_generated::Field3498
+        $crate::__pgrx_c_generated::Field_ndeltids
     };
     (ndeps) => {
-        $crate::__pgrx_c_generated::Field3499
+        $crate::__pgrx_c_generated::Field_ndeps
     };
     (ndicts) => {
-        $crate::__pgrx_c_generated::Field3500
+        $crate::__pgrx_c_generated::Field_ndicts
     };
     (ndim) => {
-        $crate::__pgrx_c_generated::Field3501
+        $crate::__pgrx_c_generated::Field_ndim
     };
     (ndimensions) => {
-        $crate::__pgrx_c_generated::Field3502
+        $crate::__pgrx_c_generated::Field_ndimensions
     };
     (ndims) => {
-        $crate::__pgrx_c_generated::Field3503
+        $crate::__pgrx_c_generated::Field_ndims
     };
     (needGroup) => {
-        $crate::__pgrx_c_generated::Field3505
+        $crate::__pgrx_c_generated::Field_needGroup
     };
     (needPrimScan) => {
-        $crate::__pgrx_c_generated::Field3506
+        $crate::__pgrx_c_generated::Field_needPrimScan
     };
     (need_bufusage) => {
-        $crate::__pgrx_c_generated::Field3507
+        $crate::__pgrx_c_generated::Field_need_bufusage
     };
     (need_exprstate) => {
-        $crate::__pgrx_c_generated::Field3508
+        $crate::__pgrx_c_generated::Field_need_exprstate
     };
     (need_init) => {
-        $crate::__pgrx_c_generated::Field3509
+        $crate::__pgrx_c_generated::Field_need_init
     };
     (need_timer) => {
-        $crate::__pgrx_c_generated::Field3510
+        $crate::__pgrx_c_generated::Field_need_timer
     };
     (need_to_scan_locally) => {
-        $crate::__pgrx_c_generated::Field3511
+        $crate::__pgrx_c_generated::Field_need_to_scan_locally
     };
     (need_transcoding) => {
-        $crate::__pgrx_c_generated::Field3512
+        $crate::__pgrx_c_generated::Field_need_transcoding
     };
     (need_walusage) => {
-        $crate::__pgrx_c_generated::Field3513
+        $crate::__pgrx_c_generated::Field_need_walusage
     };
     (needreload) => {
-        $crate::__pgrx_c_generated::Field3514
+        $crate::__pgrx_c_generated::Field_needreload
     };
     (negate) => {
-        $crate::__pgrx_c_generated::Field3516
+        $crate::__pgrx_c_generated::Field_negate
     };
     (negative) => {
-        $crate::__pgrx_c_generated::Field3517
+        $crate::__pgrx_c_generated::Field_negative
     };
     (negfuncid) => {
-        $crate::__pgrx_c_generated::Field3519
+        $crate::__pgrx_c_generated::Field_negfuncid
     };
     (nelements) => {
-        $crate::__pgrx_c_generated::Field3520
+        $crate::__pgrx_c_generated::Field_nelements
     };
     (nelems) => {
-        $crate::__pgrx_c_generated::Field3521
+        $crate::__pgrx_c_generated::Field_nelems
     };
     (nentries) => {
-        $crate::__pgrx_c_generated::Field3522
+        $crate::__pgrx_c_generated::Field_nentries
     };
     (nentries_mem) => {
-        $crate::__pgrx_c_generated::Field3523
+        $crate::__pgrx_c_generated::Field_nentries_mem
     };
     (nest_level) => {
-        $crate::__pgrx_c_generated::Field3525
+        $crate::__pgrx_c_generated::Field_nest_level
     };
     (newPage) => {
-        $crate::__pgrx_c_generated::Field3526
+        $crate::__pgrx_c_generated::Field_newPage
     };
     (newRightlink) => {
-        $crate::__pgrx_c_generated::Field3527
+        $crate::__pgrx_c_generated::Field_newRightlink
     };
     (newValIsAfter) => {
-        $crate::__pgrx_c_generated::Field3529
+        $crate::__pgrx_c_generated::Field_newValIsAfter
     };
     (new_bucket) => {
-        $crate::__pgrx_c_generated::Field3531
+        $crate::__pgrx_c_generated::Field_new_bucket
     };
     (new_bucket_flag) => {
-        $crate::__pgrx_c_generated::Field3532
+        $crate::__pgrx_c_generated::Field_new_bucket_flag
     };
     (new_index) => {
-        $crate::__pgrx_c_generated::Field3533
+        $crate::__pgrx_c_generated::Field_new_index
     };
     (new_offnum) => {
-        $crate::__pgrx_c_generated::Field3535
+        $crate::__pgrx_c_generated::Field_new_offnum
     };
     (new_varno) => {
-        $crate::__pgrx_c_generated::Field3538
+        $crate::__pgrx_c_generated::Field_new_varno
     };
     (new_xmax) => {
-        $crate::__pgrx_c_generated::Field3539
+        $crate::__pgrx_c_generated::Field_new_xmax
     };
     (newestCommitTsXid) => {
-        $crate::__pgrx_c_generated::Field3540
+        $crate::__pgrx_c_generated::Field_newestCommitTsXid
     };
     (newitemoff) => {
-        $crate::__pgrx_c_generated::Field3542
+        $crate::__pgrx_c_generated::Field_newitemoff
     };
     (newvals) => {
-        $crate::__pgrx_c_generated::Field3548
+        $crate::__pgrx_c_generated::Field_newvals
     };
     (next) => {
-        $crate::__pgrx_c_generated::Field3549
+        $crate::__pgrx_c_generated::Field_next
     };
     (nextMulti) => {
-        $crate::__pgrx_c_generated::Field3551
+        $crate::__pgrx_c_generated::Field_nextMulti
     };
     (nextMultiOffset) => {
-        $crate::__pgrx_c_generated::Field3552
+        $crate::__pgrx_c_generated::Field_nextMultiOffset
     };
     (nextOid) => {
-        $crate::__pgrx_c_generated::Field3553
+        $crate::__pgrx_c_generated::Field_nextOid
     };
     (nextPage) => {
-        $crate::__pgrx_c_generated::Field3554
+        $crate::__pgrx_c_generated::Field_nextPage
     };
     (nextTLI) => {
-        $crate::__pgrx_c_generated::Field3555
+        $crate::__pgrx_c_generated::Field_nextTLI
     };
     (nextTupleOffset) => {
-        $crate::__pgrx_c_generated::Field3556
+        $crate::__pgrx_c_generated::Field_nextTupleOffset
     };
     (nextXid) => {
-        $crate::__pgrx_c_generated::Field3558
+        $crate::__pgrx_c_generated::Field_nextXid
     };
     (next_elem) => {
-        $crate::__pgrx_c_generated::Field3559
+        $crate::__pgrx_c_generated::Field_next_elem
     };
     (next_free) => {
-        $crate::__pgrx_c_generated::Field3560
+        $crate::__pgrx_c_generated::Field_next_free
     };
     (next_lsn) => {
-        $crate::__pgrx_c_generated::Field3561
+        $crate::__pgrx_c_generated::Field_next_lsn
     };
     (next_partition) => {
-        $crate::__pgrx_c_generated::Field3562
+        $crate::__pgrx_c_generated::Field_next_partition
     };
     (next_phase_at) => {
-        $crate::__pgrx_c_generated::Field3563
+        $crate::__pgrx_c_generated::Field_next_phase_at
     };
     (nextblkno) => {
-        $crate::__pgrx_c_generated::Field3565
+        $crate::__pgrx_c_generated::Field_nextblkno
     };
     (nextfield) => {
-        $crate::__pgrx_c_generated::Field3567
+        $crate::__pgrx_c_generated::Field_nextfield
     };
     (nextkey) => {
-        $crate::__pgrx_c_generated::Field3568
+        $crate::__pgrx_c_generated::Field_nextkey
     };
     (nextreader) => {
-        $crate::__pgrx_c_generated::Field3569
+        $crate::__pgrx_c_generated::Field_nextreader
     };
     (nfields) => {
-        $crate::__pgrx_c_generated::Field3571
+        $crate::__pgrx_c_generated::Field_nfields
     };
     (nfiltered1) => {
-        $crate::__pgrx_c_generated::Field3572
+        $crate::__pgrx_c_generated::Field_nfiltered1
     };
     (nfiltered2) => {
-        $crate::__pgrx_c_generated::Field3573
+        $crate::__pgrx_c_generated::Field_nfiltered2
     };
     (nfrozen) => {
-        $crate::__pgrx_c_generated::Field3574
+        $crate::__pgrx_c_generated::Field_nfrozen
     };
     (nfuncs) => {
-        $crate::__pgrx_c_generated::Field3575
+        $crate::__pgrx_c_generated::Field_nfuncs
     };
     (nhtids) => {
-        $crate::__pgrx_c_generated::Field3576
+        $crate::__pgrx_c_generated::Field_nhtids
     };
     (nindexes) => {
-        $crate::__pgrx_c_generated::Field3577
+        $crate::__pgrx_c_generated::Field_nindexes
     };
     (nintervals) => {
-        $crate::__pgrx_c_generated::Field3578
+        $crate::__pgrx_c_generated::Field_nintervals
     };
     (ninvalidations) => {
-        $crate::__pgrx_c_generated::Field3579
+        $crate::__pgrx_c_generated::Field_ninvalidations
     };
     (ninvalidations_distributed) => {
-        $crate::__pgrx_c_generated::Field3580
+        $crate::__pgrx_c_generated::Field_ninvalidations_distributed
     };
     (ninvalmsgs) => {
-        $crate::__pgrx_c_generated::Field3581
+        $crate::__pgrx_c_generated::Field_ninvalmsgs
     };
     (nitem) => {
-        $crate::__pgrx_c_generated::Field3582
+        $crate::__pgrx_c_generated::Field_nitem
     };
     (nitems) => {
-        $crate::__pgrx_c_generated::Field3583
+        $crate::__pgrx_c_generated::Field_nitems
     };
     (nkeycolumns) => {
-        $crate::__pgrx_c_generated::Field3584
+        $crate::__pgrx_c_generated::Field_nkeycolumns
     };
     (nkeys) => {
-        $crate::__pgrx_c_generated::Field3585
+        $crate::__pgrx_c_generated::Field_nkeys
     };
     (nknown_attached_workers) => {
-        $crate::__pgrx_c_generated::Field3586
+        $crate::__pgrx_c_generated::Field_nknown_attached_workers
     };
     (nl_MatchedOuter) => {
-        $crate::__pgrx_c_generated::Field3587
+        $crate::__pgrx_c_generated::Field_nl_MatchedOuter
     };
     (nl_NeedNewOuter) => {
-        $crate::__pgrx_c_generated::Field3588
+        $crate::__pgrx_c_generated::Field_nl_NeedNewOuter
     };
     (nlist) => {
-        $crate::__pgrx_c_generated::Field3590
+        $crate::__pgrx_c_generated::Field_nlist
     };
     (nlocks) => {
-        $crate::__pgrx_c_generated::Field3591
+        $crate::__pgrx_c_generated::Field_nlocks
     };
     (nmatched_ec) => {
-        $crate::__pgrx_c_generated::Field3593
+        $crate::__pgrx_c_generated::Field_nmatched_ec
     };
     (nmatched_rcols) => {
-        $crate::__pgrx_c_generated::Field3594
+        $crate::__pgrx_c_generated::Field_nmatched_rcols
     };
     (nmatched_ri) => {
-        $crate::__pgrx_c_generated::Field3595
+        $crate::__pgrx_c_generated::Field_nmatched_ri
     };
     (nmaxitems) => {
-        $crate::__pgrx_c_generated::Field3596
+        $crate::__pgrx_c_generated::Field_nmaxitems
     };
     (nmembers) => {
-        $crate::__pgrx_c_generated::Field3597
+        $crate::__pgrx_c_generated::Field_nmembers
     };
     (nmsgs) => {
-        $crate::__pgrx_c_generated::Field3598
+        $crate::__pgrx_c_generated::Field_nmsgs
     };
     (nnames) => {
-        $crate::__pgrx_c_generated::Field3599
+        $crate::__pgrx_c_generated::Field_nnames
     };
     (nnconstraints) => {
-        $crate::__pgrx_c_generated::Field3600
+        $crate::__pgrx_c_generated::Field_nnconstraints
     };
     (nnewlpdead) => {
-        $crate::__pgrx_c_generated::Field3601
+        $crate::__pgrx_c_generated::Field_nnewlpdead
     };
     (nnumbers) => {
-        $crate::__pgrx_c_generated::Field3602
+        $crate::__pgrx_c_generated::Field_nnumbers
     };
     (noCount) => {
-        $crate::__pgrx_c_generated::Field3603
+        $crate::__pgrx_c_generated::Field_noCount
     };
     (noTransValue) => {
-        $crate::__pgrx_c_generated::Field3604
+        $crate::__pgrx_c_generated::Field_noTransValue
     };
     (nodeBlocknum) => {
-        $crate::__pgrx_c_generated::Field3606
+        $crate::__pgrx_c_generated::Field_nodeBlocknum
     };
     (nodeI) => {
-        $crate::__pgrx_c_generated::Field3610
+        $crate::__pgrx_c_generated::Field_nodeI
     };
     (nodeLabel) => {
-        $crate::__pgrx_c_generated::Field3611
+        $crate::__pgrx_c_generated::Field_nodeLabel
     };
     (nodeN) => {
-        $crate::__pgrx_c_generated::Field3613
+        $crate::__pgrx_c_generated::Field_nodeN
     };
     (node_id) => {
-        $crate::__pgrx_c_generated::Field3617
+        $crate::__pgrx_c_generated::Field_node_id
     };
     (node_size) => {
-        $crate::__pgrx_c_generated::Field3618
+        $crate::__pgrx_c_generated::Field_node_size
     };
     (nodeid) => {
-        $crate::__pgrx_c_generated::Field3619
+        $crate::__pgrx_c_generated::Field_nodeid
     };
     (noinherit) => {
-        $crate::__pgrx_c_generated::Field3620
+        $crate::__pgrx_c_generated::Field_noinherit
     };
     (nominalRelation) => {
-        $crate::__pgrx_c_generated::Field3621
+        $crate::__pgrx_c_generated::Field_nominalRelation
     };
     (nominalnargs) => {
-        $crate::__pgrx_c_generated::Field3622
+        $crate::__pgrx_c_generated::Field_nominalnargs
     };
     (non_unique_for_rels) => {
-        $crate::__pgrx_c_generated::Field3626
+        $crate::__pgrx_c_generated::Field_non_unique_for_rels
     };
     (nonblocking) => {
-        $crate::__pgrx_c_generated::Field3627
+        $crate::__pgrx_c_generated::Field_nonblocking
     };
     (norderbys) => {
-        $crate::__pgrx_c_generated::Field3629
+        $crate::__pgrx_c_generated::Field_norderbys
     };
     (notnull) => {
-        $crate::__pgrx_c_generated::Field3631
+        $crate::__pgrx_c_generated::Field_notnull
     };
     (nowait) => {
-        $crate::__pgrx_c_generated::Field3634
+        $crate::__pgrx_c_generated::Field_nowait
     };
     (npage) => {
-        $crate::__pgrx_c_generated::Field3635
+        $crate::__pgrx_c_generated::Field_npage
     };
     (nparticipants) => {
-        $crate::__pgrx_c_generated::Field3636
+        $crate::__pgrx_c_generated::Field_nparticipants
     };
     (nparts) => {
-        $crate::__pgrx_c_generated::Field3637
+        $crate::__pgrx_c_generated::Field_nparts
     };
     (npendingpages) => {
-        $crate::__pgrx_c_generated::Field3638
+        $crate::__pgrx_c_generated::Field_npendingpages
     };
     (npids) => {
-        $crate::__pgrx_c_generated::Field3639
+        $crate::__pgrx_c_generated::Field_npids
     };
     (nplans) => {
-        $crate::__pgrx_c_generated::Field3640
+        $crate::__pgrx_c_generated::Field_nplans
     };
     (npos) => {
-        $crate::__pgrx_c_generated::Field3641
+        $crate::__pgrx_c_generated::Field_npos
     };
     (nprocessed) => {
-        $crate::__pgrx_c_generated::Field3642
+        $crate::__pgrx_c_generated::Field_nprocessed
     };
     (nprocs) => {
-        $crate::__pgrx_c_generated::Field3643
+        $crate::__pgrx_c_generated::Field_nprocs
     };
     (npts) => {
-        $crate::__pgrx_c_generated::Field3644
+        $crate::__pgrx_c_generated::Field_npts
     };
     (nr_pending) => {
-        $crate::__pgrx_c_generated::Field3647
+        $crate::__pgrx_c_generated::Field_nr_pending
     };
     (nreaders) => {
-        $crate::__pgrx_c_generated::Field3648
+        $crate::__pgrx_c_generated::Field_nreaders
     };
     (nrelids) => {
-        $crate::__pgrx_c_generated::Field3649
+        $crate::__pgrx_c_generated::Field_nrelids
     };
     (nrels) => {
-        $crate::__pgrx_c_generated::Field3650
+        $crate::__pgrx_c_generated::Field_nrels
     };
     (nrequired) => {
-        $crate::__pgrx_c_generated::Field3651
+        $crate::__pgrx_c_generated::Field_nrequired
     };
     (ns_names) => {
-        $crate::__pgrx_c_generated::Field3653
+        $crate::__pgrx_c_generated::Field_ns_names
     };
     (ns_uris) => {
-        $crate::__pgrx_c_generated::Field3654
+        $crate::__pgrx_c_generated::Field_ns_uris
     };
     (nsearches) => {
-        $crate::__pgrx_c_generated::Field3655
+        $crate::__pgrx_c_generated::Field_nsearches
     };
     (nskipadvances) => {
-        $crate::__pgrx_c_generated::Field3656
+        $crate::__pgrx_c_generated::Field_nskipadvances
     };
     (nsn) => {
-        $crate::__pgrx_c_generated::Field3657
+        $crate::__pgrx_c_generated::Field_nsn
     };
     (nspowner) => {
-        $crate::__pgrx_c_generated::Field3659
+        $crate::__pgrx_c_generated::Field_nspowner
     };
     (nstatements) => {
-        $crate::__pgrx_c_generated::Field3660
+        $crate::__pgrx_c_generated::Field_nstatements
     };
     (nstats) => {
-        $crate::__pgrx_c_generated::Field3661
+        $crate::__pgrx_c_generated::Field_nstats
     };
     (nsubtxns) => {
-        $crate::__pgrx_c_generated::Field3662
+        $crate::__pgrx_c_generated::Field_nsubtxns
     };
     (nsubxacts) => {
-        $crate::__pgrx_c_generated::Field3663
+        $crate::__pgrx_c_generated::Field_nsubxacts
     };
     (ntablespaces) => {
-        $crate::__pgrx_c_generated::Field3664
+        $crate::__pgrx_c_generated::Field_ntablespaces
     };
     (ntargets) => {
-        $crate::__pgrx_c_generated::Field3665
+        $crate::__pgrx_c_generated::Field_ntargets
     };
     (ntids) => {
-        $crate::__pgrx_c_generated::Field3666
+        $crate::__pgrx_c_generated::Field_ntids
     };
     (ntodelete) => {
-        $crate::__pgrx_c_generated::Field3667
+        $crate::__pgrx_c_generated::Field_ntodelete
     };
     (ntoinsert) => {
-        $crate::__pgrx_c_generated::Field3668
+        $crate::__pgrx_c_generated::Field_ntoinsert
     };
     (ntuplecids) => {
-        $crate::__pgrx_c_generated::Field3669
+        $crate::__pgrx_c_generated::Field_ntuplecids
     };
     (ntuples) => {
-        $crate::__pgrx_c_generated::Field3670
+        $crate::__pgrx_c_generated::Field_ntuples
     };
     (ntuples2) => {
-        $crate::__pgrx_c_generated::Field3671
+        $crate::__pgrx_c_generated::Field_ntuples2
     };
     (ntups) => {
-        $crate::__pgrx_c_generated::Field3672
+        $crate::__pgrx_c_generated::Field_ntups
     };
     (null_elem) => {
-        $crate::__pgrx_c_generated::Field3673
+        $crate::__pgrx_c_generated::Field_null_elem
     };
     (null_index) => {
-        $crate::__pgrx_c_generated::Field3674
+        $crate::__pgrx_c_generated::Field_null_index
     };
     (null_lhs_isnull) => {
-        $crate::__pgrx_c_generated::Field3675
+        $crate::__pgrx_c_generated::Field_null_lhs_isnull
     };
     (null_lhs_result) => {
-        $crate::__pgrx_c_generated::Field3676
+        $crate::__pgrx_c_generated::Field_null_lhs_result
     };
     (null_print_len) => {
-        $crate::__pgrx_c_generated::Field3679
+        $crate::__pgrx_c_generated::Field_null_print_len
     };
     (nullable_partexprs) => {
-        $crate::__pgrx_c_generated::Field3680
+        $crate::__pgrx_c_generated::Field_nullable_partexprs
     };
     (nullflag) => {
-        $crate::__pgrx_c_generated::Field3682
+        $crate::__pgrx_c_generated::Field_nullflag
     };
     (nulls_first) => {
-        $crate::__pgrx_c_generated::Field3687
+        $crate::__pgrx_c_generated::Field_nulls_first
     };
     (nulls_not_distinct) => {
-        $crate::__pgrx_c_generated::Field3688
+        $crate::__pgrx_c_generated::Field_nulls_not_distinct
     };
     (nulls_ordering) => {
-        $crate::__pgrx_c_generated::Field3689
+        $crate::__pgrx_c_generated::Field_nulls_ordering
     };
     (nullsnotdistinct) => {
-        $crate::__pgrx_c_generated::Field3690
+        $crate::__pgrx_c_generated::Field_nullsnotdistinct
     };
     (nulltesttype) => {
-        $crate::__pgrx_c_generated::Field3692
+        $crate::__pgrx_c_generated::Field_nulltesttype
     };
     (num) => {
-        $crate::__pgrx_c_generated::Field3694
+        $crate::__pgrx_c_generated::Field_num
     };
     (numArrayKeys) => {
-        $crate::__pgrx_c_generated::Field3695
+        $crate::__pgrx_c_generated::Field_numArrayKeys
     };
     (numCols) => {
-        $crate::__pgrx_c_generated::Field3696
+        $crate::__pgrx_c_generated::Field_numCols
     };
     (numDistinctCols) => {
-        $crate::__pgrx_c_generated::Field3697
+        $crate::__pgrx_c_generated::Field_numDistinctCols
     };
     (numFinalArgs) => {
-        $crate::__pgrx_c_generated::Field3698
+        $crate::__pgrx_c_generated::Field_numFinalArgs
     };
     (numGroups) => {
-        $crate::__pgrx_c_generated::Field3699
+        $crate::__pgrx_c_generated::Field_numGroups
     };
     (numInputs) => {
-        $crate::__pgrx_c_generated::Field3702
+        $crate::__pgrx_c_generated::Field_numInputs
     };
     (numKeys) => {
-        $crate::__pgrx_c_generated::Field3703
+        $crate::__pgrx_c_generated::Field_numKeys
     };
     (numKilled) => {
-        $crate::__pgrx_c_generated::Field3704
+        $crate::__pgrx_c_generated::Field_numKilled
     };
     (numLockModes) => {
-        $crate::__pgrx_c_generated::Field3705
+        $crate::__pgrx_c_generated::Field_numLockModes
     };
     (numLockOwners) => {
-        $crate::__pgrx_c_generated::Field3706
+        $crate::__pgrx_c_generated::Field_numLockOwners
     };
     (numLocks) => {
-        $crate::__pgrx_c_generated::Field3707
+        $crate::__pgrx_c_generated::Field_numLocks
     };
     (numOrderedAggs) => {
-        $crate::__pgrx_c_generated::Field3708
+        $crate::__pgrx_c_generated::Field_numOrderedAggs
     };
     (numOutput) => {
-        $crate::__pgrx_c_generated::Field3709
+        $crate::__pgrx_c_generated::Field_numOutput
     };
     (numParams) => {
-        $crate::__pgrx_c_generated::Field3710
+        $crate::__pgrx_c_generated::Field_numParams
     };
     (numSortCols) => {
-        $crate::__pgrx_c_generated::Field3711
+        $crate::__pgrx_c_generated::Field_numSortCols
     };
     (numTransInputs) => {
-        $crate::__pgrx_c_generated::Field3712
+        $crate::__pgrx_c_generated::Field_numTransInputs
     };
     (numTuples) => {
-        $crate::__pgrx_c_generated::Field3713
+        $crate::__pgrx_c_generated::Field_numTuples
     };
     (numWindowFuncs) => {
-        $crate::__pgrx_c_generated::Field3714
+        $crate::__pgrx_c_generated::Field_numWindowFuncs
     };
     (num_base_rels) => {
-        $crate::__pgrx_c_generated::Field3715
+        $crate::__pgrx_c_generated::Field_num_base_rels
     };
     (num_batches) => {
-        $crate::__pgrx_c_generated::Field3716
+        $crate::__pgrx_c_generated::Field_num_batches
     };
     (num_callbacks) => {
-        $crate::__pgrx_c_generated::Field3717
+        $crate::__pgrx_c_generated::Field_num_callbacks
     };
     (num_check) => {
-        $crate::__pgrx_c_generated::Field3718
+        $crate::__pgrx_c_generated::Field_num_check
     };
     (num_child_cols) => {
-        $crate::__pgrx_c_generated::Field3719
+        $crate::__pgrx_c_generated::Field_num_child_cols
     };
     (num_custom_plans) => {
-        $crate::__pgrx_c_generated::Field3720
+        $crate::__pgrx_c_generated::Field_num_custom_plans
     };
     (num_defaults) => {
-        $crate::__pgrx_c_generated::Field3721
+        $crate::__pgrx_c_generated::Field_num_defaults
     };
     (num_defval) => {
-        $crate::__pgrx_c_generated::Field3722
+        $crate::__pgrx_c_generated::Field_num_defval
     };
     (num_elems) => {
-        $crate::__pgrx_c_generated::Field3723
+        $crate::__pgrx_c_generated::Field_num_elems
     };
     (num_errors) => {
-        $crate::__pgrx_c_generated::Field3724
+        $crate::__pgrx_c_generated::Field_num_errors
     };
     (num_generic_plans) => {
-        $crate::__pgrx_c_generated::Field3725
+        $crate::__pgrx_c_generated::Field_num_generic_plans
     };
     (num_groupby_pathkeys) => {
-        $crate::__pgrx_c_generated::Field3726
+        $crate::__pgrx_c_generated::Field_num_groupby_pathkeys
     };
     (num_hashes) => {
-        $crate::__pgrx_c_generated::Field3727
+        $crate::__pgrx_c_generated::Field_num_hashes
     };
     (num_items) => {
-        $crate::__pgrx_c_generated::Field3730
+        $crate::__pgrx_c_generated::Field_num_items
     };
     (num_keywords) => {
-        $crate::__pgrx_c_generated::Field3731
+        $crate::__pgrx_c_generated::Field_num_keywords
     };
     (num_locks) => {
-        $crate::__pgrx_c_generated::Field3732
+        $crate::__pgrx_c_generated::Field_num_locks
     };
     (num_mappings) => {
-        $crate::__pgrx_c_generated::Field3733
+        $crate::__pgrx_c_generated::Field_num_mappings
     };
     (num_pages) => {
-        $crate::__pgrx_c_generated::Field3734
+        $crate::__pgrx_c_generated::Field_num_pages
     };
     (num_params) => {
-        $crate::__pgrx_c_generated::Field3735
+        $crate::__pgrx_c_generated::Field_num_params
     };
     (num_partitions) => {
-        $crate::__pgrx_c_generated::Field3736
+        $crate::__pgrx_c_generated::Field_num_partitions
     };
     (num_partprunedata) => {
-        $crate::__pgrx_c_generated::Field3737
+        $crate::__pgrx_c_generated::Field_num_partprunedata
     };
     (num_partrelprunedata) => {
-        $crate::__pgrx_c_generated::Field3738
+        $crate::__pgrx_c_generated::Field_num_partrelprunedata
     };
     (num_performed) => {
-        $crate::__pgrx_c_generated::Field3739
+        $crate::__pgrx_c_generated::Field_num_performed
     };
     (num_requested) => {
-        $crate::__pgrx_c_generated::Field3740
+        $crate::__pgrx_c_generated::Field_num_requested
     };
     (num_slots) => {
-        $crate::__pgrx_c_generated::Field3742
+        $crate::__pgrx_c_generated::Field_num_slots
     };
     (num_staged_ios) => {
-        $crate::__pgrx_c_generated::Field3743
+        $crate::__pgrx_c_generated::Field_num_staged_ios
     };
     (num_sync) => {
-        $crate::__pgrx_c_generated::Field3744
+        $crate::__pgrx_c_generated::Field_num_sync
     };
     (num_timed) => {
-        $crate::__pgrx_c_generated::Field3745
+        $crate::__pgrx_c_generated::Field_num_timed
     };
     (num_waiters) => {
-        $crate::__pgrx_c_generated::Field3747
+        $crate::__pgrx_c_generated::Field_num_waiters
     };
     (num_workers) => {
-        $crate::__pgrx_c_generated::Field3748
+        $crate::__pgrx_c_generated::Field_num_workers
     };
     (numabbrevs) => {
-        $crate::__pgrx_c_generated::Field3749
+        $crate::__pgrx_c_generated::Field_numabbrevs
     };
     (numaggs) => {
-        $crate::__pgrx_c_generated::Field3750
+        $crate::__pgrx_c_generated::Field_numaggs
     };
     (numbatches) => {
-        $crate::__pgrx_c_generated::Field3751
+        $crate::__pgrx_c_generated::Field_numbatches
     };
     (number) => {
-        $crate::__pgrx_c_generated::Field3752
+        $crate::__pgrx_c_generated::Field_number
     };
     (numberOfKeys) => {
-        $crate::__pgrx_c_generated::Field3753
+        $crate::__pgrx_c_generated::Field_numberOfKeys
     };
     (numberOfNonNullOrderBys) => {
-        $crate::__pgrx_c_generated::Field3754
+        $crate::__pgrx_c_generated::Field_numberOfNonNullOrderBys
     };
     (numberOfOrderBys) => {
-        $crate::__pgrx_c_generated::Field3755
+        $crate::__pgrx_c_generated::Field_numberOfOrderBys
     };
     (number_of_keys) => {
-        $crate::__pgrx_c_generated::Field3756
+        $crate::__pgrx_c_generated::Field_number_of_keys
     };
     (numbuckets) => {
-        $crate::__pgrx_c_generated::Field3759
+        $crate::__pgrx_c_generated::Field_numbuckets
     };
     (numcalls) => {
-        $crate::__pgrx_c_generated::Field3760
+        $crate::__pgrx_c_generated::Field_numcalls
     };
     (numfuncs) => {
-        $crate::__pgrx_c_generated::Field3762
+        $crate::__pgrx_c_generated::Field_numfuncs
     };
     (numhashGrpCols) => {
-        $crate::__pgrx_c_generated::Field3763
+        $crate::__pgrx_c_generated::Field_numhashGrpCols
     };
     (numkeys) => {
-        $crate::__pgrx_c_generated::Field3764
+        $crate::__pgrx_c_generated::Field_numkeys
     };
     (numlower) => {
-        $crate::__pgrx_c_generated::Field3765
+        $crate::__pgrx_c_generated::Field_numlower
     };
     (numphases) => {
-        $crate::__pgrx_c_generated::Field3767
+        $crate::__pgrx_c_generated::Field_numphases
     };
     (numrows) => {
-        $crate::__pgrx_c_generated::Field3768
+        $crate::__pgrx_c_generated::Field_numrows
     };
     (numscans) => {
-        $crate::__pgrx_c_generated::Field3769
+        $crate::__pgrx_c_generated::Field_numscans
     };
     (numsets) => {
-        $crate::__pgrx_c_generated::Field3770
+        $crate::__pgrx_c_generated::Field_numsets
     };
     (numtrans) => {
-        $crate::__pgrx_c_generated::Field3771
+        $crate::__pgrx_c_generated::Field_numtrans
     };
     (numtriggers) => {
-        $crate::__pgrx_c_generated::Field3772
+        $crate::__pgrx_c_generated::Field_numtriggers
     };
     (numupper) => {
-        $crate::__pgrx_c_generated::Field3773
+        $crate::__pgrx_c_generated::Field_numupper
     };
     (numvals) => {
-        $crate::__pgrx_c_generated::Field3774
+        $crate::__pgrx_c_generated::Field_numvals
     };
     (nupdated) => {
-        $crate::__pgrx_c_generated::Field3776
+        $crate::__pgrx_c_generated::Field_nupdated
     };
     (nuserentries) => {
-        $crate::__pgrx_c_generated::Field3777
+        $crate::__pgrx_c_generated::Field_nuserentries
     };
     (nvalues) => {
-        $crate::__pgrx_c_generated::Field3778
+        $crate::__pgrx_c_generated::Field_nvalues
     };
     (nvargs) => {
-        $crate::__pgrx_c_generated::Field3779
+        $crate::__pgrx_c_generated::Field_nvargs
     };
     (nvariant) => {
-        $crate::__pgrx_c_generated::Field3780
+        $crate::__pgrx_c_generated::Field_nvariant
     };
     (nwords) => {
-        $crate::__pgrx_c_generated::Field3781
+        $crate::__pgrx_c_generated::Field_nwords
     };
     (nworkers) => {
-        $crate::__pgrx_c_generated::Field3782
+        $crate::__pgrx_c_generated::Field_nworkers
     };
     (nworkers_launched) => {
-        $crate::__pgrx_c_generated::Field3783
+        $crate::__pgrx_c_generated::Field_nworkers_launched
     };
     (nworkers_to_launch) => {
-        $crate::__pgrx_c_generated::Field3784
+        $crate::__pgrx_c_generated::Field_nworkers_to_launch
     };
     (objId) => {
-        $crate::__pgrx_c_generated::Field3785
+        $crate::__pgrx_c_generated::Field_objId
     };
     (objargs) => {
-        $crate::__pgrx_c_generated::Field3786
+        $crate::__pgrx_c_generated::Field_objargs
     };
     (object) => {
-        $crate::__pgrx_c_generated::Field3787
+        $crate::__pgrx_c_generated::Field_object
     };
     (objectId) => {
-        $crate::__pgrx_c_generated::Field3788
+        $crate::__pgrx_c_generated::Field_objectId
     };
     (objectSubId) => {
-        $crate::__pgrx_c_generated::Field3789
+        $crate::__pgrx_c_generated::Field_objectSubId
     };
     (objectType) => {
-        $crate::__pgrx_c_generated::Field3790
+        $crate::__pgrx_c_generated::Field_objectType
     };
     (objects) => {
-        $crate::__pgrx_c_generated::Field3791
+        $crate::__pgrx_c_generated::Field_objects
     };
     (objfuncargs) => {
-        $crate::__pgrx_c_generated::Field3792
+        $crate::__pgrx_c_generated::Field_objfuncargs
     };
     (objid) => {
-        $crate::__pgrx_c_generated::Field3793
+        $crate::__pgrx_c_generated::Field_objid
     };
     (objid_hi) => {
-        $crate::__pgrx_c_generated::Field3794
+        $crate::__pgrx_c_generated::Field_objid_hi
     };
     (objid_lo) => {
-        $crate::__pgrx_c_generated::Field3795
+        $crate::__pgrx_c_generated::Field_objid_lo
     };
     (objname) => {
-        $crate::__pgrx_c_generated::Field3796
+        $crate::__pgrx_c_generated::Field_objname
     };
     (objoid) => {
-        $crate::__pgrx_c_generated::Field3797
+        $crate::__pgrx_c_generated::Field_objoid
     };
     (objsubid) => {
-        $crate::__pgrx_c_generated::Field3798
+        $crate::__pgrx_c_generated::Field_objsubid
     };
     (objtype) => {
-        $crate::__pgrx_c_generated::Field3799
+        $crate::__pgrx_c_generated::Field_objtype
     };
     (off) => {
-        $crate::__pgrx_c_generated::Field3805
+        $crate::__pgrx_c_generated::Field_off
     };
     (offnum) => {
-        $crate::__pgrx_c_generated::Field3806
+        $crate::__pgrx_c_generated::Field_offnum
     };
     (offnumHeadLeaf) => {
-        $crate::__pgrx_c_generated::Field3807
+        $crate::__pgrx_c_generated::Field_offnumHeadLeaf
     };
     (offnumInner) => {
-        $crate::__pgrx_c_generated::Field3808
+        $crate::__pgrx_c_generated::Field_offnumInner
     };
     (offnumLeaf) => {
-        $crate::__pgrx_c_generated::Field3809
+        $crate::__pgrx_c_generated::Field_offnumLeaf
     };
     (offnumNew) => {
-        $crate::__pgrx_c_generated::Field3810
+        $crate::__pgrx_c_generated::Field_offnumNew
     };
     (offnumParent) => {
-        $crate::__pgrx_c_generated::Field3811
+        $crate::__pgrx_c_generated::Field_offnumParent
     };
     (offnumPostfix) => {
-        $crate::__pgrx_c_generated::Field3812
+        $crate::__pgrx_c_generated::Field_offnumPostfix
     };
     (offnumPrefix) => {
-        $crate::__pgrx_c_generated::Field3813
+        $crate::__pgrx_c_generated::Field_offnumPrefix
     };
     (offset) => {
-        $crate::__pgrx_c_generated::Field3814
+        $crate::__pgrx_c_generated::Field_offset
     };
     (offset_est) => {
-        $crate::__pgrx_c_generated::Field3815
+        $crate::__pgrx_c_generated::Field_offset_est
     };
     (oi_nstored) => {
-        $crate::__pgrx_c_generated::Field3817
+        $crate::__pgrx_c_generated::Field_oi_nstored
     };
     (oi_regular_nulls) => {
-        $crate::__pgrx_c_generated::Field3819
+        $crate::__pgrx_c_generated::Field_oi_regular_nulls
     };
     (oi_typcache) => {
-        $crate::__pgrx_c_generated::Field3820
+        $crate::__pgrx_c_generated::Field_oi_typcache
     };
     (oid) => {
-        $crate::__pgrx_c_generated::Field3821
+        $crate::__pgrx_c_generated::Field_oid
     };
     (oidCount) => {
-        $crate::__pgrx_c_generated::Field3822
+        $crate::__pgrx_c_generated::Field_oidCount
     };
     (oid_value) => {
-        $crate::__pgrx_c_generated::Field3823
+        $crate::__pgrx_c_generated::Field_oid_value
     };
     (ojrelid) => {
-        $crate::__pgrx_c_generated::Field3825
+        $crate::__pgrx_c_generated::Field_ojrelid
     };
     (oldCreateSubid) => {
-        $crate::__pgrx_c_generated::Field3826
+        $crate::__pgrx_c_generated::Field_oldCreateSubid
     };
     (oldFirstRelfilelocatorSubid) => {
-        $crate::__pgrx_c_generated::Field3827
+        $crate::__pgrx_c_generated::Field_oldFirstRelfilelocatorSubid
     };
     (oldNumber) => {
-        $crate::__pgrx_c_generated::Field3828
+        $crate::__pgrx_c_generated::Field_oldNumber
     };
     (oldOffnum) => {
-        $crate::__pgrx_c_generated::Field3829
+        $crate::__pgrx_c_generated::Field_oldOffnum
     };
     (old_batches) => {
-        $crate::__pgrx_c_generated::Field3831
+        $crate::__pgrx_c_generated::Field_old_batches
     };
     (old_bucket_flag) => {
-        $crate::__pgrx_c_generated::Field3832
+        $crate::__pgrx_c_generated::Field_old_bucket_flag
     };
     (old_conpfeqop) => {
-        $crate::__pgrx_c_generated::Field3833
+        $crate::__pgrx_c_generated::Field_old_conpfeqop
     };
     (old_infobits_set) => {
-        $crate::__pgrx_c_generated::Field3834
+        $crate::__pgrx_c_generated::Field_old_infobits_set
     };
     (old_nbatch) => {
-        $crate::__pgrx_c_generated::Field3836
+        $crate::__pgrx_c_generated::Field_old_nbatch
     };
     (old_ntuples) => {
-        $crate::__pgrx_c_generated::Field3837
+        $crate::__pgrx_c_generated::Field_old_ntuples
     };
     (old_offnum) => {
-        $crate::__pgrx_c_generated::Field3838
+        $crate::__pgrx_c_generated::Field_old_offnum
     };
     (old_pktable_oid) => {
-        $crate::__pgrx_c_generated::Field3839
+        $crate::__pgrx_c_generated::Field_old_pktable_oid
     };
     (old_varno) => {
-        $crate::__pgrx_c_generated::Field3841
+        $crate::__pgrx_c_generated::Field_old_varno
     };
     (old_xmax) => {
-        $crate::__pgrx_c_generated::Field3842
+        $crate::__pgrx_c_generated::Field_old_xmax
     };
     (oldestActiveXid) => {
-        $crate::__pgrx_c_generated::Field3843
+        $crate::__pgrx_c_generated::Field_oldestActiveXid
     };
     (oldestClogXid) => {
-        $crate::__pgrx_c_generated::Field3844
+        $crate::__pgrx_c_generated::Field_oldestClogXid
     };
     (oldestCommitTsXid) => {
-        $crate::__pgrx_c_generated::Field3845
+        $crate::__pgrx_c_generated::Field_oldestCommitTsXid
     };
     (oldestDatabaseRunningXid) => {
-        $crate::__pgrx_c_generated::Field3846
+        $crate::__pgrx_c_generated::Field_oldestDatabaseRunningXid
     };
     (oldestMulti) => {
-        $crate::__pgrx_c_generated::Field3847
+        $crate::__pgrx_c_generated::Field_oldestMulti
     };
     (oldestMultiDB) => {
-        $crate::__pgrx_c_generated::Field3848
+        $crate::__pgrx_c_generated::Field_oldestMultiDB
     };
     (oldestRunningXid) => {
-        $crate::__pgrx_c_generated::Field3849
+        $crate::__pgrx_c_generated::Field_oldestRunningXid
     };
     (oldestXact) => {
-        $crate::__pgrx_c_generated::Field3850
+        $crate::__pgrx_c_generated::Field_oldestXact
     };
     (oldestXactDb) => {
-        $crate::__pgrx_c_generated::Field3851
+        $crate::__pgrx_c_generated::Field_oldestXactDb
     };
     (oldestXid) => {
-        $crate::__pgrx_c_generated::Field3852
+        $crate::__pgrx_c_generated::Field_oldestXid
     };
     (oldestXidDB) => {
-        $crate::__pgrx_c_generated::Field3853
+        $crate::__pgrx_c_generated::Field_oldestXidDB
     };
     (oldstyle) => {
-        $crate::__pgrx_c_generated::Field3854
+        $crate::__pgrx_c_generated::Field_oldstyle
     };
     (omit_quotes) => {
-        $crate::__pgrx_c_generated::Field3856
+        $crate::__pgrx_c_generated::Field_omit_quotes
     };
     (onCommit) => {
-        $crate::__pgrx_c_generated::Field3857
+        $crate::__pgrx_c_generated::Field_onCommit
     };
     (onConflictAction) => {
-        $crate::__pgrx_c_generated::Field3859
+        $crate::__pgrx_c_generated::Field_onConflictAction
     };
     (onConflictCols) => {
-        $crate::__pgrx_c_generated::Field3861
+        $crate::__pgrx_c_generated::Field_onConflictCols
     };
     (onConflictSet) => {
-        $crate::__pgrx_c_generated::Field3862
+        $crate::__pgrx_c_generated::Field_onConflictSet
     };
     (on_error) => {
-        $crate::__pgrx_c_generated::Field3865
+        $crate::__pgrx_c_generated::Field_on_error
     };
     (oncommit) => {
-        $crate::__pgrx_c_generated::Field3866
+        $crate::__pgrx_c_generated::Field_oncommit
     };
     (oneCol) => {
-        $crate::__pgrx_c_generated::Field3868
+        $crate::__pgrx_c_generated::Field_oneCol
     };
     (oneshot) => {
-        $crate::__pgrx_c_generated::Field3869
+        $crate::__pgrx_c_generated::Field_oneshot
     };
     (op) => {
-        $crate::__pgrx_c_generated::Field3871
+        $crate::__pgrx_c_generated::Field_op
     };
     (opcdefault) => {
-        $crate::__pgrx_c_generated::Field3874
+        $crate::__pgrx_c_generated::Field_opcdefault
     };
     (opcfamily) => {
-        $crate::__pgrx_c_generated::Field3875
+        $crate::__pgrx_c_generated::Field_opcfamily
     };
     (opcintype) => {
-        $crate::__pgrx_c_generated::Field3876
+        $crate::__pgrx_c_generated::Field_opcintype
     };
     (opckeytype) => {
-        $crate::__pgrx_c_generated::Field3877
+        $crate::__pgrx_c_generated::Field_opckeytype
     };
     (opclass) => {
-        $crate::__pgrx_c_generated::Field3878
+        $crate::__pgrx_c_generated::Field_opclass
     };
     (opclassname) => {
-        $crate::__pgrx_c_generated::Field3879
+        $crate::__pgrx_c_generated::Field_opclassname
     };
     (opclassopts) => {
-        $crate::__pgrx_c_generated::Field3881
+        $crate::__pgrx_c_generated::Field_opclassopts
     };
     (opcmethod) => {
-        $crate::__pgrx_c_generated::Field3882
+        $crate::__pgrx_c_generated::Field_opcmethod
     };
     (opcnamespace) => {
-        $crate::__pgrx_c_generated::Field3884
+        $crate::__pgrx_c_generated::Field_opcnamespace
     };
     (opcode) => {
-        $crate::__pgrx_c_generated::Field3885
+        $crate::__pgrx_c_generated::Field_opcode
     };
     (opcollid) => {
-        $crate::__pgrx_c_generated::Field3886
+        $crate::__pgrx_c_generated::Field_opcollid
     };
     (opcowner) => {
-        $crate::__pgrx_c_generated::Field3887
+        $crate::__pgrx_c_generated::Field_opcowner
     };
     (oper) => {
-        $crate::__pgrx_c_generated::Field3888
+        $crate::__pgrx_c_generated::Field_oper
     };
     (operName) => {
-        $crate::__pgrx_c_generated::Field3889
+        $crate::__pgrx_c_generated::Field_operName
     };
     (operation) => {
-        $crate::__pgrx_c_generated::Field3890
+        $crate::__pgrx_c_generated::Field_operation
     };
     (operatorset) => {
-        $crate::__pgrx_c_generated::Field3892
+        $crate::__pgrx_c_generated::Field_operatorset
     };
     (opfamilies) => {
-        $crate::__pgrx_c_generated::Field3895
+        $crate::__pgrx_c_generated::Field_opfamilies
     };
     (opfamily) => {
-        $crate::__pgrx_c_generated::Field3896
+        $crate::__pgrx_c_generated::Field_opfamily
     };
     (opfamily_id) => {
-        $crate::__pgrx_c_generated::Field3897
+        $crate::__pgrx_c_generated::Field_opfamily_id
     };
     (opfamilyname) => {
-        $crate::__pgrx_c_generated::Field3898
+        $crate::__pgrx_c_generated::Field_opfamilyname
     };
     (opfmethod) => {
-        $crate::__pgrx_c_generated::Field3899
+        $crate::__pgrx_c_generated::Field_opfmethod
     };
     (opfnamespace) => {
-        $crate::__pgrx_c_generated::Field3901
+        $crate::__pgrx_c_generated::Field_opfnamespace
     };
     (opfowner) => {
-        $crate::__pgrx_c_generated::Field3902
+        $crate::__pgrx_c_generated::Field_opfowner
     };
     (opfuncid) => {
-        $crate::__pgrx_c_generated::Field3903
+        $crate::__pgrx_c_generated::Field_opfuncid
     };
     (oplefttype) => {
-        $crate::__pgrx_c_generated::Field3904
+        $crate::__pgrx_c_generated::Field_oplefttype
     };
     (opno) => {
-        $crate::__pgrx_c_generated::Field3905
+        $crate::__pgrx_c_generated::Field_opno
     };
     (opnos) => {
-        $crate::__pgrx_c_generated::Field3906
+        $crate::__pgrx_c_generated::Field_opnos
     };
     (oppositeDirCheck) => {
-        $crate::__pgrx_c_generated::Field3907
+        $crate::__pgrx_c_generated::Field_oppositeDirCheck
     };
     (oprcanhash) => {
-        $crate::__pgrx_c_generated::Field3908
+        $crate::__pgrx_c_generated::Field_oprcanhash
     };
     (oprcanmerge) => {
-        $crate::__pgrx_c_generated::Field3909
+        $crate::__pgrx_c_generated::Field_oprcanmerge
     };
     (oprcode) => {
-        $crate::__pgrx_c_generated::Field3910
+        $crate::__pgrx_c_generated::Field_oprcode
     };
     (oprcom) => {
-        $crate::__pgrx_c_generated::Field3911
+        $crate::__pgrx_c_generated::Field_oprcom
     };
     (opresulttype) => {
-        $crate::__pgrx_c_generated::Field3912
+        $crate::__pgrx_c_generated::Field_opresulttype
     };
     (opretset) => {
-        $crate::__pgrx_c_generated::Field3913
+        $crate::__pgrx_c_generated::Field_opretset
     };
     (oprighttype) => {
-        $crate::__pgrx_c_generated::Field3914
+        $crate::__pgrx_c_generated::Field_oprighttype
     };
     (oprjoin) => {
-        $crate::__pgrx_c_generated::Field3915
+        $crate::__pgrx_c_generated::Field_oprjoin
     };
     (oprkind) => {
-        $crate::__pgrx_c_generated::Field3916
+        $crate::__pgrx_c_generated::Field_oprkind
     };
     (oprleft) => {
-        $crate::__pgrx_c_generated::Field3917
+        $crate::__pgrx_c_generated::Field_oprleft
     };
     (oprnamespace) => {
-        $crate::__pgrx_c_generated::Field3919
+        $crate::__pgrx_c_generated::Field_oprnamespace
     };
     (oprnegate) => {
-        $crate::__pgrx_c_generated::Field3920
+        $crate::__pgrx_c_generated::Field_oprnegate
     };
     (oprowner) => {
-        $crate::__pgrx_c_generated::Field3921
+        $crate::__pgrx_c_generated::Field_oprowner
     };
     (oprrest) => {
-        $crate::__pgrx_c_generated::Field3922
+        $crate::__pgrx_c_generated::Field_oprrest
     };
     (oprresult) => {
-        $crate::__pgrx_c_generated::Field3923
+        $crate::__pgrx_c_generated::Field_oprresult
     };
     (oprright) => {
-        $crate::__pgrx_c_generated::Field3924
+        $crate::__pgrx_c_generated::Field_oprright
     };
     (opstrategy) => {
-        $crate::__pgrx_c_generated::Field3925
+        $crate::__pgrx_c_generated::Field_opstrategy
     };
     (opt) => {
-        $crate::__pgrx_c_generated::Field3926
+        $crate::__pgrx_c_generated::Field_opt
     };
     (opt_type) => {
-        $crate::__pgrx_c_generated::Field3927
+        $crate::__pgrx_c_generated::Field_opt_type
     };
     (option) => {
-        $crate::__pgrx_c_generated::Field3929
+        $crate::__pgrx_c_generated::Field_option
     };
     (options) => {
-        $crate::__pgrx_c_generated::Field3930
+        $crate::__pgrx_c_generated::Field_options
     };
     (opttype) => {
-        $crate::__pgrx_c_generated::Field3933
+        $crate::__pgrx_c_generated::Field_opttype
     };
     (ordNumCols) => {
-        $crate::__pgrx_c_generated::Field3938
+        $crate::__pgrx_c_generated::Field_ordNumCols
     };
     (order) => {
-        $crate::__pgrx_c_generated::Field3940
+        $crate::__pgrx_c_generated::Field_order
     };
     (orderClause) => {
-        $crate::__pgrx_c_generated::Field3943
+        $crate::__pgrx_c_generated::Field_orderClause
     };
     (order_family) => {
-        $crate::__pgrx_c_generated::Field3945
+        $crate::__pgrx_c_generated::Field_order_family
     };
     (ordered) => {
-        $crate::__pgrx_c_generated::Field3947
+        $crate::__pgrx_c_generated::Field_ordered
     };
     (ordering) => {
-        $crate::__pgrx_c_generated::Field3948
+        $crate::__pgrx_c_generated::Field_ordering
     };
     (ordinal) => {
-        $crate::__pgrx_c_generated::Field3949
+        $crate::__pgrx_c_generated::Field_ordinal
     };
     (ordinality) => {
-        $crate::__pgrx_c_generated::Field3950
+        $crate::__pgrx_c_generated::Field_ordinality
     };
     (ordinalitycol) => {
-        $crate::__pgrx_c_generated::Field3951
+        $crate::__pgrx_c_generated::Field_ordinalitycol
     };
     (origin) => {
-        $crate::__pgrx_c_generated::Field3954
+        $crate::__pgrx_c_generated::Field_origin
     };
     (origin_id) => {
-        $crate::__pgrx_c_generated::Field3955
+        $crate::__pgrx_c_generated::Field_origin_id
     };
     (origin_lsn) => {
-        $crate::__pgrx_c_generated::Field3956
+        $crate::__pgrx_c_generated::Field_origin_lsn
     };
     (origin_timestamp) => {
-        $crate::__pgrx_c_generated::Field3957
+        $crate::__pgrx_c_generated::Field_origin_timestamp
     };
     (origleaf) => {
-        $crate::__pgrx_c_generated::Field3958
+        $crate::__pgrx_c_generated::Field_origleaf
     };
     (orignsn) => {
-        $crate::__pgrx_c_generated::Field3959
+        $crate::__pgrx_c_generated::Field_orignsn
     };
     (origptr) => {
-        $crate::__pgrx_c_generated::Field3960
+        $crate::__pgrx_c_generated::Field_origptr
     };
     (origrlink) => {
-        $crate::__pgrx_c_generated::Field3961
+        $crate::__pgrx_c_generated::Field_origrlink
     };
     (origslot) => {
-        $crate::__pgrx_c_generated::Field3962
+        $crate::__pgrx_c_generated::Field_origslot
     };
     (out_param_varno) => {
-        $crate::__pgrx_c_generated::Field3968
+        $crate::__pgrx_c_generated::Field_out_param_varno
     };
     (outargs) => {
-        $crate::__pgrx_c_generated::Field3969
+        $crate::__pgrx_c_generated::Field_outargs
     };
     (outbufsize) => {
-        $crate::__pgrx_c_generated::Field3971
+        $crate::__pgrx_c_generated::Field_outbufsize
     };
     (outerNodeDone) => {
-        $crate::__pgrx_c_generated::Field3975
+        $crate::__pgrx_c_generated::Field_outerNodeDone
     };
     (outer_eof) => {
-        $crate::__pgrx_c_generated::Field3976
+        $crate::__pgrx_c_generated::Field_outer_eof
     };
     (outer_is_left) => {
-        $crate::__pgrx_c_generated::Field3977
+        $crate::__pgrx_c_generated::Field_outer_is_left
     };
     (outer_presorted_keys) => {
-        $crate::__pgrx_c_generated::Field3981
+        $crate::__pgrx_c_generated::Field_outer_presorted_keys
     };
     (outer_processed) => {
-        $crate::__pgrx_c_generated::Field3982
+        $crate::__pgrx_c_generated::Field_outer_processed
     };
     (outer_result) => {
-        $crate::__pgrx_c_generated::Field3984
+        $crate::__pgrx_c_generated::Field_outer_result
     };
     (outeropsfixed) => {
-        $crate::__pgrx_c_generated::Field3992
+        $crate::__pgrx_c_generated::Field_outeropsfixed
     };
     (outeropsset) => {
-        $crate::__pgrx_c_generated::Field3993
+        $crate::__pgrx_c_generated::Field_outeropsset
     };
     (outersortkeys) => {
-        $crate::__pgrx_c_generated::Field3995
+        $crate::__pgrx_c_generated::Field_outersortkeys
     };
     (outfuncid) => {
-        $crate::__pgrx_c_generated::Field3996
+        $crate::__pgrx_c_generated::Field_outfuncid
     };
     (output_plugin_options) => {
-        $crate::__pgrx_c_generated::Field3999
+        $crate::__pgrx_c_generated::Field_output_plugin_options
     };
     (output_rewrites) => {
-        $crate::__pgrx_c_generated::Field4001
+        $crate::__pgrx_c_generated::Field_output_rewrites
     };
     (output_to_client) => {
-        $crate::__pgrx_c_generated::Field4002
+        $crate::__pgrx_c_generated::Field_output_to_client
     };
     (output_to_server) => {
-        $crate::__pgrx_c_generated::Field4003
+        $crate::__pgrx_c_generated::Field_output_to_server
     };
     (output_type) => {
-        $crate::__pgrx_c_generated::Field4004
+        $crate::__pgrx_c_generated::Field_output_type
     };
     (outputtype) => {
-        $crate::__pgrx_c_generated::Field4006
+        $crate::__pgrx_c_generated::Field_outputtype
     };
     (overflowed) => {
-        $crate::__pgrx_c_generated::Field4009
+        $crate::__pgrx_c_generated::Field_overflowed
     };
     (override) => {
-        $crate::__pgrx_c_generated::Field4010
+        $crate::__pgrx_c_generated::Field_override
     };
     (r#override) => {
-        $crate::__pgrx_c_generated::Field4010
+        $crate::__pgrx_c_generated::Field_override
     };
     (oversized) => {
-        $crate::__pgrx_c_generated::Field4011
+        $crate::__pgrx_c_generated::Field_oversized
     };
     (overwrite_time) => {
-        $crate::__pgrx_c_generated::Field4012
+        $crate::__pgrx_c_generated::Field_overwrite_time
     };
     (overwrittenRecPtr) => {
-        $crate::__pgrx_c_generated::Field4013
+        $crate::__pgrx_c_generated::Field_overwrittenRecPtr
     };
     (overwritten_lsn) => {
-        $crate::__pgrx_c_generated::Field4014
+        $crate::__pgrx_c_generated::Field_overwritten_lsn
     };
     (owner) => {
-        $crate::__pgrx_c_generated::Field4015
+        $crate::__pgrx_c_generated::Field_owner
     };
     (ownerId) => {
-        $crate::__pgrx_c_generated::Field4016
+        $crate::__pgrx_c_generated::Field_ownerId
     };
     (owner_pid) => {
-        $crate::__pgrx_c_generated::Field4017
+        $crate::__pgrx_c_generated::Field_owner_pid
     };
     (owner_procno) => {
-        $crate::__pgrx_c_generated::Field4018
+        $crate::__pgrx_c_generated::Field_owner_procno
     };
     (ownersuperuser) => {
-        $crate::__pgrx_c_generated::Field4019
+        $crate::__pgrx_c_generated::Field_ownersuperuser
     };
     (p_cols_visible) => {
-        $crate::__pgrx_c_generated::Field4023
+        $crate::__pgrx_c_generated::Field_p_cols_visible
     };
     (p_cs_precedes) => {
-        $crate::__pgrx_c_generated::Field4024
+        $crate::__pgrx_c_generated::Field_p_cs_precedes
     };
     (p_ctenamespace) => {
-        $crate::__pgrx_c_generated::Field4025
+        $crate::__pgrx_c_generated::Field_p_ctenamespace
     };
     (p_dontexpand) => {
-        $crate::__pgrx_c_generated::Field4026
+        $crate::__pgrx_c_generated::Field_p_dontexpand
     };
     (p_expr_kind) => {
-        $crate::__pgrx_c_generated::Field4027
+        $crate::__pgrx_c_generated::Field_p_expr_kind
     };
     (p_future_ctes) => {
-        $crate::__pgrx_c_generated::Field4028
+        $crate::__pgrx_c_generated::Field_p_future_ctes
     };
     (p_hasAggs) => {
-        $crate::__pgrx_c_generated::Field4030
+        $crate::__pgrx_c_generated::Field_p_hasAggs
     };
     (p_hasModifyingCTE) => {
-        $crate::__pgrx_c_generated::Field4031
+        $crate::__pgrx_c_generated::Field_p_hasModifyingCTE
     };
     (p_hasSubLinks) => {
-        $crate::__pgrx_c_generated::Field4032
+        $crate::__pgrx_c_generated::Field_p_hasSubLinks
     };
     (p_hasTargetSRFs) => {
-        $crate::__pgrx_c_generated::Field4033
+        $crate::__pgrx_c_generated::Field_p_hasTargetSRFs
     };
     (p_hasWindowFuncs) => {
-        $crate::__pgrx_c_generated::Field4034
+        $crate::__pgrx_c_generated::Field_p_hasWindowFuncs
     };
     (p_is_insert) => {
-        $crate::__pgrx_c_generated::Field4035
+        $crate::__pgrx_c_generated::Field_p_is_insert
     };
     (p_joinexprs) => {
-        $crate::__pgrx_c_generated::Field4036
+        $crate::__pgrx_c_generated::Field_p_joinexprs
     };
     (p_joinlist) => {
-        $crate::__pgrx_c_generated::Field4037
+        $crate::__pgrx_c_generated::Field_p_joinlist
     };
     (p_lateral_active) => {
-        $crate::__pgrx_c_generated::Field4039
+        $crate::__pgrx_c_generated::Field_p_lateral_active
     };
     (p_lateral_ok) => {
-        $crate::__pgrx_c_generated::Field4040
+        $crate::__pgrx_c_generated::Field_p_lateral_ok
     };
     (p_lateral_only) => {
-        $crate::__pgrx_c_generated::Field4041
+        $crate::__pgrx_c_generated::Field_p_lateral_only
     };
     (p_locked_from_parent) => {
-        $crate::__pgrx_c_generated::Field4042
+        $crate::__pgrx_c_generated::Field_p_locked_from_parent
     };
     (p_locking_clause) => {
-        $crate::__pgrx_c_generated::Field4043
+        $crate::__pgrx_c_generated::Field_p_locking_clause
     };
     (p_multiassign_exprs) => {
-        $crate::__pgrx_c_generated::Field4044
+        $crate::__pgrx_c_generated::Field_p_multiassign_exprs
     };
     (p_namespace) => {
-        $crate::__pgrx_c_generated::Field4047
+        $crate::__pgrx_c_generated::Field_p_namespace
     };
     (p_next_resno) => {
-        $crate::__pgrx_c_generated::Field4048
+        $crate::__pgrx_c_generated::Field_p_next_resno
     };
     (p_nullingrels) => {
-        $crate::__pgrx_c_generated::Field4050
+        $crate::__pgrx_c_generated::Field_p_nullingrels
     };
     (p_rel_visible) => {
-        $crate::__pgrx_c_generated::Field4059
+        $crate::__pgrx_c_generated::Field_p_rel_visible
     };
     (p_resolve_unknowns) => {
-        $crate::__pgrx_c_generated::Field4060
+        $crate::__pgrx_c_generated::Field_p_resolve_unknowns
     };
     (p_returning_type) => {
-        $crate::__pgrx_c_generated::Field4061
+        $crate::__pgrx_c_generated::Field_p_returning_type
     };
     (p_rtable) => {
-        $crate::__pgrx_c_generated::Field4062
+        $crate::__pgrx_c_generated::Field_p_rtable
     };
     (p_rteperminfos) => {
-        $crate::__pgrx_c_generated::Field4064
+        $crate::__pgrx_c_generated::Field_p_rteperminfos
     };
     (p_rtindex) => {
-        $crate::__pgrx_c_generated::Field4065
+        $crate::__pgrx_c_generated::Field_p_rtindex
     };
     (p_sep_by_space) => {
-        $crate::__pgrx_c_generated::Field4066
+        $crate::__pgrx_c_generated::Field_p_sep_by_space
     };
     (p_sign_posn) => {
-        $crate::__pgrx_c_generated::Field4067
+        $crate::__pgrx_c_generated::Field_p_sign_posn
     };
     (p_varattno) => {
-        $crate::__pgrx_c_generated::Field4071
+        $crate::__pgrx_c_generated::Field_p_varattno
     };
     (p_varattnosyn) => {
-        $crate::__pgrx_c_generated::Field4072
+        $crate::__pgrx_c_generated::Field_p_varattnosyn
     };
     (p_varcollid) => {
-        $crate::__pgrx_c_generated::Field4073
+        $crate::__pgrx_c_generated::Field_p_varcollid
     };
     (p_varno) => {
-        $crate::__pgrx_c_generated::Field4074
+        $crate::__pgrx_c_generated::Field_p_varno
     };
     (p_varnosyn) => {
-        $crate::__pgrx_c_generated::Field4075
+        $crate::__pgrx_c_generated::Field_p_varnosyn
     };
     (p_varreturningtype) => {
-        $crate::__pgrx_c_generated::Field4076
+        $crate::__pgrx_c_generated::Field_p_varreturningtype
     };
     (p_vartype) => {
-        $crate::__pgrx_c_generated::Field4077
+        $crate::__pgrx_c_generated::Field_p_vartype
     };
     (p_vartypmod) => {
-        $crate::__pgrx_c_generated::Field4078
+        $crate::__pgrx_c_generated::Field_p_vartypmod
     };
     (p_windowdefs) => {
-        $crate::__pgrx_c_generated::Field4079
+        $crate::__pgrx_c_generated::Field_p_windowdefs
     };
     (page) => {
-        $crate::__pgrx_c_generated::Field4081
+        $crate::__pgrx_c_generated::Field_page
     };
     (pageBlocknum) => {
-        $crate::__pgrx_c_generated::Field4082
+        $crate::__pgrx_c_generated::Field_pageBlocknum
     };
     (pageno) => {
-        $crate::__pgrx_c_generated::Field4093
+        $crate::__pgrx_c_generated::Field_pageno
     };
     (pages) => {
-        $crate::__pgrx_c_generated::Field4094
+        $crate::__pgrx_c_generated::Field_pages
     };
     (pagesPerBuffer) => {
-        $crate::__pgrx_c_generated::Field4095
+        $crate::__pgrx_c_generated::Field_pagesPerBuffer
     };
     (pagesPerRange) => {
-        $crate::__pgrx_c_generated::Field4096
+        $crate::__pgrx_c_generated::Field_pagesPerRange
     };
     (pages_deleted) => {
-        $crate::__pgrx_c_generated::Field4097
+        $crate::__pgrx_c_generated::Field_pages_deleted
     };
     (pages_free) => {
-        $crate::__pgrx_c_generated::Field4098
+        $crate::__pgrx_c_generated::Field_pages_free
     };
     (pages_newly_deleted) => {
-        $crate::__pgrx_c_generated::Field4099
+        $crate::__pgrx_c_generated::Field_pages_newly_deleted
     };
     (parParam) => {
-        $crate::__pgrx_c_generated::Field4101
+        $crate::__pgrx_c_generated::Field_parParam
     };
     (parallelModeNeeded) => {
-        $crate::__pgrx_c_generated::Field4102
+        $crate::__pgrx_c_generated::Field_parallelModeNeeded
     };
     (parallelModeOK) => {
-        $crate::__pgrx_c_generated::Field4103
+        $crate::__pgrx_c_generated::Field_parallelModeOK
     };
     (parallel_apply) => {
-        $crate::__pgrx_c_generated::Field4104
+        $crate::__pgrx_c_generated::Field_parallel_apply
     };
     (parallel_aware) => {
-        $crate::__pgrx_c_generated::Field4105
+        $crate::__pgrx_c_generated::Field_parallel_aware
     };
     (parallel_safe) => {
-        $crate::__pgrx_c_generated::Field4106
+        $crate::__pgrx_c_generated::Field_parallel_safe
     };
     (parallel_state) => {
-        $crate::__pgrx_c_generated::Field4108
+        $crate::__pgrx_c_generated::Field_parallel_state
     };
     (parallel_workers) => {
-        $crate::__pgrx_c_generated::Field4109
+        $crate::__pgrx_c_generated::Field_parallel_workers
     };
     (parallel_workers_launched) => {
-        $crate::__pgrx_c_generated::Field4110
+        $crate::__pgrx_c_generated::Field_parallel_workers_launched
     };
     (parallel_workers_to_launch) => {
-        $crate::__pgrx_c_generated::Field4111
+        $crate::__pgrx_c_generated::Field_parallel_workers_to_launch
     };
     (paramExecTypes) => {
-        $crate::__pgrx_c_generated::Field4118
+        $crate::__pgrx_c_generated::Field_paramExecTypes
     };
     (paramId) => {
-        $crate::__pgrx_c_generated::Field4121
+        $crate::__pgrx_c_generated::Field_paramId
     };
     (paramIds) => {
-        $crate::__pgrx_c_generated::Field4122
+        $crate::__pgrx_c_generated::Field_paramIds
     };
     (param_exec) => {
-        $crate::__pgrx_c_generated::Field4125
+        $crate::__pgrx_c_generated::Field_param_exec
     };
     (param_exprs) => {
-        $crate::__pgrx_c_generated::Field4126
+        $crate::__pgrx_c_generated::Field_param_exprs
     };
     (param_info) => {
-        $crate::__pgrx_c_generated::Field4127
+        $crate::__pgrx_c_generated::Field_param_info
     };
     (paramcollid) => {
-        $crate::__pgrx_c_generated::Field4132
+        $crate::__pgrx_c_generated::Field_paramcollid
     };
     (parameterTypes) => {
-        $crate::__pgrx_c_generated::Field4133
+        $crate::__pgrx_c_generated::Field_parameterTypes
     };
     (parameters) => {
-        $crate::__pgrx_c_generated::Field4134
+        $crate::__pgrx_c_generated::Field_parameters
     };
     (paramid) => {
-        $crate::__pgrx_c_generated::Field4136
+        $crate::__pgrx_c_generated::Field_paramid
     };
     (paramkind) => {
-        $crate::__pgrx_c_generated::Field4137
+        $crate::__pgrx_c_generated::Field_paramkind
     };
     (paramno) => {
-        $crate::__pgrx_c_generated::Field4138
+        $crate::__pgrx_c_generated::Field_paramno
     };
     (params) => {
-        $crate::__pgrx_c_generated::Field4140
+        $crate::__pgrx_c_generated::Field_params
     };
     (paramtype) => {
-        $crate::__pgrx_c_generated::Field4141
+        $crate::__pgrx_c_generated::Field_paramtype
     };
     (paramtypmod) => {
-        $crate::__pgrx_c_generated::Field4142
+        $crate::__pgrx_c_generated::Field_paramtypmod
     };
     (parentBlk) => {
-        $crate::__pgrx_c_generated::Field4145
+        $crate::__pgrx_c_generated::Field_parentBlk
     };
     (parentOffset) => {
-        $crate::__pgrx_c_generated::Field4146
+        $crate::__pgrx_c_generated::Field_parentOffset
     };
     (parent_relid) => {
-        $crate::__pgrx_c_generated::Field4150
+        $crate::__pgrx_c_generated::Field_parent_relid
     };
     (parent_reloid) => {
-        $crate::__pgrx_c_generated::Field4151
+        $crate::__pgrx_c_generated::Field_parent_reloid
     };
     (parent_reltype) => {
-        $crate::__pgrx_c_generated::Field4152
+        $crate::__pgrx_c_generated::Field_parent_reltype
     };
     (parentlsn) => {
-        $crate::__pgrx_c_generated::Field4155
+        $crate::__pgrx_c_generated::Field_parentlsn
     };
     (parse) => {
-        $crate::__pgrx_c_generated::Field4156
+        $crate::__pgrx_c_generated::Field_parse
     };
     (parseMode) => {
-        $crate::__pgrx_c_generated::Field4157
+        $crate::__pgrx_c_generated::Field_parseMode
     };
     (parse_mode) => {
-        $crate::__pgrx_c_generated::Field4158
+        $crate::__pgrx_c_generated::Field_parse_mode
     };
     (partColsUpdated) => {
-        $crate::__pgrx_c_generated::Field4164
+        $crate::__pgrx_c_generated::Field_partColsUpdated
     };
     (partNumCols) => {
-        $crate::__pgrx_c_generated::Field4166
+        $crate::__pgrx_c_generated::Field_partNumCols
     };
     (partParams) => {
-        $crate::__pgrx_c_generated::Field4168
+        $crate::__pgrx_c_generated::Field_partParams
     };
     (partPruneInfos) => {
-        $crate::__pgrx_c_generated::Field4169
+        $crate::__pgrx_c_generated::Field_partPruneInfos
     };
     (part_prune_index) => {
-        $crate::__pgrx_c_generated::Field4170
+        $crate::__pgrx_c_generated::Field_part_prune_index
     };
     (part_rels) => {
-        $crate::__pgrx_c_generated::Field4171
+        $crate::__pgrx_c_generated::Field_part_rels
     };
     (part_scheme) => {
-        $crate::__pgrx_c_generated::Field4172
+        $crate::__pgrx_c_generated::Field_part_scheme
     };
     (part_schemes) => {
-        $crate::__pgrx_c_generated::Field4173
+        $crate::__pgrx_c_generated::Field_part_schemes
     };
     (partbounds_merged) => {
-        $crate::__pgrx_c_generated::Field4176
+        $crate::__pgrx_c_generated::Field_partbounds_merged
     };
     (partdefid) => {
-        $crate::__pgrx_c_generated::Field4179
+        $crate::__pgrx_c_generated::Field_partdefid
     };
     (partexprs) => {
-        $crate::__pgrx_c_generated::Field4180
+        $crate::__pgrx_c_generated::Field_partexprs
     };
     (partial_costs_set) => {
-        $crate::__pgrx_c_generated::Field4182
+        $crate::__pgrx_c_generated::Field_partial_costs_set
     };
     (partial_pathlist) => {
-        $crate::__pgrx_c_generated::Field4183
+        $crate::__pgrx_c_generated::Field_partial_pathlist
     };
     (participants) => {
-        $crate::__pgrx_c_generated::Field4184
+        $crate::__pgrx_c_generated::Field_participants
     };
     (partitionClause) => {
-        $crate::__pgrx_c_generated::Field4185
+        $crate::__pgrx_c_generated::Field_partitionClause
     };
     (partition_qual) => {
-        $crate::__pgrx_c_generated::Field4187
+        $crate::__pgrx_c_generated::Field_partition_qual
     };
     (partition_spooled) => {
-        $crate::__pgrx_c_generated::Field4188
+        $crate::__pgrx_c_generated::Field_partition_spooled
     };
     (partnatts) => {
-        $crate::__pgrx_c_generated::Field4189
+        $crate::__pgrx_c_generated::Field_partnatts
     };
     (partrelid) => {
-        $crate::__pgrx_c_generated::Field4194
+        $crate::__pgrx_c_generated::Field_partrelid
     };
     (partstrat) => {
-        $crate::__pgrx_c_generated::Field4197
+        $crate::__pgrx_c_generated::Field_partstrat
     };
     (passing) => {
-        $crate::__pgrx_c_generated::Field4201
+        $crate::__pgrx_c_generated::Field_passing
     };
     (passing_names) => {
-        $crate::__pgrx_c_generated::Field4202
+        $crate::__pgrx_c_generated::Field_passing_names
     };
     (passing_values) => {
-        $crate::__pgrx_c_generated::Field4203
+        $crate::__pgrx_c_generated::Field_passing_values
     };
     (passingvalexprs) => {
-        $crate::__pgrx_c_generated::Field4204
+        $crate::__pgrx_c_generated::Field_passingvalexprs
     };
     (passwordrequired) => {
-        $crate::__pgrx_c_generated::Field4205
+        $crate::__pgrx_c_generated::Field_passwordrequired
     };
     (path_hashclauses) => {
-        $crate::__pgrx_c_generated::Field4207
+        $crate::__pgrx_c_generated::Field_path_hashclauses
     };
     (path_mergeclauses) => {
-        $crate::__pgrx_c_generated::Field4208
+        $crate::__pgrx_c_generated::Field_path_mergeclauses
     };
     (pathkeys) => {
-        $crate::__pgrx_c_generated::Field4211
+        $crate::__pgrx_c_generated::Field_pathkeys
     };
     (pathlist) => {
-        $crate::__pgrx_c_generated::Field4212
+        $crate::__pgrx_c_generated::Field_pathlist
     };
     (pathpos) => {
-        $crate::__pgrx_c_generated::Field4213
+        $crate::__pgrx_c_generated::Field_pathpos
     };
     (pathtype) => {
-        $crate::__pgrx_c_generated::Field4216
+        $crate::__pgrx_c_generated::Field_pathtype
     };
     (patype) => {
-        $crate::__pgrx_c_generated::Field4217
+        $crate::__pgrx_c_generated::Field_patype
     };
     (pct_type) => {
-        $crate::__pgrx_c_generated::Field4219
+        $crate::__pgrx_c_generated::Field_pct_type
     };
     (pd_checksum) => {
-        $crate::__pgrx_c_generated::Field4221
+        $crate::__pgrx_c_generated::Field_pd_checksum
     };
     (pd_flags) => {
-        $crate::__pgrx_c_generated::Field4222
+        $crate::__pgrx_c_generated::Field_pd_flags
     };
     (pd_linp) => {
-        $crate::__pgrx_c_generated::Field4223
+        $crate::__pgrx_c_generated::Field_pd_linp
     };
     (pd_lower) => {
-        $crate::__pgrx_c_generated::Field4224
+        $crate::__pgrx_c_generated::Field_pd_lower
     };
     (pd_pagesize_version) => {
-        $crate::__pgrx_c_generated::Field4226
+        $crate::__pgrx_c_generated::Field_pd_pagesize_version
     };
     (pd_prune_xid) => {
-        $crate::__pgrx_c_generated::Field4227
+        $crate::__pgrx_c_generated::Field_pd_prune_xid
     };
     (pd_special) => {
-        $crate::__pgrx_c_generated::Field4228
+        $crate::__pgrx_c_generated::Field_pd_special
     };
     (pd_upper) => {
-        $crate::__pgrx_c_generated::Field4229
+        $crate::__pgrx_c_generated::Field_pd_upper
     };
     (pendingListCleanupSize) => {
-        $crate::__pgrx_c_generated::Field4232
+        $crate::__pgrx_c_generated::Field_pendingListCleanupSize
     };
     (pending_nulls) => {
-        $crate::__pgrx_c_generated::Field4234
+        $crate::__pgrx_c_generated::Field_pending_nulls
     };
     (pending_srf_tuples) => {
-        $crate::__pgrx_c_generated::Field4235
+        $crate::__pgrx_c_generated::Field_pending_srf_tuples
     };
     (permInfos) => {
-        $crate::__pgrx_c_generated::Field4248
+        $crate::__pgrx_c_generated::Field_permInfos
     };
     (perminfoindex) => {
-        $crate::__pgrx_c_generated::Field4249
+        $crate::__pgrx_c_generated::Field_perminfoindex
     };
     (permissive) => {
-        $crate::__pgrx_c_generated::Field4250
+        $crate::__pgrx_c_generated::Field_permissive
     };
     (persistence) => {
-        $crate::__pgrx_c_generated::Field4251
+        $crate::__pgrx_c_generated::Field_persistence
     };
     (persistency) => {
-        $crate::__pgrx_c_generated::Field4252
+        $crate::__pgrx_c_generated::Field_persistency
     };
     (pflags) => {
-        $crate::__pgrx_c_generated::Field4255
+        $crate::__pgrx_c_generated::Field_pflags
     };
     (pg_control_version) => {
-        $crate::__pgrx_c_generated::Field4256
+        $crate::__pgrx_c_generated::Field_pg_control_version
     };
     (pgprocno) => {
-        $crate::__pgrx_c_generated::Field4257
+        $crate::__pgrx_c_generated::Field_pgprocno
     };
     (pgstat_enabled) => {
-        $crate::__pgrx_c_generated::Field4258
+        $crate::__pgrx_c_generated::Field_pgstat_enabled
     };
     (pgstat_info) => {
-        $crate::__pgrx_c_generated::Field4259
+        $crate::__pgrx_c_generated::Field_pgstat_info
     };
     (pgxactoff) => {
-        $crate::__pgrx_c_generated::Field4260
+        $crate::__pgrx_c_generated::Field_pgxactoff
     };
     (ph_root) => {
-        $crate::__pgrx_c_generated::Field4268
+        $crate::__pgrx_c_generated::Field_ph_root
     };
     (ph_width) => {
-        $crate::__pgrx_c_generated::Field4270
+        $crate::__pgrx_c_generated::Field_ph_width
     };
     (phase) => {
-        $crate::__pgrx_c_generated::Field4271
+        $crate::__pgrx_c_generated::Field_phase
     };
     (phid) => {
-        $crate::__pgrx_c_generated::Field4275
+        $crate::__pgrx_c_generated::Field_phid
     };
     (phlevelsup) => {
-        $crate::__pgrx_c_generated::Field4276
+        $crate::__pgrx_c_generated::Field_phlevelsup
     };
     (phs_mutex) => {
-        $crate::__pgrx_c_generated::Field4280
+        $crate::__pgrx_c_generated::Field_phs_mutex
     };
     (phs_nblocks) => {
-        $crate::__pgrx_c_generated::Field4282
+        $crate::__pgrx_c_generated::Field_phs_nblocks
     };
     (phs_snapshot_any) => {
-        $crate::__pgrx_c_generated::Field4283
+        $crate::__pgrx_c_generated::Field_phs_snapshot_any
     };
     (phs_snapshot_off) => {
-        $crate::__pgrx_c_generated::Field4284
+        $crate::__pgrx_c_generated::Field_phs_snapshot_off
     };
     (phs_startblock) => {
-        $crate::__pgrx_c_generated::Field4285
+        $crate::__pgrx_c_generated::Field_phs_startblock
     };
     (phs_syncscan) => {
-        $crate::__pgrx_c_generated::Field4286
+        $crate::__pgrx_c_generated::Field_phs_syncscan
     };
     (phsw_chunk_remaining) => {
-        $crate::__pgrx_c_generated::Field4287
+        $crate::__pgrx_c_generated::Field_phsw_chunk_remaining
     };
     (phsw_chunk_size) => {
-        $crate::__pgrx_c_generated::Field4288
+        $crate::__pgrx_c_generated::Field_phsw_chunk_size
     };
     (phsw_nallocated) => {
-        $crate::__pgrx_c_generated::Field4289
+        $crate::__pgrx_c_generated::Field_phsw_nallocated
     };
     (phystupsize) => {
-        $crate::__pgrx_c_generated::Field4291
+        $crate::__pgrx_c_generated::Field_phystupsize
     };
     (pid) => {
-        $crate::__pgrx_c_generated::Field4295
+        $crate::__pgrx_c_generated::Field_pid
     };
     (pincount) => {
-        $crate::__pgrx_c_generated::Field4296
+        $crate::__pgrx_c_generated::Field_pincount
     };
     (pk_attrs) => {
-        $crate::__pgrx_c_generated::Field4297
+        $crate::__pgrx_c_generated::Field_pk_attrs
     };
     (pk_cmptype) => {
-        $crate::__pgrx_c_generated::Field4298
+        $crate::__pgrx_c_generated::Field_pk_cmptype
     };
     (pk_nulls_first) => {
-        $crate::__pgrx_c_generated::Field4301
+        $crate::__pgrx_c_generated::Field_pk_nulls_first
     };
     (pk_opfamily) => {
-        $crate::__pgrx_c_generated::Field4302
+        $crate::__pgrx_c_generated::Field_pk_opfamily
     };
     (pk_table) => {
-        $crate::__pgrx_c_generated::Field4303
+        $crate::__pgrx_c_generated::Field_pk_table
     };
     (pk_with_period) => {
-        $crate::__pgrx_c_generated::Field4304
+        $crate::__pgrx_c_generated::Field_pk_with_period
     };
     (placeholder_array_size) => {
-        $crate::__pgrx_c_generated::Field4307
+        $crate::__pgrx_c_generated::Field_placeholder_array_size
     };
     (placeholder_list) => {
-        $crate::__pgrx_c_generated::Field4308
+        $crate::__pgrx_c_generated::Field_placeholder_list
     };
     (placeholdersFrozen) => {
-        $crate::__pgrx_c_generated::Field4309
+        $crate::__pgrx_c_generated::Field_placeholdersFrozen
     };
     (planId) => {
-        $crate::__pgrx_c_generated::Field4311
+        $crate::__pgrx_c_generated::Field_planId
     };
     (planRoleId) => {
-        $crate::__pgrx_c_generated::Field4312
+        $crate::__pgrx_c_generated::Field_planRoleId
     };
     (plan_id) => {
-        $crate::__pgrx_c_generated::Field4314
+        $crate::__pgrx_c_generated::Field_plan_id
     };
     (plan_node_id) => {
-        $crate::__pgrx_c_generated::Field4316
+        $crate::__pgrx_c_generated::Field_plan_node_id
     };
     (plan_params) => {
-        $crate::__pgrx_c_generated::Field4317
+        $crate::__pgrx_c_generated::Field_plan_params
     };
     (plan_width) => {
-        $crate::__pgrx_c_generated::Field4319
+        $crate::__pgrx_c_generated::Field_plan_width
     };
     (plancache_list) => {
-        $crate::__pgrx_c_generated::Field4320
+        $crate::__pgrx_c_generated::Field_plancache_list
     };
     (plhandler) => {
-        $crate::__pgrx_c_generated::Field4327
+        $crate::__pgrx_c_generated::Field_plhandler
     };
     (plinline) => {
-        $crate::__pgrx_c_generated::Field4328
+        $crate::__pgrx_c_generated::Field_plinline
     };
     (pltrusted) => {
-        $crate::__pgrx_c_generated::Field4330
+        $crate::__pgrx_c_generated::Field_pltrusted
     };
     (plvalidator) => {
-        $crate::__pgrx_c_generated::Field4333
+        $crate::__pgrx_c_generated::Field_plvalidator
     };
     (pnextitem) => {
-        $crate::__pgrx_c_generated::Field4334
+        $crate::__pgrx_c_generated::Field_pnextitem
     };
     (pnnspid) => {
-        $crate::__pgrx_c_generated::Field4335
+        $crate::__pgrx_c_generated::Field_pnnspid
     };
     (pnpubid) => {
-        $crate::__pgrx_c_generated::Field4336
+        $crate::__pgrx_c_generated::Field_pnpubid
     };
     (poffset) => {
-        $crate::__pgrx_c_generated::Field4337
+        $crate::__pgrx_c_generated::Field_poffset
     };
     (polcmd) => {
-        $crate::__pgrx_c_generated::Field4339
+        $crate::__pgrx_c_generated::Field_polcmd
     };
     (polpermissive) => {
-        $crate::__pgrx_c_generated::Field4343
+        $crate::__pgrx_c_generated::Field_polpermissive
     };
     (polrelid) => {
-        $crate::__pgrx_c_generated::Field4344
+        $crate::__pgrx_c_generated::Field_polrelid
     };
     (portalPinned) => {
-        $crate::__pgrx_c_generated::Field4348
+        $crate::__pgrx_c_generated::Field_portalPinned
     };
     (portalPos) => {
-        $crate::__pgrx_c_generated::Field4349
+        $crate::__pgrx_c_generated::Field_portalPos
     };
     (pos) => {
-        $crate::__pgrx_c_generated::Field4352
+        $crate::__pgrx_c_generated::Field_pos
     };
     (position) => {
-        $crate::__pgrx_c_generated::Field4353
+        $crate::__pgrx_c_generated::Field_position
     };
     (postfixBlkSame) => {
-        $crate::__pgrx_c_generated::Field4359
+        $crate::__pgrx_c_generated::Field_postfixBlkSame
     };
     (postfixHasPrefix) => {
-        $crate::__pgrx_c_generated::Field4360
+        $crate::__pgrx_c_generated::Field_postfixHasPrefix
     };
     (postfixPrefixDatum) => {
-        $crate::__pgrx_c_generated::Field4361
+        $crate::__pgrx_c_generated::Field_postfixPrefixDatum
     };
     (postingoff) => {
-        $crate::__pgrx_c_generated::Field4362
+        $crate::__pgrx_c_generated::Field_postingoff
     };
     (ppi_clauses) => {
-        $crate::__pgrx_c_generated::Field4364
+        $crate::__pgrx_c_generated::Field_ppi_clauses
     };
     (ppi_req_outer) => {
-        $crate::__pgrx_c_generated::Field4365
+        $crate::__pgrx_c_generated::Field_ppi_req_outer
     };
     (ppilist) => {
-        $crate::__pgrx_c_generated::Field4368
+        $crate::__pgrx_c_generated::Field_ppilist
     };
     (preallocated) => {
-        $crate::__pgrx_c_generated::Field4370
+        $crate::__pgrx_c_generated::Field_preallocated
     };
     (predOK) => {
-        $crate::__pgrx_c_generated::Field4372
+        $crate::__pgrx_c_generated::Field_predOK
     };
     (predictNumber) => {
-        $crate::__pgrx_c_generated::Field4374
+        $crate::__pgrx_c_generated::Field_predictNumber
     };
     (predictNumberResult) => {
-        $crate::__pgrx_c_generated::Field4375
+        $crate::__pgrx_c_generated::Field_predictNumberResult
     };
     (prefetch_buffer) => {
-        $crate::__pgrx_c_generated::Field4376
+        $crate::__pgrx_c_generated::Field_prefetch_buffer
     };
     (prefix) => {
-        $crate::__pgrx_c_generated::Field4377
+        $crate::__pgrx_c_generated::Field_prefix
     };
     (prefixDatum) => {
-        $crate::__pgrx_c_generated::Field4378
+        $crate::__pgrx_c_generated::Field_prefixDatum
     };
     (prefixHasPrefix) => {
-        $crate::__pgrx_c_generated::Field4379
+        $crate::__pgrx_c_generated::Field_prefixHasPrefix
     };
     (prefixNNodes) => {
-        $crate::__pgrx_c_generated::Field4380
+        $crate::__pgrx_c_generated::Field_prefixNNodes
     };
     (prefixPrefixDatum) => {
-        $crate::__pgrx_c_generated::Field4382
+        $crate::__pgrx_c_generated::Field_prefixPrefixDatum
     };
     (prefixSize) => {
-        $crate::__pgrx_c_generated::Field4383
+        $crate::__pgrx_c_generated::Field_prefixSize
     };
     (prefixType) => {
-        $crate::__pgrx_c_generated::Field4384
+        $crate::__pgrx_c_generated::Field_prefixType
     };
     (prefix_size) => {
-        $crate::__pgrx_c_generated::Field4385
+        $crate::__pgrx_c_generated::Field_prefix_size
     };
     (prepareSeqNo) => {
-        $crate::__pgrx_c_generated::Field4391
+        $crate::__pgrx_c_generated::Field_prepareSeqNo
     };
     (prepare_end_lsn) => {
-        $crate::__pgrx_c_generated::Field4393
+        $crate::__pgrx_c_generated::Field_prepare_end_lsn
     };
     (prepare_lsn) => {
-        $crate::__pgrx_c_generated::Field4394
+        $crate::__pgrx_c_generated::Field_prepare_lsn
     };
     (prepare_time) => {
-        $crate::__pgrx_c_generated::Field4395
+        $crate::__pgrx_c_generated::Field_prepare_time
     };
     (prepared_at) => {
-        $crate::__pgrx_c_generated::Field4397
+        $crate::__pgrx_c_generated::Field_prepared_at
     };
     (prepared_write) => {
-        $crate::__pgrx_c_generated::Field4398
+        $crate::__pgrx_c_generated::Field_prepared_write
     };
     (prev) => {
-        $crate::__pgrx_c_generated::Field4401
+        $crate::__pgrx_c_generated::Field_prev
     };
     (prevPage) => {
-        $crate::__pgrx_c_generated::Field4402
+        $crate::__pgrx_c_generated::Field_prevPage
     };
     (prevTail) => {
-        $crate::__pgrx_c_generated::Field4403
+        $crate::__pgrx_c_generated::Field_prevTail
     };
     (prevblkno) => {
-        $crate::__pgrx_c_generated::Field4406
+        $crate::__pgrx_c_generated::Field_prevblkno
     };
     (prevnull) => {
-        $crate::__pgrx_c_generated::Field4409
+        $crate::__pgrx_c_generated::Field_prevnull
     };
     (prevvalue) => {
-        $crate::__pgrx_c_generated::Field4410
+        $crate::__pgrx_c_generated::Field_prevvalue
     };
     (primary) => {
-        $crate::__pgrx_c_generated::Field4411
+        $crate::__pgrx_c_generated::Field_primary
     };
     (print_strict_params) => {
-        $crate::__pgrx_c_generated::Field4412
+        $crate::__pgrx_c_generated::Field_print_strict_params
     };
     (private_cxt) => {
-        $crate::__pgrx_c_generated::Field4416
+        $crate::__pgrx_c_generated::Field_private_cxt
     };
     (privileges) => {
-        $crate::__pgrx_c_generated::Field4421
+        $crate::__pgrx_c_generated::Field_privileges
     };
     (privtype) => {
-        $crate::__pgrx_c_generated::Field4422
+        $crate::__pgrx_c_generated::Field_privtype
     };
     (procArrayGroupMember) => {
-        $crate::__pgrx_c_generated::Field4427
+        $crate::__pgrx_c_generated::Field_procArrayGroupMember
     };
     (procArrayGroupMemberXid) => {
-        $crate::__pgrx_c_generated::Field4428
+        $crate::__pgrx_c_generated::Field_procArrayGroupMemberXid
     };
     (procArrayGroupNext) => {
-        $crate::__pgrx_c_generated::Field4429
+        $crate::__pgrx_c_generated::Field_procArrayGroupNext
     };
     (procLatch) => {
-        $crate::__pgrx_c_generated::Field4431
+        $crate::__pgrx_c_generated::Field_procLatch
     };
     (procNumber) => {
-        $crate::__pgrx_c_generated::Field4434
+        $crate::__pgrx_c_generated::Field_procNumber
     };
     (proc_number) => {
-        $crate::__pgrx_c_generated::Field4435
+        $crate::__pgrx_c_generated::Field_proc_number
     };
     (processed) => {
-        $crate::__pgrx_c_generated::Field4438
+        $crate::__pgrx_c_generated::Field_processed
     };
     (processed_distinctClause) => {
-        $crate::__pgrx_c_generated::Field4439
+        $crate::__pgrx_c_generated::Field_processed_distinctClause
     };
     (processed_groupClause) => {
-        $crate::__pgrx_c_generated::Field4440
+        $crate::__pgrx_c_generated::Field_processed_groupClause
     };
     (processed_tlist) => {
-        $crate::__pgrx_c_generated::Field4441
+        $crate::__pgrx_c_generated::Field_processed_tlist
     };
     (processing_required) => {
-        $crate::__pgrx_c_generated::Field4442
+        $crate::__pgrx_c_generated::Field_processing_required
     };
     (procgloballist) => {
-        $crate::__pgrx_c_generated::Field4443
+        $crate::__pgrx_c_generated::Field_procgloballist
     };
     (procid) => {
-        $crate::__pgrx_c_generated::Field4444
+        $crate::__pgrx_c_generated::Field_procid
     };
     (procno) => {
-        $crate::__pgrx_c_generated::Field4446
+        $crate::__pgrx_c_generated::Field_procno
     };
     (proisstrict) => {
-        $crate::__pgrx_c_generated::Field4449
+        $crate::__pgrx_c_generated::Field_proisstrict
     };
     (projected_set) => {
-        $crate::__pgrx_c_generated::Field4452
+        $crate::__pgrx_c_generated::Field_projected_set
     };
     (prokind) => {
-        $crate::__pgrx_c_generated::Field4453
+        $crate::__pgrx_c_generated::Field_prokind
     };
     (prolang) => {
-        $crate::__pgrx_c_generated::Field4454
+        $crate::__pgrx_c_generated::Field_prolang
     };
     (proleakproof) => {
-        $crate::__pgrx_c_generated::Field4455
+        $crate::__pgrx_c_generated::Field_proleakproof
     };
     (promise) => {
-        $crate::__pgrx_c_generated::Field4456
+        $crate::__pgrx_c_generated::Field_promise
     };
     (promising) => {
-        $crate::__pgrx_c_generated::Field4457
+        $crate::__pgrx_c_generated::Field_promising
     };
     (pronamespace) => {
-        $crate::__pgrx_c_generated::Field4459
+        $crate::__pgrx_c_generated::Field_pronamespace
     };
     (pronargdefaults) => {
-        $crate::__pgrx_c_generated::Field4460
+        $crate::__pgrx_c_generated::Field_pronargdefaults
     };
     (pronargs) => {
-        $crate::__pgrx_c_generated::Field4461
+        $crate::__pgrx_c_generated::Field_pronargs
     };
     (proowner) => {
-        $crate::__pgrx_c_generated::Field4462
+        $crate::__pgrx_c_generated::Field_proowner
     };
     (proparallel) => {
-        $crate::__pgrx_c_generated::Field4463
+        $crate::__pgrx_c_generated::Field_proparallel
     };
     (proretset) => {
-        $crate::__pgrx_c_generated::Field4464
+        $crate::__pgrx_c_generated::Field_proretset
     };
     (prorettype) => {
-        $crate::__pgrx_c_generated::Field4465
+        $crate::__pgrx_c_generated::Field_prorettype
     };
     (prosecdef) => {
-        $crate::__pgrx_c_generated::Field4467
+        $crate::__pgrx_c_generated::Field_prosecdef
     };
     (prosupport) => {
-        $crate::__pgrx_c_generated::Field4468
+        $crate::__pgrx_c_generated::Field_prosupport
     };
     (proto_version) => {
-        $crate::__pgrx_c_generated::Field4470
+        $crate::__pgrx_c_generated::Field_proto_version
     };
     (protocol_version) => {
-        $crate::__pgrx_c_generated::Field4471
+        $crate::__pgrx_c_generated::Field_protocol_version
     };
     (provariadic) => {
-        $crate::__pgrx_c_generated::Field4472
+        $crate::__pgrx_c_generated::Field_provariadic
     };
     (provider) => {
-        $crate::__pgrx_c_generated::Field4473
+        $crate::__pgrx_c_generated::Field_provider
     };
     (provolatile) => {
-        $crate::__pgrx_c_generated::Field4474
+        $crate::__pgrx_c_generated::Field_provolatile
     };
     (prpubid) => {
-        $crate::__pgrx_c_generated::Field4475
+        $crate::__pgrx_c_generated::Field_prpubid
     };
     (prrelid) => {
-        $crate::__pgrx_c_generated::Field4476
+        $crate::__pgrx_c_generated::Field_prrelid
     };
     (prsId) => {
-        $crate::__pgrx_c_generated::Field4477
+        $crate::__pgrx_c_generated::Field_prsId
     };
     (prsend) => {
-        $crate::__pgrx_c_generated::Field4478
+        $crate::__pgrx_c_generated::Field_prsend
     };
     (prsheadline) => {
-        $crate::__pgrx_c_generated::Field4479
+        $crate::__pgrx_c_generated::Field_prsheadline
     };
     (prslextype) => {
-        $crate::__pgrx_c_generated::Field4480
+        $crate::__pgrx_c_generated::Field_prslextype
     };
     (prsnamespace) => {
-        $crate::__pgrx_c_generated::Field4482
+        $crate::__pgrx_c_generated::Field_prsnamespace
     };
     (prsstart) => {
-        $crate::__pgrx_c_generated::Field4483
+        $crate::__pgrx_c_generated::Field_prsstart
     };
     (prstoken) => {
-        $crate::__pgrx_c_generated::Field4484
+        $crate::__pgrx_c_generated::Field_prstoken
     };
     (prti) => {
-        $crate::__pgrx_c_generated::Field4485
+        $crate::__pgrx_c_generated::Field_prti
     };
     (prune_infos) => {
-        $crate::__pgrx_c_generated::Field4488
+        $crate::__pgrx_c_generated::Field_prune_infos
     };
     (ps_offset_am) => {
-        $crate::__pgrx_c_generated::Field4496
+        $crate::__pgrx_c_generated::Field_ps_offset_am
     };
     (ps_offset_ins) => {
-        $crate::__pgrx_c_generated::Field4497
+        $crate::__pgrx_c_generated::Field_ps_offset_ins
     };
     (pscan_len) => {
-        $crate::__pgrx_c_generated::Field4499
+        $crate::__pgrx_c_generated::Field_pscan_len
     };
     (pseudoconstant) => {
-        $crate::__pgrx_c_generated::Field4500
+        $crate::__pgrx_c_generated::Field_pseudoconstant
     };
     (pstate_len) => {
-        $crate::__pgrx_c_generated::Field4502
+        $crate::__pgrx_c_generated::Field_pstate_len
     };
     (ptr_value) => {
-        $crate::__pgrx_c_generated::Field4504
+        $crate::__pgrx_c_generated::Field_ptr_value
     };
     (ptype) => {
-        $crate::__pgrx_c_generated::Field4505
+        $crate::__pgrx_c_generated::Field_ptype
     };
     (puballtables) => {
-        $crate::__pgrx_c_generated::Field4507
+        $crate::__pgrx_c_generated::Field_puballtables
     };
     (pubdelete) => {
-        $crate::__pgrx_c_generated::Field4509
+        $crate::__pgrx_c_generated::Field_pubdelete
     };
     (pubgencols) => {
-        $crate::__pgrx_c_generated::Field4510
+        $crate::__pgrx_c_generated::Field_pubgencols
     };
     (pubgencols_type) => {
-        $crate::__pgrx_c_generated::Field4511
+        $crate::__pgrx_c_generated::Field_pubgencols_type
     };
     (pubinsert) => {
-        $crate::__pgrx_c_generated::Field4512
+        $crate::__pgrx_c_generated::Field_pubinsert
     };
     (publication) => {
-        $crate::__pgrx_c_generated::Field4513
+        $crate::__pgrx_c_generated::Field_publication
     };
     (publication_names) => {
-        $crate::__pgrx_c_generated::Field4514
+        $crate::__pgrx_c_generated::Field_publication_names
     };
     (publications) => {
-        $crate::__pgrx_c_generated::Field4515
+        $crate::__pgrx_c_generated::Field_publications
     };
     (publish_no_origin) => {
-        $crate::__pgrx_c_generated::Field4516
+        $crate::__pgrx_c_generated::Field_publish_no_origin
     };
     (pubobjects) => {
-        $crate::__pgrx_c_generated::Field4518
+        $crate::__pgrx_c_generated::Field_pubobjects
     };
     (pubobjtype) => {
-        $crate::__pgrx_c_generated::Field4519
+        $crate::__pgrx_c_generated::Field_pubobjtype
     };
     (pubowner) => {
-        $crate::__pgrx_c_generated::Field4520
+        $crate::__pgrx_c_generated::Field_pubowner
     };
     (pubtruncate) => {
-        $crate::__pgrx_c_generated::Field4522
+        $crate::__pgrx_c_generated::Field_pubtruncate
     };
     (pubupdate) => {
-        $crate::__pgrx_c_generated::Field4523
+        $crate::__pgrx_c_generated::Field_pubupdate
     };
     (pubviaroot) => {
-        $crate::__pgrx_c_generated::Field4524
+        $crate::__pgrx_c_generated::Field_pubviaroot
     };
     (pushedDown) => {
-        $crate::__pgrx_c_generated::Field4525
+        $crate::__pgrx_c_generated::Field_pushedDown
     };
     (qual) => {
-        $crate::__pgrx_c_generated::Field4529
+        $crate::__pgrx_c_generated::Field_qual
     };
     (qual_ok) => {
-        $crate::__pgrx_c_generated::Field4530
+        $crate::__pgrx_c_generated::Field_qual_ok
     };
     (qual_security_level) => {
-        $crate::__pgrx_c_generated::Field4531
+        $crate::__pgrx_c_generated::Field_qual_security_level
     };
     (query) => {
-        $crate::__pgrx_c_generated::Field4534
+        $crate::__pgrx_c_generated::Field_query
     };
     (queryCategory) => {
-        $crate::__pgrx_c_generated::Field4536
+        $crate::__pgrx_c_generated::Field_queryCategory
     };
     (queryId) => {
-        $crate::__pgrx_c_generated::Field4539
+        $crate::__pgrx_c_generated::Field_queryId
     };
     (queryKey) => {
-        $crate::__pgrx_c_generated::Field4540
+        $crate::__pgrx_c_generated::Field_queryKey
     };
     (querySource) => {
-        $crate::__pgrx_c_generated::Field4541
+        $crate::__pgrx_c_generated::Field_querySource
     };
     (query_level) => {
-        $crate::__pgrx_c_generated::Field4545
+        $crate::__pgrx_c_generated::Field_query_level
     };
     (query_list) => {
-        $crate::__pgrx_c_generated::Field4546
+        $crate::__pgrx_c_generated::Field_query_list
     };
     (query_pathkeys) => {
-        $crate::__pgrx_c_generated::Field4547
+        $crate::__pgrx_c_generated::Field_query_pathkeys
     };
     (queuedForEmptying) => {
-        $crate::__pgrx_c_generated::Field4551
+        $crate::__pgrx_c_generated::Field_queuedForEmptying
     };
     (quoted) => {
-        $crate::__pgrx_c_generated::Field4554
+        $crate::__pgrx_c_generated::Field_quoted
     };
     (quotes) => {
-        $crate::__pgrx_c_generated::Field4555
+        $crate::__pgrx_c_generated::Field_quotes
     };
     (randomAccess) => {
-        $crate::__pgrx_c_generated::Field4566
+        $crate::__pgrx_c_generated::Field_randomAccess
     };
     (range_table) => {
-        $crate::__pgrx_c_generated::Field4570
+        $crate::__pgrx_c_generated::Field_range_table
     };
     (rangetypid) => {
-        $crate::__pgrx_c_generated::Field4571
+        $crate::__pgrx_c_generated::Field_rangetypid
     };
     (rargs) => {
-        $crate::__pgrx_c_generated::Field4573
+        $crate::__pgrx_c_generated::Field_rargs
     };
     (rawScalar) => {
-        $crate::__pgrx_c_generated::Field4574
+        $crate::__pgrx_c_generated::Field_rawScalar
     };
     (raw_buf_index) => {
-        $crate::__pgrx_c_generated::Field4576
+        $crate::__pgrx_c_generated::Field_raw_buf_index
     };
     (raw_buf_len) => {
-        $crate::__pgrx_c_generated::Field4577
+        $crate::__pgrx_c_generated::Field_raw_buf_len
     };
     (raw_reached_eof) => {
-        $crate::__pgrx_c_generated::Field4582
+        $crate::__pgrx_c_generated::Field_raw_reached_eof
     };
     (rd_amhandler) => {
-        $crate::__pgrx_c_generated::Field4587
+        $crate::__pgrx_c_generated::Field_rd_amhandler
     };
     (rd_att) => {
-        $crate::__pgrx_c_generated::Field4588
+        $crate::__pgrx_c_generated::Field_rd_att
     };
     (rd_attrsvalid) => {
-        $crate::__pgrx_c_generated::Field4589
+        $crate::__pgrx_c_generated::Field_rd_attrsvalid
     };
     (rd_backend) => {
-        $crate::__pgrx_c_generated::Field4590
+        $crate::__pgrx_c_generated::Field_rd_backend
     };
     (rd_createSubid) => {
-        $crate::__pgrx_c_generated::Field4591
+        $crate::__pgrx_c_generated::Field_rd_createSubid
     };
     (rd_droppedSubid) => {
-        $crate::__pgrx_c_generated::Field4592
+        $crate::__pgrx_c_generated::Field_rd_droppedSubid
     };
     (rd_firstRelfilelocatorSubid) => {
-        $crate::__pgrx_c_generated::Field4597
+        $crate::__pgrx_c_generated::Field_rd_firstRelfilelocatorSubid
     };
     (rd_fkeylist) => {
-        $crate::__pgrx_c_generated::Field4598
+        $crate::__pgrx_c_generated::Field_rd_fkeylist
     };
     (rd_fkeyvalid) => {
-        $crate::__pgrx_c_generated::Field4599
+        $crate::__pgrx_c_generated::Field_rd_fkeyvalid
     };
     (rd_id) => {
-        $crate::__pgrx_c_generated::Field4601
+        $crate::__pgrx_c_generated::Field_rd_id
     };
     (rd_index) => {
-        $crate::__pgrx_c_generated::Field4605
+        $crate::__pgrx_c_generated::Field_rd_index
     };
     (rd_indexlist) => {
-        $crate::__pgrx_c_generated::Field4607
+        $crate::__pgrx_c_generated::Field_rd_indexlist
     };
     (rd_indexprs) => {
-        $crate::__pgrx_c_generated::Field4608
+        $crate::__pgrx_c_generated::Field_rd_indexprs
     };
     (rd_indexvalid) => {
-        $crate::__pgrx_c_generated::Field4610
+        $crate::__pgrx_c_generated::Field_rd_indexvalid
     };
     (rd_indpred) => {
-        $crate::__pgrx_c_generated::Field4612
+        $crate::__pgrx_c_generated::Field_rd_indpred
     };
     (rd_islocaltemp) => {
-        $crate::__pgrx_c_generated::Field4613
+        $crate::__pgrx_c_generated::Field_rd_islocaltemp
     };
     (rd_isnailed) => {
-        $crate::__pgrx_c_generated::Field4614
+        $crate::__pgrx_c_generated::Field_rd_isnailed
     };
     (rd_ispkdeferrable) => {
-        $crate::__pgrx_c_generated::Field4615
+        $crate::__pgrx_c_generated::Field_rd_ispkdeferrable
     };
     (rd_isvalid) => {
-        $crate::__pgrx_c_generated::Field4616
+        $crate::__pgrx_c_generated::Field_rd_isvalid
     };
     (rd_newRelfilelocatorSubid) => {
-        $crate::__pgrx_c_generated::Field4620
+        $crate::__pgrx_c_generated::Field_rd_newRelfilelocatorSubid
     };
     (rd_options) => {
-        $crate::__pgrx_c_generated::Field4624
+        $crate::__pgrx_c_generated::Field_rd_options
     };
     (rd_partcheck) => {
-        $crate::__pgrx_c_generated::Field4625
+        $crate::__pgrx_c_generated::Field_rd_partcheck
     };
     (rd_partcheckvalid) => {
-        $crate::__pgrx_c_generated::Field4627
+        $crate::__pgrx_c_generated::Field_rd_partcheckvalid
     };
     (rd_partdesc_nodetached_xmin) => {
-        $crate::__pgrx_c_generated::Field4630
+        $crate::__pgrx_c_generated::Field_rd_partdesc_nodetached_xmin
     };
     (rd_pkindex) => {
-        $crate::__pgrx_c_generated::Field4636
+        $crate::__pgrx_c_generated::Field_rd_pkindex
     };
     (rd_refcnt) => {
-        $crate::__pgrx_c_generated::Field4638
+        $crate::__pgrx_c_generated::Field_rd_refcnt
     };
     (rd_rel) => {
-        $crate::__pgrx_c_generated::Field4639
+        $crate::__pgrx_c_generated::Field_rd_rel
     };
     (rd_replidindex) => {
-        $crate::__pgrx_c_generated::Field4640
+        $crate::__pgrx_c_generated::Field_rd_replidindex
     };
     (rd_smgr) => {
-        $crate::__pgrx_c_generated::Field4644
+        $crate::__pgrx_c_generated::Field_rd_smgr
     };
     (rd_statlist) => {
-        $crate::__pgrx_c_generated::Field4645
+        $crate::__pgrx_c_generated::Field_rd_statlist
     };
     (rd_statvalid) => {
-        $crate::__pgrx_c_generated::Field4646
+        $crate::__pgrx_c_generated::Field_rd_statvalid
     };
     (rd_toastoid) => {
-        $crate::__pgrx_c_generated::Field4651
+        $crate::__pgrx_c_generated::Field_rd_toastoid
     };
     (readLen) => {
-        $crate::__pgrx_c_generated::Field4654
+        $crate::__pgrx_c_generated::Field_readLen
     };
     (readRecordBufSize) => {
-        $crate::__pgrx_c_generated::Field4656
+        $crate::__pgrx_c_generated::Field_readRecordBufSize
     };
     (read_only) => {
-        $crate::__pgrx_c_generated::Field4657
+        $crate::__pgrx_c_generated::Field_read_only
     };
     (readonly_func) => {
-        $crate::__pgrx_c_generated::Field4659
+        $crate::__pgrx_c_generated::Field_readonly_func
     };
     (readptr) => {
-        $crate::__pgrx_c_generated::Field4660
+        $crate::__pgrx_c_generated::Field_readptr
     };
     (ready_for_use) => {
-        $crate::__pgrx_c_generated::Field4662
+        $crate::__pgrx_c_generated::Field_ready_for_use
     };
     (ready_to_display) => {
-        $crate::__pgrx_c_generated::Field4663
+        $crate::__pgrx_c_generated::Field_ready_to_display
     };
     (reason) => {
-        $crate::__pgrx_c_generated::Field4667
+        $crate::__pgrx_c_generated::Field_reason
     };
     (rec_len) => {
-        $crate::__pgrx_c_generated::Field4668
+        $crate::__pgrx_c_generated::Field_rec_len
     };
     (receiveStart) => {
-        $crate::__pgrx_c_generated::Field4670
+        $crate::__pgrx_c_generated::Field_receiveStart
     };
     (receiveStartTLI) => {
-        $crate::__pgrx_c_generated::Field4671
+        $crate::__pgrx_c_generated::Field_receiveStartTLI
     };
     (receive_rewrites) => {
-        $crate::__pgrx_c_generated::Field4672
+        $crate::__pgrx_c_generated::Field_receive_rewrites
     };
     (receivedTLI) => {
-        $crate::__pgrx_c_generated::Field4673
+        $crate::__pgrx_c_generated::Field_receivedTLI
     };
     (recent_buffer) => {
-        $crate::__pgrx_c_generated::Field4674
+        $crate::__pgrx_c_generated::Field_recent_buffer
     };
     (recently_dead_tuples) => {
-        $crate::__pgrx_c_generated::Field4675
+        $crate::__pgrx_c_generated::Field_recently_dead_tuples
     };
     (recheck) => {
-        $crate::__pgrx_c_generated::Field4676
+        $crate::__pgrx_c_generated::Field_recheck
     };
     (recheckCurItem) => {
-        $crate::__pgrx_c_generated::Field4677
+        $crate::__pgrx_c_generated::Field_recheckCurItem
     };
     (recheckDistances) => {
-        $crate::__pgrx_c_generated::Field4678
+        $crate::__pgrx_c_generated::Field_recheckDistances
     };
     (recheckqual) => {
-        $crate::__pgrx_c_generated::Field4681
+        $crate::__pgrx_c_generated::Field_recheckqual
     };
     (rechecks) => {
-        $crate::__pgrx_c_generated::Field4682
+        $crate::__pgrx_c_generated::Field_rechecks
     };
     (reconstructedValue) => {
-        $crate::__pgrx_c_generated::Field4685
+        $crate::__pgrx_c_generated::Field_reconstructedValue
     };
     (record) => {
-        $crate::__pgrx_c_generated::Field4688
+        $crate::__pgrx_c_generated::Field_record
     };
     (record_origin) => {
-        $crate::__pgrx_c_generated::Field4689
+        $crate::__pgrx_c_generated::Field_record_origin
     };
     (record_stats) => {
-        $crate::__pgrx_c_generated::Field4690
+        $crate::__pgrx_c_generated::Field_record_stats
     };
     (recoveryConflictPending) => {
-        $crate::__pgrx_c_generated::Field4691
+        $crate::__pgrx_c_generated::Field_recoveryConflictPending
     };
     (recovery_signal_file_found) => {
-        $crate::__pgrx_c_generated::Field4693
+        $crate::__pgrx_c_generated::Field_recovery_signal_file_found
     };
     (recparentno) => {
-        $crate::__pgrx_c_generated::Field4694
+        $crate::__pgrx_c_generated::Field_recparentno
     };
     (rectupledescid) => {
-        $crate::__pgrx_c_generated::Field4695
+        $crate::__pgrx_c_generated::Field_rectupledescid
     };
     (rectypeid) => {
-        $crate::__pgrx_c_generated::Field4696
+        $crate::__pgrx_c_generated::Field_rectypeid
     };
     (recurse) => {
-        $crate::__pgrx_c_generated::Field4697
+        $crate::__pgrx_c_generated::Field_recurse
     };
     (recursing) => {
-        $crate::__pgrx_c_generated::Field4698
+        $crate::__pgrx_c_generated::Field_recursing
     };
     (recursive) => {
-        $crate::__pgrx_c_generated::Field4699
+        $crate::__pgrx_c_generated::Field_recursive
     };
     (redirectXid) => {
-        $crate::__pgrx_c_generated::Field4700
+        $crate::__pgrx_c_generated::Field_redirectXid
     };
     (redo) => {
-        $crate::__pgrx_c_generated::Field4701
+        $crate::__pgrx_c_generated::Field_redo
     };
     (reduceResult) => {
-        $crate::__pgrx_c_generated::Field4702
+        $crate::__pgrx_c_generated::Field_reduceResult
     };
     (ref_is_family) => {
-        $crate::__pgrx_c_generated::Field4703
+        $crate::__pgrx_c_generated::Field_ref_is_family
     };
     (ref_is_hard) => {
-        $crate::__pgrx_c_generated::Field4704
+        $crate::__pgrx_c_generated::Field_ref_is_hard
     };
     (ref_relid) => {
-        $crate::__pgrx_c_generated::Field4705
+        $crate::__pgrx_c_generated::Field_ref_relid
     };
     (refclassid) => {
-        $crate::__pgrx_c_generated::Field4707
+        $crate::__pgrx_c_generated::Field_refclassid
     };
     (refcnt) => {
-        $crate::__pgrx_c_generated::Field4708
+        $crate::__pgrx_c_generated::Field_refcnt
     };
     (refcollid) => {
-        $crate::__pgrx_c_generated::Field4709
+        $crate::__pgrx_c_generated::Field_refcollid
     };
     (refcontainertype) => {
-        $crate::__pgrx_c_generated::Field4710
+        $crate::__pgrx_c_generated::Field_refcontainertype
     };
     (refcount) => {
-        $crate::__pgrx_c_generated::Field4711
+        $crate::__pgrx_c_generated::Field_refcount
     };
     (refelemtype) => {
-        $crate::__pgrx_c_generated::Field4713
+        $crate::__pgrx_c_generated::Field_refelemtype
     };
     (reflowerindexpr) => {
-        $crate::__pgrx_c_generated::Field4715
+        $crate::__pgrx_c_generated::Field_reflowerindexpr
     };
     (refobjid) => {
-        $crate::__pgrx_c_generated::Field4717
+        $crate::__pgrx_c_generated::Field_refobjid
     };
     (refobjsubid) => {
-        $crate::__pgrx_c_generated::Field4718
+        $crate::__pgrx_c_generated::Field_refobjsubid
     };
     (refrestype) => {
-        $crate::__pgrx_c_generated::Field4719
+        $crate::__pgrx_c_generated::Field_refrestype
     };
     (refs) => {
-        $crate::__pgrx_c_generated::Field4720
+        $crate::__pgrx_c_generated::Field_refs
     };
     (reftypmod) => {
-        $crate::__pgrx_c_generated::Field4721
+        $crate::__pgrx_c_generated::Field_reftypmod
     };
     (refupperindexpr) => {
-        $crate::__pgrx_c_generated::Field4722
+        $crate::__pgrx_c_generated::Field_refupperindexpr
     };
     (regOffset) => {
-        $crate::__pgrx_c_generated::Field4723
+        $crate::__pgrx_c_generated::Field_regOffset
     };
     (regd_count) => {
-        $crate::__pgrx_c_generated::Field4724
+        $crate::__pgrx_c_generated::Field_regd_count
     };
     (reject_limit) => {
-        $crate::__pgrx_c_generated::Field4725
+        $crate::__pgrx_c_generated::Field_reject_limit
     };
     (rel) => {
-        $crate::__pgrx_c_generated::Field4726
+        $crate::__pgrx_c_generated::Field_rel
     };
     (relId) => {
-        $crate::__pgrx_c_generated::Field4727
+        $crate::__pgrx_c_generated::Field_relId
     };
     (relNumber) => {
-        $crate::__pgrx_c_generated::Field4728
+        $crate::__pgrx_c_generated::Field_relNumber
     };
     (relOid) => {
-        $crate::__pgrx_c_generated::Field4729
+        $crate::__pgrx_c_generated::Field_relOid
     };
     (rel_parallel_workers) => {
-        $crate::__pgrx_c_generated::Field4730
+        $crate::__pgrx_c_generated::Field_rel_parallel_workers
     };
     (relabelformat) => {
-        $crate::__pgrx_c_generated::Field4731
+        $crate::__pgrx_c_generated::Field_relabelformat
     };
     (relallfrozen) => {
-        $crate::__pgrx_c_generated::Field4732
+        $crate::__pgrx_c_generated::Field_relallfrozen
     };
     (relallvisible) => {
-        $crate::__pgrx_c_generated::Field4733
+        $crate::__pgrx_c_generated::Field_relallvisible
     };
     (relam) => {
-        $crate::__pgrx_c_generated::Field4734
+        $crate::__pgrx_c_generated::Field_relam
     };
     (relationOid) => {
-        $crate::__pgrx_c_generated::Field4736
+        $crate::__pgrx_c_generated::Field_relationOid
     };
     (relationOids) => {
-        $crate::__pgrx_c_generated::Field4737
+        $crate::__pgrx_c_generated::Field_relationOids
     };
     (relationType) => {
-        $crate::__pgrx_c_generated::Field4738
+        $crate::__pgrx_c_generated::Field_relationType
     };
     (relations) => {
-        $crate::__pgrx_c_generated::Field4749
+        $crate::__pgrx_c_generated::Field_relations
     };
     (relcacheInitFileInval) => {
-        $crate::__pgrx_c_generated::Field4750
+        $crate::__pgrx_c_generated::Field_relcacheInitFileInval
     };
     (relchecks) => {
-        $crate::__pgrx_c_generated::Field4751
+        $crate::__pgrx_c_generated::Field_relchecks
     };
     (releaseMask) => {
-        $crate::__pgrx_c_generated::Field4754
+        $crate::__pgrx_c_generated::Field_releaseMask
     };
     (release_phase) => {
-        $crate::__pgrx_c_generated::Field4756
+        $crate::__pgrx_c_generated::Field_release_phase
     };
     (release_priority) => {
-        $crate::__pgrx_c_generated::Field4757
+        $crate::__pgrx_c_generated::Field_release_priority
     };
     (relfilenode) => {
-        $crate::__pgrx_c_generated::Field4758
+        $crate::__pgrx_c_generated::Field_relfilenode
     };
     (relforcerowsecurity) => {
-        $crate::__pgrx_c_generated::Field4759
+        $crate::__pgrx_c_generated::Field_relforcerowsecurity
     };
     (relfrozenxid) => {
-        $crate::__pgrx_c_generated::Field4760
+        $crate::__pgrx_c_generated::Field_relfrozenxid
     };
     (relhasindex) => {
-        $crate::__pgrx_c_generated::Field4761
+        $crate::__pgrx_c_generated::Field_relhasindex
     };
     (relhasrules) => {
-        $crate::__pgrx_c_generated::Field4762
+        $crate::__pgrx_c_generated::Field_relhasrules
     };
     (relhassubclass) => {
-        $crate::__pgrx_c_generated::Field4763
+        $crate::__pgrx_c_generated::Field_relhassubclass
     };
     (relhastriggers) => {
-        $crate::__pgrx_c_generated::Field4764
+        $crate::__pgrx_c_generated::Field_relhastriggers
     };
     (relid) => {
-        $crate::__pgrx_c_generated::Field4765
+        $crate::__pgrx_c_generated::Field_relid
     };
     (reliddesc) => {
-        $crate::__pgrx_c_generated::Field4767
+        $crate::__pgrx_c_generated::Field_reliddesc
     };
     (relispartition) => {
-        $crate::__pgrx_c_generated::Field4769
+        $crate::__pgrx_c_generated::Field_relispartition
     };
     (relispopulated) => {
-        $crate::__pgrx_c_generated::Field4770
+        $crate::__pgrx_c_generated::Field_relispopulated
     };
     (relisshared) => {
-        $crate::__pgrx_c_generated::Field4771
+        $crate::__pgrx_c_generated::Field_relisshared
     };
     (relkind) => {
-        $crate::__pgrx_c_generated::Field4772
+        $crate::__pgrx_c_generated::Field_relkind
     };
     (rellockmode) => {
-        $crate::__pgrx_c_generated::Field4773
+        $crate::__pgrx_c_generated::Field_rellockmode
     };
     (relminmxid) => {
-        $crate::__pgrx_c_generated::Field4774
+        $crate::__pgrx_c_generated::Field_relminmxid
     };
     (relmutex) => {
-        $crate::__pgrx_c_generated::Field4775
+        $crate::__pgrx_c_generated::Field_relmutex
     };
     (relname) => {
-        $crate::__pgrx_c_generated::Field4776
+        $crate::__pgrx_c_generated::Field_relname
     };
     (relname_only) => {
-        $crate::__pgrx_c_generated::Field4777
+        $crate::__pgrx_c_generated::Field_relname_only
     };
     (relnamespace) => {
-        $crate::__pgrx_c_generated::Field4778
+        $crate::__pgrx_c_generated::Field_relnamespace
     };
     (relnatts) => {
-        $crate::__pgrx_c_generated::Field4779
+        $crate::__pgrx_c_generated::Field_relnatts
     };
     (reloftype) => {
-        $crate::__pgrx_c_generated::Field4780
+        $crate::__pgrx_c_generated::Field_reloftype
     };
     (relopt_struct_size) => {
-        $crate::__pgrx_c_generated::Field4781
+        $crate::__pgrx_c_generated::Field_relopt_struct_size
     };
     (reloptkind) => {
-        $crate::__pgrx_c_generated::Field4782
+        $crate::__pgrx_c_generated::Field_reloptkind
     };
     (relowner) => {
-        $crate::__pgrx_c_generated::Field4783
+        $crate::__pgrx_c_generated::Field_relowner
     };
     (relpages) => {
-        $crate::__pgrx_c_generated::Field4784
+        $crate::__pgrx_c_generated::Field_relpages
     };
     (relpersistence) => {
-        $crate::__pgrx_c_generated::Field4785
+        $crate::__pgrx_c_generated::Field_relpersistence
     };
     (relreplident) => {
-        $crate::__pgrx_c_generated::Field4786
+        $crate::__pgrx_c_generated::Field_relreplident
     };
     (relrewrite) => {
-        $crate::__pgrx_c_generated::Field4787
+        $crate::__pgrx_c_generated::Field_relrewrite
     };
     (relrowsecurity) => {
-        $crate::__pgrx_c_generated::Field4788
+        $crate::__pgrx_c_generated::Field_relrowsecurity
     };
     (rels) => {
-        $crate::__pgrx_c_generated::Field4789
+        $crate::__pgrx_c_generated::Field_rels
     };
     (relseg_size) => {
-        $crate::__pgrx_c_generated::Field4790
+        $crate::__pgrx_c_generated::Field_relseg_size
     };
     (relstate) => {
-        $crate::__pgrx_c_generated::Field4791
+        $crate::__pgrx_c_generated::Field_relstate
     };
     (relstate_lsn) => {
-        $crate::__pgrx_c_generated::Field4792
+        $crate::__pgrx_c_generated::Field_relstate_lsn
     };
     (reltablespace) => {
-        $crate::__pgrx_c_generated::Field4797
+        $crate::__pgrx_c_generated::Field_reltablespace
     };
     (reltoastrelid) => {
-        $crate::__pgrx_c_generated::Field4799
+        $crate::__pgrx_c_generated::Field_reltoastrelid
     };
     (reltype) => {
-        $crate::__pgrx_c_generated::Field4801
+        $crate::__pgrx_c_generated::Field_reltype
     };
     (remainder) => {
-        $crate::__pgrx_c_generated::Field4803
+        $crate::__pgrx_c_generated::Field_remainder
     };
     (remote_lsn) => {
-        $crate::__pgrx_c_generated::Field4804
+        $crate::__pgrx_c_generated::Field_remote_lsn
     };
     (remoteid) => {
-        $crate::__pgrx_c_generated::Field4806
+        $crate::__pgrx_c_generated::Field_remoteid
     };
     (remove) => {
-        $crate::__pgrx_c_generated::Field4808
+        $crate::__pgrx_c_generated::Field_remove
     };
     (removeType) => {
-        $crate::__pgrx_c_generated::Field4809
+        $crate::__pgrx_c_generated::Field_removeType
     };
     (renameType) => {
-        $crate::__pgrx_c_generated::Field4811
+        $crate::__pgrx_c_generated::Field_renameType
     };
     (repeatable_across_queries) => {
-        $crate::__pgrx_c_generated::Field4815
+        $crate::__pgrx_c_generated::Field_repeatable_across_queries
     };
     (repeatable_across_scans) => {
-        $crate::__pgrx_c_generated::Field4816
+        $crate::__pgrx_c_generated::Field_repeatable_across_scans
     };
     (repeated) => {
-        $crate::__pgrx_c_generated::Field4817
+        $crate::__pgrx_c_generated::Field_repeated
     };
     (replace) => {
-        $crate::__pgrx_c_generated::Field4818
+        $crate::__pgrx_c_generated::Field_replace
     };
     (replaceDead) => {
-        $crate::__pgrx_c_generated::Field4819
+        $crate::__pgrx_c_generated::Field_replaceDead
     };
     (replacenull) => {
-        $crate::__pgrx_c_generated::Field4820
+        $crate::__pgrx_c_generated::Field_replacenull
     };
     (replacevalue) => {
-        $crate::__pgrx_c_generated::Field4821
+        $crate::__pgrx_c_generated::Field_replacevalue
     };
     (replident) => {
-        $crate::__pgrx_c_generated::Field4823
+        $crate::__pgrx_c_generated::Field_replident
     };
     (replyTime) => {
-        $crate::__pgrx_c_generated::Field4824
+        $crate::__pgrx_c_generated::Field_replyTime
     };
     (reply_lsn) => {
-        $crate::__pgrx_c_generated::Field4825
+        $crate::__pgrx_c_generated::Field_reply_lsn
     };
     (reply_time) => {
-        $crate::__pgrx_c_generated::Field4826
+        $crate::__pgrx_c_generated::Field_reply_time
     };
     (report_progress) => {
-        $crate::__pgrx_c_generated::Field4829
+        $crate::__pgrx_c_generated::Field_report_progress
     };
     (request_complete) => {
-        $crate::__pgrx_c_generated::Field4831
+        $crate::__pgrx_c_generated::Field_request_complete
     };
     (request_index) => {
-        $crate::__pgrx_c_generated::Field4832
+        $crate::__pgrx_c_generated::Field_request_index
     };
     (requiredPerms) => {
-        $crate::__pgrx_c_generated::Field4837
+        $crate::__pgrx_c_generated::Field_requiredPerms
     };
     (required_relids) => {
-        $crate::__pgrx_c_generated::Field4838
+        $crate::__pgrx_c_generated::Field_required_relids
     };
     (requires_procedure_resowner) => {
-        $crate::__pgrx_c_generated::Field4839
+        $crate::__pgrx_c_generated::Field_requires_procedure_resowner
     };
     (rescan_param) => {
-        $crate::__pgrx_c_generated::Field4840
+        $crate::__pgrx_c_generated::Field_rescan_param
     };
     (reset_default_tblspc) => {
-        $crate::__pgrx_c_generated::Field4848
+        $crate::__pgrx_c_generated::Field_reset_default_tblspc
     };
     (reset_scontext) => {
-        $crate::__pgrx_c_generated::Field4850
+        $crate::__pgrx_c_generated::Field_reset_scontext
     };
     (reset_source) => {
-        $crate::__pgrx_c_generated::Field4851
+        $crate::__pgrx_c_generated::Field_reset_source
     };
     (reset_srole) => {
-        $crate::__pgrx_c_generated::Field4852
+        $crate::__pgrx_c_generated::Field_reset_srole
     };
     (reset_val) => {
-        $crate::__pgrx_c_generated::Field4853
+        $crate::__pgrx_c_generated::Field_reset_val
     };
     (resjunk) => {
-        $crate::__pgrx_c_generated::Field4854
+        $crate::__pgrx_c_generated::Field_resjunk
     };
     (resno) => {
-        $crate::__pgrx_c_generated::Field4856
+        $crate::__pgrx_c_generated::Field_resno
     };
     (resnull) => {
-        $crate::__pgrx_c_generated::Field4857
+        $crate::__pgrx_c_generated::Field_resnull
     };
     (resolve_option) => {
-        $crate::__pgrx_c_generated::Field4858
+        $crate::__pgrx_c_generated::Field_resolve_option
     };
     (resorigcol) => {
-        $crate::__pgrx_c_generated::Field4859
+        $crate::__pgrx_c_generated::Field_resorigcol
     };
     (resorigtbl) => {
-        $crate::__pgrx_c_generated::Field4860
+        $crate::__pgrx_c_generated::Field_resorigtbl
     };
     (ressortgroupref) => {
-        $crate::__pgrx_c_generated::Field4863
+        $crate::__pgrx_c_generated::Field_ressortgroupref
     };
     (restDatum) => {
-        $crate::__pgrx_c_generated::Field4864
+        $crate::__pgrx_c_generated::Field_restDatum
     };
     (restart_decoding_lsn) => {
-        $crate::__pgrx_c_generated::Field4865
+        $crate::__pgrx_c_generated::Field_restart_decoding_lsn
     };
     (restart_lsn) => {
-        $crate::__pgrx_c_generated::Field4866
+        $crate::__pgrx_c_generated::Field_restart_lsn
     };
     (restart_seqs) => {
-        $crate::__pgrx_c_generated::Field4867
+        $crate::__pgrx_c_generated::Field_restart_seqs
     };
     (restartpoints_performed) => {
-        $crate::__pgrx_c_generated::Field4868
+        $crate::__pgrx_c_generated::Field_restartpoints_performed
     };
     (restartpoints_requested) => {
-        $crate::__pgrx_c_generated::Field4869
+        $crate::__pgrx_c_generated::Field_restartpoints_requested
     };
     (restartpoints_timed) => {
-        $crate::__pgrx_c_generated::Field4870
+        $crate::__pgrx_c_generated::Field_restartpoints_timed
     };
     (restrictlist) => {
-        $crate::__pgrx_c_generated::Field4871
+        $crate::__pgrx_c_generated::Field_restrictlist
     };
     (result) => {
-        $crate::__pgrx_c_generated::Field4872
+        $crate::__pgrx_c_generated::Field_result
     };
     (resultRelation) => {
-        $crate::__pgrx_c_generated::Field4875
+        $crate::__pgrx_c_generated::Field_resultRelation
     };
     (resultRelations) => {
-        $crate::__pgrx_c_generated::Field4876
+        $crate::__pgrx_c_generated::Field_resultRelations
     };
     (resultType) => {
-        $crate::__pgrx_c_generated::Field4877
+        $crate::__pgrx_c_generated::Field_resultType
     };
     (resultcollid) => {
-        $crate::__pgrx_c_generated::Field4878
+        $crate::__pgrx_c_generated::Field_resultcollid
     };
     (resultelemtype) => {
-        $crate::__pgrx_c_generated::Field4879
+        $crate::__pgrx_c_generated::Field_resultelemtype
     };
     (resultinfo) => {
-        $crate::__pgrx_c_generated::Field4880
+        $crate::__pgrx_c_generated::Field_resultinfo
     };
     (resultnum) => {
-        $crate::__pgrx_c_generated::Field4881
+        $crate::__pgrx_c_generated::Field_resultnum
     };
     (resultopsfixed) => {
-        $crate::__pgrx_c_generated::Field4883
+        $crate::__pgrx_c_generated::Field_resultopsfixed
     };
     (resultopsset) => {
-        $crate::__pgrx_c_generated::Field4884
+        $crate::__pgrx_c_generated::Field_resultopsset
     };
     (resulttype) => {
-        $crate::__pgrx_c_generated::Field4886
+        $crate::__pgrx_c_generated::Field_resulttype
     };
     (resulttypeByVal) => {
-        $crate::__pgrx_c_generated::Field4887
+        $crate::__pgrx_c_generated::Field_resulttypeByVal
     };
     (resulttypeLen) => {
-        $crate::__pgrx_c_generated::Field4888
+        $crate::__pgrx_c_generated::Field_resulttypeLen
     };
     (resulttypmod) => {
-        $crate::__pgrx_c_generated::Field4889
+        $crate::__pgrx_c_generated::Field_resulttypmod
     };
     (resvalue) => {
-        $crate::__pgrx_c_generated::Field4890
+        $crate::__pgrx_c_generated::Field_resvalue
     };
     (retisnull) => {
-        $crate::__pgrx_c_generated::Field4893
+        $crate::__pgrx_c_generated::Field_retisnull
     };
     (retisset) => {
-        $crate::__pgrx_c_generated::Field4894
+        $crate::__pgrx_c_generated::Field_retisset
     };
     (retistuple) => {
-        $crate::__pgrx_c_generated::Field4895
+        $crate::__pgrx_c_generated::Field_retistuple
     };
     (retlevelsup) => {
-        $crate::__pgrx_c_generated::Field4896
+        $crate::__pgrx_c_generated::Field_retlevelsup
     };
     (retold) => {
-        $crate::__pgrx_c_generated::Field4897
+        $crate::__pgrx_c_generated::Field_retold
     };
     (retry_from_parent) => {
-        $crate::__pgrx_c_generated::Field4898
+        $crate::__pgrx_c_generated::Field_retry_from_parent
     };
     (rettype) => {
-        $crate::__pgrx_c_generated::Field4899
+        $crate::__pgrx_c_generated::Field_rettype
     };
     (returnData) => {
-        $crate::__pgrx_c_generated::Field4900
+        $crate::__pgrx_c_generated::Field_returnData
     };
     (returnMode) => {
-        $crate::__pgrx_c_generated::Field4901
+        $crate::__pgrx_c_generated::Field_returnMode
     };
     (returningList) => {
-        $crate::__pgrx_c_generated::Field4905
+        $crate::__pgrx_c_generated::Field_returningList
     };
     (returningLists) => {
-        $crate::__pgrx_c_generated::Field4906
+        $crate::__pgrx_c_generated::Field_returningLists
     };
     (returns_multiple_rows) => {
-        $crate::__pgrx_c_generated::Field4910
+        $crate::__pgrx_c_generated::Field_returns_multiple_rows
     };
     (retval) => {
-        $crate::__pgrx_c_generated::Field4912
+        $crate::__pgrx_c_generated::Field_retval
     };
     (retvarno) => {
-        $crate::__pgrx_c_generated::Field4913
+        $crate::__pgrx_c_generated::Field_retvarno
     };
     (reverse) => {
-        $crate::__pgrx_c_generated::Field4914
+        $crate::__pgrx_c_generated::Field_reverse
     };
     (reverse_sort) => {
-        $crate::__pgrx_c_generated::Field4915
+        $crate::__pgrx_c_generated::Field_reverse_sort
     };
     (revmapNumPages) => {
-        $crate::__pgrx_c_generated::Field4916
+        $crate::__pgrx_c_generated::Field_revmapNumPages
     };
     (rewriteRoleId) => {
-        $crate::__pgrx_c_generated::Field4918
+        $crate::__pgrx_c_generated::Field_rewriteRoleId
     };
     (rewriteRowSecurity) => {
-        $crate::__pgrx_c_generated::Field4919
+        $crate::__pgrx_c_generated::Field_rewriteRowSecurity
     };
     (rexpr_list_end) => {
-        $crate::__pgrx_c_generated::Field4921
+        $crate::__pgrx_c_generated::Field_rexpr_list_end
     };
     (rexpr_list_start) => {
-        $crate::__pgrx_c_generated::Field4922
+        $crate::__pgrx_c_generated::Field_rexpr_list_start
     };
     (rf_valid_for_delete) => {
-        $crate::__pgrx_c_generated::Field4923
+        $crate::__pgrx_c_generated::Field_rf_valid_for_delete
     };
     (rf_valid_for_update) => {
-        $crate::__pgrx_c_generated::Field4924
+        $crate::__pgrx_c_generated::Field_rf_valid_for_update
     };
     (ri_BatchSize) => {
-        $crate::__pgrx_c_generated::Field4926
+        $crate::__pgrx_c_generated::Field_ri_BatchSize
     };
     (ri_ChildToRootMapValid) => {
-        $crate::__pgrx_c_generated::Field4929
+        $crate::__pgrx_c_generated::Field_ri_ChildToRootMapValid
     };
     (ri_NumGeneratedNeededI) => {
-        $crate::__pgrx_c_generated::Field4940
+        $crate::__pgrx_c_generated::Field_ri_NumGeneratedNeededI
     };
     (ri_NumGeneratedNeededU) => {
-        $crate::__pgrx_c_generated::Field4941
+        $crate::__pgrx_c_generated::Field_ri_NumGeneratedNeededU
     };
     (ri_NumIndices) => {
-        $crate::__pgrx_c_generated::Field4942
+        $crate::__pgrx_c_generated::Field_ri_NumIndices
     };
     (ri_NumSlots) => {
-        $crate::__pgrx_c_generated::Field4943
+        $crate::__pgrx_c_generated::Field_ri_NumSlots
     };
     (ri_NumSlotsInitialized) => {
-        $crate::__pgrx_c_generated::Field4944
+        $crate::__pgrx_c_generated::Field_ri_NumSlotsInitialized
     };
     (ri_RangeTableIndex) => {
-        $crate::__pgrx_c_generated::Field4948
+        $crate::__pgrx_c_generated::Field_ri_RangeTableIndex
     };
     (ri_RootToChildMapValid) => {
-        $crate::__pgrx_c_generated::Field4953
+        $crate::__pgrx_c_generated::Field_ri_RootToChildMapValid
     };
     (ri_RowIdAttNo) => {
-        $crate::__pgrx_c_generated::Field4954
+        $crate::__pgrx_c_generated::Field_ri_RowIdAttNo
     };
     (ri_WithCheckOptionExprs) => {
-        $crate::__pgrx_c_generated::Field4962
+        $crate::__pgrx_c_generated::Field_ri_WithCheckOptionExprs
     };
     (ri_WithCheckOptions) => {
-        $crate::__pgrx_c_generated::Field4963
+        $crate::__pgrx_c_generated::Field_ri_WithCheckOptions
     };
     (ri_ancestorResultRels) => {
-        $crate::__pgrx_c_generated::Field4964
+        $crate::__pgrx_c_generated::Field_ri_ancestorResultRels
     };
     (ri_extraUpdatedCols_valid) => {
-        $crate::__pgrx_c_generated::Field4985
+        $crate::__pgrx_c_generated::Field_ri_extraUpdatedCols_valid
     };
     (ri_needLockTagTuple) => {
-        $crate::__pgrx_c_generated::Field4994
+        $crate::__pgrx_c_generated::Field_ri_needLockTagTuple
     };
     (ri_onConflictArbiterIndexes) => {
-        $crate::__pgrx_c_generated::Field4999
+        $crate::__pgrx_c_generated::Field_ri_onConflictArbiterIndexes
     };
     (ri_projectNewInfoValid) => {
-        $crate::__pgrx_c_generated::Field5009
+        $crate::__pgrx_c_generated::Field_ri_projectNewInfoValid
     };
     (ri_returningList) => {
-        $crate::__pgrx_c_generated::Field5013
+        $crate::__pgrx_c_generated::Field_ri_returningList
     };
     (ri_usesFdwDirectModify) => {
-        $crate::__pgrx_c_generated::Field5023
+        $crate::__pgrx_c_generated::Field_ri_usesFdwDirectModify
     };
     (rightChildBlkno) => {
-        $crate::__pgrx_c_generated::Field5027
+        $crate::__pgrx_c_generated::Field_rightChildBlkno
     };
     (rightLink) => {
-        $crate::__pgrx_c_generated::Field5029
+        $crate::__pgrx_c_generated::Field_rightLink
     };
     (right_hasheqoperator) => {
-        $crate::__pgrx_c_generated::Field5033
+        $crate::__pgrx_c_generated::Field_right_hasheqoperator
     };
     (right_join_clauses) => {
-        $crate::__pgrx_c_generated::Field5034
+        $crate::__pgrx_c_generated::Field_right_join_clauses
     };
     (rightblk) => {
-        $crate::__pgrx_c_generated::Field5037
+        $crate::__pgrx_c_generated::Field_rightblk
     };
     (rightlink) => {
-        $crate::__pgrx_c_generated::Field5039
+        $crate::__pgrx_c_generated::Field_rightlink
     };
     (rightsib) => {
-        $crate::__pgrx_c_generated::Field5041
+        $crate::__pgrx_c_generated::Field_rightsib
     };
     (righttree) => {
-        $crate::__pgrx_c_generated::Field5043
+        $crate::__pgrx_c_generated::Field_righttree
     };
     (righttype) => {
-        $crate::__pgrx_c_generated::Field5044
+        $crate::__pgrx_c_generated::Field_righttype
     };
     (rinfo_serial) => {
-        $crate::__pgrx_c_generated::Field5046
+        $crate::__pgrx_c_generated::Field_rinfo_serial
     };
     (rng_collation) => {
-        $crate::__pgrx_c_generated::Field5064
+        $crate::__pgrx_c_generated::Field_rng_collation
     };
     (rng_opfamily) => {
-        $crate::__pgrx_c_generated::Field5065
+        $crate::__pgrx_c_generated::Field_rng_opfamily
     };
     (rngcanonical) => {
-        $crate::__pgrx_c_generated::Field5067
+        $crate::__pgrx_c_generated::Field_rngcanonical
     };
     (rngcollation) => {
-        $crate::__pgrx_c_generated::Field5068
+        $crate::__pgrx_c_generated::Field_rngcollation
     };
     (rngmultitypid) => {
-        $crate::__pgrx_c_generated::Field5070
+        $crate::__pgrx_c_generated::Field_rngmultitypid
     };
     (rngsubdiff) => {
-        $crate::__pgrx_c_generated::Field5071
+        $crate::__pgrx_c_generated::Field_rngsubdiff
     };
     (rngsubopc) => {
-        $crate::__pgrx_c_generated::Field5072
+        $crate::__pgrx_c_generated::Field_rngsubopc
     };
     (rngsubtype) => {
-        $crate::__pgrx_c_generated::Field5073
+        $crate::__pgrx_c_generated::Field_rngsubtype
     };
     (rngtypid) => {
-        $crate::__pgrx_c_generated::Field5075
+        $crate::__pgrx_c_generated::Field_rngtypid
     };
     (roident) => {
-        $crate::__pgrx_c_generated::Field5076
+        $crate::__pgrx_c_generated::Field_roident
     };
     (rolbypassrls) => {
-        $crate::__pgrx_c_generated::Field5077
+        $crate::__pgrx_c_generated::Field_rolbypassrls
     };
     (rolcanlogin) => {
-        $crate::__pgrx_c_generated::Field5078
+        $crate::__pgrx_c_generated::Field_rolcanlogin
     };
     (rolconnlimit) => {
-        $crate::__pgrx_c_generated::Field5079
+        $crate::__pgrx_c_generated::Field_rolconnlimit
     };
     (rolcreatedb) => {
-        $crate::__pgrx_c_generated::Field5080
+        $crate::__pgrx_c_generated::Field_rolcreatedb
     };
     (rolcreaterole) => {
-        $crate::__pgrx_c_generated::Field5081
+        $crate::__pgrx_c_generated::Field_rolcreaterole
     };
     (roleId) => {
-        $crate::__pgrx_c_generated::Field5083
+        $crate::__pgrx_c_generated::Field_roleId
     };
     (roleid) => {
-        $crate::__pgrx_c_generated::Field5084
+        $crate::__pgrx_c_generated::Field_roleid
     };
     (roles) => {
-        $crate::__pgrx_c_generated::Field5086
+        $crate::__pgrx_c_generated::Field_roles
     };
     (roletype) => {
-        $crate::__pgrx_c_generated::Field5087
+        $crate::__pgrx_c_generated::Field_roletype
     };
     (rolinherit) => {
-        $crate::__pgrx_c_generated::Field5088
+        $crate::__pgrx_c_generated::Field_rolinherit
     };
     (rollback_end_lsn) => {
-        $crate::__pgrx_c_generated::Field5089
+        $crate::__pgrx_c_generated::Field_rollback_end_lsn
     };
     (rollback_time) => {
-        $crate::__pgrx_c_generated::Field5092
+        $crate::__pgrx_c_generated::Field_rollback_time
     };
     (rollups) => {
-        $crate::__pgrx_c_generated::Field5093
+        $crate::__pgrx_c_generated::Field_rollups
     };
     (rolreplication) => {
-        $crate::__pgrx_c_generated::Field5095
+        $crate::__pgrx_c_generated::Field_rolreplication
     };
     (rolsuper) => {
-        $crate::__pgrx_c_generated::Field5096
+        $crate::__pgrx_c_generated::Field_rolsuper
     };
     (root) => {
-        $crate::__pgrx_c_generated::Field5098
+        $crate::__pgrx_c_generated::Field_root
     };
     (rootBlkno) => {
-        $crate::__pgrx_c_generated::Field5099
+        $crate::__pgrx_c_generated::Field_rootBlkno
     };
     (rootRelation) => {
-        $crate::__pgrx_c_generated::Field5100
+        $crate::__pgrx_c_generated::Field_rootRelation
     };
     (rootblk) => {
-        $crate::__pgrx_c_generated::Field5102
+        $crate::__pgrx_c_generated::Field_rootblk
     };
     (rootlevel) => {
-        $crate::__pgrx_c_generated::Field5103
+        $crate::__pgrx_c_generated::Field_rootlevel
     };
     (row) => {
-        $crate::__pgrx_c_generated::Field5105
+        $crate::__pgrx_c_generated::Field_row
     };
     (rowMarks) => {
-        $crate::__pgrx_c_generated::Field5106
+        $crate::__pgrx_c_generated::Field_rowMarks
     };
     (row_format) => {
-        $crate::__pgrx_c_generated::Field5107
+        $crate::__pgrx_c_generated::Field_row_format
     };
     (row_identity_vars) => {
-        $crate::__pgrx_c_generated::Field5108
+        $crate::__pgrx_c_generated::Field_row_identity_vars
     };
     (row_typeid) => {
-        $crate::__pgrx_c_generated::Field5109
+        $crate::__pgrx_c_generated::Field_row_typeid
     };
     (rowidwidth) => {
-        $crate::__pgrx_c_generated::Field5118
+        $crate::__pgrx_c_generated::Field_rowidwidth
     };
     (rowmarkId) => {
-        $crate::__pgrx_c_generated::Field5120
+        $crate::__pgrx_c_generated::Field_rowmarkId
     };
     (rowstride) => {
-        $crate::__pgrx_c_generated::Field5123
+        $crate::__pgrx_c_generated::Field_rowstride
     };
     (rp_time) => {
-        $crate::__pgrx_c_generated::Field5126
+        $crate::__pgrx_c_generated::Field_rp_time
     };
     (rrlink) => {
-        $crate::__pgrx_c_generated::Field5128
+        $crate::__pgrx_c_generated::Field_rrlink
     };
     (rs_cblock) => {
-        $crate::__pgrx_c_generated::Field5131
+        $crate::__pgrx_c_generated::Field_rs_cblock
     };
     (rs_cbuf) => {
-        $crate::__pgrx_c_generated::Field5132
+        $crate::__pgrx_c_generated::Field_rs_cbuf
     };
     (rs_checkqual) => {
-        $crate::__pgrx_c_generated::Field5133
+        $crate::__pgrx_c_generated::Field_rs_checkqual
     };
     (rs_cindex) => {
-        $crate::__pgrx_c_generated::Field5134
+        $crate::__pgrx_c_generated::Field_rs_cindex
     };
     (rs_coffset) => {
-        $crate::__pgrx_c_generated::Field5135
+        $crate::__pgrx_c_generated::Field_rs_coffset
     };
     (rs_dir) => {
-        $crate::__pgrx_c_generated::Field5137
+        $crate::__pgrx_c_generated::Field_rs_dir
     };
     (rs_done) => {
-        $crate::__pgrx_c_generated::Field5138
+        $crate::__pgrx_c_generated::Field_rs_done
     };
     (rs_flags) => {
-        $crate::__pgrx_c_generated::Field5139
+        $crate::__pgrx_c_generated::Field_rs_flags
     };
     (rs_inited) => {
-        $crate::__pgrx_c_generated::Field5141
+        $crate::__pgrx_c_generated::Field_rs_inited
     };
     (rs_nblocks) => {
-        $crate::__pgrx_c_generated::Field5145
+        $crate::__pgrx_c_generated::Field_rs_nblocks
     };
     (rs_nkeys) => {
-        $crate::__pgrx_c_generated::Field5146
+        $crate::__pgrx_c_generated::Field_rs_nkeys
     };
     (rs_ntuples) => {
-        $crate::__pgrx_c_generated::Field5147
+        $crate::__pgrx_c_generated::Field_rs_ntuples
     };
     (rs_numblocks) => {
-        $crate::__pgrx_c_generated::Field5148
+        $crate::__pgrx_c_generated::Field_rs_numblocks
     };
     (rs_prefetch_block) => {
-        $crate::__pgrx_c_generated::Field5151
+        $crate::__pgrx_c_generated::Field_rs_prefetch_block
     };
     (rs_startblock) => {
-        $crate::__pgrx_c_generated::Field5155
+        $crate::__pgrx_c_generated::Field_rs_startblock
     };
     (rt_index) => {
-        $crate::__pgrx_c_generated::Field5161
+        $crate::__pgrx_c_generated::Field_rt_index
     };
     (rtable) => {
-        $crate::__pgrx_c_generated::Field5162
+        $crate::__pgrx_c_generated::Field_rtable
     };
     (rtable_names) => {
-        $crate::__pgrx_c_generated::Field5163
+        $crate::__pgrx_c_generated::Field_rtable_names
     };
     (rtable_size) => {
-        $crate::__pgrx_c_generated::Field5164
+        $crate::__pgrx_c_generated::Field_rtable_size
     };
     (rtekind) => {
-        $crate::__pgrx_c_generated::Field5165
+        $crate::__pgrx_c_generated::Field_rtekind
     };
     (rteperminfos) => {
-        $crate::__pgrx_c_generated::Field5166
+        $crate::__pgrx_c_generated::Field_rteperminfos
     };
     (rti) => {
-        $crate::__pgrx_c_generated::Field5167
+        $crate::__pgrx_c_generated::Field_rti
     };
     (rtindex) => {
-        $crate::__pgrx_c_generated::Field5168
+        $crate::__pgrx_c_generated::Field_rtindex
     };
     (ruleId) => {
-        $crate::__pgrx_c_generated::Field5185
+        $crate::__pgrx_c_generated::Field_ruleId
     };
     (runCondition) => {
-        $crate::__pgrx_c_generated::Field5188
+        $crate::__pgrx_c_generated::Field_runCondition
     };
     (runConditionOrig) => {
-        $crate::__pgrx_c_generated::Field5189
+        $crate::__pgrx_c_generated::Field_runConditionOrig
     };
     (runasowner) => {
-        $crate::__pgrx_c_generated::Field5191
+        $crate::__pgrx_c_generated::Field_runasowner
     };
     (running) => {
-        $crate::__pgrx_c_generated::Field5193
+        $crate::__pgrx_c_generated::Field_running
     };
     (rw_crashed_at) => {
-        $crate::__pgrx_c_generated::Field5196
+        $crate::__pgrx_c_generated::Field_rw_crashed_at
     };
     (rw_pid) => {
-        $crate::__pgrx_c_generated::Field5198
+        $crate::__pgrx_c_generated::Field_rw_pid
     };
     (rw_shmem_slot) => {
-        $crate::__pgrx_c_generated::Field5199
+        $crate::__pgrx_c_generated::Field_rw_shmem_slot
     };
     (rw_terminate) => {
-        $crate::__pgrx_c_generated::Field5200
+        $crate::__pgrx_c_generated::Field_rw_terminate
     };
     (s0) => {
-        $crate::__pgrx_c_generated::Field5202
+        $crate::__pgrx_c_generated::Field_s0
     };
     (s1) => {
-        $crate::__pgrx_c_generated::Field5203
+        $crate::__pgrx_c_generated::Field_s1
     };
     (salen) => {
-        $crate::__pgrx_c_generated::Field5221
+        $crate::__pgrx_c_generated::Field_salen
     };
     (save_XactDeferrable) => {
-        $crate::__pgrx_c_generated::Field5223
+        $crate::__pgrx_c_generated::Field_save_XactDeferrable
     };
     (save_XactIsoLevel) => {
-        $crate::__pgrx_c_generated::Field5224
+        $crate::__pgrx_c_generated::Field_save_XactIsoLevel
     };
     (save_XactReadOnly) => {
-        $crate::__pgrx_c_generated::Field5225
+        $crate::__pgrx_c_generated::Field_save_XactReadOnly
     };
     (save_yylloc) => {
-        $crate::__pgrx_c_generated::Field5228
+        $crate::__pgrx_c_generated::Field_save_yylloc
     };
     (saved) => {
-        $crate::__pgrx_c_generated::Field5229
+        $crate::__pgrx_c_generated::Field_saved
     };
     (saved_errno) => {
-        $crate::__pgrx_c_generated::Field5230
+        $crate::__pgrx_c_generated::Field_saved_errno
     };
     (saved_xmin) => {
-        $crate::__pgrx_c_generated::Field5231
+        $crate::__pgrx_c_generated::Field_saved_xmin
     };
     (saw_non_ascii) => {
-        $crate::__pgrx_c_generated::Field5234
+        $crate::__pgrx_c_generated::Field_saw_non_ascii
     };
     (scanBehind) => {
-        $crate::__pgrx_c_generated::Field5244
+        $crate::__pgrx_c_generated::Field_scanBehind
     };
     (scan_key) => {
-        $crate::__pgrx_c_generated::Field5255
+        $crate::__pgrx_c_generated::Field_scan_key
     };
     (scanbuflen) => {
-        $crate::__pgrx_c_generated::Field5261
+        $crate::__pgrx_c_generated::Field_scanbuflen
     };
     (scanopsfixed) => {
-        $crate::__pgrx_c_generated::Field5265
+        $crate::__pgrx_c_generated::Field_scanopsfixed
     };
     (scanopsset) => {
-        $crate::__pgrx_c_generated::Field5266
+        $crate::__pgrx_c_generated::Field_scanopsset
     };
     (scanrelid) => {
-        $crate::__pgrx_c_generated::Field5267
+        $crate::__pgrx_c_generated::Field_scanrelid
     };
     (scansel_cache) => {
-        $crate::__pgrx_c_generated::Field5268
+        $crate::__pgrx_c_generated::Field_scansel_cache
     };
     (scanstatus) => {
-        $crate::__pgrx_c_generated::Field5269
+        $crate::__pgrx_c_generated::Field_scanstatus
     };
     (schemaElts) => {
-        $crate::__pgrx_c_generated::Field5271
+        $crate::__pgrx_c_generated::Field_schemaElts
     };
     (schemas) => {
-        $crate::__pgrx_c_generated::Field5274
+        $crate::__pgrx_c_generated::Field_schemas
     };
     (scontext) => {
-        $crate::__pgrx_c_generated::Field5275
+        $crate::__pgrx_c_generated::Field_scontext
     };
     (searchMode) => {
-        $crate::__pgrx_c_generated::Field5276
+        $crate::__pgrx_c_generated::Field_searchMode
     };
     (searchNonNulls) => {
-        $crate::__pgrx_c_generated::Field5277
+        $crate::__pgrx_c_generated::Field_searchNonNulls
     };
     (searchNulls) => {
-        $crate::__pgrx_c_generated::Field5278
+        $crate::__pgrx_c_generated::Field_searchNulls
     };
     (search_breadth_first) => {
-        $crate::__pgrx_c_generated::Field5279
+        $crate::__pgrx_c_generated::Field_search_breadth_first
     };
     (search_col_list) => {
-        $crate::__pgrx_c_generated::Field5281
+        $crate::__pgrx_c_generated::Field_search_col_list
     };
     (securityQuals) => {
-        $crate::__pgrx_c_generated::Field5285
+        $crate::__pgrx_c_generated::Field_securityQuals
     };
     (security_barrier) => {
-        $crate::__pgrx_c_generated::Field5286
+        $crate::__pgrx_c_generated::Field_security_barrier
     };
     (security_invoker) => {
-        $crate::__pgrx_c_generated::Field5287
+        $crate::__pgrx_c_generated::Field_security_invoker
     };
     (security_level) => {
-        $crate::__pgrx_c_generated::Field5288
+        $crate::__pgrx_c_generated::Field_security_level
     };
     (seed) => {
-        $crate::__pgrx_c_generated::Field5289
+        $crate::__pgrx_c_generated::Field_seed
     };
     (segno) => {
-        $crate::__pgrx_c_generated::Field5295
+        $crate::__pgrx_c_generated::Field_segno
     };
     (segoff) => {
-        $crate::__pgrx_c_generated::Field5296
+        $crate::__pgrx_c_generated::Field_segoff
     };
     (select_list) => {
-        $crate::__pgrx_c_generated::Field5298
+        $crate::__pgrx_c_generated::Field_select_list
     };
     (selected) => {
-        $crate::__pgrx_c_generated::Field5299
+        $crate::__pgrx_c_generated::Field_selected
     };
     (self_join) => {
-        $crate::__pgrx_c_generated::Field5302
+        $crate::__pgrx_c_generated::Field_self_join
     };
     (self_reference) => {
-        $crate::__pgrx_c_generated::Field5303
+        $crate::__pgrx_c_generated::Field_self_reference
     };
     (self_time) => {
-        $crate::__pgrx_c_generated::Field5304
+        $crate::__pgrx_c_generated::Field_self_time
     };
     (sem) => {
-        $crate::__pgrx_c_generated::Field5305
+        $crate::__pgrx_c_generated::Field_sem
     };
     (semi_can_btree) => {
-        $crate::__pgrx_c_generated::Field5306
+        $crate::__pgrx_c_generated::Field_semi_can_btree
     };
     (semi_can_hash) => {
-        $crate::__pgrx_c_generated::Field5307
+        $crate::__pgrx_c_generated::Field_semi_can_hash
     };
     (semi_operators) => {
-        $crate::__pgrx_c_generated::Field5308
+        $crate::__pgrx_c_generated::Field_semi_operators
     };
     (semi_rhs_exprs) => {
-        $crate::__pgrx_c_generated::Field5309
+        $crate::__pgrx_c_generated::Field_semi_rhs_exprs
     };
     (sender_port) => {
-        $crate::__pgrx_c_generated::Field5312
+        $crate::__pgrx_c_generated::Field_sender_port
     };
     (sentPtr) => {
-        $crate::__pgrx_c_generated::Field5313
+        $crate::__pgrx_c_generated::Field_sentPtr
     };
     (seqcache) => {
-        $crate::__pgrx_c_generated::Field5315
+        $crate::__pgrx_c_generated::Field_seqcache
     };
     (seqcycle) => {
-        $crate::__pgrx_c_generated::Field5316
+        $crate::__pgrx_c_generated::Field_seqcycle
     };
     (seqid) => {
-        $crate::__pgrx_c_generated::Field5317
+        $crate::__pgrx_c_generated::Field_seqid
     };
     (seqincrement) => {
-        $crate::__pgrx_c_generated::Field5318
+        $crate::__pgrx_c_generated::Field_seqincrement
     };
     (seqmax) => {
-        $crate::__pgrx_c_generated::Field5319
+        $crate::__pgrx_c_generated::Field_seqmax
     };
     (seqmin) => {
-        $crate::__pgrx_c_generated::Field5320
+        $crate::__pgrx_c_generated::Field_seqmin
     };
     (seqrelid) => {
-        $crate::__pgrx_c_generated::Field5321
+        $crate::__pgrx_c_generated::Field_seqrelid
     };
     (seqstart) => {
-        $crate::__pgrx_c_generated::Field5322
+        $crate::__pgrx_c_generated::Field_seqstart
     };
     (seqtypid) => {
-        $crate::__pgrx_c_generated::Field5323
+        $crate::__pgrx_c_generated::Field_seqtypid
     };
     (serialfn_oid) => {
-        $crate::__pgrx_c_generated::Field5327
+        $crate::__pgrx_c_generated::Field_serialfn_oid
     };
     (serialize) => {
-        $crate::__pgrx_c_generated::Field5328
+        $crate::__pgrx_c_generated::Field_serialize
     };
     (serialize_changes) => {
-        $crate::__pgrx_c_generated::Field5329
+        $crate::__pgrx_c_generated::Field_serialize_changes
     };
     (serverid) => {
-        $crate::__pgrx_c_generated::Field5331
+        $crate::__pgrx_c_generated::Field_serverid
     };
     (session_time) => {
-        $crate::__pgrx_c_generated::Field5335
+        $crate::__pgrx_c_generated::Field_session_time
     };
     (sessions) => {
-        $crate::__pgrx_c_generated::Field5336
+        $crate::__pgrx_c_generated::Field_sessions
     };
     (sessions_abandoned) => {
-        $crate::__pgrx_c_generated::Field5337
+        $crate::__pgrx_c_generated::Field_sessions_abandoned
     };
     (sessions_fatal) => {
-        $crate::__pgrx_c_generated::Field5338
+        $crate::__pgrx_c_generated::Field_sessions_fatal
     };
     (sessions_killed) => {
-        $crate::__pgrx_c_generated::Field5339
+        $crate::__pgrx_c_generated::Field_sessions_killed
     };
     (set) => {
-        $crate::__pgrx_c_generated::Field5340
+        $crate::__pgrx_c_generated::Field_set
     };
     (setArgsValid) => {
-        $crate::__pgrx_c_generated::Field5341
+        $crate::__pgrx_c_generated::Field_setArgsValid
     };
     (setParam) => {
-        $crate::__pgrx_c_generated::Field5344
+        $crate::__pgrx_c_generated::Field_setParam
     };
     (set_option) => {
-        $crate::__pgrx_c_generated::Field5347
+        $crate::__pgrx_c_generated::Field_set_option
     };
     (setdatabase) => {
-        $crate::__pgrx_c_generated::Field5348
+        $crate::__pgrx_c_generated::Field_setdatabase
     };
     (setno) => {
-        $crate::__pgrx_c_generated::Field5349
+        $crate::__pgrx_c_generated::Field_setno
     };
     (setof) => {
-        $crate::__pgrx_c_generated::Field5350
+        $crate::__pgrx_c_generated::Field_setof
     };
     (setoff) => {
-        $crate::__pgrx_c_generated::Field5351
+        $crate::__pgrx_c_generated::Field_setoff
     };
     (setop_done) => {
-        $crate::__pgrx_c_generated::Field5352
+        $crate::__pgrx_c_generated::Field_setop_done
     };
     (setop_pathkeys) => {
-        $crate::__pgrx_c_generated::Field5353
+        $crate::__pgrx_c_generated::Field_setop_pathkeys
     };
     (setrole) => {
-        $crate::__pgrx_c_generated::Field5354
+        $crate::__pgrx_c_generated::Field_setrole
     };
     (settings) => {
-        $crate::__pgrx_c_generated::Field5357
+        $crate::__pgrx_c_generated::Field_settings
     };
     (shareable) => {
-        $crate::__pgrx_c_generated::Field5358
+        $crate::__pgrx_c_generated::Field_shareable
     };
     (shared) => {
-        $crate::__pgrx_c_generated::Field5359
+        $crate::__pgrx_c_generated::Field_shared
     };
     (shared_blks_dirtied) => {
-        $crate::__pgrx_c_generated::Field5362
+        $crate::__pgrx_c_generated::Field_shared_blks_dirtied
     };
     (shared_blks_hit) => {
-        $crate::__pgrx_c_generated::Field5363
+        $crate::__pgrx_c_generated::Field_shared_blks_hit
     };
     (shared_blks_read) => {
-        $crate::__pgrx_c_generated::Field5364
+        $crate::__pgrx_c_generated::Field_shared_blks_read
     };
     (shared_blks_written) => {
-        $crate::__pgrx_c_generated::Field5365
+        $crate::__pgrx_c_generated::Field_shared_blks_written
     };
     (sharedsort) => {
-        $crate::__pgrx_c_generated::Field5371
+        $crate::__pgrx_c_generated::Field_sharedsort
     };
     (shouldSort) => {
-        $crate::__pgrx_c_generated::Field5375
+        $crate::__pgrx_c_generated::Field_shouldSort
     };
     (shutdown_reg) => {
-        $crate::__pgrx_c_generated::Field5378
+        $crate::__pgrx_c_generated::Field_shutdown_reg
     };
     (sign) => {
-        $crate::__pgrx_c_generated::Field5393
+        $crate::__pgrx_c_generated::Field_sign
     };
     (simple) => {
-        $crate::__pgrx_c_generated::Field5394
+        $crate::__pgrx_c_generated::Field_simple
     };
     (simple_rel_array_size) => {
-        $crate::__pgrx_c_generated::Field5398
+        $crate::__pgrx_c_generated::Field_simple_rel_array_size
     };
     (simple_rte_array) => {
-        $crate::__pgrx_c_generated::Field5399
+        $crate::__pgrx_c_generated::Field_simple_rte_array
     };
     (single_copy) => {
-        $crate::__pgrx_c_generated::Field5412
+        $crate::__pgrx_c_generated::Field_single_copy
     };
     (single_match) => {
-        $crate::__pgrx_c_generated::Field5413
+        $crate::__pgrx_c_generated::Field_single_match
     };
     (singlerow) => {
-        $crate::__pgrx_c_generated::Field5414
+        $crate::__pgrx_c_generated::Field_singlerow
     };
     (size) => {
-        $crate::__pgrx_c_generated::Field5418
+        $crate::__pgrx_c_generated::Field_size
     };
     (sizemask) => {
-        $crate::__pgrx_c_generated::Field5419
+        $crate::__pgrx_c_generated::Field_sizemask
     };
     (sk_argument) => {
-        $crate::__pgrx_c_generated::Field5421
+        $crate::__pgrx_c_generated::Field_sk_argument
     };
     (sk_attno) => {
-        $crate::__pgrx_c_generated::Field5422
+        $crate::__pgrx_c_generated::Field_sk_attno
     };
     (sk_collation) => {
-        $crate::__pgrx_c_generated::Field5423
+        $crate::__pgrx_c_generated::Field_sk_collation
     };
     (sk_flags) => {
-        $crate::__pgrx_c_generated::Field5424
+        $crate::__pgrx_c_generated::Field_sk_flags
     };
     (sk_strategy) => {
-        $crate::__pgrx_c_generated::Field5426
+        $crate::__pgrx_c_generated::Field_sk_strategy
     };
     (sk_subtype) => {
-        $crate::__pgrx_c_generated::Field5427
+        $crate::__pgrx_c_generated::Field_sk_subtype
     };
     (skewBucketLen) => {
-        $crate::__pgrx_c_generated::Field5429
+        $crate::__pgrx_c_generated::Field_skewBucketLen
     };
     (skewColumn) => {
-        $crate::__pgrx_c_generated::Field5431
+        $crate::__pgrx_c_generated::Field_skewColumn
     };
     (skewEnabled) => {
-        $crate::__pgrx_c_generated::Field5432
+        $crate::__pgrx_c_generated::Field_skewEnabled
     };
     (skewInherit) => {
-        $crate::__pgrx_c_generated::Field5433
+        $crate::__pgrx_c_generated::Field_skewInherit
     };
     (skewTable) => {
-        $crate::__pgrx_c_generated::Field5434
+        $crate::__pgrx_c_generated::Field_skewTable
     };
     (skew_collation) => {
-        $crate::__pgrx_c_generated::Field5436
+        $crate::__pgrx_c_generated::Field_skew_collation
     };
     (skip) => {
-        $crate::__pgrx_c_generated::Field5438
+        $crate::__pgrx_c_generated::Field_skip
     };
     (skipData) => {
-        $crate::__pgrx_c_generated::Field5439
+        $crate::__pgrx_c_generated::Field_skipData
     };
     (skipIfNewValExists) => {
-        $crate::__pgrx_c_generated::Field5440
+        $crate::__pgrx_c_generated::Field_skipIfNewValExists
     };
     (skipScan) => {
-        $crate::__pgrx_c_generated::Field5441
+        $crate::__pgrx_c_generated::Field_skipScan
     };
     (skip_mark_restore) => {
-        $crate::__pgrx_c_generated::Field5443
+        $crate::__pgrx_c_generated::Field_skip_mark_restore
     };
     (skip_nulls) => {
-        $crate::__pgrx_c_generated::Field5444
+        $crate::__pgrx_c_generated::Field_skip_nulls
     };
     (skip_unmatched) => {
-        $crate::__pgrx_c_generated::Field5445
+        $crate::__pgrx_c_generated::Field_skip_unmatched
     };
     (skip_validation) => {
-        $crate::__pgrx_c_generated::Field5446
+        $crate::__pgrx_c_generated::Field_skip_validation
     };
     (skiplsn) => {
-        $crate::__pgrx_c_generated::Field5447
+        $crate::__pgrx_c_generated::Field_skiplsn
     };
     (slice) => {
-        $crate::__pgrx_c_generated::Field5449
+        $crate::__pgrx_c_generated::Field_slice
     };
     (slow) => {
-        $crate::__pgrx_c_generated::Field5454
+        $crate::__pgrx_c_generated::Field_slow
     };
     (slru_stats_idx) => {
-        $crate::__pgrx_c_generated::Field5455
+        $crate::__pgrx_c_generated::Field_slru_stats_idx
     };
     (slru_written) => {
-        $crate::__pgrx_c_generated::Field5456
+        $crate::__pgrx_c_generated::Field_slru_written
     };
     (smgr_rlocator) => {
-        $crate::__pgrx_c_generated::Field5460
+        $crate::__pgrx_c_generated::Field_smgr_rlocator
     };
     (smgr_targblock) => {
-        $crate::__pgrx_c_generated::Field5461
+        $crate::__pgrx_c_generated::Field_smgr_targblock
     };
     (smgr_which) => {
-        $crate::__pgrx_c_generated::Field5462
+        $crate::__pgrx_c_generated::Field_smgr_which
     };
     (snapXactCompletionCount) => {
-        $crate::__pgrx_c_generated::Field5464
+        $crate::__pgrx_c_generated::Field_snapXactCompletionCount
     };
     (snapshotConflictHorizon) => {
-        $crate::__pgrx_c_generated::Field5466
+        $crate::__pgrx_c_generated::Field_snapshotConflictHorizon
     };
     (snapshot_type) => {
-        $crate::__pgrx_c_generated::Field5469
+        $crate::__pgrx_c_generated::Field_snapshot_type
     };
     (socket_create) => {
-        $crate::__pgrx_c_generated::Field5470
+        $crate::__pgrx_c_generated::Field_socket_create
     };
     (socket_created) => {
-        $crate::__pgrx_c_generated::Field5471
+        $crate::__pgrx_c_generated::Field_socket_created
     };
     (sortClause) => {
-        $crate::__pgrx_c_generated::Field5473
+        $crate::__pgrx_c_generated::Field_sortClause
     };
     (sortMethod) => {
-        $crate::__pgrx_c_generated::Field5477
+        $crate::__pgrx_c_generated::Field_sortMethod
     };
     (sortMethods) => {
-        $crate::__pgrx_c_generated::Field5478
+        $crate::__pgrx_c_generated::Field_sortMethods
     };
     (sort_Done) => {
-        $crate::__pgrx_c_generated::Field5481
+        $crate::__pgrx_c_generated::Field_sort_Done
     };
     (sort_pathkeys) => {
-        $crate::__pgrx_c_generated::Field5484
+        $crate::__pgrx_c_generated::Field_sort_pathkeys
     };
     (sortby_dir) => {
-        $crate::__pgrx_c_generated::Field5486
+        $crate::__pgrx_c_generated::Field_sortby_dir
     };
     (sortby_nulls) => {
-        $crate::__pgrx_c_generated::Field5487
+        $crate::__pgrx_c_generated::Field_sortby_nulls
     };
     (sortfamily) => {
-        $crate::__pgrx_c_generated::Field5490
+        $crate::__pgrx_c_generated::Field_sortfamily
     };
     (sortgrouprefs) => {
-        $crate::__pgrx_c_generated::Field5491
+        $crate::__pgrx_c_generated::Field_sortgrouprefs
     };
     (sortop) => {
-        $crate::__pgrx_c_generated::Field5493
+        $crate::__pgrx_c_generated::Field_sortop
     };
     (sortopt) => {
-        $crate::__pgrx_c_generated::Field5495
+        $crate::__pgrx_c_generated::Field_sortopt
     };
     (source) => {
-        $crate::__pgrx_c_generated::Field5498
+        $crate::__pgrx_c_generated::Field_source
     };
     (source_stepids) => {
-        $crate::__pgrx_c_generated::Field5501
+        $crate::__pgrx_c_generated::Field_source_stepids
     };
     (sourceline) => {
-        $crate::__pgrx_c_generated::Field5504
+        $crate::__pgrx_c_generated::Field_sourceline
     };
     (spaceAllowed) => {
-        $crate::__pgrx_c_generated::Field5508
+        $crate::__pgrx_c_generated::Field_spaceAllowed
     };
     (spaceAllowedSkew) => {
-        $crate::__pgrx_c_generated::Field5509
+        $crate::__pgrx_c_generated::Field_spaceAllowedSkew
     };
     (spacePeak) => {
-        $crate::__pgrx_c_generated::Field5510
+        $crate::__pgrx_c_generated::Field_spacePeak
     };
     (spaceType) => {
-        $crate::__pgrx_c_generated::Field5511
+        $crate::__pgrx_c_generated::Field_spaceType
     };
     (spaceUsed) => {
-        $crate::__pgrx_c_generated::Field5512
+        $crate::__pgrx_c_generated::Field_spaceUsed
     };
     (spaceUsedSkew) => {
-        $crate::__pgrx_c_generated::Field5513
+        $crate::__pgrx_c_generated::Field_spaceUsedSkew
     };
     (space_allowed) => {
-        $crate::__pgrx_c_generated::Field5514
+        $crate::__pgrx_c_generated::Field_space_allowed
     };
     (space_exhausted) => {
-        $crate::__pgrx_c_generated::Field5515
+        $crate::__pgrx_c_generated::Field_space_exhausted
     };
     (space_for_chunks) => {
-        $crate::__pgrx_c_generated::Field5516
+        $crate::__pgrx_c_generated::Field_space_for_chunks
     };
     (space_peak) => {
-        $crate::__pgrx_c_generated::Field5517
+        $crate::__pgrx_c_generated::Field_space_peak
     };
     (spcOid) => {
-        $crate::__pgrx_c_generated::Field5519
+        $crate::__pgrx_c_generated::Field_spcOid
     };
     (spcowner) => {
-        $crate::__pgrx_c_generated::Field5522
+        $crate::__pgrx_c_generated::Field_spcowner
     };
     (speculativeToken) => {
-        $crate::__pgrx_c_generated::Field5523
+        $crate::__pgrx_c_generated::Field_speculativeToken
     };
     (spgist_page_id) => {
-        $crate::__pgrx_c_generated::Field5524
+        $crate::__pgrx_c_generated::Field_spgist_page_id
     };
     (spillBytes) => {
-        $crate::__pgrx_c_generated::Field5525
+        $crate::__pgrx_c_generated::Field_spillBytes
     };
     (spillCount) => {
-        $crate::__pgrx_c_generated::Field5526
+        $crate::__pgrx_c_generated::Field_spillCount
     };
     (spillTxns) => {
-        $crate::__pgrx_c_generated::Field5528
+        $crate::__pgrx_c_generated::Field_spillTxns
     };
     (spill_bytes) => {
-        $crate::__pgrx_c_generated::Field5529
+        $crate::__pgrx_c_generated::Field_spill_bytes
     };
     (spill_count) => {
-        $crate::__pgrx_c_generated::Field5530
+        $crate::__pgrx_c_generated::Field_spill_count
     };
     (spill_txns) => {
-        $crate::__pgrx_c_generated::Field5531
+        $crate::__pgrx_c_generated::Field_spill_txns
     };
     (spins) => {
-        $crate::__pgrx_c_generated::Field5532
+        $crate::__pgrx_c_generated::Field_spins
     };
     (spins_per_delay) => {
-        $crate::__pgrx_c_generated::Field5533
+        $crate::__pgrx_c_generated::Field_spins_per_delay
     };
     (spl_ldatum) => {
-        $crate::__pgrx_c_generated::Field5536
+        $crate::__pgrx_c_generated::Field_spl_ldatum
     };
     (spl_ldatum_exists) => {
-        $crate::__pgrx_c_generated::Field5537
+        $crate::__pgrx_c_generated::Field_spl_ldatum_exists
     };
     (spl_nleft) => {
-        $crate::__pgrx_c_generated::Field5540
+        $crate::__pgrx_c_generated::Field_spl_nleft
     };
     (spl_nright) => {
-        $crate::__pgrx_c_generated::Field5541
+        $crate::__pgrx_c_generated::Field_spl_nright
     };
     (spl_rdatum) => {
-        $crate::__pgrx_c_generated::Field5543
+        $crate::__pgrx_c_generated::Field_spl_rdatum
     };
     (spl_rdatum_exists) => {
-        $crate::__pgrx_c_generated::Field5544
+        $crate::__pgrx_c_generated::Field_spl_rdatum_exists
     };
     (spooled_rows) => {
-        $crate::__pgrx_c_generated::Field5549
+        $crate::__pgrx_c_generated::Field_spooled_rows
     };
     (sqlerrcode) => {
-        $crate::__pgrx_c_generated::Field5551
+        $crate::__pgrx_c_generated::Field_sqlerrcode
     };
     (sqlerrm_varno) => {
-        $crate::__pgrx_c_generated::Field5552
+        $crate::__pgrx_c_generated::Field_sqlerrm_varno
     };
     (sqlerrstate) => {
-        $crate::__pgrx_c_generated::Field5553
+        $crate::__pgrx_c_generated::Field_sqlerrstate
     };
     (sqlstate) => {
-        $crate::__pgrx_c_generated::Field5554
+        $crate::__pgrx_c_generated::Field_sqlstate
     };
     (sqlstate_varno) => {
-        $crate::__pgrx_c_generated::Field5555
+        $crate::__pgrx_c_generated::Field_sqlstate_varno
     };
     (squashed) => {
-        $crate::__pgrx_c_generated::Field5558
+        $crate::__pgrx_c_generated::Field_squashed
     };
     (src_db_id) => {
-        $crate::__pgrx_c_generated::Field5559
+        $crate::__pgrx_c_generated::Field_src_db_id
     };
     (src_tablespace_id) => {
-        $crate::__pgrx_c_generated::Field5560
+        $crate::__pgrx_c_generated::Field_src_tablespace_id
     };
     (srctape) => {
-        $crate::__pgrx_c_generated::Field5561
+        $crate::__pgrx_c_generated::Field_srctape
     };
     (srole) => {
-        $crate::__pgrx_c_generated::Field5562
+        $crate::__pgrx_c_generated::Field_srole
     };
     (srrelid) => {
-        $crate::__pgrx_c_generated::Field5563
+        $crate::__pgrx_c_generated::Field_srrelid
     };
     (srsubid) => {
-        $crate::__pgrx_c_generated::Field5564
+        $crate::__pgrx_c_generated::Field_srsubid
     };
     (srsubstate) => {
-        $crate::__pgrx_c_generated::Field5565
+        $crate::__pgrx_c_generated::Field_srsubstate
     };
     (srvfdw) => {
-        $crate::__pgrx_c_generated::Field5566
+        $crate::__pgrx_c_generated::Field_srvfdw
     };
     (srvowner) => {
-        $crate::__pgrx_c_generated::Field5568
+        $crate::__pgrx_c_generated::Field_srvowner
     };
     (ss_family) => {
-        $crate::__pgrx_c_generated::Field5573
+        $crate::__pgrx_c_generated::Field_ss_family
     };
     (ss_len) => {
-        $crate::__pgrx_c_generated::Field5575
+        $crate::__pgrx_c_generated::Field_ss_len
     };
     (ssize) => {
-        $crate::__pgrx_c_generated::Field5579
+        $crate::__pgrx_c_generated::Field_ssize
     };
     (ssl_bits) => {
-        $crate::__pgrx_c_generated::Field5580
+        $crate::__pgrx_c_generated::Field_ssl_bits
     };
     (ssup_attno) => {
-        $crate::__pgrx_c_generated::Field5588
+        $crate::__pgrx_c_generated::Field_ssup_attno
     };
     (ssup_collation) => {
-        $crate::__pgrx_c_generated::Field5589
+        $crate::__pgrx_c_generated::Field_ssup_collation
     };
     (ssup_nulls_first) => {
-        $crate::__pgrx_c_generated::Field5592
+        $crate::__pgrx_c_generated::Field_ssup_nulls_first
     };
     (ssup_reverse) => {
-        $crate::__pgrx_c_generated::Field5593
+        $crate::__pgrx_c_generated::Field_ssup_reverse
     };
     (st_activity_start_timestamp) => {
-        $crate::__pgrx_c_generated::Field5596
+        $crate::__pgrx_c_generated::Field_st_activity_start_timestamp
     };
     (st_backendType) => {
-        $crate::__pgrx_c_generated::Field5598
+        $crate::__pgrx_c_generated::Field_st_backendType
     };
     (st_changecount) => {
-        $crate::__pgrx_c_generated::Field5599
+        $crate::__pgrx_c_generated::Field_st_changecount
     };
     (st_databaseid) => {
-        $crate::__pgrx_c_generated::Field5602
+        $crate::__pgrx_c_generated::Field_st_databaseid
     };
     (st_gss) => {
-        $crate::__pgrx_c_generated::Field5603
+        $crate::__pgrx_c_generated::Field_st_gss
     };
     (st_plan_id) => {
-        $crate::__pgrx_c_generated::Field5605
+        $crate::__pgrx_c_generated::Field_st_plan_id
     };
     (st_proc_start_timestamp) => {
-        $crate::__pgrx_c_generated::Field5606
+        $crate::__pgrx_c_generated::Field_st_proc_start_timestamp
     };
     (st_procpid) => {
-        $crate::__pgrx_c_generated::Field5607
+        $crate::__pgrx_c_generated::Field_st_procpid
     };
     (st_progress_command) => {
-        $crate::__pgrx_c_generated::Field5608
+        $crate::__pgrx_c_generated::Field_st_progress_command
     };
     (st_progress_command_target) => {
-        $crate::__pgrx_c_generated::Field5609
+        $crate::__pgrx_c_generated::Field_st_progress_command_target
     };
     (st_query_id) => {
-        $crate::__pgrx_c_generated::Field5611
+        $crate::__pgrx_c_generated::Field_st_query_id
     };
     (st_ssl) => {
-        $crate::__pgrx_c_generated::Field5612
+        $crate::__pgrx_c_generated::Field_st_ssl
     };
     (st_state) => {
-        $crate::__pgrx_c_generated::Field5614
+        $crate::__pgrx_c_generated::Field_st_state
     };
     (st_state_start_timestamp) => {
-        $crate::__pgrx_c_generated::Field5615
+        $crate::__pgrx_c_generated::Field_st_state_start_timestamp
     };
     (st_userid) => {
-        $crate::__pgrx_c_generated::Field5616
+        $crate::__pgrx_c_generated::Field_st_userid
     };
     (st_xact_start_timestamp) => {
-        $crate::__pgrx_c_generated::Field5617
+        $crate::__pgrx_c_generated::Field_st_xact_start_timestamp
     };
     (staattnum) => {
-        $crate::__pgrx_c_generated::Field5618
+        $crate::__pgrx_c_generated::Field_staattnum
     };
     (stacoll) => {
-        $crate::__pgrx_c_generated::Field5621
+        $crate::__pgrx_c_generated::Field_stacoll
     };
     (stacoll1) => {
-        $crate::__pgrx_c_generated::Field5622
+        $crate::__pgrx_c_generated::Field_stacoll1
     };
     (stacoll2) => {
-        $crate::__pgrx_c_generated::Field5623
+        $crate::__pgrx_c_generated::Field_stacoll2
     };
     (stacoll3) => {
-        $crate::__pgrx_c_generated::Field5624
+        $crate::__pgrx_c_generated::Field_stacoll3
     };
     (stacoll4) => {
-        $crate::__pgrx_c_generated::Field5625
+        $crate::__pgrx_c_generated::Field_stacoll4
     };
     (stacoll5) => {
-        $crate::__pgrx_c_generated::Field5626
+        $crate::__pgrx_c_generated::Field_stacoll5
     };
     (stainherit) => {
-        $crate::__pgrx_c_generated::Field5630
+        $crate::__pgrx_c_generated::Field_stainherit
     };
     (stakind1) => {
-        $crate::__pgrx_c_generated::Field5632
+        $crate::__pgrx_c_generated::Field_stakind1
     };
     (stakind2) => {
-        $crate::__pgrx_c_generated::Field5633
+        $crate::__pgrx_c_generated::Field_stakind2
     };
     (stakind3) => {
-        $crate::__pgrx_c_generated::Field5634
+        $crate::__pgrx_c_generated::Field_stakind3
     };
     (stakind4) => {
-        $crate::__pgrx_c_generated::Field5635
+        $crate::__pgrx_c_generated::Field_stakind4
     };
     (stakind5) => {
-        $crate::__pgrx_c_generated::Field5636
+        $crate::__pgrx_c_generated::Field_stakind5
     };
     (standard_conforming_strings) => {
-        $crate::__pgrx_c_generated::Field5637
+        $crate::__pgrx_c_generated::Field_standard_conforming_strings
     };
     (standby_signal_file_found) => {
-        $crate::__pgrx_c_generated::Field5638
+        $crate::__pgrx_c_generated::Field_standby_signal_file_found
     };
     (staop) => {
-        $crate::__pgrx_c_generated::Field5641
+        $crate::__pgrx_c_generated::Field_staop
     };
     (staop1) => {
-        $crate::__pgrx_c_generated::Field5642
+        $crate::__pgrx_c_generated::Field_staop1
     };
     (staop2) => {
-        $crate::__pgrx_c_generated::Field5643
+        $crate::__pgrx_c_generated::Field_staop2
     };
     (staop3) => {
-        $crate::__pgrx_c_generated::Field5644
+        $crate::__pgrx_c_generated::Field_staop3
     };
     (staop4) => {
-        $crate::__pgrx_c_generated::Field5645
+        $crate::__pgrx_c_generated::Field_staop4
     };
     (staop5) => {
-        $crate::__pgrx_c_generated::Field5646
+        $crate::__pgrx_c_generated::Field_staop5
     };
     (starelid) => {
-        $crate::__pgrx_c_generated::Field5647
+        $crate::__pgrx_c_generated::Field_starelid
     };
     (startInRangeFunc) => {
-        $crate::__pgrx_c_generated::Field5649
+        $crate::__pgrx_c_generated::Field_startInRangeFunc
     };
     (startOffsetValue) => {
-        $crate::__pgrx_c_generated::Field5651
+        $crate::__pgrx_c_generated::Field_startOffsetValue
     };
     (startOid) => {
-        $crate::__pgrx_c_generated::Field5652
+        $crate::__pgrx_c_generated::Field_startOid
     };
     (startTime) => {
-        $crate::__pgrx_c_generated::Field5653
+        $crate::__pgrx_c_generated::Field_startTime
     };
     (startTruncMemb) => {
-        $crate::__pgrx_c_generated::Field5654
+        $crate::__pgrx_c_generated::Field_startTruncMemb
     };
     (startTruncOff) => {
-        $crate::__pgrx_c_generated::Field5655
+        $crate::__pgrx_c_generated::Field_startTruncOff
     };
     (start_decoding_at) => {
-        $crate::__pgrx_c_generated::Field5656
+        $crate::__pgrx_c_generated::Field_start_decoding_at
     };
     (start_lsn) => {
-        $crate::__pgrx_c_generated::Field5657
+        $crate::__pgrx_c_generated::Field_start_lsn
     };
     (started_in_recovery) => {
-        $crate::__pgrx_c_generated::Field5658
+        $crate::__pgrx_c_generated::Field_started_in_recovery
     };
     (startikey) => {
-        $crate::__pgrx_c_generated::Field5659
+        $crate::__pgrx_c_generated::Field_startikey
     };
     (startpoint) => {
-        $crate::__pgrx_c_generated::Field5660
+        $crate::__pgrx_c_generated::Field_startpoint
     };
     (startpointTLI) => {
-        $crate::__pgrx_c_generated::Field5661
+        $crate::__pgrx_c_generated::Field_startpointTLI
     };
     (startsellen) => {
-        $crate::__pgrx_c_generated::Field5663
+        $crate::__pgrx_c_generated::Field_startsellen
     };
     (starttime) => {
-        $crate::__pgrx_c_generated::Field5664
+        $crate::__pgrx_c_generated::Field_starttime
     };
     (starttli) => {
-        $crate::__pgrx_c_generated::Field5665
+        $crate::__pgrx_c_generated::Field_starttli
     };
     (startupBufferPinWaitBufId) => {
-        $crate::__pgrx_c_generated::Field5667
+        $crate::__pgrx_c_generated::Field_startupBufferPinWaitBufId
     };
     (statOid) => {
-        $crate::__pgrx_c_generated::Field5670
+        $crate::__pgrx_c_generated::Field_statOid
     };
     (stat_reset_timestamp) => {
-        $crate::__pgrx_c_generated::Field5671
+        $crate::__pgrx_c_generated::Field_stat_reset_timestamp
     };
     (stat_types) => {
-        $crate::__pgrx_c_generated::Field5672
+        $crate::__pgrx_c_generated::Field_stat_types
     };
     (state) => {
-        $crate::__pgrx_c_generated::Field5673
+        $crate::__pgrx_c_generated::Field_state
     };
     (state_before_str_stop) => {
-        $crate::__pgrx_c_generated::Field5675
+        $crate::__pgrx_c_generated::Field_state_before_str_stop
     };
     (statelsn) => {
-        $crate::__pgrx_c_generated::Field5676
+        $crate::__pgrx_c_generated::Field_statelsn
     };
     (static_party) => {
-        $crate::__pgrx_c_generated::Field5678
+        $crate::__pgrx_c_generated::Field_static_party
     };
     (statlist) => {
-        $crate::__pgrx_c_generated::Field5679
+        $crate::__pgrx_c_generated::Field_statlist
     };
     (statsTuple) => {
-        $crate::__pgrx_c_generated::Field5681
+        $crate::__pgrx_c_generated::Field_statsTuple
     };
     (stats_valid) => {
-        $crate::__pgrx_c_generated::Field5682
+        $crate::__pgrx_c_generated::Field_stats_valid
     };
     (status) => {
-        $crate::__pgrx_c_generated::Field5683
+        $crate::__pgrx_c_generated::Field_status
     };
     (statusFlags) => {
-        $crate::__pgrx_c_generated::Field5684
+        $crate::__pgrx_c_generated::Field_statusFlags
     };
     (stawidth) => {
-        $crate::__pgrx_c_generated::Field5690
+        $crate::__pgrx_c_generated::Field_stawidth
     };
     (step_id) => {
-        $crate::__pgrx_c_generated::Field5693
+        $crate::__pgrx_c_generated::Field_step_id
     };
     (steps_alloc) => {
-        $crate::__pgrx_c_generated::Field5696
+        $crate::__pgrx_c_generated::Field_steps_alloc
     };
     (steps_len) => {
-        $crate::__pgrx_c_generated::Field5697
+        $crate::__pgrx_c_generated::Field_steps_len
     };
     (stmt_len) => {
-        $crate::__pgrx_c_generated::Field5701
+        $crate::__pgrx_c_generated::Field_stmt_len
     };
     (stmt_list) => {
-        $crate::__pgrx_c_generated::Field5702
+        $crate::__pgrx_c_generated::Field_stmt_list
     };
     (stmt_location) => {
-        $crate::__pgrx_c_generated::Field5703
+        $crate::__pgrx_c_generated::Field_stmt_location
     };
     (stmt_type) => {
-        $crate::__pgrx_c_generated::Field5707
+        $crate::__pgrx_c_generated::Field_stmt_type
     };
     (stmtid) => {
-        $crate::__pgrx_c_generated::Field5708
+        $crate::__pgrx_c_generated::Field_stmtid
     };
     (stmts) => {
-        $crate::__pgrx_c_generated::Field5709
+        $crate::__pgrx_c_generated::Field_stmts
     };
     (stoppoint) => {
-        $crate::__pgrx_c_generated::Field5711
+        $crate::__pgrx_c_generated::Field_stoppoint
     };
     (stopsellen) => {
-        $crate::__pgrx_c_generated::Field5713
+        $crate::__pgrx_c_generated::Field_stopsellen
     };
     (stoptime) => {
-        $crate::__pgrx_c_generated::Field5714
+        $crate::__pgrx_c_generated::Field_stoptime
     };
     (stoptli) => {
-        $crate::__pgrx_c_generated::Field5715
+        $crate::__pgrx_c_generated::Field_stoptli
     };
     (storage) => {
-        $crate::__pgrx_c_generated::Field5716
+        $crate::__pgrx_c_generated::Field_storage
     };
     (store_leakproof) => {
-        $crate::__pgrx_c_generated::Field5718
+        $crate::__pgrx_c_generated::Field_store_leakproof
     };
     (storesNulls) => {
-        $crate::__pgrx_c_generated::Field5720
+        $crate::__pgrx_c_generated::Field_storesNulls
     };
     (strategy) => {
-        $crate::__pgrx_c_generated::Field5722
+        $crate::__pgrx_c_generated::Field_strategy
     };
     (stream) => {
-        $crate::__pgrx_c_generated::Field5723
+        $crate::__pgrx_c_generated::Field_stream
     };
     (streamBytes) => {
-        $crate::__pgrx_c_generated::Field5724
+        $crate::__pgrx_c_generated::Field_streamBytes
     };
     (streamCount) => {
-        $crate::__pgrx_c_generated::Field5725
+        $crate::__pgrx_c_generated::Field_streamCount
     };
     (streamTxns) => {
-        $crate::__pgrx_c_generated::Field5726
+        $crate::__pgrx_c_generated::Field_streamTxns
     };
     (stream_bytes) => {
-        $crate::__pgrx_c_generated::Field5729
+        $crate::__pgrx_c_generated::Field_stream_bytes
     };
     (stream_count) => {
-        $crate::__pgrx_c_generated::Field5734
+        $crate::__pgrx_c_generated::Field_stream_count
     };
     (stream_txns) => {
-        $crate::__pgrx_c_generated::Field5746
+        $crate::__pgrx_c_generated::Field_stream_txns
     };
     (streaming) => {
-        $crate::__pgrx_c_generated::Field5747
+        $crate::__pgrx_c_generated::Field_streaming
     };
     (strength) => {
-        $crate::__pgrx_c_generated::Field5749
+        $crate::__pgrx_c_generated::Field_strength
     };
     (strict) => {
-        $crate::__pgrx_c_generated::Field5750
+        $crate::__pgrx_c_generated::Field_strict
     };
     (stricthigh) => {
-        $crate::__pgrx_c_generated::Field5751
+        $crate::__pgrx_c_generated::Field_stricthigh
     };
     (string_length) => {
-        $crate::__pgrx_c_generated::Field5753
+        $crate::__pgrx_c_generated::Field_string_length
     };
     (strxfrm_is_safe) => {
-        $crate::__pgrx_c_generated::Field5759
+        $crate::__pgrx_c_generated::Field_strxfrm_is_safe
     };
     (stxdinherit) => {
-        $crate::__pgrx_c_generated::Field5761
+        $crate::__pgrx_c_generated::Field_stxdinherit
     };
     (stxnamespace) => {
-        $crate::__pgrx_c_generated::Field5764
+        $crate::__pgrx_c_generated::Field_stxnamespace
     };
     (stxoid) => {
-        $crate::__pgrx_c_generated::Field5765
+        $crate::__pgrx_c_generated::Field_stxoid
     };
     (stxowner) => {
-        $crate::__pgrx_c_generated::Field5766
+        $crate::__pgrx_c_generated::Field_stxowner
     };
     (stxrelid) => {
-        $crate::__pgrx_c_generated::Field5767
+        $crate::__pgrx_c_generated::Field_stxrelid
     };
     (subLinkId) => {
-        $crate::__pgrx_c_generated::Field5769
+        $crate::__pgrx_c_generated::Field_subLinkId
     };
     (subLinkType) => {
-        $crate::__pgrx_c_generated::Field5770
+        $crate::__pgrx_c_generated::Field_subLinkType
     };
     (subPlan) => {
-        $crate::__pgrx_c_generated::Field5771
+        $crate::__pgrx_c_generated::Field_subPlan
     };
     (subbinary) => {
-        $crate::__pgrx_c_generated::Field5773
+        $crate::__pgrx_c_generated::Field_subbinary
     };
     (subcmds) => {
-        $crate::__pgrx_c_generated::Field5774
+        $crate::__pgrx_c_generated::Field_subcmds
     };
     (subdbid) => {
-        $crate::__pgrx_c_generated::Field5775
+        $crate::__pgrx_c_generated::Field_subdbid
     };
     (subdisableonerr) => {
-        $crate::__pgrx_c_generated::Field5776
+        $crate::__pgrx_c_generated::Field_subdisableonerr
     };
     (subenabled) => {
-        $crate::__pgrx_c_generated::Field5777
+        $crate::__pgrx_c_generated::Field_subenabled
     };
     (subfailover) => {
-        $crate::__pgrx_c_generated::Field5778
+        $crate::__pgrx_c_generated::Field_subfailover
     };
     (subid) => {
-        $crate::__pgrx_c_generated::Field5779
+        $crate::__pgrx_c_generated::Field_subid
     };
     (sublevels_up) => {
-        $crate::__pgrx_c_generated::Field5780
+        $crate::__pgrx_c_generated::Field_sublevels_up
     };
     (suboverflowed) => {
-        $crate::__pgrx_c_generated::Field5783
+        $crate::__pgrx_c_generated::Field_suboverflowed
     };
     (subowner) => {
-        $crate::__pgrx_c_generated::Field5784
+        $crate::__pgrx_c_generated::Field_subowner
     };
     (subpasswordrequired) => {
-        $crate::__pgrx_c_generated::Field5786
+        $crate::__pgrx_c_generated::Field_subpasswordrequired
     };
     (subpaths) => {
-        $crate::__pgrx_c_generated::Field5788
+        $crate::__pgrx_c_generated::Field_subpaths
     };
     (subplan_params) => {
-        $crate::__pgrx_c_generated::Field5791
+        $crate::__pgrx_c_generated::Field_subplan_params
     };
     (subplans) => {
-        $crate::__pgrx_c_generated::Field5792
+        $crate::__pgrx_c_generated::Field_subplans
     };
     (subroots) => {
-        $crate::__pgrx_c_generated::Field5795
+        $crate::__pgrx_c_generated::Field_subroots
     };
     (subrunasowner) => {
-        $crate::__pgrx_c_generated::Field5796
+        $crate::__pgrx_c_generated::Field_subrunasowner
     };
     (subskiplsn) => {
-        $crate::__pgrx_c_generated::Field5799
+        $crate::__pgrx_c_generated::Field_subskiplsn
     };
     (substream) => {
-        $crate::__pgrx_c_generated::Field5800
+        $crate::__pgrx_c_generated::Field_substream
     };
     (subtwophasestate) => {
-        $crate::__pgrx_c_generated::Field5801
+        $crate::__pgrx_c_generated::Field_subtwophasestate
     };
     (subtype) => {
-        $crate::__pgrx_c_generated::Field5803
+        $crate::__pgrx_c_generated::Field_subtype
     };
     (subxcnt) => {
-        $crate::__pgrx_c_generated::Field5805
+        $crate::__pgrx_c_generated::Field_subxcnt
     };
     (subxid) => {
-        $crate::__pgrx_c_generated::Field5806
+        $crate::__pgrx_c_generated::Field_subxid
     };
     (subxidStatus) => {
-        $crate::__pgrx_c_generated::Field5808
+        $crate::__pgrx_c_generated::Field_subxidStatus
     };
     (subxid_overflow) => {
-        $crate::__pgrx_c_generated::Field5809
+        $crate::__pgrx_c_generated::Field_subxid_overflow
     };
     (subxid_status) => {
-        $crate::__pgrx_c_generated::Field5810
+        $crate::__pgrx_c_generated::Field_subxid_status
     };
     (subxids) => {
-        $crate::__pgrx_c_generated::Field5811
+        $crate::__pgrx_c_generated::Field_subxids
     };
     (summary) => {
-        $crate::__pgrx_c_generated::Field5813
+        $crate::__pgrx_c_generated::Field_summary
     };
     (sumsize) => {
-        $crate::__pgrx_c_generated::Field5814
+        $crate::__pgrx_c_generated::Field_sumsize
     };
     (sval) => {
-        $crate::__pgrx_c_generated::Field5822
+        $crate::__pgrx_c_generated::Field_sval
     };
     (symbol_val) => {
-        $crate::__pgrx_c_generated::Field5826
+        $crate::__pgrx_c_generated::Field_symbol_val
     };
     (syncRepLinks) => {
-        $crate::__pgrx_c_generated::Field5829
+        $crate::__pgrx_c_generated::Field_syncRepLinks
     };
     (syncRepState) => {
-        $crate::__pgrx_c_generated::Field5830
+        $crate::__pgrx_c_generated::Field_syncRepState
     };
     (sync_error_count) => {
-        $crate::__pgrx_c_generated::Field5831
+        $crate::__pgrx_c_generated::Field_sync_error_count
     };
     (sync_handler) => {
-        $crate::__pgrx_c_generated::Field5832
+        $crate::__pgrx_c_generated::Field_sync_handler
     };
     (sync_standby_priority) => {
-        $crate::__pgrx_c_generated::Field5833
+        $crate::__pgrx_c_generated::Field_sync_standby_priority
     };
     (sync_standbys_status) => {
-        $crate::__pgrx_c_generated::Field5834
+        $crate::__pgrx_c_generated::Field_sync_standbys_status
     };
     (sync_time) => {
-        $crate::__pgrx_c_generated::Field5835
+        $crate::__pgrx_c_generated::Field_sync_time
     };
     (synced) => {
-        $crate::__pgrx_c_generated::Field5837
+        $crate::__pgrx_c_generated::Field_synced
     };
     (syncrep_method) => {
-        $crate::__pgrx_c_generated::Field5838
+        $crate::__pgrx_c_generated::Field_syncrep_method
     };
     (system_identifier) => {
-        $crate::__pgrx_c_generated::Field5839
+        $crate::__pgrx_c_generated::Field_system_identifier
     };
     (t) => {
-        $crate::__pgrx_c_generated::Field5840
+        $crate::__pgrx_c_generated::Field_t
     };
     (t_cid) => {
-        $crate::__pgrx_c_generated::Field5843
+        $crate::__pgrx_c_generated::Field_t_cid
     };
     (t_hoff) => {
-        $crate::__pgrx_c_generated::Field5850
+        $crate::__pgrx_c_generated::Field_t_hoff
     };
     (t_info) => {
-        $crate::__pgrx_c_generated::Field5851
+        $crate::__pgrx_c_generated::Field_t_info
     };
     (t_infomask) => {
-        $crate::__pgrx_c_generated::Field5852
+        $crate::__pgrx_c_generated::Field_t_infomask
     };
     (t_infomask2) => {
-        $crate::__pgrx_c_generated::Field5853
+        $crate::__pgrx_c_generated::Field_t_infomask2
     };
     (t_len) => {
-        $crate::__pgrx_c_generated::Field5854
+        $crate::__pgrx_c_generated::Field_t_len
     };
     (t_tableOid) => {
-        $crate::__pgrx_c_generated::Field5856
+        $crate::__pgrx_c_generated::Field_t_tableOid
     };
     (t_tid) => {
-        $crate::__pgrx_c_generated::Field5857
+        $crate::__pgrx_c_generated::Field_t_tid
     };
     (t_varno) => {
-        $crate::__pgrx_c_generated::Field5858
+        $crate::__pgrx_c_generated::Field_t_varno
     };
     (t_xmax) => {
-        $crate::__pgrx_c_generated::Field5859
+        $crate::__pgrx_c_generated::Field_t_xmax
     };
     (t_xmin) => {
-        $crate::__pgrx_c_generated::Field5860
+        $crate::__pgrx_c_generated::Field_t_xmin
     };
     (t_xvac) => {
-        $crate::__pgrx_c_generated::Field5861
+        $crate::__pgrx_c_generated::Field_t_xvac
     };
     (tableElts) => {
-        $crate::__pgrx_c_generated::Field5869
+        $crate::__pgrx_c_generated::Field_tableElts
     };
     (table_filled) => {
-        $crate::__pgrx_c_generated::Field5872
+        $crate::__pgrx_c_generated::Field_table_filled
     };
     (table_list) => {
-        $crate::__pgrx_c_generated::Field5873
+        $crate::__pgrx_c_generated::Field_table_list
     };
     (tablespaceOid) => {
-        $crate::__pgrx_c_generated::Field5879
+        $crate::__pgrx_c_generated::Field_tablespaceOid
     };
     (tablespace_id) => {
-        $crate::__pgrx_c_generated::Field5880
+        $crate::__pgrx_c_generated::Field_tablespace_id
     };
     (tag) => {
-        $crate::__pgrx_c_generated::Field5884
+        $crate::__pgrx_c_generated::Field_tag
     };
     (tai_colflags) => {
-        $crate::__pgrx_c_generated::Field5885
+        $crate::__pgrx_c_generated::Field_tai_colflags
     };
     (tai_compression) => {
-        $crate::__pgrx_c_generated::Field5886
+        $crate::__pgrx_c_generated::Field_tai_compression
     };
     (tai_size) => {
-        $crate::__pgrx_c_generated::Field5888
+        $crate::__pgrx_c_generated::Field_tai_size
     };
     (tail) => {
-        $crate::__pgrx_c_generated::Field5889
+        $crate::__pgrx_c_generated::Field_tail
     };
     (tailFreeSize) => {
-        $crate::__pgrx_c_generated::Field5890
+        $crate::__pgrx_c_generated::Field_tailFreeSize
     };
     (takenDuringRecovery) => {
-        $crate::__pgrx_c_generated::Field5891
+        $crate::__pgrx_c_generated::Field_takenDuringRecovery
     };
     (target) => {
-        $crate::__pgrx_c_generated::Field5892
+        $crate::__pgrx_c_generated::Field_target
     };
     (targetBlk) => {
-        $crate::__pgrx_c_generated::Field5893
+        $crate::__pgrx_c_generated::Field_targetBlk
     };
     (targetList) => {
-        $crate::__pgrx_c_generated::Field5895
+        $crate::__pgrx_c_generated::Field_targetList
     };
     (target_is_local) => {
-        $crate::__pgrx_c_generated::Field5897
+        $crate::__pgrx_c_generated::Field_target_is_local
     };
     (target_parallel_safe) => {
-        $crate::__pgrx_c_generated::Field5899
+        $crate::__pgrx_c_generated::Field_target_parallel_safe
     };
     (target_param) => {
-        $crate::__pgrx_c_generated::Field5900
+        $crate::__pgrx_c_generated::Field_target_param
     };
     (target_varno) => {
-        $crate::__pgrx_c_generated::Field5902
+        $crate::__pgrx_c_generated::Field_target_varno
     };
     (targetdistance) => {
-        $crate::__pgrx_c_generated::Field5903
+        $crate::__pgrx_c_generated::Field_targetdistance
     };
     (targetlist) => {
-        $crate::__pgrx_c_generated::Field5904
+        $crate::__pgrx_c_generated::Field_targetlist
     };
     (targettype) => {
-        $crate::__pgrx_c_generated::Field5905
+        $crate::__pgrx_c_generated::Field_targettype
     };
     (targettypmod) => {
-        $crate::__pgrx_c_generated::Field5906
+        $crate::__pgrx_c_generated::Field_targettypmod
     };
     (targtype) => {
-        $crate::__pgrx_c_generated::Field5907
+        $crate::__pgrx_c_generated::Field_targtype
     };
     (tblsize) => {
-        $crate::__pgrx_c_generated::Field5908
+        $crate::__pgrx_c_generated::Field_tblsize
     };
     (tbmiterator) => {
-        $crate::__pgrx_c_generated::Field5910
+        $crate::__pgrx_c_generated::Field_tbmiterator
     };
     (tcinfo) => {
-        $crate::__pgrx_c_generated::Field5912
+        $crate::__pgrx_c_generated::Field_tcinfo
     };
     (tcount) => {
-        $crate::__pgrx_c_generated::Field5913
+        $crate::__pgrx_c_generated::Field_tcount
     };
     (tcs_delete_old_table) => {
-        $crate::__pgrx_c_generated::Field5914
+        $crate::__pgrx_c_generated::Field_tcs_delete_old_table
     };
     (tcs_insert_new_table) => {
-        $crate::__pgrx_c_generated::Field5916
+        $crate::__pgrx_c_generated::Field_tcs_insert_new_table
     };
     (tcs_update_new_table) => {
-        $crate::__pgrx_c_generated::Field5919
+        $crate::__pgrx_c_generated::Field_tcs_update_new_table
     };
     (tcs_update_old_table) => {
-        $crate::__pgrx_c_generated::Field5920
+        $crate::__pgrx_c_generated::Field_tcs_update_old_table
     };
     (tdrefcount) => {
-        $crate::__pgrx_c_generated::Field5922
+        $crate::__pgrx_c_generated::Field_tdrefcount
     };
     (tdtypeid) => {
-        $crate::__pgrx_c_generated::Field5923
+        $crate::__pgrx_c_generated::Field_tdtypeid
     };
     (tdtypmod) => {
-        $crate::__pgrx_c_generated::Field5924
+        $crate::__pgrx_c_generated::Field_tdtypmod
     };
     (tempNamespaceId) => {
-        $crate::__pgrx_c_generated::Field5928
+        $crate::__pgrx_c_generated::Field_tempNamespaceId
     };
     (temp_blks_read) => {
-        $crate::__pgrx_c_generated::Field5931
+        $crate::__pgrx_c_generated::Field_temp_blks_read
     };
     (temp_blks_written) => {
-        $crate::__pgrx_c_generated::Field5932
+        $crate::__pgrx_c_generated::Field_temp_blks_written
     };
     (temp_bytes) => {
-        $crate::__pgrx_c_generated::Field5933
+        $crate::__pgrx_c_generated::Field_temp_bytes
     };
     (temp_files) => {
-        $crate::__pgrx_c_generated::Field5934
+        $crate::__pgrx_c_generated::Field_temp_files
     };
     (temporary) => {
-        $crate::__pgrx_c_generated::Field5938
+        $crate::__pgrx_c_generated::Field_temporary
     };
     (tg_event) => {
-        $crate::__pgrx_c_generated::Field5940
+        $crate::__pgrx_c_generated::Field_tg_event
     };
     (tgconstraint) => {
-        $crate::__pgrx_c_generated::Field5952
+        $crate::__pgrx_c_generated::Field_tgconstraint
     };
     (tgconstrindid) => {
-        $crate::__pgrx_c_generated::Field5953
+        $crate::__pgrx_c_generated::Field_tgconstrindid
     };
     (tgconstrrelid) => {
-        $crate::__pgrx_c_generated::Field5954
+        $crate::__pgrx_c_generated::Field_tgconstrrelid
     };
     (tgdeferrable) => {
-        $crate::__pgrx_c_generated::Field5955
+        $crate::__pgrx_c_generated::Field_tgdeferrable
     };
     (tgenabled) => {
-        $crate::__pgrx_c_generated::Field5956
+        $crate::__pgrx_c_generated::Field_tgenabled
     };
     (tgfoid) => {
-        $crate::__pgrx_c_generated::Field5957
+        $crate::__pgrx_c_generated::Field_tgfoid
     };
     (tginitdeferred) => {
-        $crate::__pgrx_c_generated::Field5958
+        $crate::__pgrx_c_generated::Field_tginitdeferred
     };
     (tgisclone) => {
-        $crate::__pgrx_c_generated::Field5959
+        $crate::__pgrx_c_generated::Field_tgisclone
     };
     (tgisinternal) => {
-        $crate::__pgrx_c_generated::Field5960
+        $crate::__pgrx_c_generated::Field_tgisinternal
     };
     (tgnargs) => {
-        $crate::__pgrx_c_generated::Field5962
+        $crate::__pgrx_c_generated::Field_tgnargs
     };
     (tgnattr) => {
-        $crate::__pgrx_c_generated::Field5963
+        $crate::__pgrx_c_generated::Field_tgnattr
     };
     (tgoid) => {
-        $crate::__pgrx_c_generated::Field5965
+        $crate::__pgrx_c_generated::Field_tgoid
     };
     (tgparentid) => {
-        $crate::__pgrx_c_generated::Field5967
+        $crate::__pgrx_c_generated::Field_tgparentid
     };
     (tgrelid) => {
-        $crate::__pgrx_c_generated::Field5969
+        $crate::__pgrx_c_generated::Field_tgrelid
     };
     (tgtype) => {
-        $crate::__pgrx_c_generated::Field5970
+        $crate::__pgrx_c_generated::Field_tgtype
     };
     (then_body) => {
-        $crate::__pgrx_c_generated::Field5971
+        $crate::__pgrx_c_generated::Field_then_body
     };
     (ticks) => {
-        $crate::__pgrx_c_generated::Field5973
+        $crate::__pgrx_c_generated::Field_ticks
     };
     (time) => {
-        $crate::__pgrx_c_generated::Field5978
+        $crate::__pgrx_c_generated::Field_time
     };
     (timeline) => {
-        $crate::__pgrx_c_generated::Field5980
+        $crate::__pgrx_c_generated::Field_timeline
     };
     (timestamp) => {
-        $crate::__pgrx_c_generated::Field5983
+        $crate::__pgrx_c_generated::Field_timestamp
     };
     (timing) => {
-        $crate::__pgrx_c_generated::Field5984
+        $crate::__pgrx_c_generated::Field_timing
     };
     (tleSortGroupRef) => {
-        $crate::__pgrx_c_generated::Field5985
+        $crate::__pgrx_c_generated::Field_tleSortGroupRef
     };
     (tli) => {
-        $crate::__pgrx_c_generated::Field5986
+        $crate::__pgrx_c_generated::Field_tli
     };
     (tm_gmtoff) => {
-        $crate::__pgrx_c_generated::Field5987
+        $crate::__pgrx_c_generated::Field_tm_gmtoff
     };
     (tm_hour) => {
-        $crate::__pgrx_c_generated::Field5988
+        $crate::__pgrx_c_generated::Field_tm_hour
     };
     (tm_isdst) => {
-        $crate::__pgrx_c_generated::Field5989
+        $crate::__pgrx_c_generated::Field_tm_isdst
     };
     (tm_mday) => {
-        $crate::__pgrx_c_generated::Field5990
+        $crate::__pgrx_c_generated::Field_tm_mday
     };
     (tm_min) => {
-        $crate::__pgrx_c_generated::Field5991
+        $crate::__pgrx_c_generated::Field_tm_min
     };
     (tm_mon) => {
-        $crate::__pgrx_c_generated::Field5992
+        $crate::__pgrx_c_generated::Field_tm_mon
     };
     (tm_sec) => {
-        $crate::__pgrx_c_generated::Field5993
+        $crate::__pgrx_c_generated::Field_tm_sec
     };
     (tm_usec) => {
-        $crate::__pgrx_c_generated::Field5994
+        $crate::__pgrx_c_generated::Field_tm_usec
     };
     (tm_wday) => {
-        $crate::__pgrx_c_generated::Field5995
+        $crate::__pgrx_c_generated::Field_tm_wday
     };
     (tm_yday) => {
-        $crate::__pgrx_c_generated::Field5996
+        $crate::__pgrx_c_generated::Field_tm_yday
     };
     (tm_year) => {
-        $crate::__pgrx_c_generated::Field5997
+        $crate::__pgrx_c_generated::Field_tm_year
     };
     (tmplinit) => {
-        $crate::__pgrx_c_generated::Field6000
+        $crate::__pgrx_c_generated::Field_tmplinit
     };
     (tmpllexize) => {
-        $crate::__pgrx_c_generated::Field6001
+        $crate::__pgrx_c_generated::Field_tmpllexize
     };
     (tmplnamespace) => {
-        $crate::__pgrx_c_generated::Field6003
+        $crate::__pgrx_c_generated::Field_tmplnamespace
     };
     (toast_max_chunk_size) => {
-        $crate::__pgrx_c_generated::Field6006
+        $crate::__pgrx_c_generated::Field_toast_max_chunk_size
     };
     (toast_parent) => {
-        $crate::__pgrx_c_generated::Field6007
+        $crate::__pgrx_c_generated::Field_toast_parent
     };
     (toast_tuple_target) => {
-        $crate::__pgrx_c_generated::Field6008
+        $crate::__pgrx_c_generated::Field_toast_tuple_target
     };
     (toidAttNo) => {
-        $crate::__pgrx_c_generated::Field6010
+        $crate::__pgrx_c_generated::Field_toidAttNo
     };
     (tokenOid) => {
-        $crate::__pgrx_c_generated::Field6012
+        $crate::__pgrx_c_generated::Field_tokenOid
     };
     (tokentype) => {
-        $crate::__pgrx_c_generated::Field6013
+        $crate::__pgrx_c_generated::Field_tokentype
     };
     (topWindow) => {
-        $crate::__pgrx_c_generated::Field6014
+        $crate::__pgrx_c_generated::Field_topWindow
     };
     (topXid) => {
-        $crate::__pgrx_c_generated::Field6015
+        $crate::__pgrx_c_generated::Field_topXid
     };
     (top_window) => {
-        $crate::__pgrx_c_generated::Field6018
+        $crate::__pgrx_c_generated::Field_top_window
     };
     (top_xid) => {
-        $crate::__pgrx_c_generated::Field6019
+        $crate::__pgrx_c_generated::Field_top_xid
     };
     (toplevel_xid) => {
-        $crate::__pgrx_c_generated::Field6021
+        $crate::__pgrx_c_generated::Field_toplevel_xid
     };
     (topparent) => {
-        $crate::__pgrx_c_generated::Field6022
+        $crate::__pgrx_c_generated::Field_topparent
     };
     (toptxn) => {
-        $crate::__pgrx_c_generated::Field6023
+        $crate::__pgrx_c_generated::Field_toptxn
     };
     (topwindow) => {
-        $crate::__pgrx_c_generated::Field6024
+        $crate::__pgrx_c_generated::Field_topwindow
     };
     (totalBytes) => {
-        $crate::__pgrx_c_generated::Field6027
+        $crate::__pgrx_c_generated::Field_totalBytes
     };
     (totalDiskSpaceUsed) => {
-        $crate::__pgrx_c_generated::Field6028
+        $crate::__pgrx_c_generated::Field_totalDiskSpaceUsed
     };
     (totalMemorySpaceUsed) => {
-        $crate::__pgrx_c_generated::Field6029
+        $crate::__pgrx_c_generated::Field_totalMemorySpaceUsed
     };
     (totalTxns) => {
-        $crate::__pgrx_c_generated::Field6031
+        $crate::__pgrx_c_generated::Field_totalTxns
     };
     (total_analyze_time) => {
-        $crate::__pgrx_c_generated::Field6032
+        $crate::__pgrx_c_generated::Field_total_analyze_time
     };
     (total_autoanalyze_time) => {
-        $crate::__pgrx_c_generated::Field6033
+        $crate::__pgrx_c_generated::Field_total_autoanalyze_time
     };
     (total_autovacuum_time) => {
-        $crate::__pgrx_c_generated::Field6034
+        $crate::__pgrx_c_generated::Field_total_autovacuum_time
     };
     (total_bytes) => {
-        $crate::__pgrx_c_generated::Field6035
+        $crate::__pgrx_c_generated::Field_total_bytes
     };
     (total_edges) => {
-        $crate::__pgrx_c_generated::Field6038
+        $crate::__pgrx_c_generated::Field_total_edges
     };
     (total_len) => {
-        $crate::__pgrx_c_generated::Field6039
+        $crate::__pgrx_c_generated::Field_total_len
     };
     (total_size) => {
-        $crate::__pgrx_c_generated::Field6040
+        $crate::__pgrx_c_generated::Field_total_size
     };
     (total_time) => {
-        $crate::__pgrx_c_generated::Field6042
+        $crate::__pgrx_c_generated::Field_total_time
     };
     (total_tuples) => {
-        $crate::__pgrx_c_generated::Field6043
+        $crate::__pgrx_c_generated::Field_total_tuples
     };
     (total_txns) => {
-        $crate::__pgrx_c_generated::Field6044
+        $crate::__pgrx_c_generated::Field_total_txns
     };
     (total_vacuum_time) => {
-        $crate::__pgrx_c_generated::Field6045
+        $crate::__pgrx_c_generated::Field_total_vacuum_time
     };
     (totalentries) => {
-        $crate::__pgrx_c_generated::Field6046
+        $crate::__pgrx_c_generated::Field_totalentries
     };
     (totalsize) => {
-        $crate::__pgrx_c_generated::Field6047
+        $crate::__pgrx_c_generated::Field_totalsize
     };
     (totalspace) => {
-        $crate::__pgrx_c_generated::Field6048
+        $crate::__pgrx_c_generated::Field_totalspace
     };
     (tour1_position) => {
-        $crate::__pgrx_c_generated::Field6050
+        $crate::__pgrx_c_generated::Field_tour1_position
     };
     (tour2_position) => {
-        $crate::__pgrx_c_generated::Field6051
+        $crate::__pgrx_c_generated::Field_tour2_position
     };
     (track_commit_timestamp) => {
-        $crate::__pgrx_c_generated::Field6055
+        $crate::__pgrx_c_generated::Field_track_commit_timestamp
     };
     (tranche) => {
-        $crate::__pgrx_c_generated::Field6057
+        $crate::__pgrx_c_generated::Field_tranche
     };
     (trancheId) => {
-        $crate::__pgrx_c_generated::Field6058
+        $crate::__pgrx_c_generated::Field_trancheId
     };
     (tranche_id) => {
-        $crate::__pgrx_c_generated::Field6060
+        $crate::__pgrx_c_generated::Field_tranche_id
     };
     (transValue) => {
-        $crate::__pgrx_c_generated::Field6063
+        $crate::__pgrx_c_generated::Field_transValue
     };
     (transValueIsNull) => {
-        $crate::__pgrx_c_generated::Field6064
+        $crate::__pgrx_c_generated::Field_transValueIsNull
     };
     (transactional) => {
-        $crate::__pgrx_c_generated::Field6065
+        $crate::__pgrx_c_generated::Field_transactional
     };
     (transfn_oid) => {
-        $crate::__pgrx_c_generated::Field6069
+        $crate::__pgrx_c_generated::Field_transfn_oid
     };
     (transformed) => {
-        $crate::__pgrx_c_generated::Field6071
+        $crate::__pgrx_c_generated::Field_transformed
     };
     (transientPlan) => {
-        $crate::__pgrx_c_generated::Field6072
+        $crate::__pgrx_c_generated::Field_transientPlan
     };
     (transitionRels) => {
-        $crate::__pgrx_c_generated::Field6073
+        $crate::__pgrx_c_generated::Field_transitionRels
     };
     (transitionSpace) => {
-        $crate::__pgrx_c_generated::Field6074
+        $crate::__pgrx_c_generated::Field_transitionSpace
     };
     (translated_vars) => {
-        $crate::__pgrx_c_generated::Field6076
+        $crate::__pgrx_c_generated::Field_translated_vars
     };
     (transno) => {
-        $crate::__pgrx_c_generated::Field6077
+        $crate::__pgrx_c_generated::Field_transno
     };
     (transtypeByVal) => {
-        $crate::__pgrx_c_generated::Field6078
+        $crate::__pgrx_c_generated::Field_transtypeByVal
     };
     (transtypeLen) => {
-        $crate::__pgrx_c_generated::Field6079
+        $crate::__pgrx_c_generated::Field_transtypeLen
     };
     (traversed) => {
-        $crate::__pgrx_c_generated::Field6084
+        $crate::__pgrx_c_generated::Field_traversed
     };
     (tree_height) => {
-        $crate::__pgrx_c_generated::Field6086
+        $crate::__pgrx_c_generated::Field_tree_height
     };
     (trffromsql) => {
-        $crate::__pgrx_c_generated::Field6088
+        $crate::__pgrx_c_generated::Field_trffromsql
     };
     (trflang) => {
-        $crate::__pgrx_c_generated::Field6089
+        $crate::__pgrx_c_generated::Field_trflang
     };
     (trftosql) => {
-        $crate::__pgrx_c_generated::Field6090
+        $crate::__pgrx_c_generated::Field_trftosql
     };
     (trftype) => {
-        $crate::__pgrx_c_generated::Field6091
+        $crate::__pgrx_c_generated::Field_trftype
     };
     (trigOid) => {
-        $crate::__pgrx_c_generated::Field6094
+        $crate::__pgrx_c_generated::Field_trigOid
     };
     (trig_delete_after_row) => {
-        $crate::__pgrx_c_generated::Field6095
+        $crate::__pgrx_c_generated::Field_trig_delete_after_row
     };
     (trig_delete_after_statement) => {
-        $crate::__pgrx_c_generated::Field6096
+        $crate::__pgrx_c_generated::Field_trig_delete_after_statement
     };
     (trig_delete_before_row) => {
-        $crate::__pgrx_c_generated::Field6097
+        $crate::__pgrx_c_generated::Field_trig_delete_before_row
     };
     (trig_delete_before_statement) => {
-        $crate::__pgrx_c_generated::Field6098
+        $crate::__pgrx_c_generated::Field_trig_delete_before_statement
     };
     (trig_delete_instead_row) => {
-        $crate::__pgrx_c_generated::Field6099
+        $crate::__pgrx_c_generated::Field_trig_delete_instead_row
     };
     (trig_delete_old_table) => {
-        $crate::__pgrx_c_generated::Field6100
+        $crate::__pgrx_c_generated::Field_trig_delete_old_table
     };
     (trig_insert_after_row) => {
-        $crate::__pgrx_c_generated::Field6101
+        $crate::__pgrx_c_generated::Field_trig_insert_after_row
     };
     (trig_insert_after_statement) => {
-        $crate::__pgrx_c_generated::Field6102
+        $crate::__pgrx_c_generated::Field_trig_insert_after_statement
     };
     (trig_insert_before_row) => {
-        $crate::__pgrx_c_generated::Field6103
+        $crate::__pgrx_c_generated::Field_trig_insert_before_row
     };
     (trig_insert_before_statement) => {
-        $crate::__pgrx_c_generated::Field6104
+        $crate::__pgrx_c_generated::Field_trig_insert_before_statement
     };
     (trig_insert_instead_row) => {
-        $crate::__pgrx_c_generated::Field6105
+        $crate::__pgrx_c_generated::Field_trig_insert_instead_row
     };
     (trig_insert_new_table) => {
-        $crate::__pgrx_c_generated::Field6106
+        $crate::__pgrx_c_generated::Field_trig_insert_new_table
     };
     (trig_truncate_after_statement) => {
-        $crate::__pgrx_c_generated::Field6107
+        $crate::__pgrx_c_generated::Field_trig_truncate_after_statement
     };
     (trig_truncate_before_statement) => {
-        $crate::__pgrx_c_generated::Field6108
+        $crate::__pgrx_c_generated::Field_trig_truncate_before_statement
     };
     (trig_update_after_row) => {
-        $crate::__pgrx_c_generated::Field6109
+        $crate::__pgrx_c_generated::Field_trig_update_after_row
     };
     (trig_update_after_statement) => {
-        $crate::__pgrx_c_generated::Field6110
+        $crate::__pgrx_c_generated::Field_trig_update_after_statement
     };
     (trig_update_before_row) => {
-        $crate::__pgrx_c_generated::Field6111
+        $crate::__pgrx_c_generated::Field_trig_update_before_row
     };
     (trig_update_before_statement) => {
-        $crate::__pgrx_c_generated::Field6112
+        $crate::__pgrx_c_generated::Field_trig_update_before_statement
     };
     (trig_update_instead_row) => {
-        $crate::__pgrx_c_generated::Field6113
+        $crate::__pgrx_c_generated::Field_trig_update_instead_row
     };
     (trig_update_new_table) => {
-        $crate::__pgrx_c_generated::Field6114
+        $crate::__pgrx_c_generated::Field_trig_update_new_table
     };
     (trig_update_old_table) => {
-        $crate::__pgrx_c_generated::Field6115
+        $crate::__pgrx_c_generated::Field_trig_update_old_table
     };
     (trss_inScan) => {
-        $crate::__pgrx_c_generated::Field6121
+        $crate::__pgrx_c_generated::Field_trss_inScan
     };
     (trss_tidexprs) => {
-        $crate::__pgrx_c_generated::Field6124
+        $crate::__pgrx_c_generated::Field_trss_tidexprs
     };
     (truncate) => {
-        $crate::__pgrx_c_generated::Field6125
+        $crate::__pgrx_c_generated::Field_truncate
     };
     (truncdropped) => {
-        $crate::__pgrx_c_generated::Field6127
+        $crate::__pgrx_c_generated::Field_truncdropped
     };
     (ts) => {
-        $crate::__pgrx_c_generated::Field6128
+        $crate::__pgrx_c_generated::Field_ts
     };
     (tsId) => {
-        $crate::__pgrx_c_generated::Field6129
+        $crate::__pgrx_c_generated::Field_tsId
     };
     (ts_id) => {
-        $crate::__pgrx_c_generated::Field6130
+        $crate::__pgrx_c_generated::Field_ts_id
     };
     (tsmhandler) => {
-        $crate::__pgrx_c_generated::Field6133
+        $crate::__pgrx_c_generated::Field_tsmhandler
     };
     (tss_NumTids) => {
-        $crate::__pgrx_c_generated::Field6135
+        $crate::__pgrx_c_generated::Field_tss_NumTids
     };
     (tss_TidPtr) => {
-        $crate::__pgrx_c_generated::Field6137
+        $crate::__pgrx_c_generated::Field_tss_TidPtr
     };
     (tss_isCurrentOf) => {
-        $crate::__pgrx_c_generated::Field6138
+        $crate::__pgrx_c_generated::Field_tss_isCurrentOf
     };
     (tss_tidexprs) => {
-        $crate::__pgrx_c_generated::Field6139
+        $crate::__pgrx_c_generated::Field_tss_tidexprs
     };
     (ttc_flags) => {
-        $crate::__pgrx_c_generated::Field6141
+        $crate::__pgrx_c_generated::Field_ttc_flags
     };
     (tts_flags) => {
-        $crate::__pgrx_c_generated::Field6147
+        $crate::__pgrx_c_generated::Field_tts_flags
     };
     (tts_nvalid) => {
-        $crate::__pgrx_c_generated::Field6150
+        $crate::__pgrx_c_generated::Field_tts_nvalid
     };
     (tts_ops) => {
-        $crate::__pgrx_c_generated::Field6151
+        $crate::__pgrx_c_generated::Field_tts_ops
     };
     (tts_tableOid) => {
-        $crate::__pgrx_c_generated::Field6152
+        $crate::__pgrx_c_generated::Field_tts_tableOid
     };
     (ttype) => {
-        $crate::__pgrx_c_generated::Field6156
+        $crate::__pgrx_c_generated::Field_ttype
     };
     (tupDesc_identifier) => {
-        $crate::__pgrx_c_generated::Field6158
+        $crate::__pgrx_c_generated::Field_tupDesc_identifier
     };
     (tupattnum) => {
-        $crate::__pgrx_c_generated::Field6160
+        $crate::__pgrx_c_generated::Field_tupattnum
     };
     (tupdesc_id) => {
-        $crate::__pgrx_c_generated::Field6163
+        $crate::__pgrx_c_generated::Field_tupdesc_id
     };
     (tupleOffset) => {
-        $crate::__pgrx_c_generated::Field6165
+        $crate::__pgrx_c_generated::Field_tupleOffset
     };
     (tuple_table) => {
-        $crate::__pgrx_c_generated::Field6180
+        $crate::__pgrx_c_generated::Field_tuple_table
     };
     (tupledata) => {
-        $crate::__pgrx_c_generated::Field6188
+        $crate::__pgrx_c_generated::Field_tupledata
     };
     (tuplen) => {
-        $crate::__pgrx_c_generated::Field6190
+        $crate::__pgrx_c_generated::Field_tuplen
     };
     (tuples) => {
-        $crate::__pgrx_c_generated::Field6191
+        $crate::__pgrx_c_generated::Field_tuples
     };
     (tuples_deleted) => {
-        $crate::__pgrx_c_generated::Field6192
+        $crate::__pgrx_c_generated::Field_tuples_deleted
     };
     (tuples_fetched) => {
-        $crate::__pgrx_c_generated::Field6193
+        $crate::__pgrx_c_generated::Field_tuples_fetched
     };
     (tuples_hot_updated) => {
-        $crate::__pgrx_c_generated::Field6194
+        $crate::__pgrx_c_generated::Field_tuples_hot_updated
     };
     (tuples_inserted) => {
-        $crate::__pgrx_c_generated::Field6195
+        $crate::__pgrx_c_generated::Field_tuples_inserted
     };
     (tuples_needed) => {
-        $crate::__pgrx_c_generated::Field6196
+        $crate::__pgrx_c_generated::Field_tuples_needed
     };
     (tuples_newpage_updated) => {
-        $crate::__pgrx_c_generated::Field6197
+        $crate::__pgrx_c_generated::Field_tuples_newpage_updated
     };
     (tuples_returned) => {
-        $crate::__pgrx_c_generated::Field6199
+        $crate::__pgrx_c_generated::Field_tuples_returned
     };
     (tuples_updated) => {
-        $crate::__pgrx_c_generated::Field6200
+        $crate::__pgrx_c_generated::Field_tuples_updated
     };
     (tupno) => {
-        $crate::__pgrx_c_generated::Field6205
+        $crate::__pgrx_c_generated::Field_tupno
     };
     (tupstate) => {
-        $crate::__pgrx_c_generated::Field6207
+        $crate::__pgrx_c_generated::Field_tupstate
     };
     (two_phase) => {
-        $crate::__pgrx_c_generated::Field6215
+        $crate::__pgrx_c_generated::Field_two_phase
     };
     (two_phase_at) => {
-        $crate::__pgrx_c_generated::Field6216
+        $crate::__pgrx_c_generated::Field_two_phase_at
     };
     (twophase) => {
-        $crate::__pgrx_c_generated::Field6217
+        $crate::__pgrx_c_generated::Field_twophase
     };
     (twophase_opt_given) => {
-        $crate::__pgrx_c_generated::Field6219
+        $crate::__pgrx_c_generated::Field_twophase_opt_given
     };
     (twophase_xid) => {
-        $crate::__pgrx_c_generated::Field6220
+        $crate::__pgrx_c_generated::Field_twophase_xid
     };
     (twophasestate) => {
-        $crate::__pgrx_c_generated::Field6221
+        $crate::__pgrx_c_generated::Field_twophasestate
     };
     (txn_flags) => {
-        $crate::__pgrx_c_generated::Field6224
+        $crate::__pgrx_c_generated::Field_txn_flags
     };
     (typalign) => {
-        $crate::__pgrx_c_generated::Field6228
+        $crate::__pgrx_c_generated::Field_typalign
     };
     (typanalyze) => {
-        $crate::__pgrx_c_generated::Field6229
+        $crate::__pgrx_c_generated::Field_typanalyze
     };
     (typarray) => {
-        $crate::__pgrx_c_generated::Field6230
+        $crate::__pgrx_c_generated::Field_typarray
     };
     (typbasetype) => {
-        $crate::__pgrx_c_generated::Field6231
+        $crate::__pgrx_c_generated::Field_typbasetype
     };
     (typbyval) => {
-        $crate::__pgrx_c_generated::Field6232
+        $crate::__pgrx_c_generated::Field_typbyval
     };
     (typcategory) => {
-        $crate::__pgrx_c_generated::Field6233
+        $crate::__pgrx_c_generated::Field_typcategory
     };
     (typcollation) => {
-        $crate::__pgrx_c_generated::Field6234
+        $crate::__pgrx_c_generated::Field_typcollation
     };
     (typdelim) => {
-        $crate::__pgrx_c_generated::Field6235
+        $crate::__pgrx_c_generated::Field_typdelim
     };
     (type) => {
-        $crate::__pgrx_c_generated::Field6236
+        $crate::__pgrx_c_generated::Field_type
     };
     (r#type) => {
-        $crate::__pgrx_c_generated::Field6236
+        $crate::__pgrx_c_generated::Field_type
     };
     (typeId) => {
-        $crate::__pgrx_c_generated::Field6237
+        $crate::__pgrx_c_generated::Field_typeId
     };
     (typeMod) => {
-        $crate::__pgrx_c_generated::Field6238
+        $crate::__pgrx_c_generated::Field_typeMod
     };
     (typeName) => {
-        $crate::__pgrx_c_generated::Field6239
+        $crate::__pgrx_c_generated::Field_typeName
     };
     (typeOid) => {
-        $crate::__pgrx_c_generated::Field6240
+        $crate::__pgrx_c_generated::Field_typeOid
     };
     (type_id) => {
-        $crate::__pgrx_c_generated::Field6241
+        $crate::__pgrx_c_generated::Field_type_id
     };
     (type_id_hash) => {
-        $crate::__pgrx_c_generated::Field6242
+        $crate::__pgrx_c_generated::Field_type_id_hash
     };
     (typelem) => {
-        $crate::__pgrx_c_generated::Field6244
+        $crate::__pgrx_c_generated::Field_typelem
     };
     (typemod) => {
-        $crate::__pgrx_c_generated::Field6245
+        $crate::__pgrx_c_generated::Field_typemod
     };
     (typid) => {
-        $crate::__pgrx_c_generated::Field6248
+        $crate::__pgrx_c_generated::Field_typid
     };
     (typinput) => {
-        $crate::__pgrx_c_generated::Field6249
+        $crate::__pgrx_c_generated::Field_typinput
     };
     (typiofunc) => {
-        $crate::__pgrx_c_generated::Field6250
+        $crate::__pgrx_c_generated::Field_typiofunc
     };
     (typioparam) => {
-        $crate::__pgrx_c_generated::Field6251
+        $crate::__pgrx_c_generated::Field_typioparam
     };
     (typisarray) => {
-        $crate::__pgrx_c_generated::Field6253
+        $crate::__pgrx_c_generated::Field_typisarray
     };
     (typisdefined) => {
-        $crate::__pgrx_c_generated::Field6254
+        $crate::__pgrx_c_generated::Field_typisdefined
     };
     (typispreferred) => {
-        $crate::__pgrx_c_generated::Field6255
+        $crate::__pgrx_c_generated::Field_typispreferred
     };
     (typlen) => {
-        $crate::__pgrx_c_generated::Field6256
+        $crate::__pgrx_c_generated::Field_typlen
     };
     (typmod) => {
-        $crate::__pgrx_c_generated::Field6257
+        $crate::__pgrx_c_generated::Field_typmod
     };
     (typmodin) => {
-        $crate::__pgrx_c_generated::Field6258
+        $crate::__pgrx_c_generated::Field_typmodin
     };
     (typmodout) => {
-        $crate::__pgrx_c_generated::Field6259
+        $crate::__pgrx_c_generated::Field_typmodout
     };
     (typmods) => {
-        $crate::__pgrx_c_generated::Field6260
+        $crate::__pgrx_c_generated::Field_typmods
     };
     (typnamespace) => {
-        $crate::__pgrx_c_generated::Field6262
+        $crate::__pgrx_c_generated::Field_typnamespace
     };
     (typndims) => {
-        $crate::__pgrx_c_generated::Field6263
+        $crate::__pgrx_c_generated::Field_typndims
     };
     (typnotnull) => {
-        $crate::__pgrx_c_generated::Field6264
+        $crate::__pgrx_c_generated::Field_typnotnull
     };
     (typoid) => {
-        $crate::__pgrx_c_generated::Field6265
+        $crate::__pgrx_c_generated::Field_typoid
     };
     (typoutput) => {
-        $crate::__pgrx_c_generated::Field6266
+        $crate::__pgrx_c_generated::Field_typoutput
     };
     (typowner) => {
-        $crate::__pgrx_c_generated::Field6267
+        $crate::__pgrx_c_generated::Field_typowner
     };
     (typreceive) => {
-        $crate::__pgrx_c_generated::Field6268
+        $crate::__pgrx_c_generated::Field_typreceive
     };
     (typrelid) => {
-        $crate::__pgrx_c_generated::Field6269
+        $crate::__pgrx_c_generated::Field_typrelid
     };
     (typsend) => {
-        $crate::__pgrx_c_generated::Field6270
+        $crate::__pgrx_c_generated::Field_typsend
     };
     (typstorage) => {
-        $crate::__pgrx_c_generated::Field6271
+        $crate::__pgrx_c_generated::Field_typstorage
     };
     (typsubscript) => {
-        $crate::__pgrx_c_generated::Field6272
+        $crate::__pgrx_c_generated::Field_typsubscript
     };
     (typtype) => {
-        $crate::__pgrx_c_generated::Field6273
+        $crate::__pgrx_c_generated::Field_typtype
     };
     (typtypmod) => {
-        $crate::__pgrx_c_generated::Field6274
+        $crate::__pgrx_c_generated::Field_typtypmod
     };
     (tz) => {
-        $crate::__pgrx_c_generated::Field6275
+        $crate::__pgrx_c_generated::Field_tz
     };
     (umethod) => {
-        $crate::__pgrx_c_generated::Field6284
+        $crate::__pgrx_c_generated::Field_umethod
     };
     (umid) => {
-        $crate::__pgrx_c_generated::Field6285
+        $crate::__pgrx_c_generated::Field_umid
     };
     (umserver) => {
-        $crate::__pgrx_c_generated::Field6286
+        $crate::__pgrx_c_generated::Field_umserver
     };
     (umuser) => {
-        $crate::__pgrx_c_generated::Field6287
+        $crate::__pgrx_c_generated::Field_umuser
     };
     (uniqNumCols) => {
-        $crate::__pgrx_c_generated::Field6291
+        $crate::__pgrx_c_generated::Field_uniqNumCols
     };
     (uniq_exprs) => {
-        $crate::__pgrx_c_generated::Field6293
+        $crate::__pgrx_c_generated::Field_uniq_exprs
     };
     (unique) => {
-        $crate::__pgrx_c_generated::Field6295
+        $crate::__pgrx_c_generated::Field_unique
     };
     (unique_for_rels) => {
-        $crate::__pgrx_c_generated::Field6296
+        $crate::__pgrx_c_generated::Field_unique_for_rels
     };
     (unique_keys) => {
-        $crate::__pgrx_c_generated::Field6297
+        $crate::__pgrx_c_generated::Field_unique_keys
     };
     (unknownEqFalse) => {
-        $crate::__pgrx_c_generated::Field6298
+        $crate::__pgrx_c_generated::Field_unknownEqFalse
     };
     (unloggedLSN) => {
-        $crate::__pgrx_c_generated::Field6299
+        $crate::__pgrx_c_generated::Field_unloggedLSN
     };
     (unused) => {
-        $crate::__pgrx_c_generated::Field6302
+        $crate::__pgrx_c_generated::Field_unused
     };
     (unused_edges) => {
-        $crate::__pgrx_c_generated::Field6303
+        $crate::__pgrx_c_generated::Field_unused_edges
     };
     (updatable) => {
-        $crate::__pgrx_c_generated::Field6304
+        $crate::__pgrx_c_generated::Field_updatable
     };
     (updateColnos) => {
-        $crate::__pgrx_c_generated::Field6305
+        $crate::__pgrx_c_generated::Field_updateColnos
     };
     (updateColnosLists) => {
-        $crate::__pgrx_c_generated::Field6306
+        $crate::__pgrx_c_generated::Field_updateColnosLists
     };
     (update_colnos) => {
-        $crate::__pgrx_c_generated::Field6307
+        $crate::__pgrx_c_generated::Field_update_colnos
     };
     (updated_pre_truncdrop) => {
-        $crate::__pgrx_c_generated::Field6311
+        $crate::__pgrx_c_generated::Field_updated_pre_truncdrop
     };
     (updatedoffset) => {
-        $crate::__pgrx_c_generated::Field6312
+        $crate::__pgrx_c_generated::Field_updatedoffset
     };
     (upperdatums) => {
-        $crate::__pgrx_c_generated::Field6316
+        $crate::__pgrx_c_generated::Field_upperdatums
     };
     (useFastUpdate) => {
-        $crate::__pgrx_c_generated::Field6320
+        $crate::__pgrx_c_generated::Field_useFastUpdate
     };
     (useHashTable) => {
-        $crate::__pgrx_c_generated::Field6321
+        $crate::__pgrx_c_generated::Field_useHashTable
     };
     (useOp) => {
-        $crate::__pgrx_c_generated::Field6322
+        $crate::__pgrx_c_generated::Field_useOp
     };
     (useOr) => {
-        $crate::__pgrx_c_generated::Field6323
+        $crate::__pgrx_c_generated::Field_useOr
     };
     (use_bulkread) => {
-        $crate::__pgrx_c_generated::Field6324
+        $crate::__pgrx_c_generated::Field_use_bulkread
     };
     (use_count) => {
-        $crate::__pgrx_c_generated::Field6325
+        $crate::__pgrx_c_generated::Field_use_count
     };
     (use_io_coercion) => {
-        $crate::__pgrx_c_generated::Field6326
+        $crate::__pgrx_c_generated::Field_use_io_coercion
     };
     (use_json_coercion) => {
-        $crate::__pgrx_c_generated::Field6327
+        $crate::__pgrx_c_generated::Field_use_json_coercion
     };
     (use_pagemode) => {
-        $crate::__pgrx_c_generated::Field6328
+        $crate::__pgrx_c_generated::Field_use_pagemode
     };
     (use_pass_through) => {
-        $crate::__pgrx_c_generated::Field6329
+        $crate::__pgrx_c_generated::Field_use_pass_through
     };
     (used) => {
-        $crate::__pgrx_c_generated::Field6330
+        $crate::__pgrx_c_generated::Field_used
     };
     (user_catalog_table) => {
-        $crate::__pgrx_c_generated::Field6332
+        $crate::__pgrx_c_generated::Field_user_catalog_table
     };
     (userid) => {
-        $crate::__pgrx_c_generated::Field6335
+        $crate::__pgrx_c_generated::Field_userid
     };
     (useridiscurrent) => {
-        $crate::__pgrx_c_generated::Field6336
+        $crate::__pgrx_c_generated::Field_useridiscurrent
     };
     (usingClause) => {
-        $crate::__pgrx_c_generated::Field6337
+        $crate::__pgrx_c_generated::Field_usingClause
     };
     (utf1) => {
-        $crate::__pgrx_c_generated::Field6338
+        $crate::__pgrx_c_generated::Field_utf1
     };
     (utf16_first_part) => {
-        $crate::__pgrx_c_generated::Field6339
+        $crate::__pgrx_c_generated::Field_utf16_first_part
     };
     (utf2) => {
-        $crate::__pgrx_c_generated::Field6340
+        $crate::__pgrx_c_generated::Field_utf2
     };
     (va_4byte) => {
-        $crate::__pgrx_c_generated::Field6342
+        $crate::__pgrx_c_generated::Field_va_4byte
     };
     (va_cols) => {
-        $crate::__pgrx_c_generated::Field6343
+        $crate::__pgrx_c_generated::Field_va_cols
     };
     (va_compressed) => {
-        $crate::__pgrx_c_generated::Field6344
+        $crate::__pgrx_c_generated::Field_va_compressed
     };
     (va_data) => {
-        $crate::__pgrx_c_generated::Field6345
+        $crate::__pgrx_c_generated::Field_va_data
     };
     (va_extinfo) => {
-        $crate::__pgrx_c_generated::Field6346
+        $crate::__pgrx_c_generated::Field_va_extinfo
     };
     (va_header) => {
-        $crate::__pgrx_c_generated::Field6347
+        $crate::__pgrx_c_generated::Field_va_header
     };
     (va_rawsize) => {
-        $crate::__pgrx_c_generated::Field6348
+        $crate::__pgrx_c_generated::Field_va_rawsize
     };
     (va_tag) => {
-        $crate::__pgrx_c_generated::Field6349
+        $crate::__pgrx_c_generated::Field_va_tag
     };
     (va_tcinfo) => {
-        $crate::__pgrx_c_generated::Field6350
+        $crate::__pgrx_c_generated::Field_va_tcinfo
     };
     (va_toastrelid) => {
-        $crate::__pgrx_c_generated::Field6351
+        $crate::__pgrx_c_generated::Field_va_toastrelid
     };
     (va_valueid) => {
-        $crate::__pgrx_c_generated::Field6352
+        $crate::__pgrx_c_generated::Field_va_valueid
     };
     (vacuum_cost_limit) => {
-        $crate::__pgrx_c_generated::Field6355
+        $crate::__pgrx_c_generated::Field_vacuum_cost_limit
     };
     (vacuum_count) => {
-        $crate::__pgrx_c_generated::Field6356
+        $crate::__pgrx_c_generated::Field_vacuum_count
     };
     (vacuum_index_cleanup) => {
-        $crate::__pgrx_c_generated::Field6357
+        $crate::__pgrx_c_generated::Field_vacuum_index_cleanup
     };
     (vacuum_ins_threshold) => {
-        $crate::__pgrx_c_generated::Field6359
+        $crate::__pgrx_c_generated::Field_vacuum_ins_threshold
     };
     (vacuum_max_threshold) => {
-        $crate::__pgrx_c_generated::Field6361
+        $crate::__pgrx_c_generated::Field_vacuum_max_threshold
     };
     (vacuum_threshold) => {
-        $crate::__pgrx_c_generated::Field6363
+        $crate::__pgrx_c_generated::Field_vacuum_threshold
     };
     (vacuum_truncate) => {
-        $crate::__pgrx_c_generated::Field6364
+        $crate::__pgrx_c_generated::Field_vacuum_truncate
     };
     (vacuum_truncate_set) => {
-        $crate::__pgrx_c_generated::Field6365
+        $crate::__pgrx_c_generated::Field_vacuum_truncate_set
     };
     (val) => {
-        $crate::__pgrx_c_generated::Field6366
+        $crate::__pgrx_c_generated::Field_val
     };
     (valcrc) => {
-        $crate::__pgrx_c_generated::Field6367
+        $crate::__pgrx_c_generated::Field_valcrc
     };
     (validators) => {
-        $crate::__pgrx_c_generated::Field6369
+        $crate::__pgrx_c_generated::Field_validators
     };
     (vals) => {
-        $crate::__pgrx_c_generated::Field6371
+        $crate::__pgrx_c_generated::Field_vals
     };
     (value) => {
-        $crate::__pgrx_c_generated::Field6372
+        $crate::__pgrx_c_generated::Field_value
     };
     (values) => {
-        $crate::__pgrx_c_generated::Field6373
+        $crate::__pgrx_c_generated::Field_values
     };
     (valuesLists) => {
-        $crate::__pgrx_c_generated::Field6374
+        $crate::__pgrx_c_generated::Field_valuesLists
     };
     (values_lists) => {
-        $crate::__pgrx_c_generated::Field6376
+        $crate::__pgrx_c_generated::Field_values_lists
     };
     (valuetype) => {
-        $crate::__pgrx_c_generated::Field6377
+        $crate::__pgrx_c_generated::Field_valuetype
     };
     (varRelid) => {
-        $crate::__pgrx_c_generated::Field6379
+        $crate::__pgrx_c_generated::Field_varRelid
     };
     (varattno) => {
-        $crate::__pgrx_c_generated::Field6380
+        $crate::__pgrx_c_generated::Field_varattno
     };
     (varattnosyn) => {
-        $crate::__pgrx_c_generated::Field6381
+        $crate::__pgrx_c_generated::Field_varattnosyn
     };
     (varcollid) => {
-        $crate::__pgrx_c_generated::Field6382
+        $crate::__pgrx_c_generated::Field_varcollid
     };
     (varlena_header_) => {
-        $crate::__pgrx_c_generated::Field6384
+        $crate::__pgrx_c_generated::Field_varlena_header_
     };
     (varlevelsup) => {
-        $crate::__pgrx_c_generated::Field6385
+        $crate::__pgrx_c_generated::Field_varlevelsup
     };
     (varno) => {
-        $crate::__pgrx_c_generated::Field6386
+        $crate::__pgrx_c_generated::Field_varno
     };
     (varnosyn) => {
-        $crate::__pgrx_c_generated::Field6388
+        $crate::__pgrx_c_generated::Field_varnosyn
     };
     (varreturningtype) => {
-        $crate::__pgrx_c_generated::Field6390
+        $crate::__pgrx_c_generated::Field_varreturningtype
     };
     (vartype) => {
-        $crate::__pgrx_c_generated::Field6391
+        $crate::__pgrx_c_generated::Field_vartype
     };
     (vartypmod) => {
-        $crate::__pgrx_c_generated::Field6392
+        $crate::__pgrx_c_generated::Field_vartypmod
     };
     (vector) => {
-        $crate::__pgrx_c_generated::Field6393
+        $crate::__pgrx_c_generated::Field_vector
     };
     (vectorpos) => {
-        $crate::__pgrx_c_generated::Field6394
+        $crate::__pgrx_c_generated::Field_vectorpos
     };
     (verbose) => {
-        $crate::__pgrx_c_generated::Field6395
+        $crate::__pgrx_c_generated::Field_verbose
     };
     (version) => {
-        $crate::__pgrx_c_generated::Field6396
+        $crate::__pgrx_c_generated::Field_version
     };
     (visible) => {
-        $crate::__pgrx_c_generated::Field6399
+        $crate::__pgrx_c_generated::Field_visible
     };
     (vistest) => {
-        $crate::__pgrx_c_generated::Field6400
+        $crate::__pgrx_c_generated::Field_vistest
     };
     (vl_len_) => {
-        $crate::__pgrx_c_generated::Field6402
+        $crate::__pgrx_c_generated::Field_vl_len_
     };
     (vm_conflict_horizon) => {
-        $crate::__pgrx_c_generated::Field6403
+        $crate::__pgrx_c_generated::Field_vm_conflict_horizon
     };
     (volatile_defexprs) => {
-        $crate::__pgrx_c_generated::Field6404
+        $crate::__pgrx_c_generated::Field_volatile_defexprs
     };
     (vxid) => {
-        $crate::__pgrx_c_generated::Field6405
+        $crate::__pgrx_c_generated::Field_vxid
     };
     (wait) => {
-        $crate::__pgrx_c_generated::Field6415
+        $crate::__pgrx_c_generated::Field_wait
     };
     (waitLSN) => {
-        $crate::__pgrx_c_generated::Field6416
+        $crate::__pgrx_c_generated::Field_waitLSN
     };
     (waitLock) => {
-        $crate::__pgrx_c_generated::Field6417
+        $crate::__pgrx_c_generated::Field_waitLock
     };
     (waitLockMode) => {
-        $crate::__pgrx_c_generated::Field6418
+        $crate::__pgrx_c_generated::Field_waitLockMode
     };
     (waitMask) => {
-        $crate::__pgrx_c_generated::Field6419
+        $crate::__pgrx_c_generated::Field_waitMask
     };
     (waitPolicy) => {
-        $crate::__pgrx_c_generated::Field6420
+        $crate::__pgrx_c_generated::Field_waitPolicy
     };
     (waitProcLock) => {
-        $crate::__pgrx_c_generated::Field6421
+        $crate::__pgrx_c_generated::Field_waitProcLock
     };
     (waitStart) => {
-        $crate::__pgrx_c_generated::Field6423
+        $crate::__pgrx_c_generated::Field_waitStart
     };
     (waitStatus) => {
-        $crate::__pgrx_c_generated::Field6424
+        $crate::__pgrx_c_generated::Field_waitStatus
     };
     (wait_backend_pgprocno) => {
-        $crate::__pgrx_c_generated::Field6425
+        $crate::__pgrx_c_generated::Field_wait_backend_pgprocno
     };
     (wait_event_info) => {
-        $crate::__pgrx_c_generated::Field6426
+        $crate::__pgrx_c_generated::Field_wait_event_info
     };
     (wait_on_fd_before_close) => {
-        $crate::__pgrx_c_generated::Field6427
+        $crate::__pgrx_c_generated::Field_wait_on_fd_before_close
     };
     (waiters) => {
-        $crate::__pgrx_c_generated::Field6430
+        $crate::__pgrx_c_generated::Field_waiters
     };
     (wal) => {
-        $crate::__pgrx_c_generated::Field6432
+        $crate::__pgrx_c_generated::Field_wal
     };
     (walRcvState) => {
-        $crate::__pgrx_c_generated::Field6433
+        $crate::__pgrx_c_generated::Field_walRcvState
     };
     (wal_buffers_full) => {
-        $crate::__pgrx_c_generated::Field6435
+        $crate::__pgrx_c_generated::Field_wal_buffers_full
     };
     (wal_bytes) => {
-        $crate::__pgrx_c_generated::Field6436
+        $crate::__pgrx_c_generated::Field_wal_bytes
     };
     (wal_fpi) => {
-        $crate::__pgrx_c_generated::Field6440
+        $crate::__pgrx_c_generated::Field_wal_fpi
     };
     (wal_level) => {
-        $crate::__pgrx_c_generated::Field6441
+        $crate::__pgrx_c_generated::Field_wal_level
     };
     (wal_log_hints) => {
-        $crate::__pgrx_c_generated::Field6442
+        $crate::__pgrx_c_generated::Field_wal_log_hints
     };
     (wal_records) => {
-        $crate::__pgrx_c_generated::Field6443
+        $crate::__pgrx_c_generated::Field_wal_records
     };
     (walrcv_alter_slot) => {
-        $crate::__pgrx_c_generated::Field6446
+        $crate::__pgrx_c_generated::Field_walrcv_alter_slot
     };
     (walrcv_check_conninfo) => {
-        $crate::__pgrx_c_generated::Field6447
+        $crate::__pgrx_c_generated::Field_walrcv_check_conninfo
     };
     (walrcv_connect) => {
-        $crate::__pgrx_c_generated::Field6448
+        $crate::__pgrx_c_generated::Field_walrcv_connect
     };
     (walrcv_create_slot) => {
-        $crate::__pgrx_c_generated::Field6449
+        $crate::__pgrx_c_generated::Field_walrcv_create_slot
     };
     (walrcv_disconnect) => {
-        $crate::__pgrx_c_generated::Field6450
+        $crate::__pgrx_c_generated::Field_walrcv_disconnect
     };
     (walrcv_endstreaming) => {
-        $crate::__pgrx_c_generated::Field6451
+        $crate::__pgrx_c_generated::Field_walrcv_endstreaming
     };
     (walrcv_exec) => {
-        $crate::__pgrx_c_generated::Field6452
+        $crate::__pgrx_c_generated::Field_walrcv_exec
     };
     (walrcv_get_backend_pid) => {
-        $crate::__pgrx_c_generated::Field6453
+        $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid
     };
     (walrcv_get_conninfo) => {
-        $crate::__pgrx_c_generated::Field6454
+        $crate::__pgrx_c_generated::Field_walrcv_get_conninfo
     };
     (walrcv_get_dbname_from_conninfo) => {
-        $crate::__pgrx_c_generated::Field6455
+        $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo
     };
     (walrcv_get_senderinfo) => {
-        $crate::__pgrx_c_generated::Field6456
+        $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo
     };
     (walrcv_identify_system) => {
-        $crate::__pgrx_c_generated::Field6457
+        $crate::__pgrx_c_generated::Field_walrcv_identify_system
     };
     (walrcv_readtimelinehistoryfile) => {
-        $crate::__pgrx_c_generated::Field6458
+        $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile
     };
     (walrcv_receive) => {
-        $crate::__pgrx_c_generated::Field6459
+        $crate::__pgrx_c_generated::Field_walrcv_receive
     };
     (walrcv_send) => {
-        $crate::__pgrx_c_generated::Field6460
+        $crate::__pgrx_c_generated::Field_walrcv_send
     };
     (walrcv_server_version) => {
-        $crate::__pgrx_c_generated::Field6461
+        $crate::__pgrx_c_generated::Field_walrcv_server_version
     };
     (walrcv_startstreaming) => {
-        $crate::__pgrx_c_generated::Field6462
+        $crate::__pgrx_c_generated::Field_walrcv_startstreaming
     };
     (walsnd_index) => {
-        $crate::__pgrx_c_generated::Field6464
+        $crate::__pgrx_c_generated::Field_walsnd_index
     };
     (walwriterProc) => {
-        $crate::__pgrx_c_generated::Field6468
+        $crate::__pgrx_c_generated::Field_walwriterProc
     };
     (want_itup) => {
-        $crate::__pgrx_c_generated::Field6469
+        $crate::__pgrx_c_generated::Field_want_itup
     };
     (warn_on_first_escape) => {
-        $crate::__pgrx_c_generated::Field6470
+        $crate::__pgrx_c_generated::Field_warn_on_first_escape
     };
     (weight) => {
-        $crate::__pgrx_c_generated::Field6472
+        $crate::__pgrx_c_generated::Field_weight
     };
     (wfunc_left) => {
-        $crate::__pgrx_c_generated::Field6475
+        $crate::__pgrx_c_generated::Field_wfunc_left
     };
     (wfuncno) => {
-        $crate::__pgrx_c_generated::Field6476
+        $crate::__pgrx_c_generated::Field_wfuncno
     };
     (whenclause) => {
-        $crate::__pgrx_c_generated::Field6478
+        $crate::__pgrx_c_generated::Field_whenclause
     };
     (wholeAttNo) => {
-        $crate::__pgrx_c_generated::Field6481
+        $crate::__pgrx_c_generated::Field_wholeAttNo
     };
     (width) => {
-        $crate::__pgrx_c_generated::Field6483
+        $crate::__pgrx_c_generated::Field_width
     };
     (winagg) => {
-        $crate::__pgrx_c_generated::Field6484
+        $crate::__pgrx_c_generated::Field_winagg
     };
     (wincollid) => {
-        $crate::__pgrx_c_generated::Field6486
+        $crate::__pgrx_c_generated::Field_wincollid
     };
     (windowClause) => {
-        $crate::__pgrx_c_generated::Field6487
+        $crate::__pgrx_c_generated::Field_windowClause
     };
     (window_pathkeys) => {
-        $crate::__pgrx_c_generated::Field6491
+        $crate::__pgrx_c_generated::Field_window_pathkeys
     };
     (winfnoid) => {
-        $crate::__pgrx_c_generated::Field6492
+        $crate::__pgrx_c_generated::Field_winfnoid
     };
     (winref) => {
-        $crate::__pgrx_c_generated::Field6494
+        $crate::__pgrx_c_generated::Field_winref
     };
     (winstar) => {
-        $crate::__pgrx_c_generated::Field6495
+        $crate::__pgrx_c_generated::Field_winstar
     };
     (wintype) => {
-        $crate::__pgrx_c_generated::Field6497
+        $crate::__pgrx_c_generated::Field_wintype
     };
     (withCheckOption) => {
-        $crate::__pgrx_c_generated::Field6498
+        $crate::__pgrx_c_generated::Field_withCheckOption
     };
     (withCheckOptionLists) => {
-        $crate::__pgrx_c_generated::Field6499
+        $crate::__pgrx_c_generated::Field_withCheckOptionLists
     };
     (withCheckOptions) => {
-        $crate::__pgrx_c_generated::Field6500
+        $crate::__pgrx_c_generated::Field_withCheckOptions
     };
     (without_overlaps) => {
-        $crate::__pgrx_c_generated::Field6504
+        $crate::__pgrx_c_generated::Field_without_overlaps
     };
     (wrapper) => {
-        $crate::__pgrx_c_generated::Field6519
+        $crate::__pgrx_c_generated::Field_wrapper
     };
     (wre_errno) => {
-        $crate::__pgrx_c_generated::Field6520
+        $crate::__pgrx_c_generated::Field_wre_errno
     };
     (wre_off) => {
-        $crate::__pgrx_c_generated::Field6521
+        $crate::__pgrx_c_generated::Field_wre_off
     };
     (wre_read) => {
-        $crate::__pgrx_c_generated::Field6522
+        $crate::__pgrx_c_generated::Field_wre_read
     };
     (wre_req) => {
-        $crate::__pgrx_c_generated::Field6523
+        $crate::__pgrx_c_generated::Field_wre_req
     };
     (write) => {
-        $crate::__pgrx_c_generated::Field6525
+        $crate::__pgrx_c_generated::Field_write
     };
     (writeLag) => {
-        $crate::__pgrx_c_generated::Field6526
+        $crate::__pgrx_c_generated::Field_writeLag
     };
     (write_location) => {
-        $crate::__pgrx_c_generated::Field6527
+        $crate::__pgrx_c_generated::Field_write_location
     };
     (write_time) => {
-        $crate::__pgrx_c_generated::Field6528
+        $crate::__pgrx_c_generated::Field_write_time
     };
     (write_xid) => {
-        $crate::__pgrx_c_generated::Field6529
+        $crate::__pgrx_c_generated::Field_write_xid
     };
     (ws_file) => {
-        $crate::__pgrx_c_generated::Field6533
+        $crate::__pgrx_c_generated::Field_ws_file
     };
     (ws_segno) => {
-        $crate::__pgrx_c_generated::Field6534
+        $crate::__pgrx_c_generated::Field_ws_segno
     };
     (ws_segsize) => {
-        $crate::__pgrx_c_generated::Field6535
+        $crate::__pgrx_c_generated::Field_ws_segsize
     };
     (ws_tli) => {
-        $crate::__pgrx_c_generated::Field6536
+        $crate::__pgrx_c_generated::Field_ws_tli
     };
     (wtParam) => {
-        $crate::__pgrx_c_generated::Field6537
+        $crate::__pgrx_c_generated::Field_wtParam
     };
     (wt_param_id) => {
-        $crate::__pgrx_c_generated::Field6538
+        $crate::__pgrx_c_generated::Field_wt_param_id
     };
     (xactCompletionCount) => {
-        $crate::__pgrx_c_generated::Field6540
+        $crate::__pgrx_c_generated::Field_xactCompletionCount
     };
     (xactStartedInRecovery) => {
-        $crate::__pgrx_c_generated::Field6543
+        $crate::__pgrx_c_generated::Field_xactStartedInRecovery
     };
     (xact_commit) => {
-        $crate::__pgrx_c_generated::Field6544
+        $crate::__pgrx_c_generated::Field_xact_commit
     };
     (xact_rollback) => {
-        $crate::__pgrx_c_generated::Field6545
+        $crate::__pgrx_c_generated::Field_xact_rollback
     };
     (xact_state) => {
-        $crate::__pgrx_c_generated::Field6546
+        $crate::__pgrx_c_generated::Field_xact_state
     };
     (xact_time) => {
-        $crate::__pgrx_c_generated::Field6547
+        $crate::__pgrx_c_generated::Field_xact_time
     };
     (xcdepth) => {
-        $crate::__pgrx_c_generated::Field6549
+        $crate::__pgrx_c_generated::Field_xcdepth
     };
     (xcnt) => {
-        $crate::__pgrx_c_generated::Field6550
+        $crate::__pgrx_c_generated::Field_xcnt
     };
     (xcnt_space) => {
-        $crate::__pgrx_c_generated::Field6551
+        $crate::__pgrx_c_generated::Field_xcnt_space
     };
     (xid) => {
-        $crate::__pgrx_c_generated::Field6553
+        $crate::__pgrx_c_generated::Field_xid
     };
     (xidStopLimit) => {
-        $crate::__pgrx_c_generated::Field6554
+        $crate::__pgrx_c_generated::Field_xidStopLimit
     };
     (xidVacLimit) => {
-        $crate::__pgrx_c_generated::Field6555
+        $crate::__pgrx_c_generated::Field_xidVacLimit
     };
     (xidWarnLimit) => {
-        $crate::__pgrx_c_generated::Field6556
+        $crate::__pgrx_c_generated::Field_xidWarnLimit
     };
     (xidWrapLimit) => {
-        $crate::__pgrx_c_generated::Field6557
+        $crate::__pgrx_c_generated::Field_xidWrapLimit
     };
     (xid_value) => {
-        $crate::__pgrx_c_generated::Field6558
+        $crate::__pgrx_c_generated::Field_xid_value
     };
     (xids) => {
-        $crate::__pgrx_c_generated::Field6559
+        $crate::__pgrx_c_generated::Field_xids
     };
     (xinfo) => {
-        $crate::__pgrx_c_generated::Field6560
+        $crate::__pgrx_c_generated::Field_xinfo
     };
     (xl_crc) => {
-        $crate::__pgrx_c_generated::Field6562
+        $crate::__pgrx_c_generated::Field_xl_crc
     };
     (xl_info) => {
-        $crate::__pgrx_c_generated::Field6563
+        $crate::__pgrx_c_generated::Field_xl_info
     };
     (xl_prev) => {
-        $crate::__pgrx_c_generated::Field6564
+        $crate::__pgrx_c_generated::Field_xl_prev
     };
     (xl_rmid) => {
-        $crate::__pgrx_c_generated::Field6565
+        $crate::__pgrx_c_generated::Field_xl_rmid
     };
     (xl_tot_len) => {
-        $crate::__pgrx_c_generated::Field6566
+        $crate::__pgrx_c_generated::Field_xl_tot_len
     };
     (xl_xid) => {
-        $crate::__pgrx_c_generated::Field6567
+        $crate::__pgrx_c_generated::Field_xl_xid
     };
     (xlog_blcksz) => {
-        $crate::__pgrx_c_generated::Field6569
+        $crate::__pgrx_c_generated::Field_xlog_blcksz
     };
     (xlog_seg_size) => {
-        $crate::__pgrx_c_generated::Field6570
+        $crate::__pgrx_c_generated::Field_xlog_seg_size
     };
     (xlogid) => {
-        $crate::__pgrx_c_generated::Field6571
+        $crate::__pgrx_c_generated::Field_xlogid
     };
     (xlp_info) => {
-        $crate::__pgrx_c_generated::Field6572
+        $crate::__pgrx_c_generated::Field_xlp_info
     };
     (xlp_magic) => {
-        $crate::__pgrx_c_generated::Field6573
+        $crate::__pgrx_c_generated::Field_xlp_magic
     };
     (xlp_pageaddr) => {
-        $crate::__pgrx_c_generated::Field6574
+        $crate::__pgrx_c_generated::Field_xlp_pageaddr
     };
     (xlp_rem_len) => {
-        $crate::__pgrx_c_generated::Field6575
+        $crate::__pgrx_c_generated::Field_xlp_rem_len
     };
     (xlp_seg_size) => {
-        $crate::__pgrx_c_generated::Field6576
+        $crate::__pgrx_c_generated::Field_xlp_seg_size
     };
     (xlp_sysid) => {
-        $crate::__pgrx_c_generated::Field6577
+        $crate::__pgrx_c_generated::Field_xlp_sysid
     };
     (xlp_tli) => {
-        $crate::__pgrx_c_generated::Field6578
+        $crate::__pgrx_c_generated::Field_xlp_tli
     };
     (xlp_xlog_blcksz) => {
-        $crate::__pgrx_c_generated::Field6579
+        $crate::__pgrx_c_generated::Field_xlp_xlog_blcksz
     };
     (xmax) => {
-        $crate::__pgrx_c_generated::Field6580
+        $crate::__pgrx_c_generated::Field_xmax
     };
     (xmin) => {
-        $crate::__pgrx_c_generated::Field6581
+        $crate::__pgrx_c_generated::Field_xmin
     };
     (xmloption) => {
-        $crate::__pgrx_c_generated::Field6583
+        $crate::__pgrx_c_generated::Field_xmloption
     };
     (xpn) => {
-        $crate::__pgrx_c_generated::Field6584
+        $crate::__pgrx_c_generated::Field_xpn
     };
     (xrecoff) => {
-        $crate::__pgrx_c_generated::Field6586
+        $crate::__pgrx_c_generated::Field_xrecoff
     };
     (xs_cbuf) => {
-        $crate::__pgrx_c_generated::Field6588
+        $crate::__pgrx_c_generated::Field_xs_cbuf
     };
     (xs_heap_continue) => {
-        $crate::__pgrx_c_generated::Field6589
+        $crate::__pgrx_c_generated::Field_xs_heap_continue
     };
     (xs_recheck) => {
-        $crate::__pgrx_c_generated::Field6598
+        $crate::__pgrx_c_generated::Field_xs_recheck
     };
     (xs_recheckorderby) => {
-        $crate::__pgrx_c_generated::Field6599
+        $crate::__pgrx_c_generated::Field_xs_recheckorderby
     };
     (xs_temp_snap) => {
-        $crate::__pgrx_c_generated::Field6601
+        $crate::__pgrx_c_generated::Field_xs_temp_snap
     };
     (xs_want_itup) => {
-        $crate::__pgrx_c_generated::Field6602
+        $crate::__pgrx_c_generated::Field_xs_want_itup
     };
     (xtop) => {
-        $crate::__pgrx_c_generated::Field6604
+        $crate::__pgrx_c_generated::Field_xtop
     };
     (zone) => {
-        $crate::__pgrx_c_generated::Field6608
+        $crate::__pgrx_c_generated::Field_zone
     };
     ($($unknown:tt)*) => {
         compile_error!("field has no compiler-verified PostgreSQL binding capability")

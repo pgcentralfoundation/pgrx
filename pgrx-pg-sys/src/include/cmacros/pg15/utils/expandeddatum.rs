@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
@@ -253,8 +264,32 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
 /// ```text
 /// #define DatumIsReadWriteExpandedObject( d , isnull , typlen ) ( ( ( isnull ) || ( typlen ) != - 1 ) ? false : VARATT_IS_EXTERNAL_EXPANDED_RW ( DatumGetPointer ( d ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumIsReadWriteExpandedObject {
+    (@__pgrx_emit_check_safety; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $d);
+                $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                $crate::__pgrx_c_operand!(@check_safety; $typlen);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumIsReadWriteExpandedObject!(@__pgrx_emit_value; $d, $isnull, $typlen)
@@ -351,7 +386,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5874,
+                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                         _,
                                                                         _
                                                                     >(
@@ -380,7 +415,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                         $crate::Pointer,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
                                                                                                         _
@@ -434,7 +472,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5876,
+                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                     _,
                                                                     _
                                                                 >(
@@ -463,7 +501,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                     $crate::Pointer,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
                                                                                                     _
@@ -547,6 +588,13 @@ macro_rules! DatumIsReadWriteExpandedObject {
         /* PGRX: DatumGetPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARATT_IS_EXTERNAL_EXPANDED_RW remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_1B_E remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: VARTAG_EXTERNAL remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $d);
+                        $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                        $crate::__pgrx_c_operand!(@check_safety; $typlen);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -655,7 +703,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field5874,
+                                                                                    $crate::__pgrx_c_generated::Field_va_header,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -684,7 +732,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                                     $crate::Pointer,
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                     >,
                                                                                                                     _
@@ -738,7 +789,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field5876,
+                                                                                $crate::__pgrx_c_generated::Field_va_tag,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -767,7 +818,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                                 $crate::Pointer,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
                                                                                                                 _
@@ -925,7 +979,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5874,
+                                                                        $crate::__pgrx_c_generated::Field_va_header,
                                                                         _,
                                                                         _
                                                                     >(
@@ -954,7 +1008,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                         $crate::Pointer,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
                                                                                                         _
@@ -1008,7 +1065,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field5876,
+                                                                    $crate::__pgrx_c_generated::Field_va_tag,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1037,7 +1094,10 @@ macro_rules! DatumIsReadWriteExpandedObject {
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
                                                                                                     $crate::Pointer,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
                                                                                                     _
@@ -1115,6 +1175,17 @@ macro_rules! DatumIsReadWriteExpandedObject {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EOHPGetRODatum {
@@ -1224,8 +1295,27 @@ macro_rules! __pgrx_c_args_EOHPGetRODatum {
 /// ```text
 /// #define EOHPGetRODatum( eohptr ) PointerGetDatum ( ( eohptr ) -> eoh_ro_ptr )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! EOHPGetRODatum {
+    (@__pgrx_emit_check_safety; $eohptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EOHPGetRODatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $eohptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EOHPGetRODatum!(@__pgrx_emit_value; $eohptr)
@@ -1239,7 +1329,7 @@ macro_rules! EOHPGetRODatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1486,
+                                $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                 _,
                                 _
                             >(
@@ -1256,7 +1346,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1270,7 +1360,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1285,10 +1375,15 @@ macro_rules! EOHPGetRODatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1486,
+                                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                         _,
                                         _
                                     >(
@@ -1322,7 +1417,7 @@ macro_rules! EOHPGetRODatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1486,
+                                $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                 _,
                                 _
                             >(
@@ -1339,7 +1434,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1353,7 +1448,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1368,10 +1463,15 @@ macro_rules! EOHPGetRODatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1486,
+                                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                         _,
                                         _
                                     >(
@@ -1405,7 +1505,7 @@ macro_rules! EOHPGetRODatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1486,
+                                $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                 _,
                                 _
                             >(
@@ -1422,7 +1522,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1436,7 +1536,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1451,10 +1551,15 @@ macro_rules! EOHPGetRODatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1486,
+                                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                         _,
                                         _
                                     >(
@@ -1488,7 +1593,7 @@ macro_rules! EOHPGetRODatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1486,
+                                $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                 _,
                                 _
                             >(
@@ -1505,7 +1610,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1519,7 +1624,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1534,10 +1639,15 @@ macro_rules! EOHPGetRODatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1486,
+                                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                         _,
                                         _
                                     >(
@@ -1571,7 +1681,7 @@ macro_rules! EOHPGetRODatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1486,
+                                $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                 _,
                                 _
                             >(
@@ -1588,7 +1698,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1602,7 +1712,7 @@ macro_rules! EOHPGetRODatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1486,
+                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                         _,
                         _
                     >(
@@ -1617,10 +1727,15 @@ macro_rules! EOHPGetRODatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1486,
+                                        $crate::__pgrx_c_generated::Field_eoh_ro_ptr,
                                         _,
                                         _
                                     >(
@@ -1659,6 +1774,17 @@ macro_rules! EOHPGetRODatum {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EOHPGetRWDatum {
@@ -1768,8 +1894,27 @@ macro_rules! __pgrx_c_args_EOHPGetRWDatum {
 /// ```text
 /// #define EOHPGetRWDatum( eohptr ) PointerGetDatum ( ( eohptr ) -> eoh_rw_ptr )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! EOHPGetRWDatum {
+    (@__pgrx_emit_check_safety; $eohptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EOHPGetRWDatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $eohptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EOHPGetRWDatum!(@__pgrx_emit_value; $eohptr)
@@ -1783,7 +1928,7 @@ macro_rules! EOHPGetRWDatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1487,
+                                $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                 _,
                                 _
                             >(
@@ -1800,7 +1945,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1814,7 +1959,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1829,10 +1974,15 @@ macro_rules! EOHPGetRWDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1487,
+                                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                         _,
                                         _
                                     >(
@@ -1866,7 +2016,7 @@ macro_rules! EOHPGetRWDatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1487,
+                                $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                 _,
                                 _
                             >(
@@ -1883,7 +2033,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1897,7 +2047,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1912,10 +2062,15 @@ macro_rules! EOHPGetRWDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1487,
+                                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                         _,
                                         _
                                     >(
@@ -1949,7 +2104,7 @@ macro_rules! EOHPGetRWDatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1487,
+                                $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                 _,
                                 _
                             >(
@@ -1966,7 +2121,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1980,7 +2135,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -1995,10 +2150,15 @@ macro_rules! EOHPGetRWDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1487,
+                                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                         _,
                                         _
                                     >(
@@ -2032,7 +2192,7 @@ macro_rules! EOHPGetRWDatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1487,
+                                $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                 _,
                                 _
                             >(
@@ -2049,7 +2209,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -2063,7 +2223,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -2078,10 +2238,15 @@ macro_rules! EOHPGetRWDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1487,
+                                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                         _,
                                         _
                                     >(
@@ -2115,7 +2280,7 @@ macro_rules! EOHPGetRWDatum {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1487,
+                                $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                 _,
                                 _
                             >(
@@ -2132,7 +2297,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -2146,7 +2311,7 @@ macro_rules! EOHPGetRWDatum {
                     )
                 ] [
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1487,
+                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                         _,
                         _
                     >(
@@ -2161,10 +2326,15 @@ macro_rules! EOHPGetRWDatum {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $eohptr);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1487,
+                                        $crate::__pgrx_c_generated::Field_eoh_rw_ptr,
                                         _,
                                         _
                                     >(
@@ -2203,6 +2373,17 @@ macro_rules! EOHPGetRWDatum {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
@@ -2435,8 +2616,32 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
 /// ```text
 /// #define MakeExpandedObjectReadOnly( d , isnull , typlen ) ( ( ( isnull ) || ( typlen ) != - 1 ) ? ( d ) : MakeExpandedObjectReadOnlyInternal ( d ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MakeExpandedObjectReadOnly {
+    (@__pgrx_emit_check_safety; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $d);
+                $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                $crate::__pgrx_c_operand!(@check_safety; $typlen);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::MakeExpandedObjectReadOnly!(@__pgrx_emit_value; $d, $isnull, $typlen)
@@ -2569,6 +2774,13 @@ macro_rules! MakeExpandedObjectReadOnly {
     (@__pgrx_emit_size; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $d);
+                        $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                        $crate::__pgrx_c_operand!(@check_safety; $typlen);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2824,6 +3036,17 @@ macro_rules! MakeExpandedObjectReadOnly {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_VARATT_IS_EXPANDED_HEADER {
@@ -2948,8 +3171,30 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXPANDED_HEADER {
 /// ```text
 /// #define VARATT_IS_EXPANDED_HEADER( PTR ) ( ( ( varattrib_4b * ) ( PTR ) ) -> va_4byte . va_header == ( uint32 ) EOH_HEADER_MAGIC )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXPANDED_HEADER {
+    (@__pgrx_emit_check_safety; $PTR:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $PTR);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::VARATT_IS_EXPANDED_HEADER!(@__pgrx_emit_value; $PTR)
@@ -2962,12 +3207,12 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5874,
+                                $crate::__pgrx_c_generated::Field_va_header,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5869,
+                                    $crate::__pgrx_c_generated::Field_va_4byte,
                                     _,
                                     _
                                 >(
@@ -3044,6 +3289,11 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
     (@__pgrx_emit_size; $PTR:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $PTR);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3051,12 +3301,12 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5874,
+                                            $crate::__pgrx_c_generated::Field_va_header,
                                             _,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field5869,
+                                                $crate::__pgrx_c_generated::Field_va_4byte,
                                                 _,
                                                 _
                                             >(
@@ -3130,12 +3380,12 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5874,
+                                $crate::__pgrx_c_generated::Field_va_header,
                                 _,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field5869,
+                                    $crate::__pgrx_c_generated::Field_va_4byte,
                                     _,
                                     _
                                 >(

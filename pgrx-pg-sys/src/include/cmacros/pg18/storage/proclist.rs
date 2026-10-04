@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_proclist_contains {
@@ -150,8 +161,28 @@ macro_rules! __pgrx_c_args_proclist_contains {
 /// ```text
 /// #define proclist_contains( list , procno , link_member ) proclist_contains_offset ( ( list ) , ( procno ) , offsetof ( PGPROC , link_member ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_contains {
+    (@__pgrx_emit_check_safety; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $list);
+                $crate::__pgrx_c_operand!(@check_safety; $procno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_proclist_contains!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::proclist_contains!(@__pgrx_emit_value; $list, $procno, $link_member)
@@ -161,7 +192,7 @@ macro_rules! proclist_contains {
         /* PGRX: proclist_contains remains expanded because proclist_contains_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_6f5b7bc6f3b9edea74d1e1330ecac065(
+                $crate::proclist_contains_offset(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -195,10 +226,16 @@ macro_rules! proclist_contains {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -232,13 +269,19 @@ macro_rules! proclist_contains {
         /* PGRX: proclist_contains remains expanded because proclist_contains_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $list);
+                        $crate::__pgrx_c_operand!(@check_safety; $procno);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_6f5b7bc6f3b9edea74d1e1330ecac065(
+                                $crate::proclist_contains_offset(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -280,10 +323,16 @@ macro_rules! proclist_contains {
                                         )
                                     ),
                                     <
-                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            usize
+                                        > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                usize
+                                            >,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -320,7 +369,7 @@ macro_rules! proclist_contains {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_6f5b7bc6f3b9edea74d1e1330ecac065(
+                    $crate::proclist_contains_offset(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -358,10 +407,16 @@ macro_rules! proclist_contains {
                             )
                         ),
                         <
-                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
-                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    usize
+                                >,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -393,6 +448,17 @@ macro_rules! proclist_contains {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_proclist_delete {
@@ -528,8 +594,28 @@ macro_rules! __pgrx_c_args_proclist_delete {
 /// ```text
 /// #define proclist_delete( list , procno , link_member ) proclist_delete_offset ( ( list ) , ( procno ) , offsetof ( PGPROC , link_member ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_delete {
+    (@__pgrx_emit_check_safety; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $list);
+                $crate::__pgrx_c_operand!(@check_safety; $procno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_proclist_delete!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::proclist_delete!(@__pgrx_emit_value; $list, $procno, $link_member)
@@ -538,7 +624,7 @@ macro_rules! proclist_delete {
     (@__pgrx_emit_value; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         /* PGRX: proclist_delete remains expanded because proclist_delete_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_147a6283e9ba3f0a6c8ff62634c1cfae(
+            $crate::proclist_delete_offset(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -572,10 +658,16 @@ macro_rules! proclist_delete {
                     )
                 ),
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        usize
+                    > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -608,10 +700,16 @@ macro_rules! proclist_delete {
         /* PGRX: proclist_delete remains expanded because proclist_delete_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $list);
+                        $crate::__pgrx_c_operand!(@check_safety; $procno);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_147a6283e9ba3f0a6c8ff62634c1cfae(
+                            $crate::proclist_delete_offset(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -653,10 +751,16 @@ macro_rules! proclist_delete {
                                     )
                                 ),
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            usize
+                                        >,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -688,7 +792,7 @@ macro_rules! proclist_delete {
         /* PGRX: proclist_delete remains expanded because proclist_delete_offset is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_147a6283e9ba3f0a6c8ff62634c1cfae(
+                $crate::proclist_delete_offset(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -722,10 +826,16 @@ macro_rules! proclist_delete {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -756,6 +866,17 @@ macro_rules! proclist_delete {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_proclist_pop_head_node {
@@ -843,8 +964,30 @@ macro_rules! __pgrx_c_args_proclist_pop_head_node {
 /// ```text
 /// #define proclist_pop_head_node( list , link_member ) proclist_pop_head_node_offset ( ( list ) , offsetof ( PGPROC , link_member ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_pop_head_node {
+    (@__pgrx_emit_check_safety; $list:tt, $link_member:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $list);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_proclist_pop_head_node!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $list:tt, $link_member:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::proclist_pop_head_node!(@__pgrx_emit_value; $list, $link_member)
@@ -859,7 +1002,7 @@ macro_rules! proclist_pop_head_node {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_1e28dcb2241f19ae6b1f13862bfdee09(
+                $crate::proclist_pop_head_node_offset(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -881,10 +1024,16 @@ macro_rules! proclist_pop_head_node {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -918,6 +1067,11 @@ macro_rules! proclist_pop_head_node {
         /* PGRX: proclist_pop_head_node remains expanded because proclist_pop_head_node_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $list);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -927,7 +1081,7 @@ macro_rules! proclist_pop_head_node {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_1e28dcb2241f19ae6b1f13862bfdee09(
+                                $crate::proclist_pop_head_node_offset(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -954,10 +1108,16 @@ macro_rules! proclist_pop_head_node {
                                         )
                                     ),
                                     <
-                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            usize
+                                        > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                usize
+                                            >,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -999,7 +1159,7 @@ macro_rules! proclist_pop_head_node {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_1e28dcb2241f19ae6b1f13862bfdee09(
+                    $crate::proclist_pop_head_node_offset(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -1023,10 +1183,16 @@ macro_rules! proclist_pop_head_node {
                             )
                         ),
                         <
-                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
-                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    usize
+                                >,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1058,6 +1224,17 @@ macro_rules! proclist_pop_head_node {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_proclist_push_head {
@@ -1196,8 +1373,28 @@ macro_rules! __pgrx_c_args_proclist_push_head {
 /// ```text
 /// #define proclist_push_head( list , procno , link_member ) proclist_push_head_offset ( ( list ) , ( procno ) , offsetof ( PGPROC , link_member ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_push_head {
+    (@__pgrx_emit_check_safety; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $list);
+                $crate::__pgrx_c_operand!(@check_safety; $procno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_proclist_push_head!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::proclist_push_head!(@__pgrx_emit_value; $list, $procno, $link_member)
@@ -1206,7 +1403,7 @@ macro_rules! proclist_push_head {
     (@__pgrx_emit_value; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         /* PGRX: proclist_push_head remains expanded because proclist_push_head_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_de9996e2813cdf2beacbecc222f975e8(
+            $crate::proclist_push_head_offset(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -1240,10 +1437,16 @@ macro_rules! proclist_push_head {
                     )
                 ),
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        usize
+                    > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1276,10 +1479,16 @@ macro_rules! proclist_push_head {
         /* PGRX: proclist_push_head remains expanded because proclist_push_head_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $list);
+                        $crate::__pgrx_c_operand!(@check_safety; $procno);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_de9996e2813cdf2beacbecc222f975e8(
+                            $crate::proclist_push_head_offset(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1321,10 +1530,16 @@ macro_rules! proclist_push_head {
                                     )
                                 ),
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            usize
+                                        >,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1356,7 +1571,7 @@ macro_rules! proclist_push_head {
         /* PGRX: proclist_push_head remains expanded because proclist_push_head_offset is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_de9996e2813cdf2beacbecc222f975e8(
+                $crate::proclist_push_head_offset(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -1390,10 +1605,16 @@ macro_rules! proclist_push_head {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1424,6 +1645,17 @@ macro_rules! proclist_push_head {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_proclist_push_tail {
@@ -1562,8 +1794,28 @@ macro_rules! __pgrx_c_args_proclist_push_tail {
 /// ```text
 /// #define proclist_push_tail( list , procno , link_member ) proclist_push_tail_offset ( ( list ) , ( procno ) , offsetof ( PGPROC , link_member ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_push_tail {
+    (@__pgrx_emit_check_safety; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $list);
+                $crate::__pgrx_c_operand!(@check_safety; $procno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_proclist_push_tail!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::proclist_push_tail!(@__pgrx_emit_value; $list, $procno, $link_member)
@@ -1572,7 +1824,7 @@ macro_rules! proclist_push_tail {
     (@__pgrx_emit_value; $list:tt, $procno:tt, $link_member:tt $(,)?) => {
         /* PGRX: proclist_push_tail remains expanded because proclist_push_tail_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_13a59ddd28547b79abc64fd133a9890a(
+            $crate::proclist_push_tail_offset(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -1606,10 +1858,16 @@ macro_rules! proclist_push_tail {
                     )
                 ),
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        usize
+                    > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1642,10 +1900,16 @@ macro_rules! proclist_push_tail {
         /* PGRX: proclist_push_tail remains expanded because proclist_push_tail_offset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $list);
+                        $crate::__pgrx_c_operand!(@check_safety; $procno);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_13a59ddd28547b79abc64fd133a9890a(
+                            $crate::proclist_push_tail_offset(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1687,10 +1951,16 @@ macro_rules! proclist_push_tail {
                                     )
                                 ),
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            usize
+                                        >,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1722,7 +1992,7 @@ macro_rules! proclist_push_tail {
         /* PGRX: proclist_push_tail remains expanded because proclist_push_tail_offset is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_13a59ddd28547b79abc64fd133a9890a(
+                $crate::proclist_push_tail_offset(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::proclist_head>,
@@ -1756,10 +2026,16 @@ macro_rules! proclist_push_tail {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

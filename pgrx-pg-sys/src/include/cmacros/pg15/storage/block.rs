@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockIdCopy {
@@ -147,8 +158,24 @@ macro_rules! __pgrx_c_args_BlockIdCopy {
 /// ```text
 /// #define BlockIdCopy( toBlockId , fromBlockId ) ( ( toBlockId ) -> bi_hi = ( fromBlockId ) -> bi_hi , ( toBlockId ) -> bi_lo = ( fromBlockId ) -> bi_lo )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BlockIdCopy {
+    (@__pgrx_emit_check_safety; $toBlockId:tt, $fromBlockId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $toBlockId);
+                $crate::__pgrx_c_operand!(@check_safety; $fromBlockId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockIdCopy!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $toBlockId:tt, $fromBlockId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockIdCopy!(@__pgrx_emit_value; $toBlockId, $fromBlockId)
@@ -162,7 +189,7 @@ macro_rules! BlockIdCopy {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -178,7 +205,7 @@ macro_rules! BlockIdCopy {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -204,7 +231,7 @@ macro_rules! BlockIdCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -220,7 +247,7 @@ macro_rules! BlockIdCopy {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field649,
+                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                         _,
                                         _
                                     >(
@@ -264,6 +291,12 @@ macro_rules! BlockIdCopy {
     (@__pgrx_emit_size; $toBlockId:tt, $fromBlockId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $toBlockId);
+                        $crate::__pgrx_c_operand!(@check_safety; $fromBlockId);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -275,7 +308,7 @@ macro_rules! BlockIdCopy {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field648,
+                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                 _,
                                                 _
                                             >(
@@ -299,7 +332,7 @@ macro_rules! BlockIdCopy {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -325,7 +358,7 @@ macro_rules! BlockIdCopy {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -349,7 +382,7 @@ macro_rules! BlockIdCopy {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field649,
+                                                    $crate::__pgrx_c_generated::Field_bi_lo,
                                                     _,
                                                     _
                                                 >(
@@ -391,7 +424,7 @@ macro_rules! BlockIdCopy {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -407,7 +440,7 @@ macro_rules! BlockIdCopy {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -433,7 +466,7 @@ macro_rules! BlockIdCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -449,7 +482,7 @@ macro_rules! BlockIdCopy {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field649,
+                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                         _,
                                         _
                                     >(
@@ -491,6 +524,17 @@ macro_rules! BlockIdCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockIdEquals {
@@ -654,8 +698,24 @@ macro_rules! __pgrx_c_args_BlockIdEquals {
 /// ```text
 /// #define BlockIdEquals( blockId1 , blockId2 ) ( ( blockId1 ) -> bi_hi == ( blockId2 ) -> bi_hi && ( blockId1 ) -> bi_lo == ( blockId2 ) -> bi_lo )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! BlockIdEquals {
+    (@__pgrx_emit_check_safety; $blockId1:tt, $blockId2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $blockId1);
+                $crate::__pgrx_c_operand!(@check_safety; $blockId2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockIdEquals!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $blockId1:tt, $blockId2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockIdEquals!(@__pgrx_emit_value; $blockId1, $blockId2)
@@ -671,7 +731,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -694,7 +754,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -722,7 +782,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -745,7 +805,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -794,6 +854,12 @@ macro_rules! BlockIdEquals {
     (@__pgrx_emit_size; $blockId1:tt, $blockId2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $blockId1);
+                        $crate::__pgrx_c_operand!(@check_safety; $blockId2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -807,7 +873,7 @@ macro_rules! BlockIdEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -833,7 +899,7 @@ macro_rules! BlockIdEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -864,7 +930,7 @@ macro_rules! BlockIdEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -890,7 +956,7 @@ macro_rules! BlockIdEquals {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -939,7 +1005,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -962,7 +1028,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field648,
+                                            $crate::__pgrx_c_generated::Field_bi_hi,
                                             _,
                                             _
                                         >(
@@ -990,7 +1056,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -1013,7 +1079,7 @@ macro_rules! BlockIdEquals {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -1060,6 +1126,17 @@ macro_rules! BlockIdEquals {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockIdGetBlockNumber {
@@ -1174,8 +1251,27 @@ macro_rules! __pgrx_c_args_BlockIdGetBlockNumber {
 /// ```text
 /// #define BlockIdGetBlockNumber( blockId ) ( ( ( ( BlockNumber ) ( blockId ) -> bi_hi ) << 16 ) | ( ( BlockNumber ) ( blockId ) -> bi_lo ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BlockIdGetBlockNumber {
+    (@__pgrx_emit_check_safety; $blockId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $blockId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockIdGetBlockNumber!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $blockId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockIdGetBlockNumber!(@__pgrx_emit_value; $blockId)
@@ -1205,7 +1301,7 @@ macro_rules! BlockIdGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -1246,7 +1342,7 @@ macro_rules! BlockIdGetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -1291,6 +1387,11 @@ macro_rules! BlockIdGetBlockNumber {
     (@__pgrx_emit_size; $blockId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $blockId);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1318,7 +1419,7 @@ macro_rules! BlockIdGetBlockNumber {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field648,
+                                                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                                                     _,
                                                                     _
                                                                 >(
@@ -1365,7 +1466,7 @@ macro_rules! BlockIdGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field649,
+                                                        $crate::__pgrx_c_generated::Field_bi_lo,
                                                         _,
                                                         _
                                                     >(
@@ -1424,7 +1525,7 @@ macro_rules! BlockIdGetBlockNumber {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field648,
+                                                        $crate::__pgrx_c_generated::Field_bi_hi,
                                                         _,
                                                         _
                                                     >(
@@ -1465,7 +1566,7 @@ macro_rules! BlockIdGetBlockNumber {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -1508,6 +1609,17 @@ macro_rules! BlockIdGetBlockNumber {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockIdIsValid {
@@ -1617,8 +1729,27 @@ macro_rules! __pgrx_c_args_BlockIdIsValid {
 /// ```text
 /// #define BlockIdIsValid( blockId ) PointerIsValid ( blockId )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BlockIdIsValid {
+    (@__pgrx_emit_check_safety; $blockId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $blockId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockIdIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $blockId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockIdIsValid!(@__pgrx_emit_value; $blockId)
@@ -1688,6 +1819,11 @@ macro_rules! BlockIdIsValid {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: BlockIdIsValid remains expanded because PointerIsValid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $blockId);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1805,6 +1941,17 @@ macro_rules! BlockIdIsValid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockIdSet {
@@ -1940,8 +2087,28 @@ macro_rules! __pgrx_c_args_BlockIdSet {
 /// ```text
 /// #define BlockIdSet( blockId , blockNumber ) ( ( blockId ) -> bi_hi = ( blockNumber ) >> 16 , ( blockId ) -> bi_lo = ( blockNumber ) & 0xffff )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BlockIdSet {
+    (@__pgrx_emit_check_safety; $blockId:tt, $blockNumber:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $blockId);
+                $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockIdSet!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $blockId:tt, $blockNumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockIdSet!(@__pgrx_emit_value; $blockId, $blockNumber)
@@ -1955,7 +2122,7 @@ macro_rules! BlockIdSet {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -1997,7 +2164,7 @@ macro_rules! BlockIdSet {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -2049,6 +2216,12 @@ macro_rules! BlockIdSet {
     (@__pgrx_emit_size; $blockId:tt, $blockNumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $blockId);
+                        $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2060,7 +2233,7 @@ macro_rules! BlockIdSet {
                                     >(
                                         $crate::__pgrx_c_macros::expression::assign(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field648,
+                                                $crate::__pgrx_c_generated::Field_bi_hi,
                                                 _,
                                                 _
                                             >(
@@ -2110,7 +2283,7 @@ macro_rules! BlockIdSet {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::assign(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field649,
+                                            $crate::__pgrx_c_generated::Field_bi_lo,
                                             _,
                                             _
                                         >(
@@ -2176,7 +2349,7 @@ macro_rules! BlockIdSet {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field648,
+                                    $crate::__pgrx_c_generated::Field_bi_hi,
                                     _,
                                     _
                                 >(
@@ -2218,7 +2391,7 @@ macro_rules! BlockIdSet {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::assign(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field649,
+                                $crate::__pgrx_c_generated::Field_bi_lo,
                                 _,
                                 _
                             >(
@@ -2268,6 +2441,17 @@ macro_rules! BlockIdSet {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BlockNumberIsValid {
@@ -2377,8 +2561,27 @@ macro_rules! __pgrx_c_args_BlockNumberIsValid {
 /// ```text
 /// #define BlockNumberIsValid( blockNumber ) ( ( BlockNumber ) ( blockNumber ) != InvalidBlockNumber )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BlockNumberIsValid {
+    (@__pgrx_emit_check_safety; $blockNumber:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BlockNumberIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $blockNumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BlockNumberIsValid!(@__pgrx_emit_value; $blockNumber)
@@ -2429,6 +2632,11 @@ macro_rules! BlockNumberIsValid {
     (@__pgrx_emit_size; $blockNumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

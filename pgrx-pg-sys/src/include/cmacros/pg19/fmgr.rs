@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetBpCharP {
@@ -121,8 +132,27 @@ macro_rules! __pgrx_c_args_DatumGetBpCharP {
 /// ```text
 /// #define DatumGetBpCharP( X ) ( ( BpChar * ) PG_DETOAST_DATUM ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetBpCharP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetBpCharP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetBpCharP!(@__pgrx_emit_value; $X)
@@ -189,7 +219,7 @@ macro_rules! DatumGetBpCharP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -247,6 +277,11 @@ macro_rules! DatumGetBpCharP {
         /* PGRX: PG_DETOAST_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -309,7 +344,7 @@ macro_rules! DatumGetBpCharP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -419,7 +454,7 @@ macro_rules! DatumGetBpCharP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -474,6 +509,17 @@ macro_rules! DatumGetBpCharP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetBpCharPCopy {
@@ -583,8 +629,27 @@ macro_rules! __pgrx_c_args_DatumGetBpCharPCopy {
 /// ```text
 /// #define DatumGetBpCharPCopy( X ) ( ( BpChar * ) PG_DETOAST_DATUM_COPY ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetBpCharPCopy {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetBpCharPCopy!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetBpCharPCopy!(@__pgrx_emit_value; $X)
@@ -651,7 +716,7 @@ macro_rules! DatumGetBpCharPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -709,6 +774,11 @@ macro_rules! DatumGetBpCharPCopy {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -771,7 +841,7 @@ macro_rules! DatumGetBpCharPCopy {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -881,7 +951,7 @@ macro_rules! DatumGetBpCharPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -936,6 +1006,17 @@ macro_rules! DatumGetBpCharPCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetBpCharPP {
@@ -1045,8 +1126,27 @@ macro_rules! __pgrx_c_args_DatumGetBpCharPP {
 /// ```text
 /// #define DatumGetBpCharPP( X ) ( ( BpChar * ) PG_DETOAST_DATUM_PACKED ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetBpCharPP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetBpCharPP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetBpCharPP!(@__pgrx_emit_value; $X)
@@ -1113,7 +1213,7 @@ macro_rules! DatumGetBpCharPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -1171,6 +1271,11 @@ macro_rules! DatumGetBpCharPP {
         /* PGRX: PG_DETOAST_DATUM_PACKED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1233,7 +1338,7 @@ macro_rules! DatumGetBpCharPP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -1343,7 +1448,7 @@ macro_rules! DatumGetBpCharPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -1398,6 +1503,17 @@ macro_rules! DatumGetBpCharPP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetBpCharPSlice {
@@ -1620,8 +1736,29 @@ macro_rules! __pgrx_c_args_DatumGetBpCharPSlice {
 /// ```text
 /// #define DatumGetBpCharPSlice( X , m , n ) ( ( BpChar * ) PG_DETOAST_DATUM_SLICE ( X , m , n ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetBpCharPSlice {
+    (@__pgrx_emit_check_safety; $X:tt, $m:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetBpCharPSlice!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt, $m:tt, $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetBpCharPSlice!(@__pgrx_emit_value; $X, $m, $n)
@@ -1688,7 +1825,7 @@ macro_rules! DatumGetBpCharPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -1798,6 +1935,13 @@ macro_rules! DatumGetBpCharPSlice {
         /* PGRX: PG_DETOAST_DATUM_SLICE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1860,7 +2004,7 @@ macro_rules! DatumGetBpCharPSlice {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2032,7 +2176,7 @@ macro_rules! DatumGetBpCharPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2139,6 +2283,17 @@ macro_rules! DatumGetBpCharPSlice {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetByteaP {
@@ -2248,8 +2403,27 @@ macro_rules! __pgrx_c_args_DatumGetByteaP {
 /// ```text
 /// #define DatumGetByteaP( X ) ( ( bytea * ) PG_DETOAST_DATUM ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetByteaP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetByteaP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetByteaP!(@__pgrx_emit_value; $X)
@@ -2316,7 +2490,7 @@ macro_rules! DatumGetByteaP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2374,6 +2548,11 @@ macro_rules! DatumGetByteaP {
         /* PGRX: PG_DETOAST_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2436,7 +2615,7 @@ macro_rules! DatumGetByteaP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2546,7 +2725,7 @@ macro_rules! DatumGetByteaP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2601,6 +2780,17 @@ macro_rules! DatumGetByteaP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetByteaPCopy {
@@ -2710,8 +2900,27 @@ macro_rules! __pgrx_c_args_DatumGetByteaPCopy {
 /// ```text
 /// #define DatumGetByteaPCopy( X ) ( ( bytea * ) PG_DETOAST_DATUM_COPY ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetByteaPCopy {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetByteaPCopy!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetByteaPCopy!(@__pgrx_emit_value; $X)
@@ -2778,7 +2987,7 @@ macro_rules! DatumGetByteaPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -2836,6 +3045,11 @@ macro_rules! DatumGetByteaPCopy {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2898,7 +3112,7 @@ macro_rules! DatumGetByteaPCopy {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3008,7 +3222,7 @@ macro_rules! DatumGetByteaPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3063,6 +3277,17 @@ macro_rules! DatumGetByteaPCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetByteaPP {
@@ -3172,8 +3397,27 @@ macro_rules! __pgrx_c_args_DatumGetByteaPP {
 /// ```text
 /// #define DatumGetByteaPP( X ) ( ( bytea * ) PG_DETOAST_DATUM_PACKED ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetByteaPP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetByteaPP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetByteaPP!(@__pgrx_emit_value; $X)
@@ -3240,7 +3484,7 @@ macro_rules! DatumGetByteaPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3298,6 +3542,11 @@ macro_rules! DatumGetByteaPP {
         /* PGRX: PG_DETOAST_DATUM_PACKED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3360,7 +3609,7 @@ macro_rules! DatumGetByteaPP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3470,7 +3719,7 @@ macro_rules! DatumGetByteaPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3525,6 +3774,17 @@ macro_rules! DatumGetByteaPP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetByteaPSlice {
@@ -3742,8 +4002,29 @@ macro_rules! __pgrx_c_args_DatumGetByteaPSlice {
 /// ```text
 /// #define DatumGetByteaPSlice( X , m , n ) ( ( bytea * ) PG_DETOAST_DATUM_SLICE ( X , m , n ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetByteaPSlice {
+    (@__pgrx_emit_check_safety; $X:tt, $m:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetByteaPSlice!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt, $m:tt, $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetByteaPSlice!(@__pgrx_emit_value; $X, $m, $n)
@@ -3810,7 +4091,7 @@ macro_rules! DatumGetByteaPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -3920,6 +4201,13 @@ macro_rules! DatumGetByteaPSlice {
         /* PGRX: PG_DETOAST_DATUM_SLICE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3982,7 +4270,7 @@ macro_rules! DatumGetByteaPSlice {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4154,7 +4442,7 @@ macro_rules! DatumGetByteaPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4261,6 +4549,17 @@ macro_rules! DatumGetByteaPSlice {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetHeapTupleHeader {
@@ -4385,8 +4684,30 @@ macro_rules! __pgrx_c_args_DatumGetHeapTupleHeader {
 /// ```text
 /// #define DatumGetHeapTupleHeader( X ) ( ( HeapTupleHeader ) PG_DETOAST_DATUM ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeader {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetHeapTupleHeader!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetHeapTupleHeader!(@__pgrx_emit_value; $X)
@@ -4453,7 +4774,7 @@ macro_rules! DatumGetHeapTupleHeader {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4511,6 +4832,11 @@ macro_rules! DatumGetHeapTupleHeader {
         /* PGRX: PG_DETOAST_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4575,7 +4901,7 @@ macro_rules! DatumGetHeapTupleHeader {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4685,7 +5011,7 @@ macro_rules! DatumGetHeapTupleHeader {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4740,6 +5066,17 @@ macro_rules! DatumGetHeapTupleHeader {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetHeapTupleHeaderCopy {
@@ -4864,8 +5201,30 @@ macro_rules! __pgrx_c_args_DatumGetHeapTupleHeaderCopy {
 /// ```text
 /// #define DatumGetHeapTupleHeaderCopy( X ) ( ( HeapTupleHeader ) PG_DETOAST_DATUM_COPY ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeaderCopy {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetHeapTupleHeaderCopy!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetHeapTupleHeaderCopy!(@__pgrx_emit_value; $X)
@@ -4932,7 +5291,7 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -4993,6 +5352,11 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5057,7 +5421,7 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5167,7 +5531,7 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5225,6 +5589,17 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetTextP {
@@ -5334,8 +5709,27 @@ macro_rules! __pgrx_c_args_DatumGetTextP {
 /// ```text
 /// #define DatumGetTextP( X ) ( ( text * ) PG_DETOAST_DATUM ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTextP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTextP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetTextP!(@__pgrx_emit_value; $X)
@@ -5402,7 +5796,7 @@ macro_rules! DatumGetTextP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5460,6 +5854,11 @@ macro_rules! DatumGetTextP {
         /* PGRX: PG_DETOAST_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5522,7 +5921,7 @@ macro_rules! DatumGetTextP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5632,7 +6031,7 @@ macro_rules! DatumGetTextP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5687,6 +6086,17 @@ macro_rules! DatumGetTextP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetTextPCopy {
@@ -5796,8 +6206,27 @@ macro_rules! __pgrx_c_args_DatumGetTextPCopy {
 /// ```text
 /// #define DatumGetTextPCopy( X ) ( ( text * ) PG_DETOAST_DATUM_COPY ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTextPCopy {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTextPCopy!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetTextPCopy!(@__pgrx_emit_value; $X)
@@ -5864,7 +6293,7 @@ macro_rules! DatumGetTextPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -5922,6 +6351,11 @@ macro_rules! DatumGetTextPCopy {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5984,7 +6418,7 @@ macro_rules! DatumGetTextPCopy {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -6094,7 +6528,7 @@ macro_rules! DatumGetTextPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -6149,6 +6583,17 @@ macro_rules! DatumGetTextPCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetTextPP {
@@ -6258,8 +6703,27 @@ macro_rules! __pgrx_c_args_DatumGetTextPP {
 /// ```text
 /// #define DatumGetTextPP( X ) ( ( text * ) PG_DETOAST_DATUM_PACKED ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTextPP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTextPP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetTextPP!(@__pgrx_emit_value; $X)
@@ -6326,7 +6790,7 @@ macro_rules! DatumGetTextPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -6384,6 +6848,11 @@ macro_rules! DatumGetTextPP {
         /* PGRX: PG_DETOAST_DATUM_PACKED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6446,7 +6915,7 @@ macro_rules! DatumGetTextPP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -6556,7 +7025,7 @@ macro_rules! DatumGetTextPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -6611,6 +7080,17 @@ macro_rules! DatumGetTextPP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetTextPSlice {
@@ -6828,8 +7308,29 @@ macro_rules! __pgrx_c_args_DatumGetTextPSlice {
 /// ```text
 /// #define DatumGetTextPSlice( X , m , n ) ( ( text * ) PG_DETOAST_DATUM_SLICE ( X , m , n ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTextPSlice {
+    (@__pgrx_emit_check_safety; $X:tt, $m:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTextPSlice!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt, $m:tt, $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetTextPSlice!(@__pgrx_emit_value; $X, $m, $n)
@@ -6896,7 +7397,7 @@ macro_rules! DatumGetTextPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7006,6 +7507,13 @@ macro_rules! DatumGetTextPSlice {
         /* PGRX: PG_DETOAST_DATUM_SLICE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7068,7 +7576,7 @@ macro_rules! DatumGetTextPSlice {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7240,7 +7748,7 @@ macro_rules! DatumGetTextPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7347,6 +7855,17 @@ macro_rules! DatumGetTextPSlice {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetVarCharP {
@@ -7456,8 +7975,27 @@ macro_rules! __pgrx_c_args_DatumGetVarCharP {
 /// ```text
 /// #define DatumGetVarCharP( X ) ( ( VarChar * ) PG_DETOAST_DATUM ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetVarCharP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetVarCharP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetVarCharP!(@__pgrx_emit_value; $X)
@@ -7524,7 +8062,7 @@ macro_rules! DatumGetVarCharP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7582,6 +8120,11 @@ macro_rules! DatumGetVarCharP {
         /* PGRX: PG_DETOAST_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7644,7 +8187,7 @@ macro_rules! DatumGetVarCharP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7754,7 +8297,7 @@ macro_rules! DatumGetVarCharP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -7809,6 +8352,17 @@ macro_rules! DatumGetVarCharP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetVarCharPCopy {
@@ -7923,8 +8477,27 @@ macro_rules! __pgrx_c_args_DatumGetVarCharPCopy {
 /// ```text
 /// #define DatumGetVarCharPCopy( X ) ( ( VarChar * ) PG_DETOAST_DATUM_COPY ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetVarCharPCopy {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetVarCharPCopy!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetVarCharPCopy!(@__pgrx_emit_value; $X)
@@ -7991,7 +8564,7 @@ macro_rules! DatumGetVarCharPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8049,6 +8622,11 @@ macro_rules! DatumGetVarCharPCopy {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8111,7 +8689,7 @@ macro_rules! DatumGetVarCharPCopy {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8221,7 +8799,7 @@ macro_rules! DatumGetVarCharPCopy {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8276,6 +8854,17 @@ macro_rules! DatumGetVarCharPCopy {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetVarCharPP {
@@ -8385,8 +8974,27 @@ macro_rules! __pgrx_c_args_DatumGetVarCharPP {
 /// ```text
 /// #define DatumGetVarCharPP( X ) ( ( VarChar * ) PG_DETOAST_DATUM_PACKED ( X ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetVarCharPP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetVarCharPP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetVarCharPP!(@__pgrx_emit_value; $X)
@@ -8453,7 +9061,7 @@ macro_rules! DatumGetVarCharPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8511,6 +9119,11 @@ macro_rules! DatumGetVarCharPP {
         /* PGRX: PG_DETOAST_DATUM_PACKED remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8573,7 +9186,7 @@ macro_rules! DatumGetVarCharPP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8683,7 +9296,7 @@ macro_rules! DatumGetVarCharPP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -8738,6 +9351,17 @@ macro_rules! DatumGetVarCharPP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DatumGetVarCharPSlice {
@@ -8960,8 +9584,29 @@ macro_rules! __pgrx_c_args_DatumGetVarCharPSlice {
 /// ```text
 /// #define DatumGetVarCharPSlice( X , m , n ) ( ( VarChar * ) PG_DETOAST_DATUM_SLICE ( X , m , n ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetVarCharPSlice {
+    (@__pgrx_emit_check_safety; $X:tt, $m:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+                $crate::__pgrx_c_operand!(@check_safety; $m);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetVarCharPSlice!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $X:tt, $m:tt, $n:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DatumGetVarCharPSlice!(@__pgrx_emit_value; $X, $m, $n)
@@ -9028,7 +9673,7 @@ macro_rules! DatumGetVarCharPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -9138,6 +9783,13 @@ macro_rules! DatumGetVarCharPSlice {
         /* PGRX: PG_DETOAST_DATUM_SLICE remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                        $crate::__pgrx_c_operand!(@check_safety; $m);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9200,7 +9852,7 @@ macro_rules! DatumGetVarCharPSlice {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -9372,7 +10024,7 @@ macro_rules! DatumGetVarCharPSlice {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -9479,6 +10131,17 @@ macro_rules! DatumGetVarCharPSlice {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall1 {
@@ -9642,8 +10305,28 @@ macro_rules! __pgrx_c_args_DirectFunctionCall1 {
 /// ```text
 /// #define DirectFunctionCall1( func , arg1 ) DirectFunctionCall1Coll ( func , InvalidOid , arg1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall1 {
+    (@__pgrx_emit_check_safety; $func:tt, $arg1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $func:tt, $arg1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DirectFunctionCall1!(@__pgrx_emit_value; $func, $arg1)
@@ -9661,12 +10344,12 @@ macro_rules! DirectFunctionCall1 {
                 $crate::DirectFunctionCall1Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -9739,6 +10422,12 @@ macro_rules! DirectFunctionCall1 {
         /* PGRX: DirectFunctionCall1 remains expanded because DirectFunctionCall1Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9751,12 +10440,12 @@ macro_rules! DirectFunctionCall1 {
                                 $crate::DirectFunctionCall1Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -9837,12 +10526,12 @@ macro_rules! DirectFunctionCall1 {
                     $crate::DirectFunctionCall1Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -9913,6 +10602,17 @@ macro_rules! DirectFunctionCall1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall2 {
@@ -10130,8 +10830,29 @@ macro_rules! __pgrx_c_args_DirectFunctionCall2 {
 /// ```text
 /// #define DirectFunctionCall2( func , arg1 , arg2 ) DirectFunctionCall2Coll ( func , InvalidOid , arg1 , arg2 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall2 {
+    (@__pgrx_emit_check_safety; $func:tt, $arg1:tt, $arg2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $func:tt, $arg1:tt, $arg2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DirectFunctionCall2!(@__pgrx_emit_value; $func, $arg1, $arg2)
@@ -10149,12 +10870,12 @@ macro_rules! DirectFunctionCall2 {
                 $crate::DirectFunctionCall2Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -10245,6 +10966,13 @@ macro_rules! DirectFunctionCall2 {
         /* PGRX: DirectFunctionCall2 remains expanded because DirectFunctionCall2Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10257,12 +10985,12 @@ macro_rules! DirectFunctionCall2 {
                                 $crate::DirectFunctionCall2Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -10362,12 +11090,12 @@ macro_rules! DirectFunctionCall2 {
                     $crate::DirectFunctionCall2Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -10456,6 +11184,17 @@ macro_rules! DirectFunctionCall2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall3 {
@@ -10727,8 +11466,30 @@ macro_rules! __pgrx_c_args_DirectFunctionCall3 {
 /// ```text
 /// #define DirectFunctionCall3( func , arg1 , arg2 , arg3 ) DirectFunctionCall3Coll ( func , InvalidOid , arg1 , arg2 , arg3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall3 {
+    (@__pgrx_emit_check_safety; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DirectFunctionCall3!(@__pgrx_emit_value; $func, $arg1, $arg2, $arg3)
@@ -10746,12 +11507,12 @@ macro_rules! DirectFunctionCall3 {
                 $crate::DirectFunctionCall3Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -10860,6 +11621,14 @@ macro_rules! DirectFunctionCall3 {
         /* PGRX: DirectFunctionCall3 remains expanded because DirectFunctionCall3Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10872,12 +11641,12 @@ macro_rules! DirectFunctionCall3 {
                                 $crate::DirectFunctionCall3Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -10996,12 +11765,12 @@ macro_rules! DirectFunctionCall3 {
                     $crate::DirectFunctionCall3Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -11108,6 +11877,17 @@ macro_rules! DirectFunctionCall3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall4 {
@@ -11433,8 +12213,31 @@ macro_rules! __pgrx_c_args_DirectFunctionCall4 {
 /// ```text
 /// #define DirectFunctionCall4( func , arg1 , arg2 , arg3 , arg4 ) DirectFunctionCall4Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall4 {
+    (@__pgrx_emit_check_safety; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DirectFunctionCall4!(@__pgrx_emit_value; $func, $arg1, $arg2, $arg3, $arg4)
@@ -11452,12 +12255,12 @@ macro_rules! DirectFunctionCall4 {
                 $crate::DirectFunctionCall4Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -11584,6 +12387,15 @@ macro_rules! DirectFunctionCall4 {
         /* PGRX: DirectFunctionCall4 remains expanded because DirectFunctionCall4Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11596,12 +12408,12 @@ macro_rules! DirectFunctionCall4 {
                                 $crate::DirectFunctionCall4Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -11739,12 +12551,12 @@ macro_rules! DirectFunctionCall4 {
                     $crate::DirectFunctionCall4Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -11869,6 +12681,17 @@ macro_rules! DirectFunctionCall4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall5 {
@@ -12248,8 +13071,32 @@ macro_rules! __pgrx_c_args_DirectFunctionCall5 {
 /// ```text
 /// #define DirectFunctionCall5( func , arg1 , arg2 , arg3 , arg4 , arg5 ) DirectFunctionCall5Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall5 {
+    (@__pgrx_emit_check_safety; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt, $arg5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall5!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $func:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt, $arg5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::DirectFunctionCall5!(
@@ -12275,12 +13122,12 @@ macro_rules! DirectFunctionCall5 {
                 $crate::DirectFunctionCall5Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -12425,6 +13272,16 @@ macro_rules! DirectFunctionCall5 {
         /* PGRX: DirectFunctionCall5 remains expanded because DirectFunctionCall5Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -12437,12 +13294,12 @@ macro_rules! DirectFunctionCall5 {
                                 $crate::DirectFunctionCall5Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -12599,12 +13456,12 @@ macro_rules! DirectFunctionCall5 {
                     $crate::DirectFunctionCall5Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -12747,6 +13604,17 @@ macro_rules! DirectFunctionCall5 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall6 {
@@ -13180,8 +14048,42 @@ macro_rules! __pgrx_c_args_DirectFunctionCall6 {
 /// ```text
 /// #define DirectFunctionCall6( func , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 ) DirectFunctionCall6Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall6 {
+    (
+        @__pgrx_emit_check_safety;
+        $func:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall6!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $func:tt,
@@ -13217,12 +14119,12 @@ macro_rules! DirectFunctionCall6 {
                 $crate::DirectFunctionCall6Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -13394,6 +14296,17 @@ macro_rules! DirectFunctionCall6 {
         /* PGRX: DirectFunctionCall6 remains expanded because DirectFunctionCall6Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13406,12 +14319,12 @@ macro_rules! DirectFunctionCall6 {
                                 $crate::DirectFunctionCall6Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -13596,12 +14509,12 @@ macro_rules! DirectFunctionCall6 {
                     $crate::DirectFunctionCall6Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -13762,6 +14675,17 @@ macro_rules! DirectFunctionCall6 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall7 {
@@ -14249,8 +15173,44 @@ macro_rules! __pgrx_c_args_DirectFunctionCall7 {
 /// ```text
 /// #define DirectFunctionCall7( func , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 ) DirectFunctionCall7Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall7 {
+    (
+        @__pgrx_emit_check_safety;
+        $func:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall7!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $func:tt,
@@ -14298,12 +15258,12 @@ macro_rules! DirectFunctionCall7 {
                 $crate::DirectFunctionCall7Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -14514,6 +15474,18 @@ macro_rules! DirectFunctionCall7 {
         /* PGRX: DirectFunctionCall7 remains expanded because DirectFunctionCall7Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14526,12 +15498,12 @@ macro_rules! DirectFunctionCall7 {
                                 $crate::DirectFunctionCall7Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -14736,12 +15708,12 @@ macro_rules! DirectFunctionCall7 {
                     $crate::DirectFunctionCall7Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -14920,6 +15892,17 @@ macro_rules! DirectFunctionCall7 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall8 {
@@ -15461,8 +16444,46 @@ macro_rules! __pgrx_c_args_DirectFunctionCall8 {
 /// ```text
 /// #define DirectFunctionCall8( func , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 ) DirectFunctionCall8Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall8 {
+    (
+        @__pgrx_emit_check_safety;
+        $func:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $func:tt,
@@ -15513,12 +16534,12 @@ macro_rules! DirectFunctionCall8 {
                 $crate::DirectFunctionCall8Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -15750,6 +16771,19 @@ macro_rules! DirectFunctionCall8 {
         /* PGRX: DirectFunctionCall8 remains expanded because DirectFunctionCall8Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15762,12 +16796,12 @@ macro_rules! DirectFunctionCall8 {
                                 $crate::DirectFunctionCall8Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -15992,12 +17026,12 @@ macro_rules! DirectFunctionCall8 {
                     $crate::DirectFunctionCall8Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -16194,6 +17228,17 @@ macro_rules! DirectFunctionCall8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_DirectFunctionCall9 {
@@ -16791,8 +17836,48 @@ macro_rules! __pgrx_c_args_DirectFunctionCall9 {
 /// ```text
 /// #define DirectFunctionCall9( func , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 ) DirectFunctionCall9Coll ( func , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall9 {
+    (
+        @__pgrx_emit_check_safety;
+        $func:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt,
+        $arg9:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $func);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                $crate::__pgrx_c_operand!(@check_safety; $arg9);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DirectFunctionCall9!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $func:tt,
@@ -16846,12 +17931,12 @@ macro_rules! DirectFunctionCall9 {
                 $crate::DirectFunctionCall9Coll(
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             >,
                             _
                         >(
@@ -17104,6 +18189,20 @@ macro_rules! DirectFunctionCall9 {
         /* PGRX: DirectFunctionCall9 remains expanded because DirectFunctionCall9Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $func);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg9);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17116,12 +18215,12 @@ macro_rules! DirectFunctionCall9 {
                                 $crate::DirectFunctionCall9Coll(
                                     <
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                            $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                             >,
                                             _
                                         >(
@@ -17366,12 +18465,12 @@ macro_rules! DirectFunctionCall9 {
                     $crate::DirectFunctionCall9Coll(
                         <
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_39ff035d45e40a870b0c2495eb030b20
+                                    $crate::__pgrx_c_generated::Signature_6dd67d25a124c7dcb2f850b675b28518
                                 >,
                                 _
                             >(
@@ -17586,6 +18685,17 @@ macro_rules! DirectFunctionCall9 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FmgrHookIsNeeded {
@@ -17695,8 +18805,27 @@ macro_rules! __pgrx_c_args_FmgrHookIsNeeded {
 /// ```text
 /// #define FmgrHookIsNeeded( fn_oid ) ( ! needs_fmgr_hook ? false : ( * needs_fmgr_hook ) ( fn_oid ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FmgrHookIsNeeded {
+    (@__pgrx_emit_check_safety; $fn_oid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fn_oid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FmgrHookIsNeeded!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fn_oid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FmgrHookIsNeeded!(@__pgrx_emit_value; $fn_oid)
@@ -17713,7 +18842,7 @@ macro_rules! FmgrHookIsNeeded {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                             >>(::core::ptr::addr_of_mut!($crate::needs_fmgr_hook))
                                     )
                                 )
@@ -17747,7 +18876,7 @@ macro_rules! FmgrHookIsNeeded {
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                                $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                                $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
                                                                 $crate::needs_fmgr_hook
@@ -17790,6 +18919,11 @@ macro_rules! FmgrHookIsNeeded {
     (@__pgrx_emit_size; $fn_oid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fn_oid);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -17804,7 +18938,7 @@ macro_rules! FmgrHookIsNeeded {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                            $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                            $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
                                                             $crate::needs_fmgr_hook
@@ -17848,7 +18982,7 @@ macro_rules! FmgrHookIsNeeded {
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::place::<
                                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                                            $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                                            $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                                                         >>(
                                                                         ::core::ptr::addr_of_mut!(
                                                                             $crate::needs_fmgr_hook
@@ -17897,7 +19031,7 @@ macro_rules! FmgrHookIsNeeded {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                             >>(::core::ptr::addr_of_mut!($crate::needs_fmgr_hook))
                                     )
                                 )
@@ -17931,7 +19065,7 @@ macro_rules! FmgrHookIsNeeded {
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                                $crate::__pgrx_c_generated::Signature_b07c85294f5a8a3787fa45f3db7ee6ce
+                                                                $crate::__pgrx_c_generated::Signature_936f9598b1f77278af5fd5c279af05ed
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
                                                                 $crate::needs_fmgr_hook
@@ -17972,6 +19106,17 @@ macro_rules! FmgrHookIsNeeded {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall1 {
@@ -18135,8 +19280,28 @@ macro_rules! __pgrx_c_args_FunctionCall1 {
 /// ```text
 /// #define FunctionCall1( flinfo , arg1 ) FunctionCall1Coll ( flinfo , InvalidOid , arg1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall1 {
+    (@__pgrx_emit_check_safety; $flinfo:tt, $arg1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $flinfo:tt, $arg1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCall1!(@__pgrx_emit_value; $flinfo, $arg1)
@@ -18234,6 +19399,12 @@ macro_rules! FunctionCall1 {
         /* PGRX: FunctionCall1 remains expanded because FunctionCall1Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18416,6 +19587,17 @@ macro_rules! FunctionCall1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall2 {
@@ -18633,8 +19815,29 @@ macro_rules! __pgrx_c_args_FunctionCall2 {
 /// ```text
 /// #define FunctionCall2( flinfo , arg1 , arg2 ) FunctionCall2Coll ( flinfo , InvalidOid , arg1 , arg2 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall2 {
+    (@__pgrx_emit_check_safety; $flinfo:tt, $arg1:tt, $arg2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $flinfo:tt, $arg1:tt, $arg2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCall2!(@__pgrx_emit_value; $flinfo, $arg1, $arg2)
@@ -18750,6 +19953,13 @@ macro_rules! FunctionCall2 {
         /* PGRX: FunctionCall2 remains expanded because FunctionCall2Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18969,6 +20179,17 @@ macro_rules! FunctionCall2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall3 {
@@ -19240,8 +20461,30 @@ macro_rules! __pgrx_c_args_FunctionCall3 {
 /// ```text
 /// #define FunctionCall3( flinfo , arg1 , arg2 , arg3 ) FunctionCall3Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall3 {
+    (@__pgrx_emit_check_safety; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCall3!(@__pgrx_emit_value; $flinfo, $arg1, $arg2, $arg3)
@@ -19375,6 +20618,14 @@ macro_rules! FunctionCall3 {
         /* PGRX: FunctionCall3 remains expanded because FunctionCall3Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -19631,6 +20882,17 @@ macro_rules! FunctionCall3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall4 {
@@ -19956,8 +21218,31 @@ macro_rules! __pgrx_c_args_FunctionCall4 {
 /// ```text
 /// #define FunctionCall4( flinfo , arg1 , arg2 , arg3 , arg4 ) FunctionCall4Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall4 {
+    (@__pgrx_emit_check_safety; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCall4!(@__pgrx_emit_value; $flinfo, $arg1, $arg2, $arg3, $arg4)
@@ -20109,6 +21394,15 @@ macro_rules! FunctionCall4 {
         /* PGRX: FunctionCall4 remains expanded because FunctionCall4Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -20402,6 +21696,17 @@ macro_rules! FunctionCall4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall5 {
@@ -20781,8 +22086,32 @@ macro_rules! __pgrx_c_args_FunctionCall5 {
 /// ```text
 /// #define FunctionCall5( flinfo , arg1 , arg2 , arg3 , arg4 , arg5 ) FunctionCall5Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall5 {
+    (@__pgrx_emit_check_safety; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt, $arg5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall5!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $flinfo:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt, $arg5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCall5!(@__pgrx_emit_value; $flinfo, $arg1, $arg2, $arg3, $arg4, $arg5)
@@ -20952,6 +22281,16 @@ macro_rules! FunctionCall5 {
         /* PGRX: FunctionCall5 remains expanded because FunctionCall5Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -21282,6 +22621,17 @@ macro_rules! FunctionCall5 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall6 {
@@ -21715,8 +23065,42 @@ macro_rules! __pgrx_c_args_FunctionCall6 {
 /// ```text
 /// #define FunctionCall6( flinfo , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 ) FunctionCall6Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall6 {
+    (
+        @__pgrx_emit_check_safety;
+        $flinfo:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall6!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $flinfo:tt,
@@ -21958,6 +23342,17 @@ macro_rules! FunctionCall6 {
         /* PGRX: FunctionCall6 remains expanded because FunctionCall6Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -22334,6 +23729,17 @@ macro_rules! FunctionCall6 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall7 {
@@ -22821,8 +24227,44 @@ macro_rules! __pgrx_c_args_FunctionCall7 {
 /// ```text
 /// #define FunctionCall7( flinfo , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 ) FunctionCall7Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall7 {
+    (
+        @__pgrx_emit_check_safety;
+        $flinfo:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall7!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $flinfo:tt,
@@ -23088,6 +24530,18 @@ macro_rules! FunctionCall7 {
         /* PGRX: FunctionCall7 remains expanded because FunctionCall7Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -23502,6 +24956,17 @@ macro_rules! FunctionCall7 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall8 {
@@ -24043,8 +25508,46 @@ macro_rules! __pgrx_c_args_FunctionCall8 {
 /// ```text
 /// #define FunctionCall8( flinfo , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 ) FunctionCall8Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall8 {
+    (
+        @__pgrx_emit_check_safety;
+        $flinfo:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $flinfo:tt,
@@ -24334,6 +25837,19 @@ macro_rules! FunctionCall8 {
         /* PGRX: FunctionCall8 remains expanded because FunctionCall8Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -24786,6 +26302,17 @@ macro_rules! FunctionCall8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCall9 {
@@ -25381,8 +26908,48 @@ macro_rules! __pgrx_c_args_FunctionCall9 {
 /// ```text
 /// #define FunctionCall9( flinfo , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 ) FunctionCall9Coll ( flinfo , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall9 {
+    (
+        @__pgrx_emit_check_safety;
+        $flinfo:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt,
+        $arg9:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                $crate::__pgrx_c_operand!(@check_safety; $arg9);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCall9!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $flinfo:tt,
@@ -25696,6 +27263,20 @@ macro_rules! FunctionCall9 {
         /* PGRX: FunctionCall9 remains expanded because FunctionCall9Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $flinfo);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg9);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -26186,6 +27767,17 @@ macro_rules! FunctionCall9 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_FunctionCallInvoke {
@@ -26295,8 +27887,27 @@ macro_rules! __pgrx_c_args_FunctionCallInvoke {
 /// ```text
 /// #define FunctionCallInvoke( fcinfo ) ( ( * ( fcinfo ) -> flinfo -> fn_addr ) ( fcinfo ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCallInvoke {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_FunctionCallInvoke!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::FunctionCallInvoke!(@__pgrx_emit_value; $fcinfo)
@@ -26312,7 +27923,7 @@ macro_rules! FunctionCallInvoke {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2009,
+                                            $crate::__pgrx_c_generated::Field_fn_addr,
                                             _,
                                             _
                                         >(
@@ -26323,7 +27934,7 @@ macro_rules! FunctionCallInvoke {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2001,
+                                                            $crate::__pgrx_c_generated::Field_flinfo,
                                                             _,
                                                             _
                                                         >(
@@ -26371,7 +27982,7 @@ macro_rules! FunctionCallInvoke {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2009,
+                                        $crate::__pgrx_c_generated::Field_fn_addr,
                                         _,
                                         _
                                     >(
@@ -26382,7 +27993,7 @@ macro_rules! FunctionCallInvoke {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2001,
+                                                        $crate::__pgrx_c_generated::Field_flinfo,
                                                         _,
                                                         _
                                                     >(
@@ -26429,7 +28040,7 @@ macro_rules! FunctionCallInvoke {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2009,
+                                        $crate::__pgrx_c_generated::Field_fn_addr,
                                         _,
                                         _
                                     >(
@@ -26440,7 +28051,7 @@ macro_rules! FunctionCallInvoke {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2001,
+                                                        $crate::__pgrx_c_generated::Field_flinfo,
                                                         _,
                                                         _
                                                     >(
@@ -26481,6 +28092,11 @@ macro_rules! FunctionCallInvoke {
     (@__pgrx_emit_size; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -26494,7 +28110,7 @@ macro_rules! FunctionCallInvoke {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2009,
+                                                        $crate::__pgrx_c_generated::Field_fn_addr,
                                                         _,
                                                         _
                                                     >(
@@ -26505,7 +28121,7 @@ macro_rules! FunctionCallInvoke {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field2001,
+                                                                        $crate::__pgrx_c_generated::Field_flinfo,
                                                                         _,
                                                                         _
                                                                     >(
@@ -26561,7 +28177,7 @@ macro_rules! FunctionCallInvoke {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2009,
+                                            $crate::__pgrx_c_generated::Field_fn_addr,
                                             _,
                                             _
                                         >(
@@ -26572,7 +28188,7 @@ macro_rules! FunctionCallInvoke {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field2001,
+                                                            $crate::__pgrx_c_generated::Field_flinfo,
                                                             _,
                                                             _
                                                         >(
@@ -26624,6 +28240,17 @@ macro_rules! FunctionCallInvoke {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_InitFunctionCallInfoData {
@@ -27021,8 +28648,38 @@ macro_rules! __pgrx_c_args_InitFunctionCallInfoData {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! InitFunctionCallInfoData {
+    (
+        @__pgrx_emit_check_safety;
+        $Fcinfo:tt,
+        $Flinfo:tt,
+        $Nargs:tt,
+        $Collation:tt,
+        $Context:tt,
+        $Resultinfo:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $Fcinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $Flinfo);
+                $crate::__pgrx_c_operand!(@check_safety; $Nargs);
+                $crate::__pgrx_c_operand!(@check_safety; $Collation);
+                $crate::__pgrx_c_operand!(@check_safety; $Context);
+                $crate::__pgrx_c_operand!(@check_safety; $Resultinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_InitFunctionCallInfoData!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (
         @__pgrx_emit_public;
         $Fcinfo:tt,
@@ -27037,7 +28694,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2001,
+                            $crate::__pgrx_c_generated::Field_flinfo,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27053,7 +28710,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1208,
+                            $crate::__pgrx_c_generated::Field_context,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27069,7 +28726,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5031,
+                            $crate::__pgrx_c_generated::Field_resultinfo,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27085,7 +28742,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2034,
+                            $crate::__pgrx_c_generated::Field_fncollation,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27101,7 +28758,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2902,
+                            $crate::__pgrx_c_generated::Field_isnull,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27120,7 +28777,7 @@ macro_rules! InitFunctionCallInfoData {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3580,
+                            $crate::__pgrx_c_generated::Field_nargs,
                             _,
                             _
                         >(($crate::__pgrx_c_operand!(@place; $Fcinfo))),
@@ -27172,6 +28829,17 @@ macro_rules! InitFunctionCallInfoData {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall0 {
@@ -27281,8 +28949,27 @@ macro_rules! __pgrx_c_args_OidFunctionCall0 {
 /// ```text
 /// #define OidFunctionCall0( functionId ) OidFunctionCall0Coll ( functionId , InvalidOid )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall0 {
+    (@__pgrx_emit_check_safety; $functionId:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall0!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall0!(@__pgrx_emit_value; $functionId)
@@ -27362,6 +29049,11 @@ macro_rules! OidFunctionCall0 {
         /* PGRX: OidFunctionCall0 remains expanded because OidFunctionCall0Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -27503,6 +29195,17 @@ macro_rules! OidFunctionCall0 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall1 {
@@ -27666,8 +29369,28 @@ macro_rules! __pgrx_c_args_OidFunctionCall1 {
 /// ```text
 /// #define OidFunctionCall1( functionId , arg1 ) OidFunctionCall1Coll ( functionId , InvalidOid , arg1 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall1 {
+    (@__pgrx_emit_check_safety; $functionId:tt, $arg1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt, $arg1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall1!(@__pgrx_emit_value; $functionId, $arg1)
@@ -27765,6 +29488,12 @@ macro_rules! OidFunctionCall1 {
         /* PGRX: OidFunctionCall1 remains expanded because OidFunctionCall1Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -27943,6 +29672,17 @@ macro_rules! OidFunctionCall1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall2 {
@@ -28160,8 +29900,29 @@ macro_rules! __pgrx_c_args_OidFunctionCall2 {
 /// ```text
 /// #define OidFunctionCall2( functionId , arg1 , arg2 ) OidFunctionCall2Coll ( functionId , InvalidOid , arg1 , arg2 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall2 {
+    (@__pgrx_emit_check_safety; $functionId:tt, $arg1:tt, $arg2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt, $arg1:tt, $arg2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall2!(@__pgrx_emit_value; $functionId, $arg1, $arg2)
@@ -28277,6 +30038,13 @@ macro_rules! OidFunctionCall2 {
         /* PGRX: OidFunctionCall2 remains expanded because OidFunctionCall2Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -28492,6 +30260,17 @@ macro_rules! OidFunctionCall2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall3 {
@@ -28763,8 +30542,30 @@ macro_rules! __pgrx_c_args_OidFunctionCall3 {
 /// ```text
 /// #define OidFunctionCall3( functionId , arg1 , arg2 , arg3 ) OidFunctionCall3Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall3 {
+    (@__pgrx_emit_check_safety; $functionId:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt, $arg1:tt, $arg2:tt, $arg3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall3!(@__pgrx_emit_value; $functionId, $arg1, $arg2, $arg3)
@@ -28898,6 +30699,14 @@ macro_rules! OidFunctionCall3 {
         /* PGRX: OidFunctionCall3 remains expanded because OidFunctionCall3Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -29150,6 +30959,17 @@ macro_rules! OidFunctionCall3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall4 {
@@ -29475,8 +31295,31 @@ macro_rules! __pgrx_c_args_OidFunctionCall4 {
 /// ```text
 /// #define OidFunctionCall4( functionId , arg1 , arg2 , arg3 , arg4 ) OidFunctionCall4Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall4 {
+    (@__pgrx_emit_check_safety; $functionId:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall4!(@__pgrx_emit_value; $functionId, $arg1, $arg2, $arg3, $arg4)
@@ -29628,6 +31471,15 @@ macro_rules! OidFunctionCall4 {
         /* PGRX: OidFunctionCall4 remains expanded because OidFunctionCall4Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -29917,6 +31769,17 @@ macro_rules! OidFunctionCall4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall5 {
@@ -30296,8 +32159,40 @@ macro_rules! __pgrx_c_args_OidFunctionCall5 {
 /// ```text
 /// #define OidFunctionCall5( functionId , arg1 , arg2 , arg3 , arg4 , arg5 ) OidFunctionCall5Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall5 {
+    (
+        @__pgrx_emit_check_safety;
+        $functionId:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall5!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $functionId:tt, $arg1:tt, $arg2:tt, $arg3:tt, $arg4:tt, $arg5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::OidFunctionCall5!(
@@ -30483,6 +32378,16 @@ macro_rules! OidFunctionCall5 {
         /* PGRX: OidFunctionCall5 remains expanded because OidFunctionCall5Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -30809,6 +32714,17 @@ macro_rules! OidFunctionCall5 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall6 {
@@ -31242,8 +33158,42 @@ macro_rules! __pgrx_c_args_OidFunctionCall6 {
 /// ```text
 /// #define OidFunctionCall6( functionId , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 ) OidFunctionCall6Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall6 {
+    (
+        @__pgrx_emit_check_safety;
+        $functionId:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall6!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $functionId:tt,
@@ -31485,6 +33435,17 @@ macro_rules! OidFunctionCall6 {
         /* PGRX: OidFunctionCall6 remains expanded because OidFunctionCall6Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -31857,6 +33818,17 @@ macro_rules! OidFunctionCall6 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall7 {
@@ -32344,8 +34316,44 @@ macro_rules! __pgrx_c_args_OidFunctionCall7 {
 /// ```text
 /// #define OidFunctionCall7( functionId , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 ) OidFunctionCall7Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall7 {
+    (
+        @__pgrx_emit_check_safety;
+        $functionId:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall7!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $functionId:tt,
@@ -32611,6 +34619,18 @@ macro_rules! OidFunctionCall7 {
         /* PGRX: OidFunctionCall7 remains expanded because OidFunctionCall7Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -33021,6 +35041,17 @@ macro_rules! OidFunctionCall7 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall8 {
@@ -33562,8 +35593,46 @@ macro_rules! __pgrx_c_args_OidFunctionCall8 {
 /// ```text
 /// #define OidFunctionCall8( functionId , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 ) OidFunctionCall8Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall8 {
+    (
+        @__pgrx_emit_check_safety;
+        $functionId:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $functionId:tt,
@@ -33853,6 +35922,19 @@ macro_rules! OidFunctionCall8 {
         /* PGRX: OidFunctionCall8 remains expanded because OidFunctionCall8Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -34301,6 +36383,17 @@ macro_rules! OidFunctionCall8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_OidFunctionCall9 {
@@ -34896,8 +36989,48 @@ macro_rules! __pgrx_c_args_OidFunctionCall9 {
 /// ```text
 /// #define OidFunctionCall9( functionId , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 ) OidFunctionCall9Coll ( functionId , InvalidOid , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall9 {
+    (
+        @__pgrx_emit_check_safety;
+        $functionId:tt,
+        $arg1:tt,
+        $arg2:tt,
+        $arg3:tt,
+        $arg4:tt,
+        $arg5:tt,
+        $arg6:tt,
+        $arg7:tt,
+        $arg8:tt,
+        $arg9:tt $(,)?
+    ) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                $crate::__pgrx_c_operand!(@check_safety; $arg9);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_OidFunctionCall9!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (
         @__pgrx_emit_public;
         $functionId:tt,
@@ -35211,6 +37344,20 @@ macro_rules! OidFunctionCall9 {
         /* PGRX: OidFunctionCall9 remains expanded because OidFunctionCall9Coll is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $functionId);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg1);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg2);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg3);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg4);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg5);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg6);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg7);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg8);
+                        $crate::__pgrx_c_operand!(@check_safety; $arg9);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -35697,6 +37844,17 @@ macro_rules! OidFunctionCall9 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_ARGISNULL {
@@ -35838,8 +37996,23 @@ macro_rules! __pgrx_c_args_PG_ARGISNULL {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! PG_ARGISNULL {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_ARGISNULL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_ARGISNULL!(@__pgrx_emit_value; $n, $fcinfo)
@@ -35850,7 +38023,7 @@ macro_rules! PG_ARGISNULL {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2902,
+                        $crate::__pgrx_c_generated::Field_isnull,
                         _,
                         _
                     >(
@@ -35858,7 +38031,7 @@ macro_rules! PG_ARGISNULL {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field529,
+                                        $crate::__pgrx_c_generated::Field_args,
                                         _,
                                         _
                                     >(
@@ -35886,7 +38059,7 @@ macro_rules! PG_ARGISNULL {
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2902,
+                $crate::__pgrx_c_generated::Field_isnull,
                 _,
                 _
             >(
@@ -35894,7 +38067,7 @@ macro_rules! PG_ARGISNULL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field529,
+                                $crate::__pgrx_c_generated::Field_args,
                                 _,
                                 _
                             >(
@@ -35919,7 +38092,7 @@ macro_rules! PG_ARGISNULL {
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2902,
+                $crate::__pgrx_c_generated::Field_isnull,
                 _,
                 _
             >(
@@ -35927,7 +38100,7 @@ macro_rules! PG_ARGISNULL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field529,
+                                $crate::__pgrx_c_generated::Field_args,
                                 _,
                                 _
                             >(
@@ -35952,10 +38125,16 @@ macro_rules! PG_ARGISNULL {
     (@__pgrx_emit_size; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2902,
+                            $crate::__pgrx_c_generated::Field_isnull,
                             _,
                             _
                         >(
@@ -35963,7 +38142,7 @@ macro_rules! PG_ARGISNULL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field529,
+                                            $crate::__pgrx_c_generated::Field_args,
                                             _,
                                             _
                                         >(
@@ -35996,7 +38175,7 @@ macro_rules! PG_ARGISNULL {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2902,
+                        $crate::__pgrx_c_generated::Field_isnull,
                         _,
                         _
                     >(
@@ -36004,7 +38183,7 @@ macro_rules! PG_ARGISNULL {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field529,
+                                        $crate::__pgrx_c_generated::Field_args,
                                         _,
                                         _
                                     >(
@@ -36042,6 +38221,17 @@ macro_rules! PG_ARGISNULL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_DETOAST_DATUM {
@@ -36151,8 +38341,27 @@ macro_rules! __pgrx_c_args_PG_DETOAST_DATUM {
 /// ```text
 /// #define PG_DETOAST_DATUM( datum ) pg_detoast_datum ( ( varlena * ) DatumGetPointer ( datum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM {
+    (@__pgrx_emit_check_safety; $datum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $datum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_DETOAST_DATUM!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $datum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_DETOAST_DATUM!(@__pgrx_emit_value; $datum)
@@ -36199,7 +38408,7 @@ macro_rules! PG_DETOAST_DATUM {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36254,6 +38463,11 @@ macro_rules! PG_DETOAST_DATUM {
         /* PGRX: PG_DETOAST_DATUM remains expanded because pg_detoast_datum is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $datum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -36305,7 +38519,7 @@ macro_rules! PG_DETOAST_DATUM {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36395,7 +38609,7 @@ macro_rules! PG_DETOAST_DATUM {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36448,6 +38662,17 @@ macro_rules! PG_DETOAST_DATUM {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_COPY {
@@ -36562,8 +38787,27 @@ macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_COPY {
 /// ```text
 /// #define PG_DETOAST_DATUM_COPY( datum ) pg_detoast_datum_copy ( ( varlena * ) DatumGetPointer ( datum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_COPY {
+    (@__pgrx_emit_check_safety; $datum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $datum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_DETOAST_DATUM_COPY!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $datum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_DETOAST_DATUM_COPY!(@__pgrx_emit_value; $datum)
@@ -36610,7 +38854,7 @@ macro_rules! PG_DETOAST_DATUM_COPY {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36665,6 +38909,11 @@ macro_rules! PG_DETOAST_DATUM_COPY {
         /* PGRX: PG_DETOAST_DATUM_COPY remains expanded because pg_detoast_datum_copy is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $datum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -36716,7 +38965,7 @@ macro_rules! PG_DETOAST_DATUM_COPY {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36806,7 +39055,7 @@ macro_rules! PG_DETOAST_DATUM_COPY {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -36859,6 +39108,17 @@ macro_rules! PG_DETOAST_DATUM_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_PACKED {
@@ -36983,8 +39243,30 @@ macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_PACKED {
 /// ```text
 /// #define PG_DETOAST_DATUM_PACKED( datum ) pg_detoast_datum_packed ( ( varlena * ) DatumGetPointer ( datum ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_PACKED {
+    (@__pgrx_emit_check_safety; $datum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $datum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_DETOAST_DATUM_PACKED!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $datum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_DETOAST_DATUM_PACKED!(@__pgrx_emit_value; $datum)
@@ -37031,7 +39313,7 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37086,6 +39368,11 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
         /* PGRX: PG_DETOAST_DATUM_PACKED remains expanded because pg_detoast_datum_packed is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $datum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -37137,7 +39424,7 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37227,7 +39514,7 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37280,6 +39567,17 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_SLICE {
@@ -37506,8 +39804,32 @@ macro_rules! __pgrx_c_args_PG_DETOAST_DATUM_SLICE {
 /// ```text
 /// #define PG_DETOAST_DATUM_SLICE( datum , f , c ) pg_detoast_datum_slice ( ( varlena * ) DatumGetPointer ( datum ) , ( int32 ) ( f ) , ( int32 ) ( c ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_SLICE {
+    (@__pgrx_emit_check_safety; $datum:tt, $f:tt, $c:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $datum);
+                $crate::__pgrx_c_operand!(@check_safety; $f);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_DETOAST_DATUM_SLICE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $datum:tt, $f:tt, $c:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_DETOAST_DATUM_SLICE!(@__pgrx_emit_value; $datum, $f, $c)
@@ -37554,7 +39876,7 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37651,6 +39973,13 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
         /* PGRX: PG_DETOAST_DATUM_SLICE remains expanded because pg_detoast_datum_slice is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $datum);
+                        $crate::__pgrx_c_operand!(@check_safety; $f);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -37702,7 +40031,7 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37854,7 +40183,7 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -37953,6 +40282,17 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_FREE_IF_COPY {
@@ -38172,8 +40512,28 @@ macro_rules! __pgrx_c_args_PG_FREE_IF_COPY {
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
 ///
 /// Rust callers supply 3 arguments: the 2 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_FREE_IF_COPY {
+    (@__pgrx_emit_check_safety; $ptr:tt, $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ptr);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_FREE_IF_COPY!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ptr:tt, $n:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_GETARG_DATUM remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: PG_GETARG_POINTER remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -38193,7 +40553,7 @@ macro_rules! PG_FREE_IF_COPY {
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                    $crate::DatumGetPointer(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -38214,7 +40574,7 @@ macro_rules! PG_FREE_IF_COPY {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                $crate::__pgrx_c_generated::Field_value,
                                                                 _,
                                                                 _
                                                             >(
@@ -38225,7 +40585,7 @@ macro_rules! PG_FREE_IF_COPY {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -38317,6 +40677,17 @@ macro_rules! PG_FREE_IF_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BOOL {
@@ -38480,8 +40851,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_BOOL {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BOOL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BOOL!(@__pgrx_emit_value; $n, $fcinfo)
@@ -38491,7 +40881,7 @@ macro_rules! PG_GETARG_BOOL {
         /* PGRX: PG_GETARG_BOOL remains expanded because DatumGetBool is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_561ff70cfb703178219447417f802e5d(
+                $crate::DatumGetBool(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -38509,7 +40899,7 @@ macro_rules! PG_GETARG_BOOL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -38520,7 +40910,7 @@ macro_rules! PG_GETARG_BOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -38572,13 +40962,19 @@ macro_rules! PG_GETARG_BOOL {
         /* PGRX: PG_GETARG_BOOL remains expanded because DatumGetBool is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_561ff70cfb703178219447417f802e5d(
+                                $crate::DatumGetBool(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -38599,7 +40995,7 @@ macro_rules! PG_GETARG_BOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -38610,7 +41006,7 @@ macro_rules! PG_GETARG_BOOL {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -38664,7 +41060,7 @@ macro_rules! PG_GETARG_BOOL {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_561ff70cfb703178219447417f802e5d(
+                    $crate::DatumGetBool(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -38682,7 +41078,7 @@ macro_rules! PG_GETARG_BOOL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -38693,7 +41089,7 @@ macro_rules! PG_GETARG_BOOL {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -38743,6 +41139,17 @@ macro_rules! PG_GETARG_BOOL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P {
@@ -38906,8 +41313,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BPCHAR_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BPCHAR_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -38974,7 +41400,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -38995,7 +41421,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -39006,7 +41432,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -39077,6 +41503,12 @@ macro_rules! PG_GETARG_BPCHAR_P {
         /* PGRX: PG_GETARG_BPCHAR_P remains expanded because DatumGetBpCharP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39139,7 +41571,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -39160,7 +41592,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -39171,7 +41603,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -39292,7 +41724,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -39313,7 +41745,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -39324,7 +41756,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -39392,6 +41824,17 @@ macro_rules! PG_GETARG_BPCHAR_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_PP {
@@ -39555,8 +41998,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_PP {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_PP {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BPCHAR_PP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BPCHAR_PP!(@__pgrx_emit_value; $n, $fcinfo)
@@ -39623,7 +42085,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -39644,7 +42106,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -39655,7 +42117,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -39726,6 +42188,12 @@ macro_rules! PG_GETARG_BPCHAR_PP {
         /* PGRX: PG_GETARG_BPCHAR_PP remains expanded because DatumGetBpCharPP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -39788,7 +42256,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -39809,7 +42277,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -39820,7 +42288,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -39941,7 +42409,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -39962,7 +42430,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -39973,7 +42441,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -40041,6 +42509,17 @@ macro_rules! PG_GETARG_BPCHAR_PP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P_COPY {
@@ -40219,8 +42698,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P_COPY {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_COPY {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BPCHAR_P_COPY!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BPCHAR_P_COPY!(@__pgrx_emit_value; $n, $fcinfo)
@@ -40287,7 +42788,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -40308,7 +42809,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -40319,7 +42820,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -40390,6 +42891,12 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
         /* PGRX: PG_GETARG_BPCHAR_P_COPY remains expanded because DatumGetBpCharPCopy expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -40452,7 +42959,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -40473,7 +42980,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -40484,7 +42991,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -40605,7 +43112,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -40626,7 +43133,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -40637,7 +43144,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -40705,6 +43212,17 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P_SLICE {
@@ -40991,8 +43509,32 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P_SLICE {
 ///
 ///
 /// Rust callers supply 4 arguments: the 3 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_SLICE {
+    (@__pgrx_emit_check_safety; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BPCHAR_P_SLICE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BPCHAR_P_SLICE!(@__pgrx_emit_value; $n, $a, $b, $fcinfo)
@@ -41059,7 +43601,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -41080,7 +43622,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -41091,7 +43633,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -41217,6 +43759,14 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
         /* PGRX: PG_GETARG_BPCHAR_P_SLICE remains expanded because DatumGetBpCharPSlice expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -41279,7 +43829,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -41300,7 +43850,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -41311,7 +43861,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -41494,7 +44044,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -41515,7 +44065,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -41526,7 +44076,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -41646,6 +44196,17 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P {
@@ -41809,8 +44370,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BYTEA_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BYTEA_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -41877,7 +44457,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -41898,7 +44478,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -41909,7 +44489,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -41980,6 +44560,12 @@ macro_rules! PG_GETARG_BYTEA_P {
         /* PGRX: PG_GETARG_BYTEA_P remains expanded because DatumGetByteaP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -42042,7 +44628,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -42063,7 +44649,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -42074,7 +44660,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -42195,7 +44781,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -42216,7 +44802,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -42227,7 +44813,7 @@ macro_rules! PG_GETARG_BYTEA_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -42295,6 +44881,17 @@ macro_rules! PG_GETARG_BYTEA_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_PP {
@@ -42458,8 +45055,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_PP {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_PP {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BYTEA_PP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BYTEA_PP!(@__pgrx_emit_value; $n, $fcinfo)
@@ -42526,7 +45142,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -42547,7 +45163,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -42558,7 +45174,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -42629,6 +45245,12 @@ macro_rules! PG_GETARG_BYTEA_PP {
         /* PGRX: PG_GETARG_BYTEA_PP remains expanded because DatumGetByteaPP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -42691,7 +45313,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -42712,7 +45334,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -42723,7 +45345,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -42844,7 +45466,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -42865,7 +45487,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -42876,7 +45498,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -42944,6 +45566,17 @@ macro_rules! PG_GETARG_BYTEA_PP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P_COPY {
@@ -43116,8 +45749,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P_COPY {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_COPY {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BYTEA_P_COPY!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BYTEA_P_COPY!(@__pgrx_emit_value; $n, $fcinfo)
@@ -43184,7 +45839,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -43205,7 +45860,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -43216,7 +45871,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -43287,6 +45942,12 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
         /* PGRX: PG_GETARG_BYTEA_P_COPY remains expanded because DatumGetByteaPCopy expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -43349,7 +46010,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -43370,7 +46031,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -43381,7 +46042,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -43502,7 +46163,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -43523,7 +46184,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -43534,7 +46195,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -43602,6 +46263,17 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P_SLICE {
@@ -43888,8 +46560,32 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P_SLICE {
 ///
 ///
 /// Rust callers supply 4 arguments: the 3 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_SLICE {
+    (@__pgrx_emit_check_safety; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_BYTEA_P_SLICE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_BYTEA_P_SLICE!(@__pgrx_emit_value; $n, $a, $b, $fcinfo)
@@ -43956,7 +46652,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -43977,7 +46673,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -43988,7 +46684,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -44111,6 +46807,14 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
         /* PGRX: PG_GETARG_BYTEA_P_SLICE remains expanded because DatumGetByteaPSlice expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -44173,7 +46877,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -44194,7 +46898,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -44205,7 +46909,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -44388,7 +47092,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -44409,7 +47113,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -44420,7 +47124,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -44540,6 +47244,17 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_CHAR {
@@ -44703,8 +47418,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_CHAR {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_CHAR!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_CHAR!(@__pgrx_emit_value; $n, $fcinfo)
@@ -44714,7 +47448,7 @@ macro_rules! PG_GETARG_CHAR {
         /* PGRX: PG_GETARG_CHAR remains expanded because DatumGetChar is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_1781d5acde5dc762ad83398844ad709e(
+                $crate::__pgrx_c_generated::Inline_85fab55a0d16cc136f1e1df6e17c81dd(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -44732,7 +47466,7 @@ macro_rules! PG_GETARG_CHAR {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -44743,7 +47477,7 @@ macro_rules! PG_GETARG_CHAR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -44795,13 +47529,19 @@ macro_rules! PG_GETARG_CHAR {
         /* PGRX: PG_GETARG_CHAR remains expanded because DatumGetChar is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_1781d5acde5dc762ad83398844ad709e(
+                                $crate::__pgrx_c_generated::Inline_85fab55a0d16cc136f1e1df6e17c81dd(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -44822,7 +47562,7 @@ macro_rules! PG_GETARG_CHAR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -44833,7 +47573,7 @@ macro_rules! PG_GETARG_CHAR {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -44887,7 +47627,7 @@ macro_rules! PG_GETARG_CHAR {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_1781d5acde5dc762ad83398844ad709e(
+                    $crate::__pgrx_c_generated::Inline_85fab55a0d16cc136f1e1df6e17c81dd(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -44905,7 +47645,7 @@ macro_rules! PG_GETARG_CHAR {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -44916,7 +47656,7 @@ macro_rules! PG_GETARG_CHAR {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -44966,6 +47706,17 @@ macro_rules! PG_GETARG_CHAR {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_CSTRING {
@@ -45129,8 +47880,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_CSTRING {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_CSTRING!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_CSTRING!(@__pgrx_emit_value; $n, $fcinfo)
@@ -45141,11 +47911,14 @@ macro_rules! PG_GETARG_CSTRING {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::CChar,
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CChar,
+                        ::core::ffi::c_char
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_1a12a17eb4d027e7c5b474e556f477e3(
+                $crate::DatumGetCString(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -45163,7 +47936,7 @@ macro_rules! PG_GETARG_CSTRING {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -45174,7 +47947,7 @@ macro_rules! PG_GETARG_CSTRING {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -45226,16 +47999,25 @@ macro_rules! PG_GETARG_CSTRING {
         /* PGRX: PG_GETARG_CSTRING remains expanded because DatumGetCString is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_1a12a17eb4d027e7c5b474e556f477e3(
+                                $crate::DatumGetCString(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -45256,7 +48038,7 @@ macro_rules! PG_GETARG_CSTRING {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -45267,7 +48049,7 @@ macro_rules! PG_GETARG_CSTRING {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -45322,11 +48104,14 @@ macro_rules! PG_GETARG_CSTRING {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_1a12a17eb4d027e7c5b474e556f477e3(
+                    $crate::DatumGetCString(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -45344,7 +48129,7 @@ macro_rules! PG_GETARG_CSTRING {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -45355,7 +48140,7 @@ macro_rules! PG_GETARG_CSTRING {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -45405,6 +48190,17 @@ macro_rules! PG_GETARG_CSTRING {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_DATUM {
@@ -45568,8 +48364,23 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATUM {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! PG_GETARG_DATUM {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_DATUM!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_DATUM!(@__pgrx_emit_value; $n, $fcinfo)
@@ -45580,7 +48391,7 @@ macro_rules! PG_GETARG_DATUM {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6564,
+                        $crate::__pgrx_c_generated::Field_value,
                         _,
                         _
                     >(
@@ -45588,7 +48399,7 @@ macro_rules! PG_GETARG_DATUM {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field529,
+                                        $crate::__pgrx_c_generated::Field_args,
                                         _,
                                         _
                                     >(
@@ -45616,7 +48427,7 @@ macro_rules! PG_GETARG_DATUM {
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6564,
+                $crate::__pgrx_c_generated::Field_value,
                 _,
                 _
             >(
@@ -45624,7 +48435,7 @@ macro_rules! PG_GETARG_DATUM {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field529,
+                                $crate::__pgrx_c_generated::Field_args,
                                 _,
                                 _
                             >(
@@ -45649,7 +48460,7 @@ macro_rules! PG_GETARG_DATUM {
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6564,
+                $crate::__pgrx_c_generated::Field_value,
                 _,
                 _
             >(
@@ -45657,7 +48468,7 @@ macro_rules! PG_GETARG_DATUM {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field529,
+                                $crate::__pgrx_c_generated::Field_args,
                                 _,
                                 _
                             >(
@@ -45682,10 +48493,16 @@ macro_rules! PG_GETARG_DATUM {
     (@__pgrx_emit_size; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6564,
+                            $crate::__pgrx_c_generated::Field_value,
                             _,
                             _
                         >(
@@ -45693,7 +48510,7 @@ macro_rules! PG_GETARG_DATUM {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field529,
+                                            $crate::__pgrx_c_generated::Field_args,
                                             _,
                                             _
                                         >(
@@ -45726,7 +48543,7 @@ macro_rules! PG_GETARG_DATUM {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6564,
+                        $crate::__pgrx_c_generated::Field_value,
                         _,
                         _
                     >(
@@ -45734,7 +48551,7 @@ macro_rules! PG_GETARG_DATUM {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field529,
+                                        $crate::__pgrx_c_generated::Field_args,
                                         _,
                                         _
                                     >(
@@ -45772,6 +48589,17 @@ macro_rules! PG_GETARG_DATUM {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_FLOAT4 {
@@ -45935,8 +48763,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_FLOAT4 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT4 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_FLOAT4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_FLOAT4!(@__pgrx_emit_value; $n, $fcinfo)
@@ -45948,7 +48795,7 @@ macro_rules! PG_GETARG_FLOAT4 {
             <
                 $crate::__pgrx_c_macros::expression::CFloat as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_ed91438de917ee70d4e83f6a9a43dd77(
+                $crate::DatumGetFloat4(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -45966,7 +48813,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -45977,7 +48824,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -46029,13 +48876,19 @@ macro_rules! PG_GETARG_FLOAT4 {
         /* PGRX: PG_GETARG_FLOAT4 remains expanded because DatumGetFloat4 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CFloat as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ed91438de917ee70d4e83f6a9a43dd77(
+                                $crate::DatumGetFloat4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46056,7 +48909,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -46067,7 +48920,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -46123,7 +48976,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                 <
                     $crate::__pgrx_c_macros::expression::CFloat as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ed91438de917ee70d4e83f6a9a43dd77(
+                    $crate::DatumGetFloat4(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46141,7 +48994,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -46152,7 +49005,7 @@ macro_rules! PG_GETARG_FLOAT4 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -46202,6 +49055,17 @@ macro_rules! PG_GETARG_FLOAT4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_FLOAT8 {
@@ -46365,8 +49229,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_FLOAT8 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT8 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_FLOAT8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_FLOAT8!(@__pgrx_emit_value; $n, $fcinfo)
@@ -46378,7 +49261,7 @@ macro_rules! PG_GETARG_FLOAT8 {
             <
                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bc267f30247f4ecc16ec47ce6066ac65(
+                $crate::DatumGetFloat8(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46396,7 +49279,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -46407,7 +49290,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -46459,13 +49342,19 @@ macro_rules! PG_GETARG_FLOAT8 {
         /* PGRX: PG_GETARG_FLOAT8 remains expanded because DatumGetFloat8 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bc267f30247f4ecc16ec47ce6066ac65(
+                                $crate::DatumGetFloat8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46486,7 +49375,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -46497,7 +49386,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -46553,7 +49442,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                 <
                     $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bc267f30247f4ecc16ec47ce6066ac65(
+                    $crate::DatumGetFloat8(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46571,7 +49460,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -46582,7 +49471,7 @@ macro_rules! PG_GETARG_FLOAT8 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -46632,6 +49521,17 @@ macro_rules! PG_GETARG_FLOAT8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER {
@@ -46810,8 +49710,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_HEAPTUPLEHEADER!(@__pgrx_emit_value; $n, $fcinfo)
@@ -46878,7 +49800,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -46899,7 +49821,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -46910,7 +49832,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -46984,6 +49906,12 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
         /* PGRX: PG_GETARG_HEAPTUPLEHEADER remains expanded because DatumGetHeapTupleHeader expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -47048,7 +49976,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -47069,7 +49997,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -47080,7 +50008,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -47201,7 +50129,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -47222,7 +50150,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -47233,7 +50161,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -47301,6 +50229,17 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER_COPY {
@@ -47482,8 +50421,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER_COPY {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER_COPY!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_HEAPTUPLEHEADER_COPY!(@__pgrx_emit_value; $n, $fcinfo)
@@ -47550,7 +50511,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -47571,7 +50532,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -47582,7 +50543,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -47662,6 +50623,12 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
         /* PGRX: PG_GETARG_HEAPTUPLEHEADER_COPY remains expanded because DatumGetHeapTupleHeaderCopy expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -47726,7 +50693,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -47747,7 +50714,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -47758,7 +50725,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -47882,7 +50849,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -47903,7 +50870,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -47914,7 +50881,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -47988,6 +50955,17 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_INT16 {
@@ -48151,8 +51129,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT16 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_INT16!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_INT16!(@__pgrx_emit_value; $n, $fcinfo)
@@ -48162,7 +51159,7 @@ macro_rules! PG_GETARG_INT16 {
         /* PGRX: PG_GETARG_INT16 remains expanded because DatumGetInt16 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CShort as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_053330ea4a6077c4c2c264a2ed4a60de(
+                $crate::DatumGetInt16(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48180,7 +51177,7 @@ macro_rules! PG_GETARG_INT16 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -48191,7 +51188,7 @@ macro_rules! PG_GETARG_INT16 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -48243,13 +51240,19 @@ macro_rules! PG_GETARG_INT16 {
         /* PGRX: PG_GETARG_INT16 remains expanded because DatumGetInt16 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_053330ea4a6077c4c2c264a2ed4a60de(
+                                $crate::DatumGetInt16(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48270,7 +51273,7 @@ macro_rules! PG_GETARG_INT16 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -48281,7 +51284,7 @@ macro_rules! PG_GETARG_INT16 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -48335,7 +51338,7 @@ macro_rules! PG_GETARG_INT16 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CShort as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_053330ea4a6077c4c2c264a2ed4a60de(
+                    $crate::DatumGetInt16(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48353,7 +51356,7 @@ macro_rules! PG_GETARG_INT16 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -48364,7 +51367,7 @@ macro_rules! PG_GETARG_INT16 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -48414,6 +51417,17 @@ macro_rules! PG_GETARG_INT16 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_INT32 {
@@ -48577,8 +51591,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT32 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_INT32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_INT32!(@__pgrx_emit_value; $n, $fcinfo)
@@ -48588,7 +51621,7 @@ macro_rules! PG_GETARG_INT32 {
         /* PGRX: PG_GETARG_INT32 remains expanded because DatumGetInt32 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_89f54e3891e033ab88e2249e1d378f56(
+                $crate::DatumGetInt32(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48606,7 +51639,7 @@ macro_rules! PG_GETARG_INT32 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -48617,7 +51650,7 @@ macro_rules! PG_GETARG_INT32 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -48669,13 +51702,19 @@ macro_rules! PG_GETARG_INT32 {
         /* PGRX: PG_GETARG_INT32 remains expanded because DatumGetInt32 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_89f54e3891e033ab88e2249e1d378f56(
+                                $crate::DatumGetInt32(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48696,7 +51735,7 @@ macro_rules! PG_GETARG_INT32 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -48707,7 +51746,7 @@ macro_rules! PG_GETARG_INT32 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -48761,7 +51800,7 @@ macro_rules! PG_GETARG_INT32 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_89f54e3891e033ab88e2249e1d378f56(
+                    $crate::DatumGetInt32(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -48779,7 +51818,7 @@ macro_rules! PG_GETARG_INT32 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -48790,7 +51829,7 @@ macro_rules! PG_GETARG_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -48840,6 +51879,17 @@ macro_rules! PG_GETARG_INT32 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_INT64 {
@@ -49003,8 +52053,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT64 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_INT64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_INT64!(@__pgrx_emit_value; $n, $fcinfo)
@@ -49014,7 +52083,7 @@ macro_rules! PG_GETARG_INT64 {
         /* PGRX: PG_GETARG_INT64 remains expanded because DatumGetInt64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_6fa1abfc171b3fd699f2ceb91b7e42ed(
+                $crate::DatumGetInt64(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49032,7 +52101,7 @@ macro_rules! PG_GETARG_INT64 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -49043,7 +52112,7 @@ macro_rules! PG_GETARG_INT64 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -49095,13 +52164,19 @@ macro_rules! PG_GETARG_INT64 {
         /* PGRX: PG_GETARG_INT64 remains expanded because DatumGetInt64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_6fa1abfc171b3fd699f2ceb91b7e42ed(
+                                $crate::DatumGetInt64(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49122,7 +52197,7 @@ macro_rules! PG_GETARG_INT64 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -49133,7 +52208,7 @@ macro_rules! PG_GETARG_INT64 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -49187,7 +52262,7 @@ macro_rules! PG_GETARG_INT64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_6fa1abfc171b3fd699f2ceb91b7e42ed(
+                    $crate::DatumGetInt64(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49205,7 +52280,7 @@ macro_rules! PG_GETARG_INT64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -49216,7 +52291,7 @@ macro_rules! PG_GETARG_INT64 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -49266,6 +52341,17 @@ macro_rules! PG_GETARG_INT64 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_NAME {
@@ -49429,8 +52515,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_NAME {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_NAME!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_NAME!(@__pgrx_emit_value; $n, $fcinfo)
@@ -49445,7 +52550,7 @@ macro_rules! PG_GETARG_NAME {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_d09e555e2ea29d342ea27bc8c4e6e713(
+                $crate::DatumGetName(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49463,7 +52568,7 @@ macro_rules! PG_GETARG_NAME {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -49474,7 +52579,7 @@ macro_rules! PG_GETARG_NAME {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -49526,6 +52631,12 @@ macro_rules! PG_GETARG_NAME {
         /* PGRX: PG_GETARG_NAME remains expanded because DatumGetName is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -49535,7 +52646,7 @@ macro_rules! PG_GETARG_NAME {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_d09e555e2ea29d342ea27bc8c4e6e713(
+                                $crate::DatumGetName(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49556,7 +52667,7 @@ macro_rules! PG_GETARG_NAME {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -49567,7 +52678,7 @@ macro_rules! PG_GETARG_NAME {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -49626,7 +52737,7 @@ macro_rules! PG_GETARG_NAME {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_d09e555e2ea29d342ea27bc8c4e6e713(
+                    $crate::DatumGetName(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49644,7 +52755,7 @@ macro_rules! PG_GETARG_NAME {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -49655,7 +52766,7 @@ macro_rules! PG_GETARG_NAME {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -49705,6 +52816,17 @@ macro_rules! PG_GETARG_NAME {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_OID {
@@ -49868,8 +52990,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_OID {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_OID {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_OID!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_OID!(@__pgrx_emit_value; $n, $fcinfo)
@@ -49884,7 +53025,7 @@ macro_rules! PG_GETARG_OID {
                     $crate::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8a6ae9cc59de74b77583443a9bb0f312(
+                $crate::DatumGetObjectId(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49902,7 +53043,7 @@ macro_rules! PG_GETARG_OID {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -49913,7 +53054,7 @@ macro_rules! PG_GETARG_OID {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -49965,6 +53106,12 @@ macro_rules! PG_GETARG_OID {
         /* PGRX: PG_GETARG_OID remains expanded because DatumGetObjectId is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -49974,7 +53121,7 @@ macro_rules! PG_GETARG_OID {
                                     $crate::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8a6ae9cc59de74b77583443a9bb0f312(
+                                $crate::DatumGetObjectId(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -49995,7 +53142,7 @@ macro_rules! PG_GETARG_OID {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -50006,7 +53153,7 @@ macro_rules! PG_GETARG_OID {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -50065,7 +53212,7 @@ macro_rules! PG_GETARG_OID {
                         $crate::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8a6ae9cc59de74b77583443a9bb0f312(
+                    $crate::DatumGetObjectId(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50083,7 +53230,7 @@ macro_rules! PG_GETARG_OID {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -50094,7 +53241,7 @@ macro_rules! PG_GETARG_OID {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -50144,6 +53291,17 @@ macro_rules! PG_GETARG_OID {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_OID8 {
@@ -50307,8 +53465,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_OID8 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_OID8 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_OID8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_OID8!(@__pgrx_emit_value; $n, $fcinfo)
@@ -50320,7 +53497,7 @@ macro_rules! PG_GETARG_OID8 {
             <
                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_f47fe1fdb67babc5609a01290b7869dc(
+                $crate::DatumGetObjectId8(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50338,7 +53515,7 @@ macro_rules! PG_GETARG_OID8 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -50349,7 +53526,7 @@ macro_rules! PG_GETARG_OID8 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -50401,13 +53578,19 @@ macro_rules! PG_GETARG_OID8 {
         /* PGRX: PG_GETARG_OID8 remains expanded because DatumGetObjectId8 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_f47fe1fdb67babc5609a01290b7869dc(
+                                $crate::DatumGetObjectId8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50428,7 +53611,7 @@ macro_rules! PG_GETARG_OID8 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -50439,7 +53622,7 @@ macro_rules! PG_GETARG_OID8 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -50495,7 +53678,7 @@ macro_rules! PG_GETARG_OID8 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_f47fe1fdb67babc5609a01290b7869dc(
+                    $crate::DatumGetObjectId8(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50513,7 +53696,7 @@ macro_rules! PG_GETARG_OID8 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -50524,7 +53707,7 @@ macro_rules! PG_GETARG_OID8 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -50574,6 +53757,17 @@ macro_rules! PG_GETARG_OID8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_POINTER {
@@ -50737,8 +53931,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_POINTER {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_POINTER!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_POINTER!(@__pgrx_emit_value; $n, $fcinfo)
@@ -50753,7 +53966,7 @@ macro_rules! PG_GETARG_POINTER {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                $crate::DatumGetPointer(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50771,7 +53984,7 @@ macro_rules! PG_GETARG_POINTER {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -50782,7 +53995,7 @@ macro_rules! PG_GETARG_POINTER {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -50834,6 +54047,12 @@ macro_rules! PG_GETARG_POINTER {
         /* PGRX: PG_GETARG_POINTER remains expanded because DatumGetPointer is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -50843,7 +54062,7 @@ macro_rules! PG_GETARG_POINTER {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                $crate::DatumGetPointer(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50864,7 +54083,7 @@ macro_rules! PG_GETARG_POINTER {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -50875,7 +54094,7 @@ macro_rules! PG_GETARG_POINTER {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -50934,7 +54153,7 @@ macro_rules! PG_GETARG_POINTER {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                    $crate::DatumGetPointer(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -50952,7 +54171,7 @@ macro_rules! PG_GETARG_POINTER {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -50963,7 +54182,7 @@ macro_rules! PG_GETARG_POINTER {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -51013,6 +54232,17 @@ macro_rules! PG_GETARG_POINTER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_RAW_VARLENA_P {
@@ -51191,8 +54421,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_RAW_VARLENA_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_RAW_VARLENA_P!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_RAW_VARLENA_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -51217,7 +54469,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                            $crate::DatumGetPointer(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -51238,7 +54490,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6564,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(
@@ -51249,7 +54501,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                         _,
                                                                         _
                                                                     >(
@@ -51309,6 +54561,12 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
         /* PGRX: PG_GETARG_DATUM remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PG_GETARG_POINTER remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -51327,7 +54585,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                        $crate::DatumGetPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -51348,7 +54606,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                     _,
                                                                     _
                                                                 >(
@@ -51359,7 +54617,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -51429,7 +54687,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                            $crate::DatumGetPointer(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -51450,7 +54708,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field6564,
+                                                        $crate::__pgrx_c_generated::Field_value,
                                                         _,
                                                         _
                                                     >(
@@ -51461,7 +54719,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                         _,
                                                                         _
                                                                     >(
@@ -51518,6 +54776,17 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P {
@@ -51681,8 +54950,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_TEXT_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_TEXT_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -51749,7 +55037,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -51770,7 +55058,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -51781,7 +55069,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -51852,6 +55140,12 @@ macro_rules! PG_GETARG_TEXT_P {
         /* PGRX: PG_GETARG_TEXT_P remains expanded because DatumGetTextP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -51914,7 +55208,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -51935,7 +55229,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -51946,7 +55240,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -52067,7 +55361,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -52088,7 +55382,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -52099,7 +55393,7 @@ macro_rules! PG_GETARG_TEXT_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -52167,6 +55461,17 @@ macro_rules! PG_GETARG_TEXT_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_TEXT_PP {
@@ -52330,8 +55635,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_PP {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_PP {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_TEXT_PP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_TEXT_PP!(@__pgrx_emit_value; $n, $fcinfo)
@@ -52398,7 +55722,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -52419,7 +55743,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -52430,7 +55754,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -52501,6 +55825,12 @@ macro_rules! PG_GETARG_TEXT_PP {
         /* PGRX: PG_GETARG_TEXT_PP remains expanded because DatumGetTextPP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -52563,7 +55893,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -52584,7 +55914,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -52595,7 +55925,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -52716,7 +56046,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -52737,7 +56067,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -52748,7 +56078,7 @@ macro_rules! PG_GETARG_TEXT_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -52816,6 +56146,17 @@ macro_rules! PG_GETARG_TEXT_PP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P_COPY {
@@ -52984,8 +56325,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P_COPY {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_COPY {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_TEXT_P_COPY!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_TEXT_P_COPY!(@__pgrx_emit_value; $n, $fcinfo)
@@ -53052,7 +56412,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -53073,7 +56433,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -53084,7 +56444,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -53155,6 +56515,12 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
         /* PGRX: PG_GETARG_TEXT_P_COPY remains expanded because DatumGetTextPCopy expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -53217,7 +56583,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -53238,7 +56604,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -53249,7 +56615,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -53370,7 +56736,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -53391,7 +56757,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -53402,7 +56768,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -53470,6 +56836,17 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P_SLICE {
@@ -53750,8 +57127,32 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P_SLICE {
 ///
 ///
 /// Rust callers supply 4 arguments: the 3 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_SLICE {
+    (@__pgrx_emit_check_safety; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_TEXT_P_SLICE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_TEXT_P_SLICE!(@__pgrx_emit_value; $n, $a, $b, $fcinfo)
@@ -53818,7 +57219,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -53839,7 +57240,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -53850,7 +57251,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -53973,6 +57374,14 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
         /* PGRX: PG_GETARG_TEXT_P_SLICE remains expanded because DatumGetTextPSlice expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -54035,7 +57444,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -54056,7 +57465,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -54067,7 +57476,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -54250,7 +57659,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -54271,7 +57680,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -54282,7 +57691,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -54402,6 +57811,17 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_TRANSACTIONID {
@@ -54580,8 +58000,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_TRANSACTIONID {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_TRANSACTIONID!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_TRANSACTIONID!(@__pgrx_emit_value; $n, $fcinfo)
@@ -54596,7 +58038,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                     $crate::TransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b6dc475dbb92a74c4141841fa626be5d(
+                $crate::DatumGetTransactionId(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -54614,7 +58056,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -54625,7 +58067,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -54677,6 +58119,12 @@ macro_rules! PG_GETARG_TRANSACTIONID {
         /* PGRX: PG_GETARG_TRANSACTIONID remains expanded because DatumGetTransactionId is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -54686,7 +58134,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                     $crate::TransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b6dc475dbb92a74c4141841fa626be5d(
+                                $crate::DatumGetTransactionId(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -54707,7 +58155,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -54718,7 +58166,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -54777,7 +58225,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                         $crate::TransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b6dc475dbb92a74c4141841fa626be5d(
+                    $crate::DatumGetTransactionId(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -54795,7 +58243,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -54806,7 +58254,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -54856,6 +58304,17 @@ macro_rules! PG_GETARG_TRANSACTIONID {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_UINT16 {
@@ -55019,8 +58478,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_UINT16 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_UINT16!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_UINT16!(@__pgrx_emit_value; $n, $fcinfo)
@@ -55030,7 +58508,7 @@ macro_rules! PG_GETARG_UINT16 {
         /* PGRX: PG_GETARG_UINT16 remains expanded because DatumGetUInt16 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_0e66866eb07e60682368a824635c9105(
+                $crate::DatumGetUInt16(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55048,7 +58526,7 @@ macro_rules! PG_GETARG_UINT16 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -55059,7 +58537,7 @@ macro_rules! PG_GETARG_UINT16 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -55111,13 +58589,19 @@ macro_rules! PG_GETARG_UINT16 {
         /* PGRX: PG_GETARG_UINT16 remains expanded because DatumGetUInt16 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_0e66866eb07e60682368a824635c9105(
+                                $crate::DatumGetUInt16(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55138,7 +58622,7 @@ macro_rules! PG_GETARG_UINT16 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -55149,7 +58633,7 @@ macro_rules! PG_GETARG_UINT16 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -55205,7 +58689,7 @@ macro_rules! PG_GETARG_UINT16 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_0e66866eb07e60682368a824635c9105(
+                    $crate::DatumGetUInt16(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55223,7 +58707,7 @@ macro_rules! PG_GETARG_UINT16 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -55234,7 +58718,7 @@ macro_rules! PG_GETARG_UINT16 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -55284,6 +58768,17 @@ macro_rules! PG_GETARG_UINT16 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_UINT32 {
@@ -55447,8 +58942,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_UINT32 {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_UINT32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_UINT32!(@__pgrx_emit_value; $n, $fcinfo)
@@ -55458,7 +58972,7 @@ macro_rules! PG_GETARG_UINT32 {
         /* PGRX: PG_GETARG_UINT32 remains expanded because DatumGetUInt32 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_9fe4ee3f2688762a0ea49a1c1022b123(
+                $crate::DatumGetUInt32(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55476,7 +58990,7 @@ macro_rules! PG_GETARG_UINT32 {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field6564,
+                                            $crate::__pgrx_c_generated::Field_value,
                                             _,
                                             _
                                         >(
@@ -55487,7 +59001,7 @@ macro_rules! PG_GETARG_UINT32 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field529,
+                                                            $crate::__pgrx_c_generated::Field_args,
                                                             _,
                                                             _
                                                         >(
@@ -55539,13 +59053,19 @@ macro_rules! PG_GETARG_UINT32 {
         /* PGRX: PG_GETARG_UINT32 remains expanded because DatumGetUInt32 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_9fe4ee3f2688762a0ea49a1c1022b123(
+                                $crate::DatumGetUInt32(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55566,7 +59086,7 @@ macro_rules! PG_GETARG_UINT32 {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6564,
+                                                            $crate::__pgrx_c_generated::Field_value,
                                                             _,
                                                             _
                                                         >(
@@ -55577,7 +59097,7 @@ macro_rules! PG_GETARG_UINT32 {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                             _,
                                                                             _
                                                                         >(
@@ -55633,7 +59153,7 @@ macro_rules! PG_GETARG_UINT32 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_9fe4ee3f2688762a0ea49a1c1022b123(
+                    $crate::DatumGetUInt32(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55651,7 +59171,7 @@ macro_rules! PG_GETARG_UINT32 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6564,
+                                                $crate::__pgrx_c_generated::Field_value,
                                                 _,
                                                 _
                                             >(
@@ -55662,7 +59182,7 @@ macro_rules! PG_GETARG_UINT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field529,
+                                                                $crate::__pgrx_c_generated::Field_args,
                                                                 _,
                                                                 _
                                                             >(
@@ -55712,6 +59232,17 @@ macro_rules! PG_GETARG_UINT32 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P {
@@ -55875,8 +59406,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARCHAR_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARCHAR_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -55943,7 +59493,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -55964,7 +59514,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -55975,7 +59525,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -56046,6 +59596,12 @@ macro_rules! PG_GETARG_VARCHAR_P {
         /* PGRX: PG_GETARG_VARCHAR_P remains expanded because DatumGetVarCharP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -56108,7 +59664,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -56129,7 +59685,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -56140,7 +59696,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -56261,7 +59817,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -56282,7 +59838,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -56293,7 +59849,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -56361,6 +59917,17 @@ macro_rules! PG_GETARG_VARCHAR_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_PP {
@@ -56529,8 +60096,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_PP {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_PP {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARCHAR_PP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARCHAR_PP!(@__pgrx_emit_value; $n, $fcinfo)
@@ -56597,7 +60183,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -56618,7 +60204,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -56629,7 +60215,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -56700,6 +60286,12 @@ macro_rules! PG_GETARG_VARCHAR_PP {
         /* PGRX: PG_GETARG_VARCHAR_PP remains expanded because DatumGetVarCharPP expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -56762,7 +60354,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -56783,7 +60375,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -56794,7 +60386,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -56915,7 +60507,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -56936,7 +60528,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -56947,7 +60539,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -57015,6 +60607,17 @@ macro_rules! PG_GETARG_VARCHAR_PP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P_COPY {
@@ -57193,8 +60796,30 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P_COPY {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_COPY {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARCHAR_P_COPY!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARCHAR_P_COPY!(@__pgrx_emit_value; $n, $fcinfo)
@@ -57261,7 +60886,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -57282,7 +60907,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -57293,7 +60918,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -57367,6 +60992,12 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
         /* PGRX: PG_GETARG_VARCHAR_P_COPY remains expanded because DatumGetVarCharPCopy expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -57429,7 +61060,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -57450,7 +61081,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -57461,7 +61092,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -57582,7 +61213,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -57603,7 +61234,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -57614,7 +61245,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -57682,6 +61313,17 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P_SLICE {
@@ -57968,8 +61610,32 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P_SLICE {
 ///
 ///
 /// Rust callers supply 4 arguments: the 3 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_SLICE {
+    (@__pgrx_emit_check_safety; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARCHAR_P_SLICE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $n:tt, $a:tt, $b:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARCHAR_P_SLICE!(@__pgrx_emit_value; $n, $a, $b, $fcinfo)
@@ -58036,7 +61702,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -58057,7 +61723,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -58068,7 +61734,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -58194,6 +61860,14 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
         /* PGRX: PG_GETARG_VARCHAR_P_SLICE remains expanded because DatumGetVarCharPSlice expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -58256,7 +61930,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                                    $crate::DatumGetPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -58277,7 +61951,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field6564,
+                                                                                                $crate::__pgrx_c_generated::Field_value,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -58288,7 +61962,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                                $crate::__pgrx_c_generated::Field529,
+                                                                                                                $crate::__pgrx_c_generated::Field_args,
                                                                                                                 _,
                                                                                                                 _
                                                                                                             >(
@@ -58471,7 +62145,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                        $crate::DatumGetPointer(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -58492,7 +62166,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field6564,
+                                                                                    $crate::__pgrx_c_generated::Field_value,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -58503,7 +62177,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                                    $crate::__pgrx_c_generated::Field529,
+                                                                                                    $crate::__pgrx_c_generated::Field_args,
                                                                                                     _,
                                                                                                     _
                                                                                                 >(
@@ -58623,6 +62297,17 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_P {
@@ -58786,8 +62471,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_P {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_P {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARLENA_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARLENA_P!(@__pgrx_emit_value; $n, $fcinfo)
@@ -58834,7 +62538,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -58855,7 +62559,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field6564,
+                                                                        $crate::__pgrx_c_generated::Field_value,
                                                                         _,
                                                                         _
                                                                     >(
@@ -58866,7 +62570,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -58932,6 +62636,12 @@ macro_rules! PG_GETARG_VARLENA_P {
         /* PGRX: PG_GETARG_VARLENA_P remains expanded because PG_DETOAST_DATUM expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -58983,7 +62693,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -59004,7 +62714,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field6564,
+                                                                                        $crate::__pgrx_c_generated::Field_value,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -59015,7 +62725,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -59118,7 +62828,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -59139,7 +62849,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6564,
+                                                                            $crate::__pgrx_c_generated::Field_value,
                                                                             _,
                                                                             _
                                                                         >(
@@ -59150,7 +62860,7 @@ macro_rules! PG_GETARG_VARLENA_P {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -59216,6 +62926,17 @@ macro_rules! PG_GETARG_VARLENA_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_PP {
@@ -59384,8 +63105,27 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_PP {
 ///
 ///
 /// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_PP {
+    (@__pgrx_emit_check_safety; $n:tt, $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GETARG_VARLENA_PP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GETARG_VARLENA_PP!(@__pgrx_emit_value; $n, $fcinfo)
@@ -59432,7 +63172,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                            $crate::DatumGetPointer(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -59453,7 +63193,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field6564,
+                                                                        $crate::__pgrx_c_generated::Field_value,
                                                                         _,
                                                                         _
                                                                     >(
@@ -59464,7 +63204,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -59530,6 +63270,12 @@ macro_rules! PG_GETARG_VARLENA_PP {
         /* PGRX: PG_GETARG_VARLENA_PP remains expanded because PG_DETOAST_DATUM_PACKED expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -59581,7 +63327,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                            $crate::DatumGetPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -59602,7 +63348,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field6564,
+                                                                                        $crate::__pgrx_c_generated::Field_value,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -59613,7 +63359,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                                        $crate::__pgrx_c_generated::Field529,
+                                                                                                        $crate::__pgrx_c_generated::Field_args,
                                                                                                         _,
                                                                                                         _
                                                                                                     >(
@@ -59716,7 +63462,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::__pgrx_c_generated::Inline_2bff3bc54d75ab3825c4b0bb0ad40c11(
+                                                $crate::DatumGetPointer(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLongLong,
@@ -59737,7 +63483,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field6564,
+                                                                            $crate::__pgrx_c_generated::Field_value,
                                                                             _,
                                                                             _
                                                                         >(
@@ -59748,7 +63494,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                                            $crate::__pgrx_c_generated::Field529,
+                                                                                            $crate::__pgrx_c_generated::Field_args,
                                                                                             _,
                                                                                             _
                                                                                         >(
@@ -59814,6 +63560,17 @@ macro_rules! PG_GETARG_VARLENA_PP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GET_COLLATION {
@@ -59926,8 +63683,22 @@ macro_rules! __pgrx_c_args_PG_GET_COLLATION {
 ///
 ///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! PG_GET_COLLATION {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GET_COLLATION!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GET_COLLATION!(@__pgrx_emit_value; $fcinfo)
@@ -59938,7 +63709,7 @@ macro_rules! PG_GET_COLLATION {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2034,
+                        $crate::__pgrx_c_generated::Field_fncollation,
                         _,
                         _
                     >(
@@ -59958,7 +63729,7 @@ macro_rules! PG_GET_COLLATION {
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2034,
+                $crate::__pgrx_c_generated::Field_fncollation,
                 _,
                 _
             >(
@@ -59976,7 +63747,7 @@ macro_rules! PG_GET_COLLATION {
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2034,
+                $crate::__pgrx_c_generated::Field_fncollation,
                 _,
                 _
             >(
@@ -59994,10 +63765,15 @@ macro_rules! PG_GET_COLLATION {
     (@__pgrx_emit_size; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2034,
+                            $crate::__pgrx_c_generated::Field_fncollation,
                             _,
                             _
                         >(
@@ -60022,7 +63798,7 @@ macro_rules! PG_GET_COLLATION {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2034,
+                        $crate::__pgrx_c_generated::Field_fncollation,
                         _,
                         _
                     >(
@@ -60052,6 +63828,17 @@ macro_rules! PG_GET_COLLATION {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_GET_OPCLASS_OPTIONS {
@@ -60173,8 +63960,29 @@ macro_rules! __pgrx_c_args_PG_GET_OPCLASS_OPTIONS {
 ///
 ///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GET_OPCLASS_OPTIONS {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_GET_OPCLASS_OPTIONS!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_GET_OPCLASS_OPTIONS!(@__pgrx_emit_value; $fcinfo)
@@ -60206,7 +64014,7 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2001,
+                                        $crate::__pgrx_c_generated::Field_flinfo,
                                         _,
                                         _
                                     >(
@@ -60244,6 +64052,11 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
         /* PGRX: PG_GET_OPCLASS_OPTIONS remains expanded because get_fn_opclass_options is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -60277,7 +64090,7 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2001,
+                                                        $crate::__pgrx_c_generated::Field_flinfo,
                                                         _,
                                                         _
                                                     >(
@@ -60337,7 +64150,7 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2001,
+                                            $crate::__pgrx_c_generated::Field_flinfo,
                                             _,
                                             _
                                         >(
@@ -60373,6 +64186,17 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_HAS_OPCLASS_OPTIONS {
@@ -60494,8 +64318,29 @@ macro_rules! __pgrx_c_args_PG_HAS_OPCLASS_OPTIONS {
 ///
 ///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_HAS_OPCLASS_OPTIONS {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_HAS_OPCLASS_OPTIONS!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_HAS_OPCLASS_OPTIONS!(@__pgrx_emit_value; $fcinfo)
@@ -60522,7 +64367,7 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field2001,
+                                        $crate::__pgrx_c_generated::Field_flinfo,
                                         _,
                                         _
                                     >(
@@ -60560,6 +64405,11 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
         /* PGRX: PG_HAS_OPCLASS_OPTIONS remains expanded because has_fn_opclass_options is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -60590,7 +64440,7 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field2001,
+                                                        $crate::__pgrx_c_generated::Field_flinfo,
                                                         _,
                                                         _
                                                     >(
@@ -60645,7 +64495,7 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field2001,
+                                            $crate::__pgrx_c_generated::Field_flinfo,
                                             _,
                                             _
                                         >(
@@ -60681,6 +64531,17 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_NARGS {
@@ -60776,8 +64637,22 @@ macro_rules! __pgrx_c_args_PG_NARGS {
 ///
 ///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! PG_NARGS {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_NARGS!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::PG_NARGS!(@__pgrx_emit_value; $fcinfo)
@@ -60788,7 +64663,7 @@ macro_rules! PG_NARGS {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3580,
+                        $crate::__pgrx_c_generated::Field_nargs,
                         _,
                         _
                     >(
@@ -60808,7 +64683,7 @@ macro_rules! PG_NARGS {
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3580,
+                $crate::__pgrx_c_generated::Field_nargs,
                 _,
                 _
             >(
@@ -60826,7 +64701,7 @@ macro_rules! PG_NARGS {
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3580,
+                $crate::__pgrx_c_generated::Field_nargs,
                 _,
                 _
             >(
@@ -60844,10 +64719,15 @@ macro_rules! PG_NARGS {
     (@__pgrx_emit_size; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3580,
+                            $crate::__pgrx_c_generated::Field_nargs,
                             _,
                             _
                         >(
@@ -60872,7 +64752,7 @@ macro_rules! PG_NARGS {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3580,
+                        $crate::__pgrx_c_generated::Field_nargs,
                         _,
                         _
                     >(
@@ -60902,6 +64782,17 @@ macro_rules! PG_NARGS {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_BOOL {
@@ -61014,8 +64905,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_BOOL {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_BOOL {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_BOOL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -61026,7 +64935,7 @@ macro_rules! PG_RETURN_BOOL {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_4400f49ecf369b7a284ca7d27a8e96a1(
+                        $crate::BoolGetDatum(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -61058,7 +64967,7 @@ macro_rules! PG_RETURN_BOOL {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_4400f49ecf369b7a284ca7d27a8e96a1(
+                        $crate::BoolGetDatum(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -61099,6 +65008,17 @@ macro_rules! PG_RETURN_BOOL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_BPCHAR_P {
@@ -61211,8 +65131,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_BPCHAR_P {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_BPCHAR_P {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_BPCHAR_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: PG_RETURN_POINTER remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: PointerGetDatum remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -61422,6 +65360,17 @@ macro_rules! PG_RETURN_BPCHAR_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_BYTEA_P {
@@ -61534,8 +65483,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_BYTEA_P {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_BYTEA_P {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_BYTEA_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: PG_RETURN_POINTER remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: PointerGetDatum remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -61745,6 +65712,17 @@ macro_rules! PG_RETURN_BYTEA_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_CHAR {
@@ -61857,8 +65835,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_CHAR {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_CHAR {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_CHAR!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -61869,7 +65865,7 @@ macro_rules! PG_RETURN_CHAR {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e153bbe0643d234b8d844f080661d885(
+                        $crate::__pgrx_c_generated::Inline_2e31a3daae20a2425b39fca4832b4691(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -61901,7 +65897,7 @@ macro_rules! PG_RETURN_CHAR {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e153bbe0643d234b8d844f080661d885(
+                        $crate::__pgrx_c_generated::Inline_2e31a3daae20a2425b39fca4832b4691(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -61942,6 +65938,17 @@ macro_rules! PG_RETURN_CHAR {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_CSTRING {
@@ -62054,8 +66061,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_CSTRING {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_CSTRING {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_CSTRING!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -62066,16 +66091,22 @@ macro_rules! PG_RETURN_CSTRING {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_b13c8f5a258a032c79a786aa3e9d355e(
+                        $crate::CStringGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -62104,16 +66135,22 @@ macro_rules! PG_RETURN_CSTRING {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_b13c8f5a258a032c79a786aa3e9d355e(
+                        $crate::CStringGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::CChar,
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
                                     _
@@ -62151,6 +66188,17 @@ macro_rules! PG_RETURN_CSTRING {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_DATUM {
@@ -62263,8 +66311,22 @@ macro_rules! __pgrx_c_args_PG_RETURN_DATUM {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! PG_RETURN_DATUM {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_DATUM!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -62312,6 +66374,17 @@ macro_rules! PG_RETURN_DATUM {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_FLOAT4 {
@@ -62424,8 +66497,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_FLOAT4 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_FLOAT4 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_FLOAT4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -62436,7 +66527,7 @@ macro_rules! PG_RETURN_FLOAT4 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e877a875a392585ce0d65d52050bd3ec(
+                        $crate::Float4GetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CFloat as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -62468,7 +66559,7 @@ macro_rules! PG_RETURN_FLOAT4 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e877a875a392585ce0d65d52050bd3ec(
+                        $crate::Float4GetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CFloat as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -62509,6 +66600,17 @@ macro_rules! PG_RETURN_FLOAT4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_FLOAT8 {
@@ -62621,8 +66723,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_FLOAT8 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_FLOAT8 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_FLOAT8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -62633,7 +66753,7 @@ macro_rules! PG_RETURN_FLOAT8 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_ba2562804b0484cf2b5bc2a00cacb66f(
+                        $crate::Float8GetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -62665,7 +66785,7 @@ macro_rules! PG_RETURN_FLOAT8 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_ba2562804b0484cf2b5bc2a00cacb66f(
+                        $crate::Float8GetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -62706,6 +66826,17 @@ macro_rules! PG_RETURN_FLOAT8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_HEAPTUPLEHEADER {
@@ -62833,8 +66964,29 @@ macro_rules! __pgrx_c_args_PG_RETURN_HEAPTUPLEHEADER {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_HEAPTUPLEHEADER {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_HEAPTUPLEHEADER!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -62938,6 +67090,17 @@ macro_rules! PG_RETURN_HEAPTUPLEHEADER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_INT16 {
@@ -63050,8 +67213,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_INT16 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_INT16 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_INT16!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -63062,7 +67243,7 @@ macro_rules! PG_RETURN_INT16 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_97b49390e866bde8ef2ca14a90d8228c(
+                        $crate::Int16GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CShort as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63094,7 +67275,7 @@ macro_rules! PG_RETURN_INT16 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_97b49390e866bde8ef2ca14a90d8228c(
+                        $crate::Int16GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CShort as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63135,6 +67316,17 @@ macro_rules! PG_RETURN_INT16 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_INT32 {
@@ -63247,8 +67439,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_INT32 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_INT32 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_INT32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -63259,7 +67469,7 @@ macro_rules! PG_RETURN_INT32 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_86bf24cd29bfe6bac9e08167fa4d8659(
+                        $crate::Int32GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63291,7 +67501,7 @@ macro_rules! PG_RETURN_INT32 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_86bf24cd29bfe6bac9e08167fa4d8659(
+                        $crate::Int32GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63332,6 +67542,17 @@ macro_rules! PG_RETURN_INT32 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_INT64 {
@@ -63444,8 +67665,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_INT64 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_INT64 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_INT64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -63456,7 +67695,7 @@ macro_rules! PG_RETURN_INT64 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_207374f1c98fac6968037e5815a78242(
+                        $crate::Int64GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63488,7 +67727,7 @@ macro_rules! PG_RETURN_INT64 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_207374f1c98fac6968037e5815a78242(
+                        $crate::Int64GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -63529,6 +67768,17 @@ macro_rules! PG_RETURN_INT64 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_NAME {
@@ -63641,8 +67891,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_NAME {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_NAME {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_NAME!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -63653,7 +67921,7 @@ macro_rules! PG_RETURN_NAME {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_a1a6505d4479f7c2bc0071bdc032189e(
+                        $crate::NameGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<$crate::nameData>,
@@ -63693,7 +67961,7 @@ macro_rules! PG_RETURN_NAME {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_a1a6505d4479f7c2bc0071bdc032189e(
+                        $crate::NameGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<$crate::nameData>,
@@ -63742,6 +68010,17 @@ macro_rules! PG_RETURN_NAME {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_NULL {
@@ -63856,15 +68135,33 @@ macro_rules! __pgrx_c_args_PG_RETURN_NULL {
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
 ///
 /// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_NULL {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_NULL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         {
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2902,
+                            $crate::__pgrx_c_generated::Field_isnull,
                             _,
                             _
                         >(
@@ -63913,7 +68210,7 @@ macro_rules! PG_RETURN_NULL {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2902,
+                            $crate::__pgrx_c_generated::Field_isnull,
                             _,
                             _
                         >(
@@ -63981,6 +68278,17 @@ macro_rules! PG_RETURN_NULL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_OID {
@@ -64093,8 +68401,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_OID {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_OID {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_OID!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -64105,7 +68431,7 @@ macro_rules! PG_RETURN_OID {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e93d7b5fa1f7895ecfdffa31cf6e8619(
+                        $crate::ObjectIdGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -64143,7 +68469,7 @@ macro_rules! PG_RETURN_OID {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_e93d7b5fa1f7895ecfdffa31cf6e8619(
+                        $crate::ObjectIdGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -64190,6 +68516,17 @@ macro_rules! PG_RETURN_OID {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_OID8 {
@@ -64302,8 +68639,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_OID8 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_OID8 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_OID8!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -64314,7 +68669,7 @@ macro_rules! PG_RETURN_OID8 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_fe154d8b6a68f6827e7dad6fb5e3e761(
+                        $crate::ObjectId8GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -64346,7 +68701,7 @@ macro_rules! PG_RETURN_OID8 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_fe154d8b6a68f6827e7dad6fb5e3e761(
+                        $crate::ObjectId8GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -64387,6 +68742,17 @@ macro_rules! PG_RETURN_OID8 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_POINTER {
@@ -64499,8 +68865,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_POINTER {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_POINTER {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_POINTER!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: PointerGetDatum remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -64710,6 +69094,17 @@ macro_rules! PG_RETURN_POINTER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_TEXT_P {
@@ -64822,8 +69217,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_TEXT_P {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_TEXT_P {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_TEXT_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: PG_RETURN_POINTER remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: PointerGetDatum remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -65033,6 +69446,17 @@ macro_rules! PG_RETURN_TEXT_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_TRANSACTIONID {
@@ -65160,8 +69584,29 @@ macro_rules! __pgrx_c_args_PG_RETURN_TRANSACTIONID {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_TRANSACTIONID {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_TRANSACTIONID!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -65172,7 +69617,7 @@ macro_rules! PG_RETURN_TRANSACTIONID {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_f45bc8c0cb36edcc48726031dcc0d545(
+                        $crate::TransactionIdGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -65210,7 +69655,7 @@ macro_rules! PG_RETURN_TRANSACTIONID {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_f45bc8c0cb36edcc48726031dcc0d545(
+                        $crate::TransactionIdGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -65257,6 +69702,17 @@ macro_rules! PG_RETURN_TRANSACTIONID {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_UINT16 {
@@ -65369,8 +69825,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_UINT16 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_UINT16 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_UINT16!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -65381,7 +69855,7 @@ macro_rules! PG_RETURN_UINT16 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_f18c586057ff4b341ba4118cf941a8a2(
+                        $crate::UInt16GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65413,7 +69887,7 @@ macro_rules! PG_RETURN_UINT16 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_f18c586057ff4b341ba4118cf941a8a2(
+                        $crate::UInt16GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65454,6 +69928,17 @@ macro_rules! PG_RETURN_UINT16 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_UINT32 {
@@ -65566,8 +70051,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_UINT32 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_UINT32 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_UINT32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -65578,7 +70081,7 @@ macro_rules! PG_RETURN_UINT32 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_b2510308aa3853688355567cf7719d10(
+                        $crate::UInt32GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65610,7 +70113,7 @@ macro_rules! PG_RETURN_UINT32 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_b2510308aa3853688355567cf7719d10(
+                        $crate::UInt32GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65651,6 +70154,17 @@ macro_rules! PG_RETURN_UINT32 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_UINT64 {
@@ -65763,8 +70277,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_UINT64 {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_UINT64 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_UINT64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -65775,7 +70307,7 @@ macro_rules! PG_RETURN_UINT64 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_1187b0f10f607aa8153d5354d88d5bea(
+                        $crate::UInt64GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65807,7 +70339,7 @@ macro_rules! PG_RETURN_UINT64 {
                             $crate::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_1187b0f10f607aa8153d5354d88d5bea(
+                        $crate::UInt64GetDatum(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -65848,6 +70380,17 @@ macro_rules! PG_RETURN_UINT64 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_PG_RETURN_VARCHAR_P {
@@ -65960,8 +70503,26 @@ macro_rules! __pgrx_c_args_PG_RETURN_VARCHAR_P {
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_VARCHAR_P {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_PG_RETURN_VARCHAR_P!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         {
             /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: PG_RETURN_POINTER remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: PointerGetDatum remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -66171,6 +70732,17 @@ macro_rules! PG_RETURN_VARCHAR_P {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 /// C macro PG_RETURN_VOID from fmgr.h:350
 ///
 /// ```text
@@ -66179,8 +70751,24 @@ compile_error!("generated C macros require their inspected C target profile");
 ///
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_VOID {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::PG_RETURN_VOID!(@__pgrx_emit_check_safety; $($raw)*)
+    };
     (@__pgrx_emit_public;) => {
         {
             return $crate::__pgrx_c_macros::expression_result::return_value(
@@ -66264,6 +70852,17 @@ macro_rules! PG_RETURN_VOID {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_SizeForFunctionCallInfo {
@@ -66388,8 +70987,30 @@ macro_rules! __pgrx_c_args_SizeForFunctionCallInfo {
 /// ```text
 /// #define SizeForFunctionCallInfo( nargs ) ( offsetof ( FunctionCallInfoBaseData , args ) + sizeof ( NullableDatum ) * ( nargs ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SizeForFunctionCallInfo {
+    (@__pgrx_emit_check_safety; $nargs:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $nargs);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_SizeForFunctionCallInfo!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $nargs:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::SizeForFunctionCallInfo!(@__pgrx_emit_value; $nargs)
@@ -66450,6 +71071,11 @@ macro_rules! SizeForFunctionCallInfo {
         /* PGRX: offsetof remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $nargs);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -66553,6 +71179,17 @@ macro_rules! SizeForFunctionCallInfo {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_fmgr_info_set_expr {
@@ -66716,8 +71353,24 @@ macro_rules! __pgrx_c_args_fmgr_info_set_expr {
 /// ```text
 /// #define fmgr_info_set_expr( expr , finfo ) ( ( finfo ) -> fn_expr = ( expr ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! fmgr_info_set_expr {
+    (@__pgrx_emit_check_safety; $expr:tt, $finfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $expr);
+                $crate::__pgrx_c_operand!(@check_safety; $finfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fmgr_info_set_expr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $expr:tt, $finfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::fmgr_info_set_expr!(@__pgrx_emit_value; $expr, $finfo)
@@ -66728,7 +71381,7 @@ macro_rules! fmgr_info_set_expr {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2012,
+                        $crate::__pgrx_c_generated::Field_fn_expr,
                         _,
                         _
                     >(
@@ -66767,12 +71420,18 @@ macro_rules! fmgr_info_set_expr {
     (@__pgrx_emit_size; $expr:tt, $finfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $expr);
+                        $crate::__pgrx_c_operand!(@check_safety; $finfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field2012,
+                                    $crate::__pgrx_c_generated::Field_fn_expr,
                                     _,
                                     _
                                 >(
@@ -66807,7 +71466,7 @@ macro_rules! fmgr_info_set_expr {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2012,
+                        $crate::__pgrx_c_generated::Field_fn_expr,
                         _,
                         _
                     >(

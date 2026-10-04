@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
@@ -130,8 +141,30 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
 /// ```text
 /// #define TOAST_COMPRESS_EXTSIZE( ptr ) ( ( ( toast_compress_header * ) ( ptr ) ) -> tcinfo & VARLENA_EXTSIZE_MASK )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TOAST_COMPRESS_EXTSIZE {
+    (@__pgrx_emit_check_safety; $ptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $ptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TOAST_COMPRESS_EXTSIZE!(@__pgrx_emit_value; $ptr)
@@ -144,7 +177,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5912,
+                                $crate::__pgrx_c_generated::Field_tcinfo,
                                 _,
                                 _
                             >(
@@ -209,6 +242,11 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
     (@__pgrx_emit_size; $ptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $ptr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -216,7 +254,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5912,
+                                            $crate::__pgrx_c_generated::Field_tcinfo,
                                             _,
                                             _
                                         >(
@@ -278,7 +316,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5912,
+                                $crate::__pgrx_c_generated::Field_tcinfo,
                                 _,
                                 _
                             >(
@@ -341,6 +379,17 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
@@ -455,8 +504,27 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
 /// ```text
 /// #define TOAST_COMPRESS_METHOD( ptr ) ( ( ( toast_compress_header * ) ( ptr ) ) -> tcinfo >> VARLENA_EXTSIZE_BITS )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TOAST_COMPRESS_METHOD {
+    (@__pgrx_emit_check_safety; $ptr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ptr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TOAST_COMPRESS_METHOD!(@__pgrx_emit_value; $ptr)
@@ -469,7 +537,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5912,
+                                $crate::__pgrx_c_generated::Field_tcinfo,
                                 _,
                                 _
                             >(
@@ -534,6 +602,11 @@ macro_rules! TOAST_COMPRESS_METHOD {
     (@__pgrx_emit_size; $ptr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $ptr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -541,7 +614,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5912,
+                                            $crate::__pgrx_c_generated::Field_tcinfo,
                                             _,
                                             _
                                         >(
@@ -603,7 +676,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5912,
+                                $crate::__pgrx_c_generated::Field_tcinfo,
                                 _,
                                 _
                             >(
@@ -666,6 +739,17 @@ macro_rules! TOAST_COMPRESS_METHOD {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
@@ -913,8 +997,31 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
+    (@__pgrx_emit_check_safety; $ptr:tt, $len:tt, $cm_method:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ptr);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+                $crate::__pgrx_c_operand!(@check_safety; $cm_method);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $ptr:tt, $len:tt, $cm_method:tt $(,)?) => {
         {
             /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -950,7 +1057,7 @@ macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field5912,
+                            $crate::__pgrx_c_generated::Field_tcinfo,
                             _,
                             _
                         >(

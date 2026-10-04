@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinGetAutoSummarize {
@@ -126,8 +137,27 @@ macro_rules! __pgrx_c_args_BrinGetAutoSummarize {
 /// ```text
 /// #define BrinGetAutoSummarize( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BRIN_AM_OID ) , ( relation ) -> rd_options ? ( ( BrinOptions * ) ( relation ) -> rd_options ) -> autosummarize : false )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinGetAutoSummarize {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinGetAutoSummarize!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinGetAutoSummarize!(@__pgrx_emit_value; $relation)
@@ -161,7 +191,7 @@ macro_rules! BrinGetAutoSummarize {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4624,
+                                            $crate::__pgrx_c_generated::Field_rd_options,
                                             _,
                                             _
                                         >(
@@ -186,7 +216,7 @@ macro_rules! BrinGetAutoSummarize {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field615,
+                                                $crate::__pgrx_c_generated::Field_autosummarize,
                                                 _,
                                                 _
                                             >(
@@ -212,7 +242,7 @@ macro_rules! BrinGetAutoSummarize {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4624,
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                             _,
                                                                             _
                                                                         >(
@@ -279,6 +309,11 @@ macro_rules! BrinGetAutoSummarize {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -312,7 +347,7 @@ macro_rules! BrinGetAutoSummarize {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4624,
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                         _,
                                                         _
                                                     >(
@@ -340,7 +375,7 @@ macro_rules! BrinGetAutoSummarize {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field615,
+                                                            $crate::__pgrx_c_generated::Field_autosummarize,
                                                             _,
                                                             _
                                                         >(
@@ -366,7 +401,7 @@ macro_rules! BrinGetAutoSummarize {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4624,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -453,7 +488,7 @@ macro_rules! BrinGetAutoSummarize {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4624,
+                                            $crate::__pgrx_c_generated::Field_rd_options,
                                             _,
                                             _
                                         >(
@@ -478,7 +513,7 @@ macro_rules! BrinGetAutoSummarize {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field615,
+                                                $crate::__pgrx_c_generated::Field_autosummarize,
                                                 _,
                                                 _
                                             >(
@@ -504,7 +539,7 @@ macro_rules! BrinGetAutoSummarize {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4624,
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                             _,
                                                                             _
                                                                         >(
@@ -568,6 +603,17 @@ macro_rules! BrinGetAutoSummarize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_BrinGetPagesPerRange {
@@ -682,8 +728,27 @@ macro_rules! __pgrx_c_args_BrinGetPagesPerRange {
 /// ```text
 /// #define BrinGetPagesPerRange( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BRIN_AM_OID ) , ( relation ) -> rd_options ? ( ( BrinOptions * ) ( relation ) -> rd_options ) -> pagesPerRange : BRIN_DEFAULT_PAGES_PER_RANGE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BrinGetPagesPerRange {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BrinGetPagesPerRange!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relation:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::BrinGetPagesPerRange!(@__pgrx_emit_value; $relation)
@@ -717,7 +782,7 @@ macro_rules! BrinGetPagesPerRange {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4624,
+                                            $crate::__pgrx_c_generated::Field_rd_options,
                                             _,
                                             _
                                         >(
@@ -742,7 +807,7 @@ macro_rules! BrinGetPagesPerRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4096,
+                                                $crate::__pgrx_c_generated::Field_pagesPerRange,
                                                 _,
                                                 _
                                             >(
@@ -768,7 +833,7 @@ macro_rules! BrinGetPagesPerRange {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4624,
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                             _,
                                                                             _
                                                                         >(
@@ -832,6 +897,11 @@ macro_rules! BrinGetPagesPerRange {
         /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -865,7 +935,7 @@ macro_rules! BrinGetPagesPerRange {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4624,
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                         _,
                                                         _
                                                     >(
@@ -893,7 +963,7 @@ macro_rules! BrinGetPagesPerRange {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field4096,
+                                                            $crate::__pgrx_c_generated::Field_pagesPerRange,
                                                             _,
                                                             _
                                                         >(
@@ -919,7 +989,7 @@ macro_rules! BrinGetPagesPerRange {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field4624,
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
                                                                                         _,
                                                                                         _
                                                                                     >(
@@ -1005,7 +1075,7 @@ macro_rules! BrinGetPagesPerRange {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4624,
+                                            $crate::__pgrx_c_generated::Field_rd_options,
                                             _,
                                             _
                                         >(
@@ -1030,7 +1100,7 @@ macro_rules! BrinGetPagesPerRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field4096,
+                                                $crate::__pgrx_c_generated::Field_pagesPerRange,
                                                 _,
                                                 _
                                             >(
@@ -1056,7 +1126,7 @@ macro_rules! BrinGetPagesPerRange {
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::load(
                                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field4624,
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
                                                                             _,
                                                                             _
                                                                         >(

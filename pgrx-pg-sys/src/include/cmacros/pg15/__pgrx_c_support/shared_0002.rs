@@ -7,6 +7,30 @@ This code is generated for documentation purposes, so that it is easy to referen
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_operand {
+    (@check_safety; (@native [$expression:expr])) => {
+        {
+            let _ = || {
+                let _ = &($expression);
+            };
+        }
+    };
+    (@check_safety; (@deref [$($original:tt)*] $pointer:tt)) => {
+        {
+            let _ = || {
+                let _ = &($($original)*);
+            };
+        }
+    };
+    (@check_safety; (@literal $argument:tt)) => {};
+    (@check_safety; (@unused)) => {};
+    (@check_safety; (@macro [$($path:tt)*] [$($arguments:tt)*])) => {
+        $($path)* !(@__pgrx_c_check_safety; $($arguments)*)
+    };
+    (@check_safety; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => {
+        {
+            let _ = $($size)*;
+        }
+    };
     (@value [$floats:tt]; (@native [$expression:expr])) => {
         $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression)
     };
@@ -19,9 +43,7 @@ macro_rules! __pgrx_c_operand {
     (@size; (@native [$expression:expr])) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
-                Some(unsafe {
-                    $crate::__pgrx_c_macros::expression::input($expression)
-                })
+                Some($crate::__pgrx_c_macros::expression::input($expression))
             } else {
                 None
             }

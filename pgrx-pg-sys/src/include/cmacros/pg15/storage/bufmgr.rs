@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelationGetNumberOfBlocks {
@@ -136,8 +147,30 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfBlocks {
 /// ```text
 /// #define RelationGetNumberOfBlocks( reln ) RelationGetNumberOfBlocksInFork ( reln , MAIN_FORKNUM )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetNumberOfBlocks {
+    (@__pgrx_emit_check_safety; $reln:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $reln);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetNumberOfBlocks!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $reln:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelationGetNumberOfBlocks!(@__pgrx_emit_value; $reln)
@@ -147,7 +180,7 @@ macro_rules! RelationGetNumberOfBlocks {
         /* PGRX: RelationGetNumberOfBlocks remains expanded because RelationGetNumberOfBlocksInFork is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_5e9f09eca94ab626adff9b7ee61ba63a(
+                $crate::__pgrx_c_generated::Inline_a1eff02754a3cd5c4b6b27cc758b85f4(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<$crate::RelationData>,
@@ -216,13 +249,18 @@ macro_rules! RelationGetNumberOfBlocks {
         /* PGRX: RelationGetNumberOfBlocks remains expanded because RelationGetNumberOfBlocksInFork is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $reln);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_5e9f09eca94ab626adff9b7ee61ba63a(
+                                $crate::__pgrx_c_generated::Inline_a1eff02754a3cd5c4b6b27cc758b85f4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -293,7 +331,7 @@ macro_rules! RelationGetNumberOfBlocks {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_5e9f09eca94ab626adff9b7ee61ba63a(
+                    $crate::__pgrx_c_generated::Inline_a1eff02754a3cd5c4b6b27cc758b85f4(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<$crate::RelationData>,

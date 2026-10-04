@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_RelFileNumberIsValid {
@@ -126,8 +137,27 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
 /// ```text
 /// #define RelFileNumberIsValid( relnumber ) ( ( bool ) ( ( relnumber ) != InvalidRelFileNumber ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelFileNumberIsValid {
+    (@__pgrx_emit_check_safety; $relnumber:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relnumber);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelFileNumberIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $relnumber:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::RelFileNumberIsValid!(@__pgrx_emit_value; $relnumber)
@@ -180,6 +210,11 @@ macro_rules! RelFileNumberIsValid {
         /* PGRX: bool remains expanded because object macro is not a supported pure integer expression: compiler and declaration keywords require a dedicated syntax contract. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relnumber);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -271,6 +306,17 @@ macro_rules! RelFileNumberIsValid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_relpath {
@@ -398,8 +444,28 @@ macro_rules! __pgrx_c_args_relpath {
 /// ```text
 /// #define relpath( rlocator , forknum ) relpathbackend ( ( rlocator ) . locator , ( rlocator ) . backend , forknum )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! relpath {
+    (@__pgrx_emit_check_safety; $rlocator:tt, $forknum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                $crate::__pgrx_c_operand!(@check_safety; $forknum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_relpath!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rlocator:tt, $forknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::relpath!(@__pgrx_emit_value; $rlocator, $forknum)
@@ -411,7 +477,7 @@ macro_rules! relpath {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -428,13 +494,13 @@ macro_rules! relpath {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1373,
+                                        $crate::__pgrx_c_generated::Field_dbOid,
                                         _,
                                         _
                                     >(
                                         (
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3113,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -460,13 +526,13 @@ macro_rules! relpath {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5519,
+                                        $crate::__pgrx_c_generated::Field_spcOid,
                                         _,
                                         _
                                     >(
                                         (
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3113,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -492,13 +558,13 @@ macro_rules! relpath {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4728,
+                                        $crate::__pgrx_c_generated::Field_relNumber,
                                         _,
                                         _
                                     >(
                                         (
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field3113,
+                                                $crate::__pgrx_c_generated::Field_locator,
                                                 _,
                                                 _
                                             >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -516,7 +582,7 @@ macro_rules! relpath {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field645,
+                                        $crate::__pgrx_c_generated::Field_backend,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -567,13 +633,19 @@ macro_rules! relpath {
         /* PGRX: relpath remains expanded because relpathbackend expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                        $crate::__pgrx_c_operand!(@check_safety; $forknum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -593,13 +665,13 @@ macro_rules! relpath {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1373,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
                                                         (
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field3113,
+                                                                $crate::__pgrx_c_generated::Field_locator,
                                                                 _,
                                                                 _
                                                             >(
@@ -635,13 +707,13 @@ macro_rules! relpath {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5519,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
                                                         (
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field3113,
+                                                                $crate::__pgrx_c_generated::Field_locator,
                                                                 _,
                                                                 _
                                                             >(
@@ -677,13 +749,13 @@ macro_rules! relpath {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4728,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
                                                         (
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field3113,
+                                                                $crate::__pgrx_c_generated::Field_locator,
                                                                 _,
                                                                 _
                                                             >(
@@ -713,7 +785,7 @@ macro_rules! relpath {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field645,
+                                                        $crate::__pgrx_c_generated::Field_backend,
                                                         _,
                                                         _
                                                     >(
@@ -769,7 +841,7 @@ macro_rules! relpath {
                 <
                     $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                    $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -786,13 +858,13 @@ macro_rules! relpath {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1373,
+                                            $crate::__pgrx_c_generated::Field_dbOid,
                                             _,
                                             _
                                         >(
                                             (
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3113,
+                                                    $crate::__pgrx_c_generated::Field_locator,
                                                     _,
                                                     _
                                                 >(
@@ -825,13 +897,13 @@ macro_rules! relpath {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5519,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(
                                             (
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3113,
+                                                    $crate::__pgrx_c_generated::Field_locator,
                                                     _,
                                                     _
                                                 >(
@@ -864,13 +936,13 @@ macro_rules! relpath {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4728,
+                                            $crate::__pgrx_c_generated::Field_relNumber,
                                             _,
                                             _
                                         >(
                                             (
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field3113,
+                                                    $crate::__pgrx_c_generated::Field_locator,
                                                     _,
                                                     _
                                                 >(
@@ -897,7 +969,7 @@ macro_rules! relpath {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field645,
+                                            $crate::__pgrx_c_generated::Field_backend,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -946,6 +1018,17 @@ macro_rules! relpath {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_relpathbackend {
@@ -1163,8 +1246,29 @@ macro_rules! __pgrx_c_args_relpathbackend {
 /// ```text
 /// #define relpathbackend( rlocator , backend , forknum ) GetRelationPath ( ( rlocator ) . dbOid , ( rlocator ) . spcOid , ( rlocator ) . relNumber , backend , forknum )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! relpathbackend {
+    (@__pgrx_emit_check_safety; $rlocator:tt, $backend:tt, $forknum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                $crate::__pgrx_c_operand!(@check_safety; $backend);
+                $crate::__pgrx_c_operand!(@check_safety; $forknum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_relpathbackend!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rlocator:tt, $backend:tt, $forknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::relpathbackend!(@__pgrx_emit_value; $rlocator, $backend, $forknum)
@@ -1176,7 +1280,7 @@ macro_rules! relpathbackend {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1193,7 +1297,7 @@ macro_rules! relpathbackend {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1373,
+                                        $crate::__pgrx_c_generated::Field_dbOid,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1217,7 +1321,7 @@ macro_rules! relpathbackend {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5519,
+                                        $crate::__pgrx_c_generated::Field_spcOid,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1241,7 +1345,7 @@ macro_rules! relpathbackend {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4728,
+                                        $crate::__pgrx_c_generated::Field_relNumber,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1302,13 +1406,20 @@ macro_rules! relpathbackend {
         /* PGRX: relpathbackend remains expanded because GetRelationPath is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                        $crate::__pgrx_c_operand!(@check_safety; $backend);
+                        $crate::__pgrx_c_operand!(@check_safety; $forknum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1328,7 +1439,7 @@ macro_rules! relpathbackend {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1373,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1362,7 +1473,7 @@ macro_rules! relpathbackend {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5519,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
@@ -1396,7 +1507,7 @@ macro_rules! relpathbackend {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4728,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -1465,7 +1576,7 @@ macro_rules! relpathbackend {
                 <
                     $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                    $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1482,7 +1593,7 @@ macro_rules! relpathbackend {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1373,
+                                            $crate::__pgrx_c_generated::Field_dbOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1506,7 +1617,7 @@ macro_rules! relpathbackend {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5519,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1530,7 +1641,7 @@ macro_rules! relpathbackend {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4728,
+                                            $crate::__pgrx_c_generated::Field_relNumber,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1591,6 +1702,17 @@ macro_rules! relpathbackend {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_relpathperm {
@@ -1726,8 +1848,28 @@ macro_rules! __pgrx_c_args_relpathperm {
 /// ```text
 /// #define relpathperm( rlocator , forknum ) relpathbackend ( rlocator , INVALID_PROC_NUMBER , forknum )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! relpathperm {
+    (@__pgrx_emit_check_safety; $rlocator:tt, $forknum:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                $crate::__pgrx_c_operand!(@check_safety; $forknum);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_relpathperm!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $rlocator:tt, $forknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::relpathperm!(@__pgrx_emit_value; $rlocator, $forknum)
@@ -1739,7 +1881,7 @@ macro_rules! relpathperm {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1756,7 +1898,7 @@ macro_rules! relpathperm {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1373,
+                                        $crate::__pgrx_c_generated::Field_dbOid,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1780,7 +1922,7 @@ macro_rules! relpathperm {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field5519,
+                                        $crate::__pgrx_c_generated::Field_spcOid,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1804,7 +1946,7 @@ macro_rules! relpathperm {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field4728,
+                                        $crate::__pgrx_c_generated::Field_relNumber,
                                         _,
                                         _
                                     >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -1867,13 +2009,19 @@ macro_rules! relpathperm {
         /* PGRX: relpathperm remains expanded because relpathbackend expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rlocator);
+                        $crate::__pgrx_c_operand!(@check_safety; $forknum);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                                $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1893,7 +2041,7 @@ macro_rules! relpathperm {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1373,
+                                                        $crate::__pgrx_c_generated::Field_dbOid,
                                                         _,
                                                         _
                                                     >(
@@ -1927,7 +2075,7 @@ macro_rules! relpathperm {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5519,
+                                                        $crate::__pgrx_c_generated::Field_spcOid,
                                                         _,
                                                         _
                                                     >(
@@ -1961,7 +2109,7 @@ macro_rules! relpathperm {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field4728,
+                                                        $crate::__pgrx_c_generated::Field_relNumber,
                                                         _,
                                                         _
                                                     >(
@@ -2034,7 +2182,7 @@ macro_rules! relpathperm {
                 <
                     $crate::__pgrx_c_macros::expression::CRawRecord<$crate::RelPathStr> as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_894a1905b06c1ca9dc671d778c1fa8c4(
+                    $crate::__pgrx_c_generated::Inline_1b5f525796909c6c1f03c0f58e214a9d(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -2051,7 +2199,7 @@ macro_rules! relpathperm {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1373,
+                                            $crate::__pgrx_c_generated::Field_dbOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -2075,7 +2223,7 @@ macro_rules! relpathperm {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5519,
+                                            $crate::__pgrx_c_generated::Field_spcOid,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))
@@ -2099,7 +2247,7 @@ macro_rules! relpathperm {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field4728,
+                                            $crate::__pgrx_c_generated::Field_relNumber,
                                             _,
                                             _
                                         >(($crate::__pgrx_c_operand!(@read_place; $rlocator)))

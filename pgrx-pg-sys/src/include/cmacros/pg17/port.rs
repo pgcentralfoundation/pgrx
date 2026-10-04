@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_DIR_SEP {
@@ -107,8 +118,23 @@ macro_rules! __pgrx_c_args_IS_DIR_SEP {
 /// ```text
 /// #define IS_DIR_SEP( ch ) IS_NONWINDOWS_DIR_SEP ( ch )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IS_DIR_SEP {
+    (@__pgrx_emit_check_safety; $ch:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ch);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_DIR_SEP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_DIR_SEP!(@__pgrx_emit_value; $ch)
@@ -157,6 +183,17 @@ macro_rules! IS_DIR_SEP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_NONWINDOWS_DIR_SEP {
@@ -271,8 +308,23 @@ macro_rules! __pgrx_c_args_IS_NONWINDOWS_DIR_SEP {
 /// ```text
 /// #define IS_NONWINDOWS_DIR_SEP( ch ) ( ( ch ) == '/' )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IS_NONWINDOWS_DIR_SEP {
+    (@__pgrx_emit_check_safety; $ch:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ch);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_NONWINDOWS_DIR_SEP!(@__pgrx_emit_value; $ch)
@@ -314,6 +366,11 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
     (@__pgrx_emit_size; $ch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $ch);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -374,6 +431,17 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IS_WINDOWS_DIR_SEP {
@@ -483,8 +551,23 @@ macro_rules! __pgrx_c_args_IS_WINDOWS_DIR_SEP {
 /// ```text
 /// #define IS_WINDOWS_DIR_SEP( ch ) ( ( ch ) == '/' || ( ch ) == '\\' )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! IS_WINDOWS_DIR_SEP {
+    (@__pgrx_emit_check_safety; $ch:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ch);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $ch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IS_WINDOWS_DIR_SEP!(@__pgrx_emit_value; $ch)
@@ -551,6 +634,11 @@ macro_rules! IS_WINDOWS_DIR_SEP {
     (@__pgrx_emit_size; $ch:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $ch);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -669,6 +757,17 @@ macro_rules! IS_WINDOWS_DIR_SEP {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_is_absolute_path {
@@ -778,8 +877,23 @@ macro_rules! __pgrx_c_args_is_absolute_path {
 /// ```text
 /// #define is_absolute_path( filename ) is_nonwindows_absolute_path ( filename )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! is_absolute_path {
+    (@__pgrx_emit_check_safety; $filename:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $filename);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_is_absolute_path!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $filename:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::is_absolute_path!(@__pgrx_emit_value; $filename)
@@ -844,6 +958,11 @@ macro_rules! is_absolute_path {
         /* PGRX: is_absolute_path remains expanded because is_nonwindows_absolute_path expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $filename);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -945,6 +1064,17 @@ macro_rules! is_absolute_path {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_is_nonwindows_absolute_path {
@@ -1069,8 +1199,26 @@ macro_rules! __pgrx_c_args_is_nonwindows_absolute_path {
 /// ```text
 /// #define is_nonwindows_absolute_path( filename ) ( IS_NONWINDOWS_DIR_SEP ( ( filename ) [ 0 ] ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! is_nonwindows_absolute_path {
+    (@__pgrx_emit_check_safety; $filename:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $filename);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_is_nonwindows_absolute_path!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $filename:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::is_nonwindows_absolute_path!(@__pgrx_emit_value; $filename)
@@ -1132,6 +1280,11 @@ macro_rules! is_nonwindows_absolute_path {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $filename);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
@@ -1221,6 +1374,11 @@ macro_rules! is_nonwindows_absolute_path {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $filename);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
@@ -1310,6 +1468,11 @@ macro_rules! is_nonwindows_absolute_path {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $filename);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
@@ -1402,6 +1565,11 @@ macro_rules! is_nonwindows_absolute_path {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $filename);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
@@ -1491,6 +1659,11 @@ macro_rules! is_nonwindows_absolute_path {
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_place_type(
                         if false {
+                            {
+                                if false {
+                                    $crate::__pgrx_c_operand!(@check_safety; $filename);
+                                }
+                            }
                             Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
@@ -1540,6 +1713,17 @@ macro_rules! is_nonwindows_absolute_path {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_is_windows_absolute_path {
@@ -1664,8 +1848,30 @@ macro_rules! __pgrx_c_args_is_windows_absolute_path {
 /// ```text
 /// #define is_windows_absolute_path( filename ) ( IS_WINDOWS_DIR_SEP ( ( filename ) [ 0 ] ) || ( isalpha ( ( unsigned char ) ( ( filename ) [ 0 ] ) ) && ( filename ) [ 1 ] == ':' && IS_WINDOWS_DIR_SEP ( ( filename ) [ 2 ] ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_windows_absolute_path {
+    (@__pgrx_emit_check_safety; $filename:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $filename);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_is_windows_absolute_path!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $filename:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::is_windows_absolute_path!(@__pgrx_emit_value; $filename)
@@ -1804,7 +2010,7 @@ macro_rules! is_windows_absolute_path {
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_fb1611221ceb3121f9122afb28c488a0(
+                                                            $crate::__pgrx_c_generated::Inline_16d57c6b654a6e752d02d90b5d4e70f3(
                                                                 <
                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
@@ -2066,6 +2272,11 @@ macro_rules! is_windows_absolute_path {
         /* PGRX: IS_WINDOWS_DIR_SEP remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $filename);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2212,7 +2423,7 @@ macro_rules! is_windows_absolute_path {
                                                                     <
                                                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_fb1611221ceb3121f9122afb28c488a0(
+                                                                        $crate::__pgrx_c_generated::Inline_16d57c6b654a6e752d02d90b5d4e70f3(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
@@ -2599,7 +2810,7 @@ macro_rules! is_windows_absolute_path {
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_fb1611221ceb3121f9122afb28c488a0(
+                                                            $crate::__pgrx_c_generated::Inline_16d57c6b654a6e752d02d90b5d4e70f3(
                                                                 <
                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
@@ -2855,6 +3066,17 @@ macro_rules! is_windows_absolute_path {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_qsort {
@@ -3054,8 +3276,30 @@ macro_rules! __pgrx_c_args_qsort {
 /// ```text
 /// #define qsort( a , b , c , d ) pg_qsort ( a , b , c , d )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! qsort {
+    (@__pgrx_emit_check_safety; $a:tt, $b:tt, $c:tt, $d:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $a);
+                $crate::__pgrx_c_operand!(@check_safety; $b);
+                $crate::__pgrx_c_operand!(@check_safety; $c);
+                $crate::__pgrx_c_operand!(@check_safety; $d);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_qsort!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $a:tt, $b:tt, $c:tt, $d:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::qsort!(@__pgrx_emit_value; $a, $b, $c, $d)
@@ -3121,12 +3365,12 @@ macro_rules! qsort {
                 ),
                 <
                     $crate::__pgrx_c_macros::expression::CFunction<
-                        $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                        $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                            $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                         >,
                         _
                     >(
@@ -3157,6 +3401,14 @@ macro_rules! qsort {
         /* PGRX: qsort remains expanded because pg_qsort is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $a);
+                        $crate::__pgrx_c_operand!(@check_safety; $b);
+                        $crate::__pgrx_c_operand!(@check_safety; $c);
+                        $crate::__pgrx_c_operand!(@check_safety; $d);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3220,12 +3472,12 @@ macro_rules! qsort {
                                 ),
                                 <
                                     $crate::__pgrx_c_macros::expression::CFunction<
-                                        $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                                        $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                            $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                                            $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                                         >,
                                         _
                                     >(
@@ -3308,12 +3560,12 @@ macro_rules! qsort {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CFunction<
-                            $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                            $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CFunction<
-                                $crate::__pgrx_c_generated::Signature_17ca9ae3f68a7a1261a016fce5a3d045
+                                $crate::__pgrx_c_generated::Signature_38be169c701f3586f0701f13ff10faa1
                             >,
                             _
                         >(

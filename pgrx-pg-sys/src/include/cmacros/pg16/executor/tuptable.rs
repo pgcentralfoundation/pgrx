@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_EMPTY {
@@ -104,8 +115,23 @@ macro_rules! __pgrx_c_args_TTS_EMPTY {
 /// ```text
 /// #define TTS_EMPTY( slot ) ( ( ( slot ) -> tts_flags & TTS_FLAG_EMPTY ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_EMPTY {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_EMPTY!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_EMPTY!(@__pgrx_emit_value; $slot)
@@ -121,7 +147,7 @@ macro_rules! TTS_EMPTY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -178,6 +204,11 @@ macro_rules! TTS_EMPTY {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -191,7 +222,7 @@ macro_rules! TTS_EMPTY {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5794,
+                                                        $crate::__pgrx_c_generated::Field_tts_flags,
                                                         _,
                                                         _
                                                     >(
@@ -251,7 +282,7 @@ macro_rules! TTS_EMPTY {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -306,6 +337,17 @@ macro_rules! TTS_EMPTY {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_FIXED {
@@ -398,8 +440,23 @@ macro_rules! __pgrx_c_args_TTS_FIXED {
 /// ```text
 /// #define TTS_FIXED( slot ) ( ( ( slot ) -> tts_flags & TTS_FLAG_FIXED ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_FIXED {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_FIXED!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_FIXED!(@__pgrx_emit_value; $slot)
@@ -415,7 +472,7 @@ macro_rules! TTS_FIXED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -472,6 +529,11 @@ macro_rules! TTS_FIXED {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -485,7 +547,7 @@ macro_rules! TTS_FIXED {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5794,
+                                                        $crate::__pgrx_c_generated::Field_tts_flags,
                                                         _,
                                                         _
                                                     >(
@@ -545,7 +607,7 @@ macro_rules! TTS_FIXED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -600,6 +662,17 @@ macro_rules! TTS_FIXED {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_IS_BUFFERTUPLE {
@@ -709,8 +782,23 @@ macro_rules! __pgrx_c_args_TTS_IS_BUFFERTUPLE {
 /// ```text
 /// #define TTS_IS_BUFFERTUPLE( slot ) ( ( slot ) -> tts_ops == & TTSOpsBufferHeapTuple )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_IS_BUFFERTUPLE {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_IS_BUFFERTUPLE!(@__pgrx_emit_value; $slot)
@@ -723,7 +811,7 @@ macro_rules! TTS_IS_BUFFERTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -768,6 +856,11 @@ macro_rules! TTS_IS_BUFFERTUPLE {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -775,7 +868,7 @@ macro_rules! TTS_IS_BUFFERTUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5798,
+                                            $crate::__pgrx_c_generated::Field_tts_ops,
                                             _,
                                             _
                                         >(
@@ -822,7 +915,7 @@ macro_rules! TTS_IS_BUFFERTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -865,6 +958,17 @@ macro_rules! TTS_IS_BUFFERTUPLE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_IS_HEAPTUPLE {
@@ -974,8 +1078,23 @@ macro_rules! __pgrx_c_args_TTS_IS_HEAPTUPLE {
 /// ```text
 /// #define TTS_IS_HEAPTUPLE( slot ) ( ( slot ) -> tts_ops == & TTSOpsHeapTuple )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_IS_HEAPTUPLE {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_IS_HEAPTUPLE!(@__pgrx_emit_value; $slot)
@@ -988,7 +1107,7 @@ macro_rules! TTS_IS_HEAPTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1033,6 +1152,11 @@ macro_rules! TTS_IS_HEAPTUPLE {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1040,7 +1164,7 @@ macro_rules! TTS_IS_HEAPTUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5798,
+                                            $crate::__pgrx_c_generated::Field_tts_ops,
                                             _,
                                             _
                                         >(
@@ -1087,7 +1211,7 @@ macro_rules! TTS_IS_HEAPTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1130,6 +1254,17 @@ macro_rules! TTS_IS_HEAPTUPLE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_IS_MINIMALTUPLE {
@@ -1239,8 +1374,23 @@ macro_rules! __pgrx_c_args_TTS_IS_MINIMALTUPLE {
 /// ```text
 /// #define TTS_IS_MINIMALTUPLE( slot ) ( ( slot ) -> tts_ops == & TTSOpsMinimalTuple )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_IS_MINIMALTUPLE {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_IS_MINIMALTUPLE!(@__pgrx_emit_value; $slot)
@@ -1253,7 +1403,7 @@ macro_rules! TTS_IS_MINIMALTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1298,6 +1448,11 @@ macro_rules! TTS_IS_MINIMALTUPLE {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1305,7 +1460,7 @@ macro_rules! TTS_IS_MINIMALTUPLE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5798,
+                                            $crate::__pgrx_c_generated::Field_tts_ops,
                                             _,
                                             _
                                         >(
@@ -1352,7 +1507,7 @@ macro_rules! TTS_IS_MINIMALTUPLE {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1395,6 +1550,17 @@ macro_rules! TTS_IS_MINIMALTUPLE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_IS_VIRTUAL {
@@ -1504,8 +1670,23 @@ macro_rules! __pgrx_c_args_TTS_IS_VIRTUAL {
 /// ```text
 /// #define TTS_IS_VIRTUAL( slot ) ( ( slot ) -> tts_ops == & TTSOpsVirtual )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_IS_VIRTUAL {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_IS_VIRTUAL!(@__pgrx_emit_value; $slot)
@@ -1518,7 +1699,7 @@ macro_rules! TTS_IS_VIRTUAL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1563,6 +1744,11 @@ macro_rules! TTS_IS_VIRTUAL {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1570,7 +1756,7 @@ macro_rules! TTS_IS_VIRTUAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5798,
+                                            $crate::__pgrx_c_generated::Field_tts_ops,
                                             _,
                                             _
                                         >(
@@ -1617,7 +1803,7 @@ macro_rules! TTS_IS_VIRTUAL {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field5798,
+                                $crate::__pgrx_c_generated::Field_tts_ops,
                                 _,
                                 _
                             >(
@@ -1660,6 +1846,17 @@ macro_rules! TTS_IS_VIRTUAL {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_SHOULDFREE {
@@ -1769,8 +1966,23 @@ macro_rules! __pgrx_c_args_TTS_SHOULDFREE {
 /// ```text
 /// #define TTS_SHOULDFREE( slot ) ( ( ( slot ) -> tts_flags & TTS_FLAG_SHOULDFREE ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_SHOULDFREE {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_SHOULDFREE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_SHOULDFREE!(@__pgrx_emit_value; $slot)
@@ -1786,7 +1998,7 @@ macro_rules! TTS_SHOULDFREE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -1843,6 +2055,11 @@ macro_rules! TTS_SHOULDFREE {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1856,7 +2073,7 @@ macro_rules! TTS_SHOULDFREE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5794,
+                                                        $crate::__pgrx_c_generated::Field_tts_flags,
                                                         _,
                                                         _
                                                     >(
@@ -1916,7 +2133,7 @@ macro_rules! TTS_SHOULDFREE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -1971,6 +2188,17 @@ macro_rules! TTS_SHOULDFREE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TTS_SLOW {
@@ -2063,8 +2291,23 @@ macro_rules! __pgrx_c_args_TTS_SLOW {
 /// ```text
 /// #define TTS_SLOW( slot ) ( ( ( slot ) -> tts_flags & TTS_FLAG_SLOW ) != 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TTS_SLOW {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TTS_SLOW!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TTS_SLOW!(@__pgrx_emit_value; $slot)
@@ -2080,7 +2323,7 @@ macro_rules! TTS_SLOW {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -2137,6 +2380,11 @@ macro_rules! TTS_SLOW {
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2150,7 +2398,7 @@ macro_rules! TTS_SLOW {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field5794,
+                                                        $crate::__pgrx_c_generated::Field_tts_flags,
                                                         _,
                                                         _
                                                     >(
@@ -2210,7 +2458,7 @@ macro_rules! TTS_SLOW {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field5794,
+                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                             _,
                                             _
                                         >(
@@ -2265,6 +2513,17 @@ macro_rules! TTS_SLOW {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TupIsNull {
@@ -2357,8 +2616,27 @@ macro_rules! __pgrx_c_args_TupIsNull {
 /// ```text
 /// #define TupIsNull( slot ) ( ( slot ) == NULL || TTS_EMPTY ( slot ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TupIsNull {
+    (@__pgrx_emit_check_safety; $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TupIsNull!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TupIsNull!(@__pgrx_emit_value; $slot)
@@ -2419,7 +2697,7 @@ macro_rules! TupIsNull {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5794,
+                                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                                             _,
                                                             _
                                                         >(
@@ -2488,6 +2766,11 @@ macro_rules! TupIsNull {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: TTS_EMPTY remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2549,7 +2832,7 @@ macro_rules! TupIsNull {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field5794,
+                                                                        $crate::__pgrx_c_generated::Field_tts_flags,
                                                                         _,
                                                                         _
                                                                     >(
@@ -2669,7 +2952,7 @@ macro_rules! TupIsNull {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field5794,
+                                                            $crate::__pgrx_c_generated::Field_tts_flags,
                                                             _,
                                                             _
                                                         >(

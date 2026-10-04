@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfirst {
@@ -102,8 +113,23 @@ macro_rules! __pgrx_c_args_lfirst {
 /// ```text
 /// #define lfirst( lc ) ( ( lc ) -> ptr_value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! lfirst {
+    (@__pgrx_emit_check_safety; $lc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $lc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfirst!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::lfirst!(@__pgrx_emit_value; $lc))
     };
@@ -112,7 +138,7 @@ macro_rules! lfirst {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -134,7 +160,7 @@ macro_rules! lfirst {
     (@__pgrx_emit_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -154,7 +180,7 @@ macro_rules! lfirst {
     (@__pgrx_emit_read_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -174,10 +200,15 @@ macro_rules! lfirst {
     (@__pgrx_emit_size; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $lc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -204,7 +235,7 @@ macro_rules! lfirst {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -236,6 +267,17 @@ macro_rules! lfirst {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfirst_int {
@@ -331,8 +373,23 @@ macro_rules! __pgrx_c_args_lfirst_int {
 /// ```text
 /// #define lfirst_int( lc ) ( ( lc ) -> int_value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! lfirst_int {
+    (@__pgrx_emit_check_safety; $lc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $lc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfirst_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lfirst_int!(@__pgrx_emit_value; $lc)
@@ -343,7 +400,7 @@ macro_rules! lfirst_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -365,7 +422,7 @@ macro_rules! lfirst_int {
     (@__pgrx_emit_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -385,7 +442,7 @@ macro_rules! lfirst_int {
     (@__pgrx_emit_read_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -405,10 +462,15 @@ macro_rules! lfirst_int {
     (@__pgrx_emit_size; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $lc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -435,7 +497,7 @@ macro_rules! lfirst_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -467,6 +529,17 @@ macro_rules! lfirst_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfirst_oid {
@@ -562,8 +635,23 @@ macro_rules! __pgrx_c_args_lfirst_oid {
 /// ```text
 /// #define lfirst_oid( lc ) ( ( lc ) -> oid_value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! lfirst_oid {
+    (@__pgrx_emit_check_safety; $lc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $lc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfirst_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lfirst_oid!(@__pgrx_emit_value; $lc)
@@ -574,7 +662,7 @@ macro_rules! lfirst_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -596,7 +684,7 @@ macro_rules! lfirst_oid {
     (@__pgrx_emit_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -616,7 +704,7 @@ macro_rules! lfirst_oid {
     (@__pgrx_emit_read_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -636,10 +724,15 @@ macro_rules! lfirst_oid {
     (@__pgrx_emit_size; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $lc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -666,7 +759,7 @@ macro_rules! lfirst_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -698,6 +791,17 @@ macro_rules! lfirst_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfirst_xid {
@@ -793,8 +897,23 @@ macro_rules! __pgrx_c_args_lfirst_xid {
 /// ```text
 /// #define lfirst_xid( lc ) ( ( lc ) -> xid_value )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! lfirst_xid {
+    (@__pgrx_emit_check_safety; $lc:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $lc);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfirst_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lfirst_xid!(@__pgrx_emit_value; $lc)
@@ -805,7 +924,7 @@ macro_rules! lfirst_xid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6776,
+                        $crate::__pgrx_c_generated::Field_xid_value,
                         _,
                         _
                     >(
@@ -827,7 +946,7 @@ macro_rules! lfirst_xid {
     (@__pgrx_emit_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6776,
+                $crate::__pgrx_c_generated::Field_xid_value,
                 _,
                 _
             >(
@@ -847,7 +966,7 @@ macro_rules! lfirst_xid {
     (@__pgrx_emit_read_place; $lc:tt $(,)?) => {
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6776,
+                $crate::__pgrx_c_generated::Field_xid_value,
                 _,
                 _
             >(
@@ -867,10 +986,15 @@ macro_rules! lfirst_xid {
     (@__pgrx_emit_size; $lc:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $lc);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6776,
+                            $crate::__pgrx_c_generated::Field_xid_value,
                             _,
                             _
                         >(
@@ -897,7 +1021,7 @@ macro_rules! lfirst_xid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6776,
+                        $crate::__pgrx_c_generated::Field_xid_value,
                         _,
                         _
                     >(
@@ -929,6 +1053,17 @@ macro_rules! lfirst_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfourth {
@@ -1019,8 +1154,27 @@ macro_rules! __pgrx_c_args_lfourth {
 /// ```text
 /// #define lfourth( l ) lfirst ( list_nth_cell ( l , 3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lfourth {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfourth!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::lfourth!(@__pgrx_emit_value; $l))
     };
@@ -1030,7 +1184,7 @@ macro_rules! lfourth {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -1045,7 +1199,7 @@ macro_rules! lfourth {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -1103,7 +1257,7 @@ macro_rules! lfourth {
         /* PGRX: lfourth remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -1116,7 +1270,7 @@ macro_rules! lfourth {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1172,7 +1326,7 @@ macro_rules! lfourth {
         /* PGRX: lfourth remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -1185,7 +1339,7 @@ macro_rules! lfourth {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1241,10 +1395,15 @@ macro_rules! lfourth {
         /* PGRX: lfourth remains expanded because lfirst expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -1259,7 +1418,7 @@ macro_rules! lfourth {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1327,7 +1486,7 @@ macro_rules! lfourth {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -1342,7 +1501,7 @@ macro_rules! lfourth {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -1409,6 +1568,17 @@ macro_rules! lfourth {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfourth_int {
@@ -1504,8 +1674,27 @@ macro_rules! __pgrx_c_args_lfourth_int {
 /// ```text
 /// #define lfourth_int( l ) lfirst_int ( list_nth_cell ( l , 3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lfourth_int {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfourth_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lfourth_int!(@__pgrx_emit_value; $l)
@@ -1517,7 +1706,7 @@ macro_rules! lfourth_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -1532,7 +1721,7 @@ macro_rules! lfourth_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -1590,7 +1779,7 @@ macro_rules! lfourth_int {
         /* PGRX: lfourth_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -1603,7 +1792,7 @@ macro_rules! lfourth_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1659,7 +1848,7 @@ macro_rules! lfourth_int {
         /* PGRX: lfourth_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -1672,7 +1861,7 @@ macro_rules! lfourth_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1728,10 +1917,15 @@ macro_rules! lfourth_int {
         /* PGRX: lfourth_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -1746,7 +1940,7 @@ macro_rules! lfourth_int {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1814,7 +2008,7 @@ macro_rules! lfourth_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -1829,7 +2023,7 @@ macro_rules! lfourth_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -1896,6 +2090,17 @@ macro_rules! lfourth_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lfourth_oid {
@@ -1991,8 +2196,27 @@ macro_rules! __pgrx_c_args_lfourth_oid {
 /// ```text
 /// #define lfourth_oid( l ) lfirst_oid ( list_nth_cell ( l , 3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lfourth_oid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lfourth_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lfourth_oid!(@__pgrx_emit_value; $l)
@@ -2004,7 +2228,7 @@ macro_rules! lfourth_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -2019,7 +2243,7 @@ macro_rules! lfourth_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -2077,7 +2301,7 @@ macro_rules! lfourth_oid {
         /* PGRX: lfourth_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -2090,7 +2314,7 @@ macro_rules! lfourth_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2146,7 +2370,7 @@ macro_rules! lfourth_oid {
         /* PGRX: lfourth_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -2159,7 +2383,7 @@ macro_rules! lfourth_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2215,10 +2439,15 @@ macro_rules! lfourth_oid {
         /* PGRX: lfourth_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -2233,7 +2462,7 @@ macro_rules! lfourth_oid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -2301,7 +2530,7 @@ macro_rules! lfourth_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -2316,7 +2545,7 @@ macro_rules! lfourth_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -2383,6 +2612,17 @@ macro_rules! lfourth_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_linitial {
@@ -2475,8 +2715,27 @@ macro_rules! __pgrx_c_args_linitial {
 /// ```text
 /// #define linitial( l ) lfirst ( list_nth_cell ( l , 0 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! linitial {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_linitial!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::linitial!(@__pgrx_emit_value; $l)
@@ -2488,7 +2747,7 @@ macro_rules! linitial {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -2503,7 +2762,7 @@ macro_rules! linitial {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -2563,7 +2822,7 @@ macro_rules! linitial {
         /* PGRX: linitial remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -2576,7 +2835,7 @@ macro_rules! linitial {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2634,7 +2893,7 @@ macro_rules! linitial {
         /* PGRX: linitial remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -2647,7 +2906,7 @@ macro_rules! linitial {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2705,10 +2964,15 @@ macro_rules! linitial {
         /* PGRX: linitial remains expanded because lfirst expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -2723,7 +2987,7 @@ macro_rules! linitial {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -2793,7 +3057,7 @@ macro_rules! linitial {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -2808,7 +3072,7 @@ macro_rules! linitial {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -2877,6 +3141,17 @@ macro_rules! linitial {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_linitial_int {
@@ -2975,8 +3250,27 @@ macro_rules! __pgrx_c_args_linitial_int {
 /// ```text
 /// #define linitial_int( l ) lfirst_int ( list_nth_cell ( l , 0 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! linitial_int {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_linitial_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::linitial_int!(@__pgrx_emit_value; $l)
@@ -2988,7 +3282,7 @@ macro_rules! linitial_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -3003,7 +3297,7 @@ macro_rules! linitial_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3063,7 +3357,7 @@ macro_rules! linitial_int {
         /* PGRX: linitial_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -3076,7 +3370,7 @@ macro_rules! linitial_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -3134,7 +3428,7 @@ macro_rules! linitial_int {
         /* PGRX: linitial_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -3147,7 +3441,7 @@ macro_rules! linitial_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -3205,10 +3499,15 @@ macro_rules! linitial_int {
         /* PGRX: linitial_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -3223,7 +3522,7 @@ macro_rules! linitial_int {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -3293,7 +3592,7 @@ macro_rules! linitial_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -3308,7 +3607,7 @@ macro_rules! linitial_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3377,6 +3676,17 @@ macro_rules! linitial_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_linitial_oid {
@@ -3475,8 +3785,27 @@ macro_rules! __pgrx_c_args_linitial_oid {
 /// ```text
 /// #define linitial_oid( l ) lfirst_oid ( list_nth_cell ( l , 0 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! linitial_oid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_linitial_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::linitial_oid!(@__pgrx_emit_value; $l)
@@ -3488,7 +3817,7 @@ macro_rules! linitial_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -3503,7 +3832,7 @@ macro_rules! linitial_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3563,7 +3892,7 @@ macro_rules! linitial_oid {
         /* PGRX: linitial_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -3576,7 +3905,7 @@ macro_rules! linitial_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -3634,7 +3963,7 @@ macro_rules! linitial_oid {
         /* PGRX: linitial_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -3647,7 +3976,7 @@ macro_rules! linitial_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -3705,10 +4034,15 @@ macro_rules! linitial_oid {
         /* PGRX: linitial_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -3723,7 +4057,7 @@ macro_rules! linitial_oid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -3793,7 +4127,7 @@ macro_rules! linitial_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -3808,7 +4142,7 @@ macro_rules! linitial_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3877,6 +4211,17 @@ macro_rules! linitial_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make1 {
@@ -3972,8 +4317,27 @@ macro_rules! __pgrx_c_args_list_make1 {
 /// ```text
 /// #define list_make1( x1 ) list_make1_impl ( T_List , list_make_ptr_cell ( x1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make1 {
+    (@__pgrx_emit_check_safety; $x1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make1!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make1!(@__pgrx_emit_value; $x1)
@@ -3988,7 +4352,7 @@ macro_rules! list_make1 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4024,7 +4388,7 @@ macro_rules! list_make1 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -4072,6 +4436,11 @@ macro_rules! list_make1 {
         /* PGRX: list_make1 remains expanded because list_make1_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4081,7 +4450,7 @@ macro_rules! list_make1 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4127,7 +4496,7 @@ macro_rules! list_make1 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -4180,7 +4549,7 @@ macro_rules! list_make1 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                    $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4216,7 +4585,7 @@ macro_rules! list_make1 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -4262,6 +4631,17 @@ macro_rules! list_make1 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make1_int {
@@ -4371,8 +4751,27 @@ macro_rules! __pgrx_c_args_list_make1_int {
 /// ```text
 /// #define list_make1_int( x1 ) list_make1_impl ( T_IntList , list_make_int_cell ( x1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make1_int {
+    (@__pgrx_emit_check_safety; $x1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make1_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make1_int!(@__pgrx_emit_value; $x1)
@@ -4387,7 +4786,7 @@ macro_rules! list_make1_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4423,7 +4822,7 @@ macro_rules! list_make1_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -4465,6 +4864,11 @@ macro_rules! list_make1_int {
         /* PGRX: list_make1_int remains expanded because list_make1_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4474,7 +4878,7 @@ macro_rules! list_make1_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4520,7 +4924,7 @@ macro_rules! list_make1_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -4567,7 +4971,7 @@ macro_rules! list_make1_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                    $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4603,7 +5007,7 @@ macro_rules! list_make1_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -4643,6 +5047,17 @@ macro_rules! list_make1_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make1_oid {
@@ -4752,8 +5167,27 @@ macro_rules! __pgrx_c_args_list_make1_oid {
 /// ```text
 /// #define list_make1_oid( x1 ) list_make1_impl ( T_OidList , list_make_oid_cell ( x1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make1_oid {
+    (@__pgrx_emit_check_safety; $x1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make1_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make1_oid!(@__pgrx_emit_value; $x1)
@@ -4768,7 +5202,7 @@ macro_rules! list_make1_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4804,7 +5238,7 @@ macro_rules! list_make1_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -4852,6 +5286,11 @@ macro_rules! list_make1_oid {
         /* PGRX: list_make1_oid remains expanded because list_make1_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4861,7 +5300,7 @@ macro_rules! list_make1_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4907,7 +5346,7 @@ macro_rules! list_make1_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -4960,7 +5399,7 @@ macro_rules! list_make1_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                    $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -4996,7 +5435,7 @@ macro_rules! list_make1_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -5042,6 +5481,17 @@ macro_rules! list_make1_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make1_xid {
@@ -5151,8 +5601,27 @@ macro_rules! __pgrx_c_args_list_make1_xid {
 /// ```text
 /// #define list_make1_xid( x1 ) list_make1_impl ( T_XidList , list_make_xid_cell ( x1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make1_xid {
+    (@__pgrx_emit_check_safety; $x1:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make1_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make1_xid!(@__pgrx_emit_value; $x1)
@@ -5167,7 +5636,7 @@ macro_rules! list_make1_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5203,7 +5672,7 @@ macro_rules! list_make1_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -5251,6 +5720,11 @@ macro_rules! list_make1_xid {
         /* PGRX: list_make1_xid remains expanded because list_make1_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5260,7 +5734,7 @@ macro_rules! list_make1_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                                $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5306,7 +5780,7 @@ macro_rules! list_make1_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -5359,7 +5833,7 @@ macro_rules! list_make1_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_da12cc7e30cef170aea0da2ad1315093(
+                    $crate::__pgrx_c_generated::Inline_18a7392644639ed5cafa37f0406d35f4(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5395,7 +5869,7 @@ macro_rules! list_make1_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -5441,6 +5915,17 @@ macro_rules! list_make1_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make2 {
@@ -5576,8 +6061,28 @@ macro_rules! __pgrx_c_args_list_make2 {
 /// ```text
 /// #define list_make2( x1 , x2 ) list_make2_impl ( T_List , list_make_ptr_cell ( x1 ) , list_make_ptr_cell ( x2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make2 {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make2!(@__pgrx_emit_value; $x1, $x2)
@@ -5592,7 +6097,7 @@ macro_rules! list_make2 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5628,7 +6133,7 @@ macro_rules! list_make2 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -5666,7 +6171,7 @@ macro_rules! list_make2 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -5714,6 +6219,12 @@ macro_rules! list_make2 {
         /* PGRX: list_make2 remains expanded because list_make2_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5723,7 +6234,7 @@ macro_rules! list_make2 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5769,7 +6280,7 @@ macro_rules! list_make2 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -5819,7 +6330,7 @@ macro_rules! list_make2 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -5872,7 +6383,7 @@ macro_rules! list_make2 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                    $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -5908,7 +6419,7 @@ macro_rules! list_make2 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -5946,7 +6457,7 @@ macro_rules! list_make2 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -5992,6 +6503,17 @@ macro_rules! list_make2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make2_int {
@@ -6155,8 +6677,28 @@ macro_rules! __pgrx_c_args_list_make2_int {
 /// ```text
 /// #define list_make2_int( x1 , x2 ) list_make2_impl ( T_IntList , list_make_int_cell ( x1 ) , list_make_int_cell ( x2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make2_int {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make2_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make2_int!(@__pgrx_emit_value; $x1, $x2)
@@ -6171,7 +6713,7 @@ macro_rules! list_make2_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -6207,7 +6749,7 @@ macro_rules! list_make2_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -6239,7 +6781,7 @@ macro_rules! list_make2_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -6281,6 +6823,12 @@ macro_rules! list_make2_int {
         /* PGRX: list_make2_int remains expanded because list_make2_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6290,7 +6838,7 @@ macro_rules! list_make2_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -6336,7 +6884,7 @@ macro_rules! list_make2_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -6380,7 +6928,7 @@ macro_rules! list_make2_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -6427,7 +6975,7 @@ macro_rules! list_make2_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                    $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -6463,7 +7011,7 @@ macro_rules! list_make2_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -6495,7 +7043,7 @@ macro_rules! list_make2_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -6535,6 +7083,17 @@ macro_rules! list_make2_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make2_oid {
@@ -6698,8 +7257,28 @@ macro_rules! __pgrx_c_args_list_make2_oid {
 /// ```text
 /// #define list_make2_oid( x1 , x2 ) list_make2_impl ( T_OidList , list_make_oid_cell ( x1 ) , list_make_oid_cell ( x2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make2_oid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make2_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make2_oid!(@__pgrx_emit_value; $x1, $x2)
@@ -6714,7 +7293,7 @@ macro_rules! list_make2_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -6750,7 +7329,7 @@ macro_rules! list_make2_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -6788,7 +7367,7 @@ macro_rules! list_make2_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -6836,6 +7415,12 @@ macro_rules! list_make2_oid {
         /* PGRX: list_make2_oid remains expanded because list_make2_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6845,7 +7430,7 @@ macro_rules! list_make2_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -6891,7 +7476,7 @@ macro_rules! list_make2_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -6941,7 +7526,7 @@ macro_rules! list_make2_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -6994,7 +7579,7 @@ macro_rules! list_make2_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                    $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -7030,7 +7615,7 @@ macro_rules! list_make2_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7068,7 +7653,7 @@ macro_rules! list_make2_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7114,6 +7699,17 @@ macro_rules! list_make2_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make2_xid {
@@ -7277,8 +7873,28 @@ macro_rules! __pgrx_c_args_list_make2_xid {
 /// ```text
 /// #define list_make2_xid( x1 , x2 ) list_make2_impl ( T_XidList , list_make_xid_cell ( x1 ) , list_make_xid_cell ( x2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make2_xid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make2_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make2_xid!(@__pgrx_emit_value; $x1, $x2)
@@ -7293,7 +7909,7 @@ macro_rules! list_make2_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -7329,7 +7945,7 @@ macro_rules! list_make2_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7367,7 +7983,7 @@ macro_rules! list_make2_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7415,6 +8031,12 @@ macro_rules! list_make2_xid {
         /* PGRX: list_make2_xid remains expanded because list_make2_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -7424,7 +8046,7 @@ macro_rules! list_make2_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                                $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -7470,7 +8092,7 @@ macro_rules! list_make2_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7520,7 +8142,7 @@ macro_rules! list_make2_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7573,7 +8195,7 @@ macro_rules! list_make2_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_902705811eb88845efd71ba2b5715b63(
+                    $crate::__pgrx_c_generated::Inline_f90a5747dc5f7193276fde1a6f4ab5eb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -7609,7 +8231,7 @@ macro_rules! list_make2_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7647,7 +8269,7 @@ macro_rules! list_make2_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -7693,6 +8315,17 @@ macro_rules! list_make2_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make3 {
@@ -7868,8 +8501,29 @@ macro_rules! __pgrx_c_args_list_make3 {
 /// ```text
 /// #define list_make3( x1 , x2 , x3 ) list_make3_impl ( T_List , list_make_ptr_cell ( x1 ) , list_make_ptr_cell ( x2 ) , list_make_ptr_cell ( x3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make3 {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make3!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make3!(@__pgrx_emit_value; $x1, $x2, $x3)
@@ -7884,7 +8538,7 @@ macro_rules! list_make3 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -7920,7 +8574,7 @@ macro_rules! list_make3 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -7958,7 +8612,7 @@ macro_rules! list_make3 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -7996,7 +8650,7 @@ macro_rules! list_make3 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -8044,6 +8698,13 @@ macro_rules! list_make3 {
         /* PGRX: list_make3 remains expanded because list_make3_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8053,7 +8714,7 @@ macro_rules! list_make3 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8099,7 +8760,7 @@ macro_rules! list_make3 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -8149,7 +8810,7 @@ macro_rules! list_make3 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -8199,7 +8860,7 @@ macro_rules! list_make3 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -8252,7 +8913,7 @@ macro_rules! list_make3 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                    $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8288,7 +8949,7 @@ macro_rules! list_make3 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -8326,7 +8987,7 @@ macro_rules! list_make3 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -8364,7 +9025,7 @@ macro_rules! list_make3 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -8410,6 +9071,17 @@ macro_rules! list_make3 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make3_int {
@@ -8627,8 +9299,29 @@ macro_rules! __pgrx_c_args_list_make3_int {
 /// ```text
 /// #define list_make3_int( x1 , x2 , x3 ) list_make3_impl ( T_IntList , list_make_int_cell ( x1 ) , list_make_int_cell ( x2 ) , list_make_int_cell ( x3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make3_int {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make3_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make3_int!(@__pgrx_emit_value; $x1, $x2, $x3)
@@ -8643,7 +9336,7 @@ macro_rules! list_make3_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8679,7 +9372,7 @@ macro_rules! list_make3_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -8711,7 +9404,7 @@ macro_rules! list_make3_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -8743,7 +9436,7 @@ macro_rules! list_make3_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -8785,6 +9478,13 @@ macro_rules! list_make3_int {
         /* PGRX: list_make3_int remains expanded because list_make3_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -8794,7 +9494,7 @@ macro_rules! list_make3_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8840,7 +9540,7 @@ macro_rules! list_make3_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -8884,7 +9584,7 @@ macro_rules! list_make3_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -8928,7 +9628,7 @@ macro_rules! list_make3_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -8975,7 +9675,7 @@ macro_rules! list_make3_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                    $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9011,7 +9711,7 @@ macro_rules! list_make3_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -9043,7 +9743,7 @@ macro_rules! list_make3_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -9075,7 +9775,7 @@ macro_rules! list_make3_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -9115,6 +9815,17 @@ macro_rules! list_make3_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make3_oid {
@@ -9332,8 +10043,29 @@ macro_rules! __pgrx_c_args_list_make3_oid {
 /// ```text
 /// #define list_make3_oid( x1 , x2 , x3 ) list_make3_impl ( T_OidList , list_make_oid_cell ( x1 ) , list_make_oid_cell ( x2 ) , list_make_oid_cell ( x3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make3_oid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make3_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make3_oid!(@__pgrx_emit_value; $x1, $x2, $x3)
@@ -9348,7 +10080,7 @@ macro_rules! list_make3_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9384,7 +10116,7 @@ macro_rules! list_make3_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9422,7 +10154,7 @@ macro_rules! list_make3_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9460,7 +10192,7 @@ macro_rules! list_make3_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9508,6 +10240,13 @@ macro_rules! list_make3_oid {
         /* PGRX: list_make3_oid remains expanded because list_make3_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9517,7 +10256,7 @@ macro_rules! list_make3_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9563,7 +10302,7 @@ macro_rules! list_make3_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9613,7 +10352,7 @@ macro_rules! list_make3_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9663,7 +10402,7 @@ macro_rules! list_make3_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9716,7 +10455,7 @@ macro_rules! list_make3_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                    $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9752,7 +10491,7 @@ macro_rules! list_make3_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9790,7 +10529,7 @@ macro_rules! list_make3_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9828,7 +10567,7 @@ macro_rules! list_make3_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9874,6 +10613,17 @@ macro_rules! list_make3_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make3_xid {
@@ -10091,8 +10841,29 @@ macro_rules! __pgrx_c_args_list_make3_xid {
 /// ```text
 /// #define list_make3_xid( x1 , x2 , x3 ) list_make3_impl ( T_XidList , list_make_xid_cell ( x1 ) , list_make_xid_cell ( x2 ) , list_make_xid_cell ( x3 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make3_xid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make3_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make3_xid!(@__pgrx_emit_value; $x1, $x2, $x3)
@@ -10107,7 +10878,7 @@ macro_rules! list_make3_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10143,7 +10914,7 @@ macro_rules! list_make3_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10181,7 +10952,7 @@ macro_rules! list_make3_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10219,7 +10990,7 @@ macro_rules! list_make3_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10267,6 +11038,13 @@ macro_rules! list_make3_xid {
         /* PGRX: list_make3_xid remains expanded because list_make3_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10276,7 +11054,7 @@ macro_rules! list_make3_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                                $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10322,7 +11100,7 @@ macro_rules! list_make3_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10372,7 +11150,7 @@ macro_rules! list_make3_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10422,7 +11200,7 @@ macro_rules! list_make3_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10475,7 +11253,7 @@ macro_rules! list_make3_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4b5e2af04ccb90be989d09d69037c07d(
+                    $crate::__pgrx_c_generated::Inline_77691011e672866043a244658a8180ea(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10511,7 +11289,7 @@ macro_rules! list_make3_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10549,7 +11327,7 @@ macro_rules! list_make3_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10587,7 +11365,7 @@ macro_rules! list_make3_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10633,6 +11411,17 @@ macro_rules! list_make3_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make4 {
@@ -10848,8 +11637,30 @@ macro_rules! __pgrx_c_args_list_make4 {
 /// ```text
 /// #define list_make4( x1 , x2 , x3 , x4 ) list_make4_impl ( T_List , list_make_ptr_cell ( x1 ) , list_make_ptr_cell ( x2 ) , list_make_ptr_cell ( x3 ) , list_make_ptr_cell ( x4 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make4 {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make4!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make4!(@__pgrx_emit_value; $x1, $x2, $x3, $x4)
@@ -10864,7 +11675,7 @@ macro_rules! list_make4 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10900,7 +11711,7 @@ macro_rules! list_make4 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10938,7 +11749,7 @@ macro_rules! list_make4 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10976,7 +11787,7 @@ macro_rules! list_make4 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11014,7 +11825,7 @@ macro_rules! list_make4 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11062,6 +11873,14 @@ macro_rules! list_make4 {
         /* PGRX: list_make4 remains expanded because list_make4_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11071,7 +11890,7 @@ macro_rules! list_make4 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11117,7 +11936,7 @@ macro_rules! list_make4 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11167,7 +11986,7 @@ macro_rules! list_make4 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11217,7 +12036,7 @@ macro_rules! list_make4 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11267,7 +12086,7 @@ macro_rules! list_make4 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11320,7 +12139,7 @@ macro_rules! list_make4 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                    $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11356,7 +12175,7 @@ macro_rules! list_make4 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11394,7 +12213,7 @@ macro_rules! list_make4 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11432,7 +12251,7 @@ macro_rules! list_make4 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11470,7 +12289,7 @@ macro_rules! list_make4 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11516,6 +12335,17 @@ macro_rules! list_make4 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make4_int {
@@ -11787,8 +12617,30 @@ macro_rules! __pgrx_c_args_list_make4_int {
 /// ```text
 /// #define list_make4_int( x1 , x2 , x3 , x4 ) list_make4_impl ( T_IntList , list_make_int_cell ( x1 ) , list_make_int_cell ( x2 ) , list_make_int_cell ( x3 ) , list_make_int_cell ( x4 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make4_int {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make4_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make4_int!(@__pgrx_emit_value; $x1, $x2, $x3, $x4)
@@ -11803,7 +12655,7 @@ macro_rules! list_make4_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11839,7 +12691,7 @@ macro_rules! list_make4_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11871,7 +12723,7 @@ macro_rules! list_make4_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11903,7 +12755,7 @@ macro_rules! list_make4_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11935,7 +12787,7 @@ macro_rules! list_make4_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11977,6 +12829,14 @@ macro_rules! list_make4_int {
         /* PGRX: list_make4_int remains expanded because list_make4_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11986,7 +12846,7 @@ macro_rules! list_make4_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12032,7 +12892,7 @@ macro_rules! list_make4_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -12076,7 +12936,7 @@ macro_rules! list_make4_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -12120,7 +12980,7 @@ macro_rules! list_make4_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -12164,7 +13024,7 @@ macro_rules! list_make4_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -12211,7 +13071,7 @@ macro_rules! list_make4_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                    $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12247,7 +13107,7 @@ macro_rules! list_make4_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -12279,7 +13139,7 @@ macro_rules! list_make4_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -12311,7 +13171,7 @@ macro_rules! list_make4_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -12343,7 +13203,7 @@ macro_rules! list_make4_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -12383,6 +13243,17 @@ macro_rules! list_make4_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make4_oid {
@@ -12654,8 +13525,30 @@ macro_rules! __pgrx_c_args_list_make4_oid {
 /// ```text
 /// #define list_make4_oid( x1 , x2 , x3 , x4 ) list_make4_impl ( T_OidList , list_make_oid_cell ( x1 ) , list_make_oid_cell ( x2 ) , list_make_oid_cell ( x3 ) , list_make_oid_cell ( x4 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make4_oid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make4_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make4_oid!(@__pgrx_emit_value; $x1, $x2, $x3, $x4)
@@ -12670,7 +13563,7 @@ macro_rules! list_make4_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12706,7 +13599,7 @@ macro_rules! list_make4_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12744,7 +13637,7 @@ macro_rules! list_make4_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12782,7 +13675,7 @@ macro_rules! list_make4_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12820,7 +13713,7 @@ macro_rules! list_make4_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12868,6 +13761,14 @@ macro_rules! list_make4_oid {
         /* PGRX: list_make4_oid remains expanded because list_make4_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -12877,7 +13778,7 @@ macro_rules! list_make4_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12923,7 +13824,7 @@ macro_rules! list_make4_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12973,7 +13874,7 @@ macro_rules! list_make4_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13023,7 +13924,7 @@ macro_rules! list_make4_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13073,7 +13974,7 @@ macro_rules! list_make4_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13126,7 +14027,7 @@ macro_rules! list_make4_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                    $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13162,7 +14063,7 @@ macro_rules! list_make4_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13200,7 +14101,7 @@ macro_rules! list_make4_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13238,7 +14139,7 @@ macro_rules! list_make4_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13276,7 +14177,7 @@ macro_rules! list_make4_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13322,6 +14223,17 @@ macro_rules! list_make4_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make4_xid {
@@ -13593,8 +14505,30 @@ macro_rules! __pgrx_c_args_list_make4_xid {
 /// ```text
 /// #define list_make4_xid( x1 , x2 , x3 , x4 ) list_make4_impl ( T_XidList , list_make_xid_cell ( x1 ) , list_make_xid_cell ( x2 ) , list_make_xid_cell ( x3 ) , list_make_xid_cell ( x4 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make4_xid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make4_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make4_xid!(@__pgrx_emit_value; $x1, $x2, $x3, $x4)
@@ -13609,7 +14543,7 @@ macro_rules! list_make4_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13645,7 +14579,7 @@ macro_rules! list_make4_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13683,7 +14617,7 @@ macro_rules! list_make4_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13721,7 +14655,7 @@ macro_rules! list_make4_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13759,7 +14693,7 @@ macro_rules! list_make4_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13807,6 +14741,14 @@ macro_rules! list_make4_xid {
         /* PGRX: list_make4_xid remains expanded because list_make4_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -13816,7 +14758,7 @@ macro_rules! list_make4_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                                $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13862,7 +14804,7 @@ macro_rules! list_make4_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13912,7 +14854,7 @@ macro_rules! list_make4_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13962,7 +14904,7 @@ macro_rules! list_make4_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14012,7 +14954,7 @@ macro_rules! list_make4_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14065,7 +15007,7 @@ macro_rules! list_make4_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8cb68bd916151eeed52eac79ebdfd0cc(
+                    $crate::__pgrx_c_generated::Inline_1b12ccf8f631583eccfead1cb3e7fc8b(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14101,7 +15043,7 @@ macro_rules! list_make4_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14139,7 +15081,7 @@ macro_rules! list_make4_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14177,7 +15119,7 @@ macro_rules! list_make4_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14215,7 +15157,7 @@ macro_rules! list_make4_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -14261,6 +15203,17 @@ macro_rules! list_make4_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make5 {
@@ -14516,8 +15469,31 @@ macro_rules! __pgrx_c_args_list_make5 {
 /// ```text
 /// #define list_make5( x1 , x2 , x3 , x4 , x5 ) list_make5_impl ( T_List , list_make_ptr_cell ( x1 ) , list_make_ptr_cell ( x2 ) , list_make_ptr_cell ( x3 ) , list_make_ptr_cell ( x4 ) , list_make_ptr_cell ( x5 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make5 {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+                $crate::__pgrx_c_operand!(@check_safety; $x5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make5!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make5!(@__pgrx_emit_value; $x1, $x2, $x3, $x4, $x5)
@@ -14532,7 +15508,7 @@ macro_rules! list_make5 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14568,7 +15544,7 @@ macro_rules! list_make5 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14606,7 +15582,7 @@ macro_rules! list_make5 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14644,7 +15620,7 @@ macro_rules! list_make5 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14682,7 +15658,7 @@ macro_rules! list_make5 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14720,7 +15696,7 @@ macro_rules! list_make5 {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14768,6 +15744,15 @@ macro_rules! list_make5 {
         /* PGRX: list_make5 remains expanded because list_make5_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                        $crate::__pgrx_c_operand!(@check_safety; $x5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -14777,7 +15762,7 @@ macro_rules! list_make5 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14823,7 +15808,7 @@ macro_rules! list_make5 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14873,7 +15858,7 @@ macro_rules! list_make5 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14923,7 +15908,7 @@ macro_rules! list_make5 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -14973,7 +15958,7 @@ macro_rules! list_make5 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -15023,7 +16008,7 @@ macro_rules! list_make5 {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                                    $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -15076,7 +16061,7 @@ macro_rules! list_make5 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                    $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15112,7 +16097,7 @@ macro_rules! list_make5 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -15150,7 +16135,7 @@ macro_rules! list_make5 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -15188,7 +16173,7 @@ macro_rules! list_make5 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -15226,7 +16211,7 @@ macro_rules! list_make5 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -15264,7 +16249,7 @@ macro_rules! list_make5 {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_5734b93e9608bd6fe490884c2572eec3(
+                                        $crate::__pgrx_c_generated::Inline_612aca34e62825bcd1c7459a454eccbe(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -15310,6 +16295,17 @@ macro_rules! list_make5 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make5_int {
@@ -15635,8 +16631,31 @@ macro_rules! __pgrx_c_args_list_make5_int {
 /// ```text
 /// #define list_make5_int( x1 , x2 , x3 , x4 , x5 ) list_make5_impl ( T_IntList , list_make_int_cell ( x1 ) , list_make_int_cell ( x2 ) , list_make_int_cell ( x3 ) , list_make_int_cell ( x4 ) , list_make_int_cell ( x5 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make5_int {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+                $crate::__pgrx_c_operand!(@check_safety; $x5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make5_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make5_int!(@__pgrx_emit_value; $x1, $x2, $x3, $x4, $x5)
@@ -15651,7 +16670,7 @@ macro_rules! list_make5_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15687,7 +16706,7 @@ macro_rules! list_make5_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -15719,7 +16738,7 @@ macro_rules! list_make5_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -15751,7 +16770,7 @@ macro_rules! list_make5_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -15783,7 +16802,7 @@ macro_rules! list_make5_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -15815,7 +16834,7 @@ macro_rules! list_make5_int {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -15857,6 +16876,15 @@ macro_rules! list_make5_int {
         /* PGRX: list_make5_int remains expanded because list_make5_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                        $crate::__pgrx_c_operand!(@check_safety; $x5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -15866,7 +16894,7 @@ macro_rules! list_make5_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15912,7 +16940,7 @@ macro_rules! list_make5_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -15956,7 +16984,7 @@ macro_rules! list_make5_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -16000,7 +17028,7 @@ macro_rules! list_make5_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -16044,7 +17072,7 @@ macro_rules! list_make5_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -16088,7 +17116,7 @@ macro_rules! list_make5_int {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                                    $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -16135,7 +17163,7 @@ macro_rules! list_make5_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                    $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16171,7 +17199,7 @@ macro_rules! list_make5_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -16203,7 +17231,7 @@ macro_rules! list_make5_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -16235,7 +17263,7 @@ macro_rules! list_make5_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -16267,7 +17295,7 @@ macro_rules! list_make5_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -16299,7 +17327,7 @@ macro_rules! list_make5_int {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_47c137a4d73544c72dbd7d610749285e(
+                                        $crate::__pgrx_c_generated::Inline_eae8740a0e34dda276169037ac8a913f(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -16339,6 +17367,17 @@ macro_rules! list_make5_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make5_oid {
@@ -16664,8 +17703,31 @@ macro_rules! __pgrx_c_args_list_make5_oid {
 /// ```text
 /// #define list_make5_oid( x1 , x2 , x3 , x4 , x5 ) list_make5_impl ( T_OidList , list_make_oid_cell ( x1 ) , list_make_oid_cell ( x2 ) , list_make_oid_cell ( x3 ) , list_make_oid_cell ( x4 ) , list_make_oid_cell ( x5 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make5_oid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+                $crate::__pgrx_c_operand!(@check_safety; $x5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make5_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make5_oid!(@__pgrx_emit_value; $x1, $x2, $x3, $x4, $x5)
@@ -16680,7 +17742,7 @@ macro_rules! list_make5_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16716,7 +17778,7 @@ macro_rules! list_make5_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16754,7 +17816,7 @@ macro_rules! list_make5_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16792,7 +17854,7 @@ macro_rules! list_make5_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16830,7 +17892,7 @@ macro_rules! list_make5_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16868,7 +17930,7 @@ macro_rules! list_make5_oid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16916,6 +17978,15 @@ macro_rules! list_make5_oid {
         /* PGRX: list_make5_oid remains expanded because list_make5_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                        $crate::__pgrx_c_operand!(@check_safety; $x5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -16925,7 +17996,7 @@ macro_rules! list_make5_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16971,7 +18042,7 @@ macro_rules! list_make5_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17021,7 +18092,7 @@ macro_rules! list_make5_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17071,7 +18142,7 @@ macro_rules! list_make5_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17121,7 +18192,7 @@ macro_rules! list_make5_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17171,7 +18242,7 @@ macro_rules! list_make5_oid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                                    $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17224,7 +18295,7 @@ macro_rules! list_make5_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                    $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -17260,7 +18331,7 @@ macro_rules! list_make5_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17298,7 +18369,7 @@ macro_rules! list_make5_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17336,7 +18407,7 @@ macro_rules! list_make5_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17374,7 +18445,7 @@ macro_rules! list_make5_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17412,7 +18483,7 @@ macro_rules! list_make5_oid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cc014c9ea584f6e733fa0720ce1011e4(
+                                        $crate::__pgrx_c_generated::Inline_3b44ceb5a27f7efb6efde364ce3e97b2(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17458,6 +18529,17 @@ macro_rules! list_make5_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_list_make5_xid {
@@ -17783,8 +18865,31 @@ macro_rules! __pgrx_c_args_list_make5_xid {
 /// ```text
 /// #define list_make5_xid( x1 , x2 , x3 , x4 , x5 ) list_make5_impl ( T_XidList , list_make_xid_cell ( x1 ) , list_make_xid_cell ( x2 ) , list_make_xid_cell ( x3 ) , list_make_xid_cell ( x4 ) , list_make_xid_cell ( x5 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_make5_xid {
+    (@__pgrx_emit_check_safety; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x1);
+                $crate::__pgrx_c_operand!(@check_safety; $x2);
+                $crate::__pgrx_c_operand!(@check_safety; $x3);
+                $crate::__pgrx_c_operand!(@check_safety; $x4);
+                $crate::__pgrx_c_operand!(@check_safety; $x5);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_list_make5_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::list_make5_xid!(@__pgrx_emit_value; $x1, $x2, $x3, $x4, $x5)
@@ -17799,7 +18904,7 @@ macro_rules! list_make5_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -17835,7 +18940,7 @@ macro_rules! list_make5_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17873,7 +18978,7 @@ macro_rules! list_make5_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17911,7 +19016,7 @@ macro_rules! list_make5_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17949,7 +19054,7 @@ macro_rules! list_make5_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -17987,7 +19092,7 @@ macro_rules! list_make5_xid {
                                         $crate::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18035,6 +19140,15 @@ macro_rules! list_make5_xid {
         /* PGRX: list_make5_xid remains expanded because list_make5_impl is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x1);
+                        $crate::__pgrx_c_operand!(@check_safety; $x2);
+                        $crate::__pgrx_c_operand!(@check_safety; $x3);
+                        $crate::__pgrx_c_operand!(@check_safety; $x4);
+                        $crate::__pgrx_c_operand!(@check_safety; $x5);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -18044,7 +19158,7 @@ macro_rules! list_make5_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                                $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -18090,7 +19204,7 @@ macro_rules! list_make5_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18140,7 +19254,7 @@ macro_rules! list_make5_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18190,7 +19304,7 @@ macro_rules! list_make5_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18240,7 +19354,7 @@ macro_rules! list_make5_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18290,7 +19404,7 @@ macro_rules! list_make5_xid {
                                                         $crate::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                                    $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18343,7 +19457,7 @@ macro_rules! list_make5_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e4b7d9a94758063ae5eafaef99d29b96(
+                    $crate::__pgrx_c_generated::Inline_11dfbc229e10793d5c9281e528868b2c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -18379,7 +19493,7 @@ macro_rules! list_make5_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18417,7 +19531,7 @@ macro_rules! list_make5_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18455,7 +19569,7 @@ macro_rules! list_make5_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18493,7 +19607,7 @@ macro_rules! list_make5_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18531,7 +19645,7 @@ macro_rules! list_make5_xid {
                                             $crate::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_de0074cdeb9a5ca36ac7f704fce41b2f(
+                                        $crate::__pgrx_c_generated::Inline_c5324e3d3a75ecd0dc7a07d117a427c8(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18577,6 +19691,17 @@ macro_rules! list_make5_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_llast {
@@ -18665,8 +19790,27 @@ macro_rules! __pgrx_c_args_llast {
 /// ```text
 /// #define llast( l ) lfirst ( list_last_cell ( l ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! llast {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_llast!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::llast!(@__pgrx_emit_value; $l))
     };
@@ -18676,7 +19820,7 @@ macro_rules! llast {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -18691,7 +19835,7 @@ macro_rules! llast {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -18732,7 +19876,7 @@ macro_rules! llast {
         /* PGRX: llast remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -18745,7 +19889,7 @@ macro_rules! llast {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -18784,7 +19928,7 @@ macro_rules! llast {
         /* PGRX: llast remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -18797,7 +19941,7 @@ macro_rules! llast {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -18836,10 +19980,15 @@ macro_rules! llast {
         /* PGRX: llast remains expanded because lfirst expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -18854,7 +20003,7 @@ macro_rules! llast {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                            $crate::list_last_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -18905,7 +20054,7 @@ macro_rules! llast {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -18920,7 +20069,7 @@ macro_rules! llast {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -18970,6 +20119,17 @@ macro_rules! llast {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_llast_int {
@@ -19062,8 +20222,27 @@ macro_rules! __pgrx_c_args_llast_int {
 /// ```text
 /// #define llast_int( l ) lfirst_int ( list_last_cell ( l ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! llast_int {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_llast_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::llast_int!(@__pgrx_emit_value; $l)
@@ -19075,7 +20254,7 @@ macro_rules! llast_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -19090,7 +20269,7 @@ macro_rules! llast_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -19131,7 +20310,7 @@ macro_rules! llast_int {
         /* PGRX: llast_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -19144,7 +20323,7 @@ macro_rules! llast_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -19183,7 +20362,7 @@ macro_rules! llast_int {
         /* PGRX: llast_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -19196,7 +20375,7 @@ macro_rules! llast_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -19235,10 +20414,15 @@ macro_rules! llast_int {
         /* PGRX: llast_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -19253,7 +20437,7 @@ macro_rules! llast_int {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                            $crate::list_last_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -19304,7 +20488,7 @@ macro_rules! llast_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -19319,7 +20503,7 @@ macro_rules! llast_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -19369,6 +20553,17 @@ macro_rules! llast_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_llast_oid {
@@ -19461,8 +20656,27 @@ macro_rules! __pgrx_c_args_llast_oid {
 /// ```text
 /// #define llast_oid( l ) lfirst_oid ( list_last_cell ( l ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! llast_oid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_llast_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::llast_oid!(@__pgrx_emit_value; $l)
@@ -19474,7 +20688,7 @@ macro_rules! llast_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -19489,7 +20703,7 @@ macro_rules! llast_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -19530,7 +20744,7 @@ macro_rules! llast_oid {
         /* PGRX: llast_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -19543,7 +20757,7 @@ macro_rules! llast_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -19582,7 +20796,7 @@ macro_rules! llast_oid {
         /* PGRX: llast_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -19595,7 +20809,7 @@ macro_rules! llast_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -19634,10 +20848,15 @@ macro_rules! llast_oid {
         /* PGRX: llast_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -19652,7 +20871,7 @@ macro_rules! llast_oid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                            $crate::list_last_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -19703,7 +20922,7 @@ macro_rules! llast_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -19718,7 +20937,7 @@ macro_rules! llast_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -19768,6 +20987,17 @@ macro_rules! llast_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_llast_xid {
@@ -19860,8 +21090,27 @@ macro_rules! __pgrx_c_args_llast_xid {
 /// ```text
 /// #define llast_xid( l ) lfirst_xid ( list_last_cell ( l ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! llast_xid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_llast_xid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::llast_xid!(@__pgrx_emit_value; $l)
@@ -19873,7 +21122,7 @@ macro_rules! llast_xid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6776,
+                        $crate::__pgrx_c_generated::Field_xid_value,
                         _,
                         _
                     >(
@@ -19888,7 +21137,7 @@ macro_rules! llast_xid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -19929,7 +21178,7 @@ macro_rules! llast_xid {
         /* PGRX: llast_xid remains expanded because lfirst_xid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6776,
+                $crate::__pgrx_c_generated::Field_xid_value,
                 _,
                 _
             >(
@@ -19942,7 +21191,7 @@ macro_rules! llast_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -19981,7 +21230,7 @@ macro_rules! llast_xid {
         /* PGRX: llast_xid remains expanded because lfirst_xid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field6776,
+                $crate::__pgrx_c_generated::Field_xid_value,
                 _,
                 _
             >(
@@ -19994,7 +21243,7 @@ macro_rules! llast_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                $crate::list_last_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -20033,10 +21282,15 @@ macro_rules! llast_xid {
         /* PGRX: llast_xid remains expanded because lfirst_xid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field6776,
+                            $crate::__pgrx_c_generated::Field_xid_value,
                             _,
                             _
                         >(
@@ -20051,7 +21305,7 @@ macro_rules! llast_xid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                            $crate::list_last_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -20102,7 +21356,7 @@ macro_rules! llast_xid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field6776,
+                        $crate::__pgrx_c_generated::Field_xid_value,
                         _,
                         _
                     >(
@@ -20117,7 +21371,7 @@ macro_rules! llast_xid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_c45c8ff08558d2910ba66fec718e7e5a(
+                                        $crate::list_last_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -20167,6 +21421,17 @@ macro_rules! llast_xid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lsecond {
@@ -20257,8 +21522,27 @@ macro_rules! __pgrx_c_args_lsecond {
 /// ```text
 /// #define lsecond( l ) lfirst ( list_nth_cell ( l , 1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lsecond {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lsecond!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::lsecond!(@__pgrx_emit_value; $l))
     };
@@ -20268,7 +21552,7 @@ macro_rules! lsecond {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -20283,7 +21567,7 @@ macro_rules! lsecond {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -20341,7 +21625,7 @@ macro_rules! lsecond {
         /* PGRX: lsecond remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -20354,7 +21638,7 @@ macro_rules! lsecond {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -20410,7 +21694,7 @@ macro_rules! lsecond {
         /* PGRX: lsecond remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -20423,7 +21707,7 @@ macro_rules! lsecond {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -20479,10 +21763,15 @@ macro_rules! lsecond {
         /* PGRX: lsecond remains expanded because lfirst expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -20497,7 +21786,7 @@ macro_rules! lsecond {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -20565,7 +21854,7 @@ macro_rules! lsecond {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -20580,7 +21869,7 @@ macro_rules! lsecond {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -20647,6 +21936,17 @@ macro_rules! lsecond {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lsecond_int {
@@ -20742,8 +22042,27 @@ macro_rules! __pgrx_c_args_lsecond_int {
 /// ```text
 /// #define lsecond_int( l ) lfirst_int ( list_nth_cell ( l , 1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lsecond_int {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lsecond_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lsecond_int!(@__pgrx_emit_value; $l)
@@ -20755,7 +22074,7 @@ macro_rules! lsecond_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -20770,7 +22089,7 @@ macro_rules! lsecond_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -20828,7 +22147,7 @@ macro_rules! lsecond_int {
         /* PGRX: lsecond_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -20841,7 +22160,7 @@ macro_rules! lsecond_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -20897,7 +22216,7 @@ macro_rules! lsecond_int {
         /* PGRX: lsecond_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -20910,7 +22229,7 @@ macro_rules! lsecond_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -20966,10 +22285,15 @@ macro_rules! lsecond_int {
         /* PGRX: lsecond_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -20984,7 +22308,7 @@ macro_rules! lsecond_int {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -21052,7 +22376,7 @@ macro_rules! lsecond_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -21067,7 +22391,7 @@ macro_rules! lsecond_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -21134,6 +22458,17 @@ macro_rules! lsecond_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lsecond_oid {
@@ -21229,8 +22564,27 @@ macro_rules! __pgrx_c_args_lsecond_oid {
 /// ```text
 /// #define lsecond_oid( l ) lfirst_oid ( list_nth_cell ( l , 1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lsecond_oid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lsecond_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lsecond_oid!(@__pgrx_emit_value; $l)
@@ -21242,7 +22596,7 @@ macro_rules! lsecond_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -21257,7 +22611,7 @@ macro_rules! lsecond_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -21315,7 +22669,7 @@ macro_rules! lsecond_oid {
         /* PGRX: lsecond_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -21328,7 +22682,7 @@ macro_rules! lsecond_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -21384,7 +22738,7 @@ macro_rules! lsecond_oid {
         /* PGRX: lsecond_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -21397,7 +22751,7 @@ macro_rules! lsecond_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -21453,10 +22807,15 @@ macro_rules! lsecond_oid {
         /* PGRX: lsecond_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -21471,7 +22830,7 @@ macro_rules! lsecond_oid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -21539,7 +22898,7 @@ macro_rules! lsecond_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -21554,7 +22913,7 @@ macro_rules! lsecond_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -21621,6 +22980,17 @@ macro_rules! lsecond_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lthird {
@@ -21711,8 +23081,27 @@ macro_rules! __pgrx_c_args_lthird {
 /// ```text
 /// #define lthird( l ) lfirst ( list_nth_cell ( l , 2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lthird {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lthird!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish($crate::lthird!(@__pgrx_emit_value; $l))
     };
@@ -21722,7 +23111,7 @@ macro_rules! lthird {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -21737,7 +23126,7 @@ macro_rules! lthird {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -21795,7 +23184,7 @@ macro_rules! lthird {
         /* PGRX: lthird remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -21808,7 +23197,7 @@ macro_rules! lthird {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -21864,7 +23253,7 @@ macro_rules! lthird {
         /* PGRX: lthird remains expanded because lfirst expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field4640,
+                $crate::__pgrx_c_generated::Field_ptr_value,
                 _,
                 _
             >(
@@ -21877,7 +23266,7 @@ macro_rules! lthird {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -21933,10 +23322,15 @@ macro_rules! lthird {
         /* PGRX: lthird remains expanded because lfirst expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field4640,
+                            $crate::__pgrx_c_generated::Field_ptr_value,
                             _,
                             _
                         >(
@@ -21951,7 +23345,7 @@ macro_rules! lthird {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -22019,7 +23413,7 @@ macro_rules! lthird {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field4640,
+                        $crate::__pgrx_c_generated::Field_ptr_value,
                         _,
                         _
                     >(
@@ -22034,7 +23428,7 @@ macro_rules! lthird {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -22101,6 +23495,17 @@ macro_rules! lthird {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lthird_int {
@@ -22196,8 +23601,27 @@ macro_rules! __pgrx_c_args_lthird_int {
 /// ```text
 /// #define lthird_int( l ) lfirst_int ( list_nth_cell ( l , 2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lthird_int {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lthird_int!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lthird_int!(@__pgrx_emit_value; $l)
@@ -22209,7 +23633,7 @@ macro_rules! lthird_int {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -22224,7 +23648,7 @@ macro_rules! lthird_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -22282,7 +23706,7 @@ macro_rules! lthird_int {
         /* PGRX: lthird_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -22295,7 +23719,7 @@ macro_rules! lthird_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -22351,7 +23775,7 @@ macro_rules! lthird_int {
         /* PGRX: lthird_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field2748,
+                $crate::__pgrx_c_generated::Field_int_value,
                 _,
                 _
             >(
@@ -22364,7 +23788,7 @@ macro_rules! lthird_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -22420,10 +23844,15 @@ macro_rules! lthird_int {
         /* PGRX: lthird_int remains expanded because lfirst_int expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field2748,
+                            $crate::__pgrx_c_generated::Field_int_value,
                             _,
                             _
                         >(
@@ -22438,7 +23867,7 @@ macro_rules! lthird_int {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -22506,7 +23935,7 @@ macro_rules! lthird_int {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field2748,
+                        $crate::__pgrx_c_generated::Field_int_value,
                         _,
                         _
                     >(
@@ -22521,7 +23950,7 @@ macro_rules! lthird_int {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -22588,6 +24017,17 @@ macro_rules! lthird_int {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_lthird_oid {
@@ -22683,8 +24123,27 @@ macro_rules! __pgrx_c_args_lthird_oid {
 /// ```text
 /// #define lthird_oid( l ) lfirst_oid ( list_nth_cell ( l , 2 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lthird_oid {
+    (@__pgrx_emit_check_safety; $l:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $l);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_lthird_oid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $l:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::lthird_oid!(@__pgrx_emit_value; $l)
@@ -22696,7 +24155,7 @@ macro_rules! lthird_oid {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -22711,7 +24170,7 @@ macro_rules! lthird_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -22769,7 +24228,7 @@ macro_rules! lthird_oid {
         /* PGRX: lthird_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -22782,7 +24241,7 @@ macro_rules! lthird_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -22838,7 +24297,7 @@ macro_rules! lthird_oid {
         /* PGRX: lthird_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field3940,
+                $crate::__pgrx_c_generated::Field_oid_value,
                 _,
                 _
             >(
@@ -22851,7 +24310,7 @@ macro_rules! lthird_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                $crate::list_nth_cell(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -22907,10 +24366,15 @@ macro_rules! lthird_oid {
         /* PGRX: lthird_oid remains expanded because lfirst_oid expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $l);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field3940,
+                            $crate::__pgrx_c_generated::Field_oid_value,
                             _,
                             _
                         >(
@@ -22925,7 +24389,7 @@ macro_rules! lthird_oid {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                            $crate::list_nth_cell(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -22993,7 +24457,7 @@ macro_rules! lthird_oid {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3940,
+                        $crate::__pgrx_c_generated::Field_oid_value,
                         _,
                         _
                     >(
@@ -23008,7 +24472,7 @@ macro_rules! lthird_oid {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_4fc69bcea0d0edf7ad999cfbbbbb4e20(
+                                        $crate::list_nth_cell(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -23075,6 +24539,17 @@ macro_rules! lthird_oid {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_multi_for_advance_cell {
@@ -23210,8 +24685,31 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
 /// ```text
 /// #define multi_for_advance_cell( cell , state , l , i ) ( cell = ( state . l != NIL && state . i < state . l -> length ) ? & state . l -> elements [ state . i ] : NULL )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! multi_for_advance_cell {
+    (@__pgrx_emit_check_safety; $cell:tt, $state:tt, $l:ident, $i:ident $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $cell);
+                $crate::__pgrx_c_operand!(@check_safety; $state);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_multi_for_advance_cell!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $cell:tt, $state:tt, $l:ident, $i:ident $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::multi_for_advance_cell!(@__pgrx_emit_value; $cell, $state, $l, $i)
@@ -23336,7 +24834,7 @@ macro_rules! multi_for_advance_cell {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field3156,
+                                                                    $crate::__pgrx_c_generated::Field_length,
                                                                     _,
                                                                     _
                                                                 >(
@@ -23385,7 +24883,7 @@ macro_rules! multi_for_advance_cell {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1623,
+                                                            $crate::__pgrx_c_generated::Field_elements,
                                                             _,
                                                             _
                                                         >(
@@ -23490,6 +24988,12 @@ macro_rules! multi_for_advance_cell {
         /* PGRX: NIL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $cell);
+                        $crate::__pgrx_c_operand!(@check_safety; $state);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -23611,7 +25115,7 @@ macro_rules! multi_for_advance_cell {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                $crate::__pgrx_c_generated::Field3156,
+                                                                                $crate::__pgrx_c_generated::Field_length,
                                                                                 _,
                                                                                 _
                                                                             >(
@@ -23663,7 +25167,7 @@ macro_rules! multi_for_advance_cell {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::load(
                                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                                        $crate::__pgrx_c_generated::Field1623,
+                                                                        $crate::__pgrx_c_generated::Field_elements,
                                                                         _,
                                                                         _
                                                                     >(
@@ -23878,7 +25382,7 @@ macro_rules! multi_for_advance_cell {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field3156,
+                                                                    $crate::__pgrx_c_generated::Field_length,
                                                                     _,
                                                                     _
                                                                 >(
@@ -23927,7 +25431,7 @@ macro_rules! multi_for_advance_cell {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1623,
+                                                            $crate::__pgrx_c_generated::Field_elements,
                                                             _,
                                                             _
                                                         >(

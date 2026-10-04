@@ -11,6 +11,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 impl crate::__pgrx_c_macros::sealed::Sealed for crate::Oid {}
 impl crate::__pgrx_c_macros::IntoCValue for crate::Oid {
     type Kind = crate::__pgrx_c_macros::CUnsignedInt;
@@ -132,4 +143,7 @@ pub mod __pgrx_c_generated {
     include!("native_0020.rs");
     include!("native_0021.rs");
     include!("native_0022.rs");
+    include!("native_0023.rs");
+    include!("native_0024.rs");
+    include!("native_0025.rs");
 }

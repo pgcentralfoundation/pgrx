@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
@@ -121,8 +132,27 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
 /// ```text
 /// #define CALLED_AS_TRIGGER( fcinfo ) ( ( fcinfo ) -> context != NULL && IsA ( ( fcinfo ) -> context , TriggerData ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! CALLED_AS_TRIGGER {
+    (@__pgrx_emit_check_safety; $fcinfo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::CALLED_AS_TRIGGER!(@__pgrx_emit_value; $fcinfo)
@@ -139,7 +169,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1175,
+                                            $crate::__pgrx_c_generated::Field_context,
                                             _,
                                             _
                                         >(
@@ -196,7 +226,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field6236,
+                                                    $crate::__pgrx_c_generated::Field_type,
                                                     _,
                                                     _
                                                 >(
@@ -223,7 +253,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1175,
+                                                                                    $crate::__pgrx_c_generated::Field_context,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -290,6 +320,11 @@ macro_rules! CALLED_AS_TRIGGER {
         /* PGRX: NULL remains expanded because object macro is not a supported pure integer expression: constant expression has no concrete integer type. */ /* PGRX: IsA remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: nodeTag remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -303,7 +338,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1175,
+                                                        $crate::__pgrx_c_generated::Field_context,
                                                         _,
                                                         _
                                                     >(
@@ -366,7 +401,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field6236,
+                                                                $crate::__pgrx_c_generated::Field_type,
                                                                 _,
                                                                 _
                                                             >(
@@ -393,7 +428,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::load(
                                                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field1175,
+                                                                                                $crate::__pgrx_c_generated::Field_context,
                                                                                                 _,
                                                                                                 _
                                                                                             >(
@@ -463,7 +498,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field1175,
+                                            $crate::__pgrx_c_generated::Field_context,
                                             _,
                                             _
                                         >(
@@ -520,7 +555,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field6236,
+                                                    $crate::__pgrx_c_generated::Field_type,
                                                     _,
                                                     _
                                                 >(
@@ -547,7 +582,7 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::load(
                                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field1175,
+                                                                                    $crate::__pgrx_c_generated::Field_context,
                                                                                     _,
                                                                                     _
                                                                                 >(
@@ -611,6 +646,17 @@ macro_rules! CALLED_AS_TRIGGER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
@@ -720,8 +766,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
 /// ```text
 /// #define TRIGGER_FIRED_AFTER( event ) ( ( ( event ) & TRIGGER_EVENT_TIMINGMASK ) == TRIGGER_EVENT_AFTER )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_AFTER {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_AFTER!(@__pgrx_emit_value; $event)
@@ -776,6 +837,11 @@ macro_rules! TRIGGER_FIRED_AFTER {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -866,6 +932,17 @@ macro_rules! TRIGGER_FIRED_AFTER {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
@@ -980,8 +1057,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
 /// ```text
 /// #define TRIGGER_FIRED_BEFORE( event ) ( ( ( event ) & TRIGGER_EVENT_TIMINGMASK ) == TRIGGER_EVENT_BEFORE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BEFORE {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_BEFORE!(@__pgrx_emit_value; $event)
@@ -1034,6 +1126,11 @@ macro_rules! TRIGGER_FIRED_BEFORE {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1120,6 +1217,17 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
@@ -1244,8 +1352,26 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
 /// ```text
 /// #define TRIGGER_FIRED_BY_DELETE( event ) ( ( ( event ) & TRIGGER_EVENT_OPMASK ) == TRIGGER_EVENT_DELETE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_DELETE {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_BY_DELETE!(@__pgrx_emit_value; $event)
@@ -1298,6 +1424,11 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1384,6 +1515,17 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
@@ -1508,8 +1650,26 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
 /// ```text
 /// #define TRIGGER_FIRED_BY_INSERT( event ) ( ( ( event ) & TRIGGER_EVENT_OPMASK ) == TRIGGER_EVENT_INSERT )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_INSERT {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_BY_INSERT!(@__pgrx_emit_value; $event)
@@ -1564,6 +1724,11 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1654,6 +1819,17 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
@@ -1778,8 +1954,26 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
 /// ```text
 /// #define TRIGGER_FIRED_BY_TRUNCATE( event ) ( ( ( event ) & TRIGGER_EVENT_OPMASK ) == TRIGGER_EVENT_TRUNCATE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_BY_TRUNCATE!(@__pgrx_emit_value; $event)
@@ -1835,6 +2029,11 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1921,6 +2120,17 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
@@ -2045,8 +2255,26 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
 /// ```text
 /// #define TRIGGER_FIRED_BY_UPDATE( event ) ( ( ( event ) & TRIGGER_EVENT_OPMASK ) == TRIGGER_EVENT_UPDATE )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_UPDATE {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_BY_UPDATE!(@__pgrx_emit_value; $event)
@@ -2099,6 +2327,11 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2185,6 +2418,17 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
@@ -2299,8 +2543,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
 /// ```text
 /// #define TRIGGER_FIRED_FOR_ROW( event ) ( ( event ) & TRIGGER_EVENT_ROW )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_ROW {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_FOR_ROW!(@__pgrx_emit_value; $event)
@@ -2342,6 +2601,11 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2402,6 +2666,17 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
@@ -2526,8 +2801,26 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
 /// ```text
 /// #define TRIGGER_FIRED_FOR_STATEMENT( event ) ( ! TRIGGER_FIRED_FOR_ROW ( event ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_FOR_STATEMENT!(@__pgrx_emit_value; $event)
@@ -2580,6 +2873,11 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
         /* PGRX: TRIGGER_FIRED_FOR_ROW remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2660,6 +2958,17 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
@@ -2774,8 +3083,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
 /// ```text
 /// #define TRIGGER_FIRED_INSTEAD( event ) ( ( ( event ) & TRIGGER_EVENT_TIMINGMASK ) == TRIGGER_EVENT_INSTEAD )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! TRIGGER_FIRED_INSTEAD {
+    (@__pgrx_emit_check_safety; $event:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $event);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::TRIGGER_FIRED_INSTEAD!(@__pgrx_emit_value; $event)
@@ -2828,6 +3152,11 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
     (@__pgrx_emit_size; $event:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $event);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

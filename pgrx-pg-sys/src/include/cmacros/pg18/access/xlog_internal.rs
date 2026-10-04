@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsPowerOf2 {
@@ -104,8 +115,27 @@ macro_rules! __pgrx_c_args_IsPowerOf2 {
 /// ```text
 /// #define IsPowerOf2( x ) ( x > 0 && ( ( x ) & ( ( x ) - 1 ) ) == 0 )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IsPowerOf2 {
+    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $x);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsPowerOf2!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsPowerOf2!(@__pgrx_emit_value; $x)
@@ -213,6 +243,11 @@ macro_rules! IsPowerOf2 {
     (@__pgrx_emit_size; $x:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -420,6 +455,17 @@ macro_rules! IsPowerOf2 {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_IsValidWalSegSize {
@@ -526,8 +572,27 @@ macro_rules! __pgrx_c_args_IsValidWalSegSize {
 /// ```text
 /// #define IsValidWalSegSize( size ) ( IsPowerOf2 ( size ) && ( ( size ) >= WalSegMinSize && ( size ) <= WalSegMaxSize ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IsValidWalSegSize {
+    (@__pgrx_emit_check_safety; $size:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $size);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_IsValidWalSegSize!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $size:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::IsValidWalSegSize!(@__pgrx_emit_value; $size)
@@ -793,6 +858,11 @@ macro_rules! IsValidWalSegSize {
         /* PGRX: WalSegMaxSize remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: WalSegMinSize remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: IsPowerOf2 remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $size);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -1315,6 +1385,17 @@ macro_rules! IsValidWalSegSize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLByteInPrevSeg {
@@ -1532,8 +1613,29 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
 /// ```text
 /// #define XLByteInPrevSeg( xlrp , logSegNo , wal_segsz_bytes ) ( ( ( ( xlrp ) - 1 ) / ( wal_segsz_bytes ) ) == ( logSegNo ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLByteInPrevSeg {
+    (@__pgrx_emit_check_safety; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLByteInPrevSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLByteInPrevSeg!(@__pgrx_emit_value; $xlrp, $logSegNo, $wal_segsz_bytes)
@@ -1605,6 +1707,13 @@ macro_rules! XLByteInPrevSeg {
     (@__pgrx_emit_size; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                        $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1739,6 +1848,17 @@ macro_rules! XLByteInPrevSeg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLByteInSeg {
@@ -1914,8 +2034,29 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
 /// ```text
 /// #define XLByteInSeg( xlrp , logSegNo , wal_segsz_bytes ) ( ( ( xlrp ) / ( wal_segsz_bytes ) ) == ( logSegNo ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLByteInSeg {
+    (@__pgrx_emit_check_safety; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLByteInSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLByteInSeg!(@__pgrx_emit_value; $xlrp, $logSegNo, $wal_segsz_bytes)
@@ -1968,6 +2109,13 @@ macro_rules! XLByteInSeg {
     (@__pgrx_emit_size; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                        $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2057,6 +2205,17 @@ macro_rules! XLByteInSeg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLByteToPrevSeg {
@@ -2274,8 +2433,28 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
 ///
 ///
 /// Call as `XLByteToPrevSeg!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `(XLByteToPrevSeg(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLByteToPrevSeg {
+    (@__pgrx_emit_check_safety; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLByteToPrevSeg!(@__pgrx_emit_value; $xlrp, $logSegNo, $wal_segsz_bytes)
@@ -2336,6 +2515,13 @@ macro_rules! XLByteToPrevSeg {
     (@__pgrx_emit_size; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                        $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2463,6 +2649,17 @@ macro_rules! XLByteToPrevSeg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLByteToSeg {
@@ -2638,8 +2835,28 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
 ///
 ///
 /// Call as `XLByteToSeg!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `(XLByteToSeg(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLByteToSeg {
+    (@__pgrx_emit_check_safety; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLByteToSeg!(@__pgrx_emit_value; $xlrp, $logSegNo, $wal_segsz_bytes)
@@ -2684,6 +2901,13 @@ macro_rules! XLByteToSeg {
     (@__pgrx_emit_size; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                        $crate::__pgrx_c_operand!(@check_safety; $logSegNo);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2766,6 +2990,17 @@ macro_rules! XLByteToSeg {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogMBVarToSegs {
@@ -2929,8 +3164,28 @@ macro_rules! __pgrx_c_args_XLogMBVarToSegs {
 /// ```text
 /// #define XLogMBVarToSegs( mbvar , wal_segsz_bytes ) ( ( mbvar ) / ( ( wal_segsz_bytes ) / ( 1024 * 1024 ) ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLogMBVarToSegs {
+    (@__pgrx_emit_check_safety; $mbvar:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $mbvar);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogMBVarToSegs!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $mbvar:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogMBVarToSegs!(@__pgrx_emit_value; $mbvar, $wal_segsz_bytes)
@@ -3004,6 +3259,12 @@ macro_rules! XLogMBVarToSegs {
     (@__pgrx_emit_size; $mbvar:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $mbvar);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3137,6 +3398,17 @@ macro_rules! XLogMBVarToSegs {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogPageHeaderSize {
@@ -3246,8 +3518,27 @@ macro_rules! __pgrx_c_args_XLogPageHeaderSize {
 /// ```text
 /// #define XLogPageHeaderSize( hdr ) ( ( ( hdr ) -> xlp_info & XLP_LONG_HEADER ) ? SizeOfXLogLongPHD : SizeOfXLogShortPHD )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLogPageHeaderSize {
+    (@__pgrx_emit_check_safety; $hdr:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $hdr);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogPageHeaderSize!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $hdr:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogPageHeaderSize!(@__pgrx_emit_value; $hdr)
@@ -3265,7 +3556,7 @@ macro_rules! XLogPageHeaderSize {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6572,
+                                                $crate::__pgrx_c_generated::Field_xlp_info,
                                                 _,
                                                 _
                                             >(
@@ -3581,6 +3872,11 @@ macro_rules! XLogPageHeaderSize {
         /* PGRX: SizeOfXLogLongPHD remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: SizeOfXLogShortPHD remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $hdr);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3598,7 +3894,7 @@ macro_rules! XLogPageHeaderSize {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field6572,
+                                                            $crate::__pgrx_c_generated::Field_xlp_info,
                                                             _,
                                                             _
                                                         >(
@@ -3924,7 +4220,7 @@ macro_rules! XLogPageHeaderSize {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field6572,
+                                                $crate::__pgrx_c_generated::Field_xlp_info,
                                                 _,
                                                 _
                                             >(
@@ -4237,6 +4533,17 @@ macro_rules! XLogPageHeaderSize {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
@@ -4526,8 +4833,32 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
 ///
 ///
 /// Call as `XLogSegNoOffsetToRecPtr!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `(XLogSegNoOffsetToRecPtr(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLogSegNoOffsetToRecPtr {
+    (@__pgrx_emit_check_safety; $segno:tt, $offset:tt, $wal_segsz_bytes:tt, $dest:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $segno);
+                $crate::__pgrx_c_operand!(@check_safety; $offset);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                $crate::__pgrx_c_operand!(@check_safety; $dest);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $segno:tt, $offset:tt, $wal_segsz_bytes:tt, $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogSegNoOffsetToRecPtr!(
@@ -4595,6 +4926,14 @@ macro_rules! XLogSegNoOffsetToRecPtr {
     (@__pgrx_emit_size; $segno:tt, $offset:tt, $wal_segsz_bytes:tt, $dest:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $segno);
+                        $crate::__pgrx_c_operand!(@check_safety; $offset);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                        $crate::__pgrx_c_operand!(@check_safety; $dest);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
@@ -4727,6 +5066,17 @@ macro_rules! XLogSegNoOffsetToRecPtr {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogSegmentOffset {
@@ -4890,8 +5240,28 @@ macro_rules! __pgrx_c_args_XLogSegmentOffset {
 /// ```text
 /// #define XLogSegmentOffset( xlogptr , wal_segsz_bytes ) ( ( xlogptr ) & ( ( wal_segsz_bytes ) - 1 ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLogSegmentOffset {
+    (@__pgrx_emit_check_safety; $xlogptr:tt, $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlogptr);
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogSegmentOffset!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlogptr:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogSegmentOffset!(@__pgrx_emit_value; $xlogptr, $wal_segsz_bytes)
@@ -4948,6 +5318,12 @@ macro_rules! XLogSegmentOffset {
     (@__pgrx_emit_size; $xlogptr:tt, $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlogptr);
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5047,6 +5423,17 @@ macro_rules! XLogSegmentOffset {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XLogSegmentsPerXLogId {
@@ -5161,8 +5548,27 @@ macro_rules! __pgrx_c_args_XLogSegmentsPerXLogId {
 /// ```text
 /// #define XLogSegmentsPerXLogId( wal_segsz_bytes ) ( UINT64CONST ( 0x100000000 ) / ( wal_segsz_bytes ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XLogSegmentsPerXLogId {
+    (@__pgrx_emit_check_safety; $wal_segsz_bytes:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $wal_segsz_bytes:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XLogSegmentsPerXLogId!(@__pgrx_emit_value; $wal_segsz_bytes)
@@ -5208,6 +5614,11 @@ macro_rules! XLogSegmentsPerXLogId {
         /* PGRX: UINT64CONST remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: UINT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5273,6 +5684,17 @@ macro_rules! XLogSegmentsPerXLogId {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_XRecOffIsValid {
@@ -5382,8 +5804,27 @@ macro_rules! __pgrx_c_args_XRecOffIsValid {
 /// ```text
 /// #define XRecOffIsValid( xlrp ) ( ( xlrp ) % XLOG_BLCKSZ >= SizeOfXLogShortPHD )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! XRecOffIsValid {
+    (@__pgrx_emit_check_safety; $xlrp:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_XRecOffIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $xlrp:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::XRecOffIsValid!(@__pgrx_emit_value; $xlrp)
@@ -5554,6 +5995,11 @@ macro_rules! XRecOffIsValid {
         /* PGRX: SizeOfXLogShortPHD remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $xlrp);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

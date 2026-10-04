@@ -12,6 +12,17 @@ This code is generated for documentation purposes, so that it is easy to referen
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
@@ -175,8 +186,24 @@ macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
 /// ```text
 /// #define EvalPlanQualSetSlot( epqstate , slot ) ( ( epqstate ) -> origslot = ( slot ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
 #[macro_export]
 macro_rules! EvalPlanQualSetSlot {
+    (@__pgrx_emit_check_safety; $epqstate:tt, $slot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $epqstate);
+                $crate::__pgrx_c_operand!(@check_safety; $slot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_EvalPlanQualSetSlot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $epqstate:tt, $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::EvalPlanQualSetSlot!(@__pgrx_emit_value; $epqstate, $slot)
@@ -187,7 +214,7 @@ macro_rules! EvalPlanQualSetSlot {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3962,
+                        $crate::__pgrx_c_generated::Field_origslot,
                         _,
                         _
                     >(
@@ -226,12 +253,18 @@ macro_rules! EvalPlanQualSetSlot {
     (@__pgrx_emit_size; $epqstate:tt, $slot:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $epqstate);
+                        $crate::__pgrx_c_operand!(@check_safety; $slot);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field3962,
+                                    $crate::__pgrx_c_generated::Field_origslot,
                                     _,
                                     _
                                 >(
@@ -266,7 +299,7 @@ macro_rules! EvalPlanQualSetSlot {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::assign(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field3962,
+                        $crate::__pgrx_c_generated::Field_origslot,
                         _,
                         _
                     >(
@@ -303,6 +336,17 @@ macro_rules! EvalPlanQualSetSlot {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetPerTupleExprContext {
@@ -421,8 +465,30 @@ macro_rules! __pgrx_c_args_GetPerTupleExprContext {
 /// ```text
 /// #define GetPerTupleExprContext( estate ) ( ( estate ) -> es_per_tuple_exprcontext ? ( estate ) -> es_per_tuple_exprcontext : MakePerTupleExprContext ( estate ) )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetPerTupleExprContext {
+    (@__pgrx_emit_check_safety; $estate:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $estate);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetPerTupleExprContext!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $estate:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetPerTupleExprContext!(@__pgrx_emit_value; $estate)
@@ -436,7 +502,7 @@ macro_rules! GetPerTupleExprContext {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1701,
+                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                     _,
                                     _
                                 >(
@@ -456,7 +522,7 @@ macro_rules! GetPerTupleExprContext {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1701,
+                                        $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                         _,
                                         _
                                     >(
@@ -534,6 +600,11 @@ macro_rules! GetPerTupleExprContext {
     (@__pgrx_emit_size; $estate:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $estate);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -542,7 +613,7 @@ macro_rules! GetPerTupleExprContext {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field1701,
+                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                 _,
                                                 _
                                             >(
@@ -570,7 +641,7 @@ macro_rules! GetPerTupleExprContext {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field1701,
+                                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                     _,
                                                     _
                                                 >(
@@ -659,7 +730,7 @@ macro_rules! GetPerTupleExprContext {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1701,
+                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                     _,
                                     _
                                 >(
@@ -679,7 +750,7 @@ macro_rules! GetPerTupleExprContext {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1701,
+                                        $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                         _,
                                         _
                                     >(
@@ -755,6 +826,17 @@ macro_rules! GetPerTupleExprContext {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_GetPerTupleMemoryContext {
@@ -879,8 +961,30 @@ macro_rules! __pgrx_c_args_GetPerTupleMemoryContext {
 /// ```text
 /// #define GetPerTupleMemoryContext( estate ) ( GetPerTupleExprContext ( estate ) -> ecxt_per_tuple_memory )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetPerTupleMemoryContext {
+    (@__pgrx_emit_check_safety; $estate:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $estate);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GetPerTupleMemoryContext!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $estate:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::GetPerTupleMemoryContext!(@__pgrx_emit_value; $estate)
@@ -892,7 +996,7 @@ macro_rules! GetPerTupleMemoryContext {
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1551,
+                        $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                         _,
                         _
                     >(
@@ -907,7 +1011,7 @@ macro_rules! GetPerTupleMemoryContext {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1701,
+                                                        $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                         _,
                                                         _
                                                     >(
@@ -935,7 +1039,7 @@ macro_rules! GetPerTupleMemoryContext {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1701,
+                                                            $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                             _,
                                                             _
                                                         >(
@@ -1020,7 +1124,7 @@ macro_rules! GetPerTupleMemoryContext {
         /* PGRX: GetPerTupleExprContext remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field1551,
+                $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                 _,
                 _
             >(
@@ -1032,7 +1136,7 @@ macro_rules! GetPerTupleMemoryContext {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field1701,
+                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                 _,
                                                 _
                                             >(
@@ -1060,7 +1164,7 @@ macro_rules! GetPerTupleMemoryContext {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field1701,
+                                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                     _,
                                                     _
                                                 >(
@@ -1143,7 +1247,7 @@ macro_rules! GetPerTupleMemoryContext {
         /* PGRX: GetPerTupleExprContext remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::project::<
-                $crate::__pgrx_c_generated::Field1551,
+                $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                 _,
                 _
             >(
@@ -1155,7 +1259,7 @@ macro_rules! GetPerTupleMemoryContext {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field1701,
+                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                 _,
                                                 _
                                             >(
@@ -1183,7 +1287,7 @@ macro_rules! GetPerTupleMemoryContext {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field1701,
+                                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                     _,
                                                     _
                                                 >(
@@ -1269,10 +1373,15 @@ macro_rules! GetPerTupleMemoryContext {
         /* PGRX: GetPerTupleExprContext remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_place_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $estate);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
-                            $crate::__pgrx_c_generated::Field1551,
+                            $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                             _,
                             _
                         >(
@@ -1287,7 +1396,7 @@ macro_rules! GetPerTupleMemoryContext {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1701,
+                                                            $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                             _,
                                                             _
                                                         >(
@@ -1315,7 +1424,7 @@ macro_rules! GetPerTupleMemoryContext {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::load(
                                                             $crate::__pgrx_c_macros::expression::project::<
-                                                                $crate::__pgrx_c_generated::Field1701,
+                                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                                 _,
                                                                 _
                                                             >(
@@ -1405,7 +1514,7 @@ macro_rules! GetPerTupleMemoryContext {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::load(
                     $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field1551,
+                        $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                         _,
                         _
                     >(
@@ -1420,7 +1529,7 @@ macro_rules! GetPerTupleMemoryContext {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::project::<
-                                                        $crate::__pgrx_c_generated::Field1701,
+                                                        $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                         _,
                                                         _
                                                     >(
@@ -1448,7 +1557,7 @@ macro_rules! GetPerTupleMemoryContext {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::load(
                                                         $crate::__pgrx_c_macros::expression::project::<
-                                                            $crate::__pgrx_c_generated::Field1701,
+                                                            $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                             _,
                                                             _
                                                         >(
@@ -1542,6 +1651,17 @@ macro_rules! GetPerTupleMemoryContext {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ResetExprContext {
@@ -1651,8 +1771,27 @@ macro_rules! __pgrx_c_args_ResetExprContext {
 /// ```text
 /// #define ResetExprContext( econtext ) MemoryContextReset ( ( econtext ) -> ecxt_per_tuple_memory )
 /// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ResetExprContext {
+    (@__pgrx_emit_check_safety; $econtext:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $econtext);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ResetExprContext!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
     (@__pgrx_emit_public; $econtext:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
             $crate::ResetExprContext!(@__pgrx_emit_value; $econtext)
@@ -1678,7 +1817,7 @@ macro_rules! ResetExprContext {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field1551,
+                                    $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                                     _,
                                     _
                                 >(
@@ -1717,6 +1856,11 @@ macro_rules! ResetExprContext {
         /* PGRX: ResetExprContext remains expanded because MemoryContextReset is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $econtext);
+                    }
+                }
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1744,7 +1888,7 @@ macro_rules! ResetExprContext {
                                         >(
                                             $crate::__pgrx_c_macros::expression::load(
                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                    $crate::__pgrx_c_generated::Field1551,
+                                                    $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                                                     _,
                                                     _
                                                 >(
@@ -1801,7 +1945,7 @@ macro_rules! ResetExprContext {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field1551,
+                                        $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                                         _,
                                         _
                                     >(
@@ -1843,6 +1987,17 @@ macro_rules! ResetExprContext {
 )))]
 #[cfg(not(docsrs))]
 compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_args_ResetPerTupleExprContext {
@@ -1970,8 +2125,29 @@ macro_rules! __pgrx_c_args_ResetPerTupleExprContext {
 ///
 ///
 /// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ResetPerTupleExprContext {
+    (@__pgrx_emit_check_safety; $estate:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $estate);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_ResetPerTupleExprContext!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
     (@__pgrx_emit_public; $estate:tt $(,)?) => {
         {
             /* PGRX: ResetExprContext remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
@@ -1980,7 +2156,7 @@ macro_rules! ResetPerTupleExprContext {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field1701,
+                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                 _,
                                 _
                             >(
@@ -2020,7 +2196,7 @@ macro_rules! ResetPerTupleExprContext {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::project::<
-                                                $crate::__pgrx_c_generated::Field1551,
+                                                $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
                                                 _,
                                                 _
                                             >(
@@ -2032,7 +2208,7 @@ macro_rules! ResetPerTupleExprContext {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::load(
                                                                 $crate::__pgrx_c_macros::expression::project::<
-                                                                    $crate::__pgrx_c_generated::Field1701,
+                                                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
                                                                     _,
                                                                     _
                                                                 >(
