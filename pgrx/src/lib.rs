@@ -120,6 +120,8 @@ pub mod pg_sys;
 
 // and re-export these
 pub use pg_sys::PgBuiltInOids;
+#[allow(unused_imports)]
+pub use pg_sys::cmacros::*;
 pub use pg_sys::elog::PgLogLevel;
 pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;

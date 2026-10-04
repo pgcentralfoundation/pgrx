@@ -4,47 +4,57 @@
 
 #[cfg(all(feature = "pg15", not(docsrs)))]
 pub(crate) mod pg15 {
-    #![allow(clippy::all)]
+    #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
 }
 #[cfg(all(feature = "pg15", docsrs))]
+#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg15;
 
 #[cfg(all(feature = "pg16", not(docsrs)))]
 pub(crate) mod pg16 {
-    #![allow(clippy::all)]
+    #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
 }
 #[cfg(all(feature = "pg16", docsrs))]
+#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg16;
 
 #[cfg(all(feature = "pg17", not(docsrs)))]
 pub(crate) mod pg17 {
-    #![allow(clippy::all)]
+    #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg17.rs"));
 }
 #[cfg(all(feature = "pg17", docsrs))]
+#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg17;
 
 #[cfg(all(feature = "pg18", not(docsrs)))]
 pub(crate) mod pg18 {
-    #![allow(clippy::all)]
+    #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
 }
 #[cfg(all(feature = "pg18", docsrs))]
+#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg18;
 
 #[cfg(all(feature = "pg19", not(docsrs)))]
 pub(crate) mod pg19 {
-    #![allow(clippy::all)]
+    #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg19.rs"));
 }
 #[cfg(all(feature = "pg19", docsrs))]
+#[allow(unknown_lints, unnecessary_transmutes)]
+#[allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 pub(crate) mod pg19;
 
 // export each module publicly
@@ -58,6 +68,11 @@ pub use pg17::*;
 pub use pg18::*;
 #[cfg(feature = "pg19")]
 pub use pg19::*;
+
+// The selected version exports its macros and hidden native adapters here.
+pub mod cmacros;
+#[allow(unused_imports)]
+pub use cmacros::*;
 
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg15", not(docsrs)))]
