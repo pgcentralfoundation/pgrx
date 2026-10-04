@@ -115,7 +115,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
                     let list: *mut pg_sys::List =
                         mcx.alloc_bytes(list_size).unwrap().cast().as_ptr();
                     assert!(list.is_non_null());
-                    (*list).type_ = T::LIST_TAG;
+                    pg_sys::NodeSetTag!(list, T::LIST_TAG).get();
                     (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                         / mem::size_of::<pg_sys::ListCell>())
                         as _;

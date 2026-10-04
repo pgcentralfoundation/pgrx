@@ -1,4 +1,4 @@
-use crate::{is_a, pg_sys, void_mut_ptr};
+use crate::{pg_sys, void_mut_ptr};
 use std::marker::PhantomData;
 
 pub struct PgList<T> {
@@ -64,8 +64,14 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_ptr(&self, i: usize) -> Option<*mut T> {
+        // SAFETY: The short-circuit excludes NULL. Construction keeps this List's
+        // initialized header and valid NodeTag alive; the tag read touches no elements.
         if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag::T_List) }
+            && unsafe {
+                pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::NodeTag, _>(
+                    pg_sys::nodeTag!(self.list).into_value(),
+                ) != pg_sys::NodeTag::T_List
+            }
         {
             panic!("PgList does not contain pointers")
         }
@@ -78,8 +84,14 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_int(&self, i: usize) -> Option<i32> {
+        // SAFETY: The short-circuit excludes NULL. Construction keeps this List's
+        // initialized header and valid NodeTag alive; the tag read touches no elements.
         if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag::T_IntList) }
+            && unsafe {
+                pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::NodeTag, _>(
+                    pg_sys::nodeTag!(self.list).into_value(),
+                ) != pg_sys::NodeTag::T_IntList
+            }
         {
             panic!("PgList does not contain ints")
         }
@@ -93,8 +105,14 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_oid(&self, i: usize) -> Option<pg_sys::Oid> {
+        // SAFETY: The short-circuit excludes NULL. Construction keeps this List's
+        // initialized header and valid NodeTag alive; the tag read touches no elements.
         if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag::T_OidList) }
+            && unsafe {
+                pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::NodeTag, _>(
+                    pg_sys::nodeTag!(self.list).into_value(),
+                ) != pg_sys::NodeTag::T_OidList
+            }
         {
             panic!("PgList does not contain oids")
         }

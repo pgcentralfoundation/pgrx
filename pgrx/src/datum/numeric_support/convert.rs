@@ -51,7 +51,7 @@ pub(crate) fn from_primitive_helper<I: IntoDatum, const P: u32, const S: u32>(
             debug_assert_eq!(I::type_oid(), pg_sys::CSTRINGOID);
             direct_function_call(
                 pg_sys::numeric_in,
-                &[datum, pg_sys::InvalidOid.into_datum(), make_typmod(P, S).into_datum()],
+                &[datum, pg_sys::Oid::INVALID.into_datum(), make_typmod(P, S).into_datum()],
             )
         } else if func == FromPrimitiveFunc::Numeric {
             debug_assert_eq!(I::type_oid(), pg_sys::NUMERICOID);

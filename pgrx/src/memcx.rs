@@ -60,10 +60,15 @@ impl<'mcx> MemCx<'mcx> {
     /// Postgres environment in an invalid state.
     /// Please do not use this method with closures that can panic (of course, this is
     /// less of a concern for unit tests).
+    /// Call on the backend thread, and keep the previous current context live
+    /// through `f` so it can be restored.
     pub unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
-        let remembered = pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr());
+        // SAFETY: This borrowed context is live, and the caller promises that
+        // execution can finish normally on the backend thread.
+        let remembered = unsafe { pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr()) };
         let res = f();
-        pg_sys::MemoryContextSwitchTo(remembered);
+        // SAFETY: The previous current context remains live through `f`.
+        unsafe { pg_sys::MemoryContextSwitchTo(remembered) };
         res
     }
 }
@@ -102,11 +107,9 @@ mod nightly {
             &self,
             layout: std::alloc::Layout,
         ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+            // With no MCXT_ALLOC flags, PostgreSQL enforces its ordinary size limit
+            // and raises ERROR on allocation failure rather than returning NULL.
             unsafe {
-                // Bitflags for MemoryContextAllocAligned:
-                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
                 let ptr = pg_sys::MemoryContextAllocAligned(
                     self.ptr.as_ptr(),
                     layout.size(),
@@ -130,16 +133,16 @@ mod nightly {
         ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
             // Overriding default function here to use Postgres' zeroing implementation.
             // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+            // SAFETY: MemCx holds a live context on the backend thread. Layout
+            // supplies a power-of-two alignment, and MCXT_ALLOC_ZERO initializes
+            // the requested bytes. Without MCXT_ALLOC_NO_OOM, allocation failure
+            // raises an error rather than returning null.
             unsafe {
-                // Bitflags for MemoryContextAllocAligned:
-                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
                 let ptr = pg_sys::MemoryContextAllocAligned(
                     self.ptr.as_ptr(),
                     layout.size(),
                     layout.align(),
-                    4,
+                    pg_sys::MCXT_ALLOC_ZERO as i32,
                 );
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
                 Ok(NonNull::new_unchecked(slice))

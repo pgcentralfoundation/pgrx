@@ -19,7 +19,7 @@ use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use crate::toast::{Toast, Toasty};
-use crate::{layout, pg_sys, varlena};
+use crate::{layout, pg_sys};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
 use bitvec::slice::{self as bitslice, BitSlice};
 use core::iter::{ExactSizeIterator, FusedIterator};
@@ -29,7 +29,6 @@ use core::{ffi, mem, slice};
 
 mod element;
 mod flat_array;
-mod port;
 
 pub use element::Element;
 pub use flat_array::{ArrayAllocError, FlatArray};
@@ -164,18 +163,10 @@ impl RawArray {
     /// Will be in 0..=[pg_sys::MAXDIM].
     #[inline]
     fn ndim(&self) -> libc::c_int {
+        // PostgreSQL stores ndim as a C int even though valid arrays are bounded
+        // by MAXDIM. Keep that representation until converting the dimension count.
         // SAFETY: Validity asserted on construction.
-        unsafe {
-            (*self.ptr.as_ptr()).ndim
-            /*
-            FIXME: While this is a c_int, the max ndim is normally 6
-            While the value can be set higher, it is... unlikely
-            that it is going to actually challenge even 16-bit pointer widths.
-            It would be preferable to return a usize instead,
-            however, PGRX has trouble with that, unfortunately.
-            */
-            as _
-        }
+        unsafe { pg_sys::ARR_NDIM!(self.ptr.as_ptr()).get() }
     }
 
     /** A slice describing the array's dimensions.
@@ -196,7 +187,7 @@ impl RawArray {
         */
         unsafe {
             let ndim = self.ndim() as usize;
-            slice::from_raw_parts(port::ARR_DIMS(self.ptr.as_ptr()), ndim)
+            slice::from_raw_parts(pg_sys::ARR_DIMS!(self.ptr.as_ptr()).get(), ndim)
         }
     }
 
@@ -216,12 +207,10 @@ impl RawArray {
         if dims.is_empty() {
             0
         } else {
-            // bindgen whiffs MaxArraySize AND MaxAllocSize!
-            const MAX_ARRAY_SIZE: u32 = 0x3fffffff / 8;
             dims.iter()
                 .map(|i| *i as u32) // treat negatives as huge
                 .try_fold(1u32, |prod, d| prod.checked_mul(d))
-                .filter(|prod| prod <= &MAX_ARRAY_SIZE)
+                .filter(|prod| (*prod as usize) <= pg_sys::MaxArraySize as usize)
                 .expect("product of array dimensions must be < 2.pow(27)") as usize
         }
     }
@@ -230,16 +219,7 @@ impl RawArray {
     #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
         // SAFETY: Validity asserted on construction.
-        unsafe { (*self.ptr.as_ptr()).elemtype }
-    }
-
-    /// Gets the offset to the ArrayType's data.
-    /// Should not be "taken literally".
-    #[inline]
-    fn data_offset(&self) -> i32 {
-        // SAFETY: Validity asserted on construction.
-        unsafe { (*self.ptr.as_ptr()).dataoffset }
-        // This field is an "int32" in Postgres
+        unsafe { pg_sys::Oid::from(pg_sys::ARR_ELEMTYPE!(self.ptr.as_ptr()).get()) }
     }
 
     /** Equivalent to [ARR_HASNULL(ArrayType*)][ARR_HASNULL].
@@ -250,20 +230,24 @@ impl RawArray {
     */
     #[allow(unused)]
     fn nullable(&self) -> bool {
-        self.data_offset() != 0
+        // SAFETY: The constructor requires an initialized ArrayType header.
+        unsafe { pg_sys::ARR_HASNULL!(self.ptr.as_ptr()).get() != 0 }
     }
 
     /// May return null.
     #[inline]
     fn nulls_mut_ptr(&mut self) -> *mut u8 {
-        // SAFETY: This isn't public for a reason: it's a maybe-null *mut BitSlice, which is easy to misuse.
-        // Obtaining it, however, is perfectly safe.
-        unsafe { port::ARR_NULLBITMAP(self.ptr.as_ptr()) }
+        // SAFETY: Construction requires a live initialized ArrayType header and valid
+        // dimensions. The macro reads the header and computes a raw pointer with
+        // wrapping offsets or returns NULL; callers establish readable bitmap bounds.
+        unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() }
     }
 
     #[inline]
     fn nulls_bitptr(&self) -> Option<BitPtr<Const, u8>> {
-        let nulls_ptr = unsafe { port::ARR_NULLBITMAP(self.ptr.as_ptr()) }.cast_const();
+        // SAFETY: The constructor guarantees the live initialized array header and
+        // valid dimensions. Raw offsets wrap; no bitmap bytes are read here.
+        let nulls_ptr = unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() }.cast_const();
         match BitPtr::try_from(nulls_ptr) {
             Ok(ptr) => Some(ptr),
             Err(BitPtrError::Null(_)) => None,
@@ -273,7 +257,9 @@ impl RawArray {
 
     #[inline]
     fn nulls_mut_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
-        let nulls_ptr = unsafe { port::ARR_NULLBITMAP(self.ptr.as_ptr()) };
+        // SAFETY: The constructor guarantees the live initialized array header and
+        // valid dimensions. Raw offsets wrap; no bitmap bytes are read here.
+        let nulls_ptr = unsafe { pg_sys::ARR_NULLBITMAP!(self.ptr.as_ptr()).get() };
         match BitPtr::try_from(self.nulls_mut_ptr()) {
             Ok(ptr) => Some(ptr),
             Err(BitPtrError::Null(_)) => None,
@@ -295,7 +281,10 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
-        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
+        // len() bounds the element count by MaxArraySize, so C int conversion and
+        // BITMAPLEN's addition fit. The C operation also handles the empty bitmap.
+        // SAFETY: BITMAPLEN only performs integer arithmetic on this bounded count.
+        let len = unsafe { pg_sys::BITMAPLEN!(self.len() as libc::c_int).get() } as usize;
 
         NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
@@ -380,7 +369,7 @@ impl RawArray {
         */
         unsafe {
             NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(
-                port::ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
+                pg_sys::ARR_DATA_PTR!(self.ptr.as_ptr()).get().cast::<u8>().cast(),
                 self.len(),
             ))
         }
@@ -388,13 +377,18 @@ impl RawArray {
 
     #[inline]
     pub(crate) fn data_ptr(&self) -> *const u8 {
-        unsafe { port::ARR_DATA_PTR(self.ptr.as_ptr()) }
+        // SAFETY: Construction requires an initialized array header and valid dimensions.
+        // The macro computes a raw pointer with wrapping offsets; callers separately
+        // establish payload validity and bounds before dereferencing it.
+        unsafe { pg_sys::ARR_DATA_PTR!(self.ptr.as_ptr()).get().cast::<u8>() }
     }
 
     /// "one past the end" pointer for the entire array's bytes
     pub(crate) fn end_ptr(&self) -> *const u8 {
         let ptr = self.ptr.as_ptr().cast::<u8>();
-        ptr.wrapping_add(unsafe { varlena::varsize_any(ptr.cast()) })
+        // SAFETY: The constructor requires a valid detoasted array header.
+        let size = unsafe { pg_sys::VARSIZE_ANY!(ptr).get() as usize };
+        ptr.wrapping_add(size)
     }
 }
 

@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 use crate::pglz::Strategy;
+use pgrx::pg_sys::__pgrx_c_macros::CValue;
 use pgrx::prelude::*;
 
 mod pglz;
@@ -113,7 +114,10 @@ fn pglz_analyze_column(
             let Some(bytes) = bytes else { continue };
             sampled += 1;
             total_raw += bytes.len() as u128;
-            let cap = pglz::max_output(bytes.len());
+            let cap = pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(
+                bytes.len() as _
+            ))
+            .get() as usize;
             if scratch.capacity() < cap {
                 scratch.reserve_exact(cap - scratch.len());
             }
@@ -196,7 +200,10 @@ fn pglz_ratio_histogram(
         for row in tup {
             let bytes: Option<Vec<u8>> = row.get(1).ok().flatten();
             let Some(bytes) = bytes else { continue };
-            let cap = pglz::max_output(bytes.len());
+            let cap = pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(
+                bytes.len() as _
+            ))
+            .get() as usize;
             if scratch.capacity() < cap {
                 scratch.reserve_exact(cap - scratch.len());
             }
@@ -249,7 +256,10 @@ fn pglz_recommend(
             let Some(bytes) = bytes else { continue };
             sampled += 1;
             total_raw += bytes.len() as u128;
-            let cap = pglz::max_output(bytes.len());
+            let cap = pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(
+                bytes.len() as _
+            ))
+            .get() as usize;
             if scratch.capacity() < cap {
                 scratch.reserve_exact(cap - scratch.len());
             }
@@ -302,6 +312,7 @@ fn pglz_recommend(
 #[pg_schema]
 mod tests {
     use crate::pglz::{self, PglzError, Strategy};
+    use pgrx::pg_sys::__pgrx_c_macros::CValue;
     use pgrx::prelude::*;
 
     #[pg_test]
@@ -479,8 +490,11 @@ mod tests {
         use crate::pglz::{self, Strategy};
         use std::mem::MaybeUninit;
         let src = b"hello world ".repeat(100); // 1200 bytes, very compressible
-        let mut cbuf: Vec<MaybeUninit<u8>> =
-            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let mut cbuf: Vec<MaybeUninit<u8>> = vec![
+            MaybeUninit::uninit();
+            pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+                .get() as usize
+        ];
         let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .expect("compress_into should not fail")
             .expect("input should be accepted");
@@ -502,8 +516,11 @@ mod tests {
         // 12 high-entropy bytes — below min_input_size, PGLZ should refuse.
         let src: [u8; 12] =
             [0x91, 0xa2, 0xb3, 0xc4, 0xd5, 0xe6, 0xf7, 0x08, 0x19, 0x2a, 0x3b, 0x4c];
-        let mut buf: Vec<MaybeUninit<u8>> =
-            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let mut buf: Vec<MaybeUninit<u8>> = vec![
+            MaybeUninit::uninit();
+            pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+                .get() as usize
+        ];
         let res = pglz::compress_into(&src, &mut buf, Strategy::Default).unwrap();
         assert!(res.is_none(), "expected PGLZ to reject random short input");
     }
@@ -523,8 +540,11 @@ mod tests {
         use std::mem::MaybeUninit;
         // 64 bytes of repeated 'a' — sits near PGLZ's min_comp_rate threshold for Default but Always should still attempt.
         let src = vec![b'a'; 64];
-        let mut buf_a: Vec<MaybeUninit<u8>> =
-            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let mut buf_a: Vec<MaybeUninit<u8>> = vec![
+            MaybeUninit::uninit();
+            pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+                .get() as usize
+        ];
         let always = pglz::compress_into(&src, &mut buf_a, Strategy::Always)
             .expect("compress_into should not fail");
         assert!(always.is_some(), "Strategy::Always should accept highly compressible input");
@@ -543,8 +563,11 @@ mod tests {
         use crate::pglz::{self, PglzError, Strategy};
         use std::mem::MaybeUninit;
         let src = b"abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd".to_vec();
-        let mut cbuf: Vec<MaybeUninit<u8>> =
-            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let mut cbuf: Vec<MaybeUninit<u8>> = vec![
+            MaybeUninit::uninit();
+            pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+                .get() as usize
+        ];
         let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .unwrap()
             .expect("should compress");
@@ -571,8 +594,11 @@ mod tests {
         use std::mem::MaybeUninit;
 
         let src = b"xyzxyzxyzxyzxyzxyzxyzxyzxyzxyz".repeat(20); // 600 bytes
-        let mut cbuf: Vec<MaybeUninit<u8>> =
-            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let mut cbuf: Vec<MaybeUninit<u8>> = vec![
+            MaybeUninit::uninit();
+            pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+                .get() as usize
+        ];
         let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .unwrap()
             .expect("should compress");
@@ -622,17 +648,32 @@ mod tests {
         assert!(res.is_err(), "expected unknown strategy to raise PG ERROR");
     }
 
+    /// Verify the installed header's output bound at allocation and wrap boundaries.
     #[pg_test]
-    fn max_output_adds_four() {
-        assert_eq!(pglz::max_output(0), 4);
-        assert_eq!(pglz::max_output(1024), 1028);
-        assert_eq!(pglz::max_output(usize::MAX - 4), usize::MAX);
+    fn generated_output_bound_uses_size_t_arithmetic() {
+        // common/pg_lzcompress.h defines the bound as (_dlen) + 4. An unsigned
+        // size_t operand makes overflow defined and avoids signed i32 overflow
+        // at the largest input accepted by the compression wrappers.
+        for (length, expected) in [
+            (0_usize, 4_usize),
+            (1024, 1028),
+            (i32::MAX as usize, 2_147_483_651),
+            (usize::MAX - 4, usize::MAX),
+            (usize::MAX - 3, 0),
+            (usize::MAX, 3),
+        ] {
+            assert_eq!(
+                pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(length as _))
+                    .get() as usize,
+                expected
+            );
+        }
     }
 
     #[pg_test]
     fn compress_into_rejects_undersized_buffer() {
         use std::mem::MaybeUninit;
-        // max_output(1024) = 1028; a 1027-byte buffer must be rejected before any FFI call.
+        // PGLZ_MAX_OUTPUT(1024) = 1028; a 1027-byte buffer must be rejected before any FFI call.
         let src = vec![0u8; 1024];
         let mut buf: Vec<MaybeUninit<u8>> = vec![MaybeUninit::uninit(); 1027];
         assert_eq!(

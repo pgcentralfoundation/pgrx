@@ -2,18 +2,17 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::{self, ItemFn, spanned::Spanned};
 
-/// Generate the Postgres fn info record
+/// Export the PostgreSQL function-info symbol for exactly this function identifier.
 ///
-/// Equivalent to PG_FUNCTION_INFO_V1, Postgres will sprintf the fn ident, then `dlsym(so, expected_name)`,
-/// so it is important to pass exactly the ident that you want to have the record associated with!
+/// Its immutable record comes from the original C PG_FUNCTION_INFO_V1 declaration.
+/// PostgreSQL locates this exported symbol by prefixing the function name with `pg_finfo_`.
 pub fn finfo_v1_tokens(ident: proc_macro2::Ident) -> syn::Result<ItemFn> {
     let finfo_name = format_ident!("pg_finfo_{ident}");
     let tokens = quote! {
         #[unsafe(no_mangle)]
         #[doc(hidden)]
         pub extern "C" fn #finfo_name() -> &'static ::pgrx::pg_sys::Pg_finfo_record {
-            const V1_API: ::pgrx::pg_sys::Pg_finfo_record = ::pgrx::pg_sys::Pg_finfo_record { api_version: 1 };
-            &V1_API
+            ::pgrx::pg_sys::__pgrx_function_info_v1()
         }
     };
     syn::parse2(tokens)

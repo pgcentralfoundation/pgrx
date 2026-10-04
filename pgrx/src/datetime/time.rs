@@ -20,8 +20,7 @@ use std::num::TryFromIntError;
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);
 
-// 86_400_000_000
-const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 24 * 60 * 60 * 1000 /* milli */ * 1000 /* micro */;
+const MICROSECONDS_PER_DAY: pg_sys::TimeADT = pg_sys::USECS_PER_DAY as _;
 
 impl From<Time> for pg_sys::TimeADT {
     #[inline]
@@ -89,14 +88,15 @@ impl FromDatum for Time {
         is_null: bool,
         _typoid: pg_sys::Oid,
     ) -> Option<Time> {
-        if is_null { None } else { Some(Time::modular_from_raw(datum.value() as i64)) }
+        // SAFETY: FromDatum's caller provides a valid time scalar datum.
+        unsafe { i64::from_datum(datum, is_null) }.map(Time::modular_from_raw)
     }
 }
 
 impl IntoDatum for Time {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
+        self.0.into_datum()
     }
 
     fn type_oid() -> pg_sys::Oid {

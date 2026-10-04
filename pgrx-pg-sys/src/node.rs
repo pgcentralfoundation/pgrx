@@ -43,14 +43,19 @@ pub trait PgNode: crate::seal::Sealed + Sized {
         unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
 
+    /// Test this node's stored tag against a PostgreSQL node kind.
     #[doc(alias = "IsA")]
     #[inline]
     fn is_a(&self, tag: crate::NodeTag) -> bool {
         self.node_tag() == tag
     }
 
+    /// Return this node's stored tag.
     #[inline]
     fn node_tag(&self) -> crate::NodeTag {
+        // Generated macros cannot be invoked inside pgrx-pg-sys: their `$crate::`
+        // helper calls are absolute paths to include!-expanded macro_exports
+        // (rust-lang/rust#52234). The Node header is a plain field read.
         self.as_node().type_
     }
 

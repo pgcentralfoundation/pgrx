@@ -12,13 +12,12 @@
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{PgBox, PgOid, WhoAllocated, pg_sys, rust_regtypein, set_varsize_4b};
+use crate::{PgBox, PgOid, WhoAllocated, pg_sys, rust_regtypein};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
 use std::{
     any::Any,
     ffi::{CStr, CString},
-    ptr::addr_of_mut,
     str,
 };
 
@@ -125,7 +124,10 @@ where
 impl IntoDatum for bool {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(if self { 1 } else { 0 }))
+        // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let converted = unsafe { pg_sys::BoolGetDatum!(self).get() };
+        Some(pg_sys::Datum::from(converted as usize))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -136,7 +138,15 @@ impl IntoDatum for bool {
 /// for "char"
 impl IntoDatum for i8 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self))
+        // PostgreSQL's SQL "char" uses plain C char, whose signedness is
+        // compiler dependent. Tag the byte with the inspected representation before conversion.
+        let value = pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_macros::CChar>::new(
+            self as pg_sys::__pgrx_c_macros::CCharRepr,
+        );
+        // SAFETY: value has the selected target's native C char representation.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let converted = unsafe { pg_sys::CharGetDatum!(value).get() };
+        Some(pg_sys::Datum::from(converted as usize))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -148,7 +158,10 @@ impl IntoDatum for i8 {
 impl IntoDatum for i16 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self))
+        // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let converted = unsafe { pg_sys::Int16GetDatum!(self).get() };
+        Some(pg_sys::Datum::from(converted as usize))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -164,7 +177,10 @@ impl IntoDatum for i16 {
 impl IntoDatum for i32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self))
+        // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let converted = unsafe { pg_sys::Int32GetDatum!(self).get() };
+        Some(pg_sys::Datum::from(converted as usize))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -180,7 +196,14 @@ impl IntoDatum for i32 {
 impl IntoDatum for i64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self))
+        // The generated int64 tag preserves the typedef's C integer rank.
+        let value =
+            pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::int64>::new(self as _);
+        // SAFETY: value has the native PostgreSQL int64 representation; generation
+        // selects the installation's actual by-value or by-reference conversion.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let converted = unsafe { pg_sys::Int64GetDatum!(value).get() };
+        Some(pg_sys::Datum::from(converted as usize))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -200,7 +223,8 @@ impl IntoDatum for i64 {
 impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits().into())
+        // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        Some(unsafe { pg_sys::Float4GetDatum(self) })
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -212,7 +236,8 @@ impl IntoDatum for f32 {
 impl IntoDatum for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits().into())
+        // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        Some(unsafe { pg_sys::Float8GetDatum(self) })
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -345,32 +370,26 @@ impl_into_datum_c_str!(&CStr);
 impl<'a> IntoDatum for &'a [u8] {
     /// # Panics
     ///
-    /// This function will panic if the string being converted to a datum
-    //  is longer than 1 GiB including 4 bytes used for a header.
+    /// This function will panic if the payload and four-byte header together
+    /// reach PostgreSQL's `MaxAllocSize` limit.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let len = self.len().saturating_add(pg_sys::VARHDRSZ);
-        assert!(len < (u32::MAX as usize >> 2));
+        let len = self.len().saturating_add(pg_sys::VARHDRSZ as usize);
+        assert!(len < pg_sys::MaxAllocSize as usize);
         unsafe {
             // SAFETY:  palloc gives us a valid pointer and if there's not enough memory it'll raise an error
             let varlena = pg_sys::palloc(len) as *mut pg_sys::varlena;
 
-            // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
-            // allocated thanks to our call to `palloc` above
-            let varattrib_4b: *mut _ =
-                &mut varlena.cast::<pg_sys::varattrib_4b>().as_mut().unwrap_unchecked().va_4byte;
-
-            // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
-            // `pgrx/src/varlena.rs`), however we're asserting above that the input string
-            // isn't too big for a Postgres varlena, since it's limited to 32 bits and,
-            // in reality, it's a quarter that length, but this is good enough
-            set_varsize_4b(varlena, len as i32);
+            // SAFETY: The bound above includes the header and keeps len within
+            // the varlena header's thirty-bit length and C int ranges. palloc
+            // provides aligned storage; initialize its header before copying the payload.
+            pg_sys::SET_VARSIZE_4B!(varlena, len as i32).get();
 
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
             // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
                 self.as_ptr(),
-                addr_of_mut!((&mut *varattrib_4b).va_data).cast::<u8>(),
+                pg_sys::VARDATA_4B!(varlena).get().cast::<u8>(),
                 self.len(),
             );
 

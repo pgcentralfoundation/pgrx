@@ -10,7 +10,7 @@
 #[derive(thiserror::Error, Debug, Clone, Copy)]
 pub enum PgTriggerError {
     #[error(
-        "`PgTrigger`s can only be built from `FunctionCallInfo` instances which `pgrx::pg_sys::called_as_trigger(fcinfo)` returns `true`"
+        "`PgTrigger`s can only be built from `FunctionCallInfo` instances which `pgrx::pg_sys::CALLED_AS_TRIGGER!(fcinfo).get() != 0` returns `true`"
     )]
     NotTrigger,
     #[error("`PgTrigger`s cannot be built from `NULL` `pgrx::pg_sys::FunctionCallInfo`s")]

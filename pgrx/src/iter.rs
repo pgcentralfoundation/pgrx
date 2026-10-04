@@ -11,7 +11,6 @@
 use core::{iter, ptr};
 
 use crate::callconv::{BoxRet, CallCx, RetAbi};
-use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
 use crate::{IntoDatum, IntoHeapTuple, PgMemoryContexts, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
@@ -215,10 +214,6 @@ where
         };
         IterRet(step)
     }
-
-    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe { TableIterator::<(T,)>::finish_call_fcinfo(fcinfo) }
-    }
 }
 
 unsafe impl<Row> RetAbi for TableIterator<'_, Row>
@@ -230,8 +225,8 @@ where
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         unsafe {
-            if srf_is_first_call(fcinfo) {
-                let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+            if pg_sys::SRF_IS_FIRSTCALL!(fcinfo).get() != 0 {
+                let fn_call_cx = pg_sys::SRF_FIRSTCALL_INIT!(fcinfo).get();
                 CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
             } else {
                 CallCx::RestoreCx
@@ -262,9 +257,14 @@ where
         };
 
         unsafe {
-            let fcx = deref_fcx(fcinfo);
-            srf_return_next(fcinfo, fcx);
-            <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.to_ret())
+            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+            // SAFETY: the initialized SRF context and ReturnSetInfo belong to this call.
+            // The macro records the next row before invoking the row's return conversion.
+            pg_sys::SRF_RETURN_NEXT!(
+                fcx,
+                <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.to_ret()),
+                fcinfo
+            );
         }
     }
 
@@ -272,7 +272,7 @@ where
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         unsafe {
-            let fcx = deref_fcx(fcinfo);
+            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
@@ -282,20 +282,13 @@ where
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let iter = unsafe {
-            let fcx = deref_fcx(fcinfo);
+            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
             &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>()
         };
         IterRet(match iter.next() {
             None => Step::Done,
             Some(value) => Step::Once(value),
         })
-    }
-
-    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe {
-            let fcx = deref_fcx(fcinfo);
-            srf_return_done(fcinfo, fcx)
-        }
     }
 }
 
@@ -311,15 +304,10 @@ enum Step<T: RetAbi> {
 
 pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
-        let fcx = deref_fcx(fcinfo);
-        srf_return_done(fcinfo, fcx);
-        pg_return_null(fcinfo)
+        let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+        // SAFETY: the initialized SRF context belongs to fcinfo and is no longer used.
+        pg_sys::SRF_RETURN_DONE!(fcx, fcinfo);
     }
-}
-
-/// "per_MultiFuncCall" but no FFI cost
-pub(crate) unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
-    unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
 pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
@@ -417,9 +405,9 @@ macro_rules! impl_table_iter {
 
             unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
                 unsafe {
-                    let fcx = deref_fcx(fcinfo);
+                    let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
                     let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
-                    pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+                    pg_sys::Datum::from(pg_sys::HeapTupleGetDatum!(heap_tuple).get() as usize)
                 }
             }
 
@@ -428,7 +416,7 @@ macro_rules! impl_table_iter {
             unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
                 // Pure side effect, leave the value in place.
                 unsafe {
-                    let fcx = deref_fcx(fcinfo);
+                    let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
                     srf_memcx(fcx).switch_to(|_| {
                         let mut tupdesc = ptr::null_mut();
                         let mut oid = pg_sys::Oid::default();

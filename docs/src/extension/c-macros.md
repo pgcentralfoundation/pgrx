@@ -12,8 +12,8 @@ one of your Rust functions or tests.
 
 ## Migrate handwritten helper calls
 
-To migrate a handwritten helper call, use the generated macro with its original
-PostgreSQL name and extract the result at the Rust boundary:
+pgrx's handwritten C macro helpers have been removed. Call the generated macro
+with its original PostgreSQL name and extract the result at the Rust boundary:
 
 | Previous call | Generated call |
 | --- | --- |
@@ -29,7 +29,7 @@ and unsafe blocks. For example, `VARSIZE_ANY!` reads raw storage, and
 Statement macros yield `()`, so they do not need `.get()`. Return macros return
 from the enclosing Rust function or closure; replace the complete return site.
 
-When replacing a `pgrx::is_a` call, preserve its NULL short-circuit before
+The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
 loading a tag with `nodeTag!`; a generated C field access requires valid storage.
 Application-level ownership and error adapters retain their Rust contracts.
 

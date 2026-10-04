@@ -167,19 +167,25 @@ impl Serialize for Tuple {
             }
             .to_str()
             .unwrap();
+            let (attnum, atttypid) = (attribute.attnum, attribute.atttypid);
 
             #[cfg(any(feature = "pg15", feature = "pg16"))]
             let tuple = unsafe { &raw mut (*self.data.as_ptr()).tuple };
             #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
             let tuple = self.data.as_ptr();
 
-            let datum = unsafe {
-                pg_sys::heap_getattr(tuple, attribute.attnum.into(), desc.as_ptr(), &mut isnull)
-            };
+            // SAFETY: the reorder buffer keeps tuple and its data alive, desc
+            // comes from the pinned relation, and iteration supplies a valid
+            // attribute number. isnull is an initialized exclusive output. On
+            // PG15-17 the call can write attcacheoff into desc's attribute
+            // entries, so `attribute` is not used after it; attname borrows only
+            // the name bytes, which that write does not touch.
+            let datum =
+                unsafe { pg_sys::heap_getattr(tuple, attnum.into(), desc.as_ptr(), &mut isnull) };
             if isnull {
                 continue;
             }
-            match attribute.atttypid {
+            match atttypid {
                 pg_sys::INT4OID => {
                     let value = unsafe { i32::from_datum(datum, isnull) };
                     serde_state.serialize_field(attname, &(value.unwrap()))?

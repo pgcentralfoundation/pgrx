@@ -63,7 +63,7 @@ impl<T: PGRXSharedMemory> PgSpinLock<T> {
     #[doc(alias = "SpinLockFree")]
     pub fn is_locked(&self) -> bool {
         // SAFETY: Doesn't actually modify state, despite appearances.
-        unsafe { !pg_sys::SpinLockFree(self.lock.get()) }
+        unsafe { pg_sys::SpinLockFree!(self.lock.get()).get() == 0 }
     }
 
     /// Returns a lock guard for the spinlock. See the [`PgSpinLockGuard`]

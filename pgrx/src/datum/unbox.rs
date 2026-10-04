@@ -60,23 +60,68 @@ pub unsafe trait UnboxDatum {
         Self: 'src;
 }
 
-macro_rules! unbox_int {
-    ($($int_ty:ty),*) => {
-        $(
-            unsafe impl UnboxDatum for $int_ty {
-                type As<'src> = $int_ty;
-                unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src> where Self: 'src {
-                    datum.0.value() as $int_ty
-                }
-            }
-        )*
+// SAFETY: SQL "char" is one byte. DatumGetChar reads its native C representation;
+// the final cast preserves that byte's bits in pgrx's signed Rust representation.
+unsafe impl UnboxDatum for i8 {
+    type As<'src> = i8;
+    #[inline]
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetChar!(datum.0).get() };
+        value as i8
     }
 }
 
-unbox_int! {
-    i8, i16, i32, i64
+// SAFETY: i16 is the native value representation of this PostgreSQL scalar.
+unsafe impl UnboxDatum for i16 {
+    type As<'src> = i16;
+    #[inline]
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetInt16!(datum.0).get() };
+        value
+    }
 }
 
+// SAFETY: i32 is the native value representation of this PostgreSQL scalar.
+unsafe impl UnboxDatum for i32 {
+    type As<'src> = i32;
+    #[inline]
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetInt32!(datum.0).get() };
+        value
+    }
+}
+
+// SAFETY: i64 is the native value representation of this PostgreSQL scalar.
+unsafe impl UnboxDatum for i64 {
+    type As<'src> = i64;
+    #[inline]
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetInt64!(datum.0).get() };
+        value
+    }
+}
+
+// SAFETY: bool is the native value representation of this PostgreSQL scalar.
 unsafe impl UnboxDatum for bool {
     type As<'src> = bool;
     #[inline]
@@ -84,10 +129,14 @@ unsafe impl UnboxDatum for bool {
     where
         Self: 'src,
     {
-        datum.0.value() != 0
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetBool!(datum.0).get() };
+        value
     }
 }
 
+// SAFETY: f32 is the native value representation of this PostgreSQL scalar.
 unsafe impl UnboxDatum for f32 {
     type As<'src> = f32;
     #[inline]
@@ -95,10 +144,12 @@ unsafe impl UnboxDatum for f32 {
     where
         Self: 'src,
     {
-        f32::from_bits(datum.0.value() as u32)
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        unsafe { pg_sys::DatumGetFloat4(datum.0) }
     }
 }
 
+// SAFETY: f64 is the native value representation of this PostgreSQL scalar.
 unsafe impl UnboxDatum for f64 {
     type As<'src> = f64;
     #[inline]
@@ -106,7 +157,8 @@ unsafe impl UnboxDatum for f64 {
     where
         Self: 'src,
     {
-        f64::from_bits(datum.0.value() as u64)
+        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
+        unsafe { pg_sys::DatumGetFloat8(datum.0) }
     }
 }
 
@@ -186,7 +238,10 @@ unsafe impl UnboxDatum for pg_sys::Oid {
     where
         Self: 'src,
     {
-        pg_sys::Oid::from(datum.0.value() as u32)
+        // SAFETY: UnboxDatum's caller guarantees this is an initialized OID datum.
+        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        let value = unsafe { pg_sys::DatumGetObjectId!(datum.0).get() };
+        pg_sys::Oid::from(value)
     }
 }
 
