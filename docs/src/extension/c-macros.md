@@ -31,7 +31,7 @@ Expression macros return an already evaluated C expression wrapper. `.get()`
 extracts its native Rust storage; `.into_value()` keeps the tagged C value:
 
 ```rust
-use pgrx::pg_sys::__pgrx_c_macros::{CUnsignedLong, CValue};
+use pgrx::cmacros::c::{CUnsignedLong, CValue};
 
 let rounded = pgrx::BUFFERALIGN!(33_u32);
 let bytes: u64 = rounded.get();
@@ -54,7 +54,8 @@ the supported target profile. Use explicit Rust suffixes when inference would
 otherwise be unclear. pgrx's `pg_sys::Oid`, `TransactionId`, and `Datum` inputs also
 have generated bridges that verify their C typedefs and Rust representations.
 
-Raw `i64`, `u64`, `isize`, and `usize` are ambiguous. C `unsigned long` and
+Raw `i64`, `u64`, and `isize` are ambiguous. On the accepted LP64 profile,
+`usize` represents C `size_t` (`unsigned long`). C `unsigned long` and
 `unsigned long long` can both occupy a Rust `u64` while having different ranks in
 C's arithmetic conversions. A Rust type alias does not recover that distinction.
 For example, this fails to compile:
@@ -67,7 +68,7 @@ let _ = pgrx::BUFFERALIGN!(size);
 Use a C marker when you know the intended original C type:
 
 ```rust
-use pgrx::pg_sys::__pgrx_c_macros::{CUnsignedLong, CUnsignedLongLong, CValue};
+use pgrx::cmacros::c::{CUnsignedLong, CUnsignedLongLong, CValue};
 
 let size = CValue::<CUnsignedLong>::new(33_u64);
 let aligned = pgrx::BUFFERALIGN!(size).get();
@@ -80,8 +81,24 @@ assert_eq!(grant_options, 0x1_0000_0000_u64);
 
 `CValue::new` labels the supplied representation; it does not infer the C type
 from its magnitude. Select a marker from the C declaration or the macro's
-documented invocation requirements. These helpers currently live in the hidden
-`pg_sys::__pgrx_c_macros` support module.
+documented invocation requirements. The public input vocabulary lives in
+`pgrx::cmacros::c` (also `pg_sys::cmacros::c`).
+
+Binding constants need the same care: bindgen can store a positive C `int`
+constant in a Rust `u32`. A direct caller operand follows that Rust storage
+type unless you supply the original C identity. For example, label `BLCKSZ`
+as C `int` before comparing it with a negative C `int`:
+
+```rust
+use pgrx::{cmacros::c::{CInt, CValue}, pg_sys};
+
+let block_size = CValue::<CInt>::new(i32::try_from(pg_sys::BLCKSZ).unwrap());
+assert_eq!(pgrx::Min!(block_size, -1_i32).get(), -1);
+```
+
+The transpiler preserves the C identity of binding references *inside* a macro
+definition. It cannot infer that an arbitrary Rust path at the call site denotes
+the original C constant; paths can be renamed or shadowed.
 
 If you already have a `Datum`, pass it as a `Datum`. For PostgreSQL 15, where
 `DatumGetInt32` is a C macro, a known pass-by-value int32 Datum can be decoded as
@@ -219,7 +236,7 @@ chooses the meaning of a parenthesized C invocation. For example, assigning a WA
 segment number from a position immediately after the previous segment:
 
 ```rust
-use pgrx::pg_sys::__pgrx_c_macros::{CUnsignedLongLong, CValue};
+use pgrx::cmacros::c::{CUnsignedLongLong, CValue};
 
 let position = CValue::<CUnsignedLongLong>::new(32_u64 * 1024 * 1024);
 let mut segment = CValue::<CUnsignedLongLong>::new(0_u64);
@@ -329,15 +346,36 @@ whose cast and hexadecimal mask it implements:
 preserving a symbol or nested macro call.
 
 The checked-in `pgrx-pg-sys/src/include/cmacros/` files are documentation snapshots,
-generated on Linux. Use your build's `OUT_DIR` bindings, macros, and report when
+made with the release-generation installation and target. Their source includes
+target guards; they may describe a different platform from your computer. Use
+your build's `OUT_DIR` bindings, macros, and report when
 checking actual platform values or diagnosing an unavailable macro.
 
 ## Understand refusals and runtime limits
 
 Generated macro support currently reports `RuntimeOnly`: these macros are not
-promised to work in `const` initializers or enum discriminants. The current runtime
-supports the verified LP64 profiles on x86_64 and aarch64 Linux/macOS; other ABIs
-can be inspected without having a supported runtime translation.
+promised to work in `const` initializers or enum discriminants. The runtime
+uses compiler-verified LP64, LLP64, and ILP32 profiles, with either plain-char
+signedness and byte order. This includes unsigned-char Linux AArch64 and
+Windows. The compiler proves integer ranks, alignment, and relevant native
+calling conventions separately; an unmodeled ABI option still causes a refusal.
+
+Binding generation continues if macro inspection or native compilation is
+unavailable. `PGRX_C_MACROS=0` explicitly disables generation. Macro availability
+also varies with version and headers; use the public availability wrapper to
+include optional items before Rust resolves missing macro names:
+
+```rust
+pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
+    /// Check interrupts on the PostgreSQL backend thread.
+    ///
+    /// # Safety
+    /// The caller must be on the permitted backend thread.
+    unsafe fn check_interrupts() {
+        unsafe { pgrx::CHECK_FOR_INTERRUPTS!(); }
+    }
+}}
+```
 
 Unsupported grammar, unproved types or access rules, preprocessing constructs,
 and exhausted bounds produce skips rather than guessed code. If bindgen and

@@ -374,14 +374,16 @@ impl<'a> Renderer<'a> {
                                     Some(parameter) => format!("$crate::__pgrx_c_field_marker!(${})", arguments::name(analysis, *parameter)),
                                     None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| failure(format!("{field}: no compiler-checked field adapter is available")))?,
                                 };
-                                write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ Some(unsafe {{ ").expect("String output");
+                                let checks = arguments::render_safety_checks(analysis);
+                                write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} Some(unsafe {{ ").expect("String output");
                                 tasks.extend([text(" }) } else { None })"), value(*base)]);
                                 continue;
                             }
                             let known = self.places[index];
+                            let checks = arguments::render_safety_checks(analysis);
                             write!(
                                 rust,
-                                "{EXPRESSION}::{}(if false {{ Some(unsafe {{ ",
+                                "{EXPRESSION}::{}(if false {{ {checks} Some(unsafe {{ ",
                                 if known { "size_of_place_type" } else { "size_of_value_type" }
                             )
                             .expect("String output");
@@ -897,7 +899,7 @@ impl<'a> Renderer<'a> {
                                     "sizeof/alignment requires a complete object type".into(),
                                 ));
                             }
-                            let lowered = lowering.resolve(&ty).map_err(failure)?;
+                            let lowered = lowering.resolve_object_query(&ty).map_err(failure)?;
                             write!(
                                 rust,
                                 "{EXPRESSION}::{}::<{}>()",

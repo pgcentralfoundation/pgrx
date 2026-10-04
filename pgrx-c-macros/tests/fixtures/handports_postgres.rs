@@ -1,4 +1,4 @@
-use __pgrx_c_macros::{CInteger, CLong, CLongLong, CUnsignedLong, CUnsignedLongLong, CValue};
+use __pgrx_c_macros::{CInteger, CLong, CLongLong, CSize, CUnsignedLongLong, CValue};
 use std::cell::Cell;
 
 /// Declare process-local counters implemented by the original C oracle fixture.
@@ -65,12 +65,12 @@ fn main() {
         record("MAXALIGN_SAMPLE", length, MAXALIGN!(length), 0, 0);
     }
 
-    let maximum = CValue::<CUnsignedLong>::new(u64::MAX);
+    let maximum = CValue::<CSize>::new(usize::MAX as _);
     record("TYPEALIGN_MAX", 0, TYPEALIGN!(8_i32, maximum), 0, 0);
     record(
         "TYPEALIGN_NEAR_MAX",
         0,
-        TYPEALIGN!(8_i32, CValue::<CUnsignedLong>::new(u64::MAX - 1)),
+        TYPEALIGN!(8_i32, CValue::<CSize>::new((usize::MAX - 1) as _)),
         0,
         0,
     );
@@ -124,7 +124,7 @@ fn main() {
     };
     let length_argument = || {
         second.set(second.get() + 1);
-        CValue::<CUnsignedLong>::new(13)
+        CValue::<CSize>::new(13)
     };
     let buffer_argument = || {
         first.set(first.get() + 1);

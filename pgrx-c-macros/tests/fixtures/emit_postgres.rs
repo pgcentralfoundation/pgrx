@@ -1,4 +1,4 @@
-use __pgrx_c_macros::{CInteger, CUnsignedLong, CValue};
+use __pgrx_c_macros::{CInteger, CSize, CUnsignedLongLong, CValue};
 use std::cell::Cell;
 
 /// Print the observation format consumed by the paired oracle, retaining C kind and value
@@ -46,13 +46,14 @@ fn main() {
         record("MAXALIGN_DOWN", 0, length, MAXALIGN_DOWN!(length), 0, 0);
         record("MAXALIGN64", 0, length, MAXALIGN64!(length), 0, 0);
     }
-    let maximum = CValue::<CUnsignedLong>::new(u64::MAX);
+    let maximum = CValue::<CSize>::new(usize::MAX as _);
+    let maximum64 = CValue::<CUnsignedLongLong>::new(u64::MAX);
     record("TYPEALIGN_MAX", 8, 0, TYPEALIGN!(8_i32, maximum), 0, 0);
     record("TYPEALIGN_NEGATIVE", 8, 0, TYPEALIGN!(8_i32, -1_i32), 0, 0);
     record("TYPEALIGN_DOWN_MAX", 8, 0, TYPEALIGN_DOWN!(8_i32, maximum), 0, 0);
-    record("TYPEALIGN64_MAX", 8, 0, TYPEALIGN64!(8_i32, maximum), 0, 0);
+    record("TYPEALIGN64_MAX", 8, 0, TYPEALIGN64!(8_i32, maximum64), 0, 0);
     record("MAXALIGN_MAX", 0, 0, MAXALIGN!(maximum), 0, 0);
-    record("MAXALIGN64_MAX", 0, 0, MAXALIGN64!(maximum), 0, 0);
+    record("MAXALIGN64_MAX", 0, 0, MAXALIGN64!(maximum64), 0, 0);
 
     for length in (0_u32..=65535).step_by(257) {
         record("OffsetNumberNext", 0, length, OffsetNumberNext!(length as u16), 0, 0);
@@ -76,7 +77,7 @@ fn main() {
     };
     let length_argument = || {
         second.set(second.get() + 1);
-        CValue::<CUnsignedLong>::new(13)
+        CValue::<CSize>::new(13)
     };
     let offset_argument = || {
         first.set(first.get() + 1);

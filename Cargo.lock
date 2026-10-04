@@ -2283,6 +2283,7 @@ dependencies = [
  "pgrx-pg-config",
  "proc-macro2",
  "quote",
+ "ring",
  "serde",
  "serde_json",
  "sha2",

@@ -472,7 +472,8 @@ pub(crate) fn prepare_inner(
     for (index, body) in bodies.iter().enumerate() {
         snapshot.push_str(&format!("#define {prefix}tokens_{index} {body}\n"));
     }
-    let definitions = crate::frontend::tokenize_snapshot(scanner, &snapshot)?;
+    let definitions =
+        crate::frontend::tokenize_snapshot(scanner, &snapshot, &frontend.profile().arguments)?;
     let mut definitions = definitions
         .into_iter()
         .map(|definition| (definition.name.clone(), definition))
@@ -826,7 +827,8 @@ fn verify_original_environment(
     if triple != frontend.profile().target.triple {
         return Err(FrontendError::Environment("compiler target changed after inspection".into()));
     }
-    let definitions = crate::frontend::tokenize_snapshot(scanner, &output.stdout)?;
+    let definitions =
+        crate::frontend::tokenize_snapshot(scanner, &output.stdout, &frontend.profile().arguments)?;
     let actual = definitions
         .iter()
         .map(|definition| (definition.name.as_str(), definition))

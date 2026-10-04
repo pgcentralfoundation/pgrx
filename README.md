@@ -40,7 +40,7 @@
    + SQL schemas generated automatically (or manually via `cargo pgrx schema`)
    + Include custom SQL with `extension_sql!` & `extension_sql_file!`
 - **Automatic PostgreSQL C Macro Translation**
-   + On supported Linux and macOS targets, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
+   + On verified target C profiles, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
    + Use them through `pgrx::`, with C semantics determined by the selected PostgreSQL installation, compiler flags, and target
    + See [Using PostgreSQL C macros](docs/src/extension/c-macros.md) for extension examples and the [transpiler architecture](pgrx-c-macros/ARCHITECTURE.md) for implementation details
 - **Safety First**
@@ -85,7 +85,7 @@ It is currently expected to work on other "Unix" OS with possible small changes,
    - RHEL-likes: `yum install clang`
    - Windows: download installers from https://github.com/llvm/llvm-project/releases
 - C compiler
-   - Linux and macOS: a Clang executable compatible with the loaded `libclang` for C macro generation and its generated native adapters; the `cshim` feature also needs a C compiler
+   - Linux and macOS: the generator's SHA-256 backend needs a host C compiler; optional C macro generation additionally needs a Clang executable compatible with the loaded `libclang`; ordinary bindings still build if macro inspection is unavailable, and `PGRX_C_MACROS=0` disables it explicitly; the `cshim` feature needs a target C compiler
    - Windows: MSVC or Clang
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
    - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`

@@ -2,7 +2,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-// Individual integration-test crates use different parts of this shared harness.
+// Compile generated Rust consumers independently of the test crate and compare their output
+// with original C observations. Profile-aware callers supply the cfg operands produced by
+// the validated production helper; this module also serves library unit tests without
+// depending on an external crate name.
+//
+// Every compiler and consumer has bounded runtime and captured output in owned temporary
+// files. Cross-target checks stop at metadata and explicitly report missing Rust target
+// libraries, while native comparisons execute the actual emitted macros and support.
 
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
@@ -21,13 +28,29 @@ static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 /// Compile actual emitted Rust and semantic support in an isolated standalone program.
 #[allow(dead_code)]
 pub fn run_rust(source: &str) -> String {
+    run_rust_with_arguments(source, &[])
+}
+
+/// Execute emitted Rust with `support_rust_cfg`'s validated char, size_t, and ptrdiff_t identities
+/// rather than assuming the Rust target defaults match PostgreSQL's compiler profile.
+#[allow(dead_code)]
+pub fn run_rust_with_cfg(source: &str, configurations: &[String]) -> String {
+    run_rust_with_arguments(
+        source,
+        &configurations.iter().flat_map(|value| ["--cfg", value.as_str()]).collect::<Vec<_>>(),
+    )
+}
+
+/// Compile and run a native consumer with only the explicitly selected runtime profile flags.
+fn run_rust_with_arguments(source: &str, arguments: &[&str]) -> String {
     let directory = TemporaryDirectory::new();
     let program = directory.0.join("oracle.rs");
-    let executable = directory.0.join("oracle");
+    let executable = directory.0.join(format!("oracle{}", std::env::consts::EXE_SUFFIX));
     fs::write(&program, source).expect("write Rust oracle source");
     let mut compiler = Command::new("rustc");
     compiler
         .args(["--edition=2024", "-C", "overflow-checks=yes"])
+        .args(arguments)
         .arg(&program)
         .arg("-o")
         .arg(&executable);
@@ -43,6 +66,39 @@ pub fn run_rust_linked(
     header: &Path,
     c_source: &str,
     arguments: &[&str],
+) -> String {
+    run_rust_linked_with_arguments(source, c_compiler, header, c_source, arguments, &[])
+}
+
+/// Link emitted Rust with its original C support using the production helper's validated
+/// runtime identities together with the original compilation arguments.
+#[allow(dead_code)]
+pub fn run_rust_linked_with_cfg(
+    source: &str,
+    c_compiler: &Path,
+    header: &Path,
+    c_source: &str,
+    arguments: &[&str],
+    configurations: &[String],
+) -> String {
+    run_rust_linked_with_arguments(
+        source,
+        c_compiler,
+        header,
+        c_source,
+        arguments,
+        &configurations.iter().flat_map(|value| ["--cfg", value.as_str()]).collect::<Vec<_>>(),
+    )
+}
+
+/// Apply native C arguments and Rust runtime configuration within one bounded oracle run.
+fn run_rust_linked_with_arguments(
+    source: &str,
+    c_compiler: &Path,
+    header: &Path,
+    c_source: &str,
+    arguments: &[&str],
+    rust_arguments: &[&str],
 ) -> String {
     let directory = TemporaryDirectory::new();
     let native = directory.0.join("native.c");
@@ -60,12 +116,13 @@ pub fn run_rust_linked(
         .arg(&object);
     run_bounded(&mut compiler, &directory.0, "compile_native");
     let rust = directory.0.join("linked.rs");
-    let executable = directory.0.join("linked");
+    let executable = directory.0.join(format!("linked{}", std::env::consts::EXE_SUFFIX));
     fs::write(&rust, source).expect("write emitted Rust call oracle");
     let mut compiler = Command::new("rustc");
     compiler
         .args(["--edition=2024", "-O", "-C", "overflow-checks=yes", "-C"])
         .arg(format!("link-arg={}", object.display()))
+        .args(rust_arguments)
         .arg(&rust)
         .arg("-o")
         .arg(&executable);
@@ -73,10 +130,40 @@ pub fn run_rust_linked(
     // symbols have no standalone definition. Keep only reachable C sections.
     #[cfg(target_os = "macos")]
     compiler.args(["-C", "link-arg=-Wl,-dead_strip"]);
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", all(target_os = "windows", target_env = "gnu")))]
     compiler.args(["-C", "link-arg=-Wl,--gc-sections"]);
+    #[cfg(all(target_os = "windows", target_env = "msvc"))]
+    compiler.args(["-C", "link-arg=/OPT:REF"]);
     run_bounded(&mut compiler, &directory.0, "compile_linked");
     run_bounded(&mut Command::new(executable), &directory.0, "execute_linked")
+}
+
+/// Type-check emitted Rust for an actual cross-target profile when that Rust target's standard
+/// library is installed, without requiring its linker or running foreign machine code.
+#[allow(dead_code)]
+pub fn check_rust_with_cfg(source: &str, configurations: &[String], rust_target: &str) -> bool {
+    let library = run_tool(
+        Command::new("rustc").args(["--print", "target-libdir", "--target", rust_target]),
+        "locate cross-target Rust standard library",
+    );
+    if !Path::new(library.trim()).is_dir() {
+        eprintln!(
+            "cross-target Rust type checking omitted for {rust_target}: its standard library is not installed; original C facts and macro emission remain required"
+        );
+        return false;
+    }
+    let directory = TemporaryDirectory::new();
+    let program = directory.0.join("cross.rs");
+    fs::write(&program, source).expect("write cross-target Rust oracle source");
+    let mut compiler = Command::new("rustc");
+    compiler
+        .args(["--edition=2024", "--crate-type=lib", "--emit=metadata", "--target", rust_target])
+        .args(configurations.iter().flat_map(|value| ["--cfg", value.as_str()]))
+        .arg(&program)
+        .arg("-o")
+        .arg(directory.0.join("cross.rmeta"));
+    run_bounded(&mut compiler, &directory.0, "check_cross_target");
+    true
 }
 
 /// Require downstream type checking to reject an invalid invocation before any linking.

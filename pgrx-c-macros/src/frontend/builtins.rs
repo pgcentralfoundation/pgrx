@@ -544,7 +544,7 @@ fn verify_snapshot(
         &frontend.profile().compiler.executable,
         &files.arguments(frontend, &["-E", "-dM"])?,
     )?;
-    let actual = tokenize_snapshot(scanner, &output.stdout)?;
+    let actual = tokenize_snapshot(scanner, &output.stdout, &frontend.profile().arguments)?;
     let expected = &frontend.environment().active;
     if actual.len() != expected.len()
         || actual.iter().any(|definition| {

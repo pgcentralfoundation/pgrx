@@ -10,16 +10,13 @@
     _Bool: "CBool", char: "CChar", signed char: "CSignedChar", \
     unsigned char: "CUnsignedChar", short: "CShort", unsigned short: "CUnsignedShort", \
     int: "CInt", unsigned int: "CUnsignedInt", long: "CLong", unsigned long: "CUnsignedLong", \
-    long long: "CLongLong", unsigned long long: "CUnsignedLongLong", \
-    __int128: "CInt128", unsigned __int128: "CUnsignedInt128")
+    long long: "CLongLong", unsigned long long: "CUnsignedLongLong")
 #define RANK(value) _Generic((value), \
     _Bool: 0, char: 1, signed char: 1, unsigned char: 1, short: 2, unsigned short: 2, \
-    int: 3, unsigned int: 3, long: 4, unsigned long: 4, long long: 5, unsigned long long: 5, \
-    __int128: 6, unsigned __int128: 6)
+    int: 3, unsigned int: 3, long: 4, unsigned long: 4, long long: 5, unsigned long long: 5)
 #define IS_SIGNED(value) _Generic((value), \
     _Bool: 0, char: CHAR_MIN < 0, signed char: 1, unsigned char: 0, short: 1, unsigned short: 0, \
-    int: 1, unsigned int: 0, long: 1, unsigned long: 0, long long: 1, unsigned long long: 0, \
-    __int128: 1, unsigned __int128: 0)
+    int: 1, unsigned int: 0, long: 1, unsigned long: 0, long long: 1, unsigned long long: 0)
 
 static unsigned first_evaluations;
 static unsigned second_evaluations;
@@ -52,11 +49,11 @@ static vartag_external vartag_argument(void) { ++first_evaluations; return (vart
 
 #define RECORD(name, index, expression) do { \
     __typeof__(expression) value = (expression); \
-    const unsigned __int128 bits = (unsigned __int128)value; \
+    const unsigned long long low = (unsigned long long)value; \
+    const unsigned long long high = IS_SIGNED(value) && (long long)value < 0 ? ~0ULL : 0; \
     printf("%s\t%u\t%s\t%u\t%d\t%d\t%016llx%016llx\t%u\t%u\n", \
         name, (unsigned)(index), KIND(value), (unsigned)(sizeof(value) * CHAR_BIT), \
-        IS_SIGNED(value), RANK(value), (unsigned long long)(bits >> 64), \
-        (unsigned long long)bits, first_evaluations, second_evaluations); \
+        IS_SIGNED(value), RANK(value), high, low, first_evaluations, second_evaluations); \
 } while (0)
 
 #ifndef PGRX_HANDPORT_NO_MAIN

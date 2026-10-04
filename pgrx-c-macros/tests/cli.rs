@@ -37,16 +37,20 @@ impl TestConfig {
     /// Create an isolated fake PostgreSQL configuration and server include tree for invoking
     /// the real CLI.
     fn new() -> Self {
+        Self::for_version(18)
+    }
+
+    /// Populate a selected supported major's complete packaged wrapper header set without
+    /// relying on the sibling pg-sys source tree at CLI runtime.
+    fn for_version(major_version: u16) -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let number = NEXT_CONFIG.fetch_add(1, Ordering::Relaxed);
         let home = std::env::temp_dir()
             .join(format!("pgrx-c-macros-cli-{}-{nonce}-{number}", std::process::id()));
         std::fs::create_dir(&home).expect("isolated PGRX_HOME must be created");
         let config = Self { include_dir: home.join("include"), home };
-        let wrapper = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap()
-            .join("pgrx-pg-sys/include/pg18.h");
+        let wrapper =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("include/pg{major_version}.h"));
         let wrapper = std::fs::read_to_string(wrapper).unwrap();
         for include in wrapper.lines().filter_map(|line| {
             line.trim().strip_prefix("#include \"").and_then(|include| include.strip_suffix('"'))
@@ -59,15 +63,20 @@ impl TestConfig {
             std::fs::copy(fixture(name), config.include_dir.join(name)).unwrap();
         }
         let late_header = config.include_dir.join("utils/varlena.h");
-        assert!(late_header.exists(), "sentinel must be in a header present in pg18.h");
+        assert!(late_header.exists(), "sentinel must be present in the selected wrapper");
         std::fs::write(late_header, "#define LATE_WRAPPER_FUNCTION(value) ((value) + 99)\n")
             .unwrap();
 
         let pg_config = config.home.join("pg_config");
-        std::fs::copy(fixture("pg_config.sh"), &pg_config).unwrap();
+        let script = std::fs::read_to_string(fixture("pg_config.sh"))
+            .unwrap()
+            .replace("PostgreSQL 18.0", &format!("PostgreSQL {major_version}.0"));
+        std::fs::write(&pg_config, script).unwrap();
         std::fs::set_permissions(&pg_config, std::fs::Permissions::from_mode(0o700)).unwrap();
-        let config_toml =
-            format!("[configs]\npg18 = {}\n", serde_json::to_string(&pg_config).unwrap());
+        let config_toml = format!(
+            "[configs]\npg{major_version} = {}\n",
+            serde_json::to_string(&pg_config).unwrap()
+        );
         std::fs::write(config.home.join("config.toml"), config_toml).unwrap();
         config
     }
@@ -87,6 +96,107 @@ impl TestConfig {
             .env_remove("PG_CONFIG");
         command
     }
+}
+
+/// Prove every supported default list/analyze command uses an embedded complete wrapper at a
+/// stable cache path, including repeated invocations from outside the repository.
+#[test]
+fn packaged_default_wrappers_cover_every_supported_postgres_version() {
+    for version in pgrx_pg_config::SUPPORTED_VERSIONS() {
+        let config = TestConfig::for_version(version.major);
+        let label = format!("pg{}", version.major);
+        let names = successful_stdout(
+            config
+                .command()
+                .current_dir(&config.home)
+                .args(["list", &label, "--format", "names"])
+                .output()
+                .unwrap(),
+        );
+        assert!(names.contains("LATE_WRAPPER_FUNCTION\n"), "{label}: {names}");
+        let mut previous = None;
+        for _ in 0..2 {
+            let output = successful_stdout(
+                config
+                    .command()
+                    .current_dir(&config.home)
+                    .args([
+                        "analyze",
+                        &label,
+                        "--format",
+                        "json",
+                        "--name",
+                        "LATE_WRAPPER_FUNCTION",
+                    ])
+                    .output()
+                    .unwrap(),
+            );
+            let report: serde_json::Value = serde_json::from_str(&output).unwrap();
+            let header = PathBuf::from(report["profile"]["header"].as_str().unwrap());
+            assert!(header.starts_with(config.home.join("c-macros/headers")), "{header:?}");
+            assert_eq!(header.file_name().unwrap(), format!("pg{}.h", version.major).as_str());
+            let expected = std::fs::read(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join(format!("include/pg{}.h", version.major)),
+            )
+            .unwrap();
+            assert_eq!(std::fs::read(&header).unwrap(), expected);
+            if let Some(previous) = previous {
+                assert_eq!(header, previous);
+            }
+            previous = Some(header);
+        }
+    }
+}
+
+/// Supplying a caller-owned header must not require a writable default-wrapper cache.
+#[test]
+fn explicit_headers_do_not_create_or_consult_the_default_wrapper_cache() {
+    let config = TestConfig::new();
+    std::fs::write(config.home.join("c-macros"), "cache is intentionally inaccessible").unwrap();
+    let names = successful_stdout(
+        config
+            .command()
+            .args(["list", "pg18"])
+            .arg(config.include_dir.join("postgres.h"))
+            .args(["--format", "names"])
+            .output()
+            .unwrap(),
+    );
+    assert!(names.contains("POSTGRES_FIXTURE_FUNCTION"));
+    let output = successful_stdout(
+        config
+            .command()
+            .args(["analyze", "pg18"])
+            .arg(config.include_dir.join("postgres.h"))
+            .args(["--name", "POSTGRES_FIXTURE_FUNCTION"])
+            .output()
+            .unwrap(),
+    );
+    assert!(output.contains("POSTGRES_FIXTURE_FUNCTION: candidate"));
+    let rejected = config.command().args(["list", "pg18"]).output().unwrap();
+    assert!(!rejected.status.success(), "default wrapper must report its cache failure");
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("materialize embedded wrapper"));
+}
+
+/// A pg_config override needs no preexisting pgrx configuration directory; the tool creates
+/// only its owned default-wrapper cache beneath the resolved home.
+#[test]
+fn pg_config_override_can_create_the_default_cache_without_an_initialized_pgrx_home() {
+    let config = TestConfig::new();
+    let uninitialized = config.home.join("uninitialized");
+    let names = successful_stdout(
+        config
+            .command()
+            .env("PGRX_HOME", &uninitialized)
+            .env("PGRX_PG_CONFIG_PATH", config.home.join("pg_config"))
+            .args(["list", "pg18", "--format", "names"])
+            .output()
+            .unwrap(),
+    );
+    assert!(names.contains("LATE_WRAPPER_FUNCTION\n"));
+    assert!(uninitialized.join("c-macros/headers").is_dir());
+    assert!(!uninitialized.join("config.toml").exists());
 }
 
 /// Release only temporary artifacts owned by this fixture, including on failed compiler or

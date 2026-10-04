@@ -48,6 +48,12 @@ impl<K: CInteger, const ZERO: bool> CInteger for CIntegerLiteral<K, ZERO> {
     const SIGNED: bool = K::SIGNED;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = K::RANK;
+    /// Metadata and nominal enum identity cannot create an absent underlying C integer.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the underlying C integer's preferred scalar alignment.
+    const ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve its independently measured array alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: Self::Repr) -> u128 {
         let bits = K::encode(value);

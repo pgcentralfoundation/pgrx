@@ -36,20 +36,23 @@ pub enum SupportProfileError {
         u32,
     ),
     /// The target object-pointer representation lies outside the supported helper family.
-    #[error("runtime support requires 64-bit C pointers, found {0}")]
+    #[error("runtime support requires 32-bit or 64-bit C pointers, found {0}")]
     PointerWidth(
         /// Observed target object-pointer width in bits.
         u32,
     ),
     /// The target sizeof/alignment result does not have the supported C identity.
-    #[error("runtime support requires C unsigned long size_t, found {0:?}")]
+    #[error("runtime support requires unsigned pointer-width size_t, found {0:?}")]
     SizeType(
         /// Observed sizeof/alignment C integer identity.
         IntegerKind,
     ),
-    /// Plain char signedness disagrees with the currently supported runtime profile.
-    #[error("runtime support currently requires signed plain char")]
-    UnsignedChar,
+    /// Pointer subtraction identity differs from the selected runtime target alias.
+    #[error("runtime support requires signed pointer-width ptrdiff_t, found {0:?}")]
+    PtrDiffType(
+        /// Observed signed C identity of pointer subtraction.
+        IntegerKind,
+    ),
     /// A fundamental C type differs in identity, width, signedness, or rank from the helper contract.
     #[error("runtime support requires {expected:?}, found {actual:?}")]
     IntegerLayout {
@@ -65,9 +68,12 @@ pub enum SupportProfileError {
         /// The C triple that lacks a supported Rust target guard.
         String,
     ),
-    /// The inspected target has an endian representation outside the recognized runtime family.
-    #[error("runtime support's recognized target architecture requires little endian")]
-    ByteOrder,
+    /// A partial or malformed preferred-alignment map cannot configure all runtime markers.
+    #[error("runtime support lacks a verified scalar/array alignment for {0}")]
+    AlignmentFacts(
+        /// The fundamental marker whose compiler alignment witnesses are missing or invalid.
+        &'static str,
+    ),
     /// An opaque pg-sys integer wrapper lacks its required original C typedef identity or storage.
     #[error(
         "pg-sys {name} requires an unqualified C unsigned int typedef with 4-byte storage, found {actual:?}"
@@ -104,30 +110,42 @@ pub fn validate_support_profile(profile: &CompilationProfile) -> Result<(), Supp
     if target.char_bits != 8 {
         return Err(SupportProfileError::ByteWidth(target.char_bits));
     }
-    if target.pointer_bits != 64 {
+    if !matches!(target.pointer_bits, 32 | 64) {
         return Err(SupportProfileError::PointerWidth(target.pointer_bits));
     }
-    if target.size_type != IntegerKind::UnsignedLong {
+    let (_, os) = rust_target(profile)?;
+    let long_bits = if os == "windows" { 32 } else { target.pointer_bits };
+    if !matches!(
+        target.size_type,
+        IntegerKind::UnsignedInt | IntegerKind::UnsignedLong | IntegerKind::UnsignedLongLong
+    ) || target
+        .integers
+        .get(&target.size_type)
+        .is_none_or(|ty| ty.signed || ty.bits != target.pointer_bits)
+    {
         return Err(SupportProfileError::SizeType(target.size_type));
     }
-    if !target.char_is_signed {
-        return Err(SupportProfileError::UnsignedChar);
+    if !matches!(target.ptrdiff_type, IntegerKind::Int | IntegerKind::Long | IntegerKind::LongLong)
+        || target
+            .integers
+            .get(&target.ptrdiff_type)
+            .is_none_or(|ty| !ty.signed || ty.bits != target.pointer_bits)
+    {
+        return Err(SupportProfileError::PtrDiffType(target.ptrdiff_type));
     }
     for (kind, bits, signed, rank) in [
         (IntegerKind::Bool, 8, false, 0),
-        (IntegerKind::Char, 8, true, 1),
+        (IntegerKind::Char, 8, target.char_is_signed, 1),
         (IntegerKind::SignedChar, 8, true, 1),
         (IntegerKind::UnsignedChar, 8, false, 1),
         (IntegerKind::Short, 16, true, 2),
         (IntegerKind::UnsignedShort, 16, false, 2),
         (IntegerKind::Int, 32, true, 3),
         (IntegerKind::UnsignedInt, 32, false, 3),
-        (IntegerKind::Long, 64, true, 4),
-        (IntegerKind::UnsignedLong, 64, false, 4),
+        (IntegerKind::Long, long_bits, true, 4),
+        (IntegerKind::UnsignedLong, long_bits, false, 4),
         (IntegerKind::LongLong, 64, true, 5),
         (IntegerKind::UnsignedLongLong, 64, false, 5),
-        (IntegerKind::Int128, 128, true, 6),
-        (IntegerKind::UnsignedInt128, 128, false, 6),
     ] {
         let expected = IntegerType { kind, bits, signed, rank };
         let actual = target.integers.get(&kind).copied();
@@ -135,7 +153,36 @@ pub fn validate_support_profile(profile: &CompilationProfile) -> Result<(), Supp
             return Err(SupportProfileError::IntegerLayout { expected, actual });
         }
     }
-    rust_target(profile)?;
+    // Some valid 32-bit C targets do not expose the Clang 128-bit extension.
+    // Check any admitted identities without requiring the extension globally.
+    if target.integers.contains_key(&IntegerKind::Int128)
+        || target.integers.contains_key(&IntegerKind::UnsignedInt128)
+    {
+        for (kind, signed) in [(IntegerKind::Int128, true), (IntegerKind::UnsignedInt128, false)] {
+            let actual = target.integers.get(&kind).copied();
+            let expected = IntegerType { kind, bits: 128, signed, rank: 6 };
+            if actual != Some(expected) {
+                return Err(SupportProfileError::IntegerLayout { expected, actual });
+            }
+        }
+    }
+    if !target.preferred_alignments.is_empty() {
+        for (marker, _) in crate::frontend::ALIGNMENT_PROBES {
+            if matches!(*marker, "CInt128" | "CUnsignedInt128")
+                && !target.integers.contains_key(&IntegerKind::Int128)
+            {
+                continue;
+            }
+            if target.preferred_alignments.get(*marker).is_none_or(|alignment| {
+                !alignment.scalar.is_power_of_two()
+                    || !alignment.array.is_power_of_two()
+                    || u128::from(alignment.scalar) >= (1u128 << target.pointer_bits)
+                    || u128::from(alignment.array) >= (1u128 << target.pointer_bits)
+            }) {
+                return Err(SupportProfileError::AlignmentFacts(marker));
+            }
+        }
+    }
     Ok(())
 }
 
@@ -147,10 +194,111 @@ pub fn validate_support_profile(profile: &CompilationProfile) -> Result<(), Supp
 pub fn support_abi_assertions(profile: &CompilationProfile) -> Result<String, SupportProfileError> {
     validate_support_profile(profile)?;
     let (arch, os) = rust_target(profile)?;
+    let target = &profile.target;
+    let pointer_bits = target.pointer_bits.to_string();
+    let endian = match target.byte_order {
+        ByteOrder::Little => "little",
+        ByteOrder::Big => "big",
+    };
+    let long_bits = target.integers[&IntegerKind::Long].bits;
+    let size_rank = target.integers[&target.size_type].rank;
+    let ptrdiff_rank = target.integers[&target.ptrdiff_type].rank;
+    let char_signed = target.char_is_signed;
+    let abi_guard = match (target.arm_float_abi, target.ppc64_elf_abi) {
+        (Some(crate::ArmFloatAbi::Base), _) => ", target_abi = \"eabi\"",
+        (Some(crate::ArmFloatAbi::Vfp), _) => ", target_abi = \"eabihf\"",
+        (_, Some(crate::Ppc64ElfAbi::V1)) => ", target_abi = \"elfv1\"",
+        (_, Some(crate::Ppc64ElfAbi::V2)) => ", target_abi = \"elfv2\"",
+        (None, None) => "",
+    };
     Ok(format!(
-        "#[cfg(not(all(target_arch = {arch:?}, target_os = {os:?}, target_pointer_width = \"64\", target_endian = \"little\")))]\n\
-         compile_error!(\"generated C macros require their inspected C target profile\");\n"
+        "#[cfg(not(all(target_arch = {arch:?}, target_os = {os:?}, target_pointer_width = {pointer_bits:?}, target_endian = {endian:?}{abi_guard})))]\n\
+         compile_error!(\"generated C macros require their inspected C target profile\");\n\
+         const _: () = {{\n\
+           use crate::__pgrx_c_macros::CInteger as _;\n\
+           assert!(crate::__pgrx_c_macros::CChar::SIGNED == {char_signed});\n\
+           assert!(crate::__pgrx_c_macros::CLong::BITS == {long_bits});\n\
+           assert!(crate::__pgrx_c_macros::CSize::BITS == {pointer_bits});\n\
+           assert!(crate::__pgrx_c_macros::CSize::RANK == {size_rank});\n\
+           assert!(!crate::__pgrx_c_macros::CSize::SIGNED);\n\
+           assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == {pointer_bits});\n\
+           assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == {ptrdiff_rank});\n\
+           assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);\n\
+         }};\n"
     ))
+}
+
+/// Select runtime marker configuration from the verified C identities instead of Rust host defaults.
+/// Each string is one rustc `--cfg` operand; build scripts and standalone oracle compilers share
+/// this mapping so command-line char overrides and platform typedef ranks cannot diverge.
+pub fn support_rust_cfg(profile: &CompilationProfile) -> Result<Vec<String>, SupportProfileError> {
+    validate_support_profile(profile)?;
+    let size = match profile.target.size_type {
+        IntegerKind::UnsignedInt => "unsigned_int",
+        IntegerKind::UnsignedLong => "unsigned_long",
+        IntegerKind::UnsignedLongLong => "unsigned_long_long",
+        _ => unreachable!("the support gate admitted only modeled unsigned size_t identities"),
+    };
+    let ptrdiff = match profile.target.ptrdiff_type {
+        IntegerKind::Int => "int",
+        IntegerKind::Long => "long",
+        IntegerKind::LongLong => "long_long",
+        _ => unreachable!(
+            "the support gate admitted only modeled signed pointer difference identities"
+        ),
+    };
+    let mut cfg = vec![
+        if profile.target.char_is_signed { "pgrx_c_char_signed" } else { "pgrx_c_char_unsigned" }
+            .into(),
+        format!("pgrx_c_size_type={size:?}"),
+        format!("pgrx_c_ptrdiff_type={ptrdiff:?}"),
+    ];
+    if !profile.target.preferred_alignments.is_empty() {
+        cfg.push("pgrx_c_alignment".into());
+        if !profile.target.integers.contains_key(&IntegerKind::Int128) {
+            cfg.push("pgrx_c_int128_unavailable".into());
+        }
+    }
+    Ok(cfg)
+}
+
+/// Publish original C type-operator alignment separately from Rust's storage ABI alignment.
+///
+/// Each marker constant contains its scalar and array alignment. Frontend inspection proves
+/// both with the original compiler, including nested arrays. An empty map belongs only to
+/// synthetic profiles without those proofs; it leaves runtime storage fallbacks selected.
+pub fn support_alignment_profile(
+    profile: &CompilationProfile,
+) -> Result<String, SupportProfileError> {
+    validate_support_profile(profile)?;
+    if profile.target.preferred_alignments.is_empty() {
+        return Ok(String::new());
+    }
+    let mut rust = String::from(
+        "/// Original compiler type-operator alignments; these may exceed record storage alignment.\n\
+         #[doc(hidden)]\n\
+         #[allow(non_upper_case_globals)]\n\
+         pub mod __pgrx_c_alignment {\n",
+    );
+    for (marker, _) in crate::frontend::ALIGNMENT_PROBES {
+        if let Some(alignment) = profile.target.preferred_alignments.get(*marker) {
+            rust.push_str(&format!(
+                "/// Verified C scalar and array alignment for {marker}, in bytes.\n\
+             pub const {marker}: (usize, usize) = ({}, {});\n",
+                alignment.scalar, alignment.array,
+            ));
+        }
+    }
+    for marker in ["CInt128", "CUnsignedInt128"] {
+        if !profile.target.preferred_alignments.contains_key(marker) {
+            rust.push_str(&format!(
+                "/// Unavailable C identity: zero sentinels reject runtime values and alignment queries.\n\
+                 pub const {marker}: (usize, usize) = (0, 0);\n",
+            ));
+        }
+    }
+    rust.push_str("}\n");
+    Ok(rust)
 }
 
 /// Generate numeric input adapters for pg-sys's own opaque integer types.
@@ -198,9 +346,11 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
     let datum_kind = datum
         .and_then(|ty| match ty.category {
             TypeCategory::Integer(
-                kind @ (IntegerKind::UnsignedLong | IntegerKind::UnsignedLongLong),
+                kind @ (IntegerKind::UnsignedInt
+                | IntegerKind::UnsignedLong
+                | IntegerKind::UnsignedLongLong),
             ) if ty.size == Some(u64::from(frontend.profile().target.pointer_bits / 8))
-                && ty.alignment == Some(8)
+                && ty.alignment == Some(u64::from(frontend.profile().target.pointer_bits / 8))
                 && !ty.is_const
                 && !ty.is_volatile =>
             {
@@ -210,19 +360,22 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
         })
         .ok_or_else(|| SupportProfileError::PgSysDatumType(datum.cloned()))?;
     let marker = match datum_kind {
+        IntegerKind::UnsignedInt => "CUnsignedInt",
         IntegerKind::UnsignedLong => "CUnsignedLong",
         IntegerKind::UnsignedLongLong => "CUnsignedLongLong",
         _ => unreachable!(
             "the Datum representation gate admits only pointer-width unsigned integers"
         ),
     };
+    let pointer_bytes = frontend.profile().target.pointer_bits / 8;
+    let repr = if pointer_bytes == 4 { "u32" } else { "u64" };
     rust.push_str(&format!(
         "// C Datum is an integer that can retain an exposed Rust pointer's provenance.\n\
-         const _: () = {{ assert!(::core::mem::size_of::<crate::Datum>() == 8); assert!(::core::mem::align_of::<crate::Datum>() == 8); }};\n\
+         const _: () = {{ assert!(::core::mem::size_of::<crate::Datum>() == {pointer_bytes}); assert!(::core::mem::align_of::<crate::Datum>() == {pointer_bytes}); }};\n\
          impl crate::__pgrx_c_macros::sealed::Sealed for crate::Datum {{}}\n\
          impl crate::__pgrx_c_macros::IntoCValue for crate::Datum {{\n\
            type Kind = crate::__pgrx_c_macros::{marker};\n\
-           fn into_c_value(self) -> crate::__pgrx_c_macros::CValue<Self::Kind> {{ crate::__pgrx_c_macros::CValue::new(self.cast_mut_ptr::<()>().expose_provenance() as u64) }}\n\
+           fn into_c_value(self) -> crate::__pgrx_c_macros::CValue<Self::Kind> {{ crate::__pgrx_c_macros::CValue::new(self.cast_mut_ptr::<()>().expose_provenance() as {repr}) }}\n\
          }}\n\
          impl crate::__pgrx_c_macros::expression::IntegerStorage<crate::__pgrx_c_macros::{marker}> for crate::Datum {{\n\
            fn decode(self) -> crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::{marker}> {{ crate::__pgrx_c_macros::IntoCValue::into_c_value(self) }}\n\
@@ -240,26 +393,52 @@ fn rust_target(
 ) -> Result<(&'static str, &'static str), SupportProfileError> {
     let triple = &profile.target.triple;
     let mut components = triple.split('-');
-    let arch = match components.next() {
-        Some("x86_64") => "x86_64",
-        Some("aarch64" | "arm64") => "aarch64",
+    let component = components.next().unwrap_or_default();
+    let arch = match component {
+        "x86_64" => "x86_64",
+        "i386" | "i486" | "i586" | "i686" => "x86",
+        "aarch64" | "aarch64_be" | "arm64" => "aarch64",
+        "powerpc" | "powerpcle" => "powerpc",
+        "powerpc64" | "powerpc64le" => "powerpc64",
+        "mips" | "mipsel" => "mips",
+        "mips64" | "mips64el" => "mips64",
+        "s390x" => "s390x",
+        "sparc" => "sparc",
+        "sparcv9" | "sparc64" => "sparc64",
+        "loongarch64" => "loongarch64",
+        name if name.starts_with("arm") || name.starts_with("thumb") => "arm",
+        name if name.starts_with("riscv32") => "riscv32",
+        name if name.starts_with("riscv64") => "riscv64",
         _ => return Err(SupportProfileError::TargetFamily(triple.clone())),
     };
     let components = components.collect::<Vec<_>>();
-    let os = if components.contains(&"linux") {
-        "linux"
+    let os = if components.iter().any(|os| os.starts_with("android")) {
+        "android"
+    } else if components.iter().any(|os| matches!(*os, "windows" | "win32" | "mingw32")) {
+        "windows"
     } else if components.first() == Some(&"apple")
-        && components.get(1).is_some_and(|os| {
-            os.starts_with("darwin") || os.starts_with("macosx") || *os == "macos"
-        })
+        && components.get(1).is_some_and(|os| os.starts_with("darwin") || os.starts_with("macos"))
     {
         "macos"
     } else {
-        return Err(SupportProfileError::TargetFamily(triple.clone()));
+        [
+            "linux",
+            "freebsd",
+            "netbsd",
+            "openbsd",
+            "dragonfly",
+            "illumos",
+            "solaris",
+            "haiku",
+            "hurd",
+            "aix",
+            "fuchsia",
+            "redox",
+        ]
+        .into_iter()
+        .find(|os| components.iter().any(|component| component.starts_with(os)))
+        .ok_or_else(|| SupportProfileError::TargetFamily(triple.clone()))?
     };
-    if profile.target.byte_order != ByteOrder::Little {
-        return Err(SupportProfileError::ByteOrder);
-    }
     Ok((arch, os))
 }
 
@@ -307,6 +486,10 @@ mod tests {
                 pointer_bits: 64,
                 function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
                 size_type: IntegerKind::UnsignedLong,
+                ptrdiff_type: IntegerKind::Long,
+                preferred_alignments: Default::default(),
+                arm_float_abi: None,
+                ppc64_elf_abi: None,
                 offsetof_supported: true,
                 char_bits: 8,
                 char_is_signed: true,
@@ -404,9 +587,16 @@ mod tests {
         profile.target.offsetof_supported = false;
         assert!(validate_support_profile(&profile).is_ok());
         profile.target.size_type = IntegerKind::UnsignedLongLong;
+        validate_support_profile(&profile).unwrap();
+        assert!(
+            support_rust_cfg(&profile)
+                .unwrap()
+                .contains(&"pgrx_c_size_type=\"unsigned_long_long\"".into())
+        );
+        profile.target.size_type = IntegerKind::UnsignedInt;
         assert_eq!(
             validate_support_profile(&profile),
-            Err(SupportProfileError::SizeType(IntegerKind::UnsignedLongLong))
+            Err(SupportProfileError::SizeType(IntegerKind::UnsignedInt))
         );
     }
 
@@ -422,9 +612,86 @@ mod tests {
         assert!(linux.contains("target_arch = \"x86_64\""));
         assert!(linux.contains("target_os = \"linux\""));
         profile.target.triple = "x86_64-pc-windows-msvc".into();
+        for kind in [IntegerKind::Long, IntegerKind::UnsignedLong] {
+            profile.target.integers.get_mut(&kind).unwrap().bits = 32;
+        }
+        profile.target.size_type = IntegerKind::UnsignedLongLong;
+        profile.target.ptrdiff_type = IntegerKind::LongLong;
+        let windows = support_abi_assertions(&profile).unwrap();
+        assert!(windows.contains("target_os = \"windows\""));
+        assert!(windows.contains("CLong::BITS == 32"));
+        assert!(windows.contains("CSize::RANK == 5"));
+        profile.target.triple = "unmodeled-unknown-linux-gnu".into();
         assert!(matches!(
-            support_abi_assertions(&profile),
+            validate_support_profile(&profile),
             Err(SupportProfileError::TargetFamily(_))
         ));
+    }
+    /// Admit ILP32 and big-endian layouts from facts while preserving signedness/rank invariants.
+    #[test]
+    fn verified_layouts_admit_unsigned_char_ilp32_and_big_endian() {
+        let mut profile = profile();
+        profile.target.char_is_signed = false;
+        profile.target.integers.get_mut(&IntegerKind::Char).unwrap().signed = false;
+        profile.target.triple = "powerpc64-unknown-linux-gnu".into();
+        profile.target.byte_order = ByteOrder::Big;
+        let guard = support_abi_assertions(&profile).unwrap();
+        assert!(guard.contains("target_endian = \"big\""));
+        assert!(guard.contains("CChar::SIGNED == false"));
+        assert!(support_rust_cfg(&profile).unwrap().contains(&"pgrx_c_char_unsigned".into()));
+        profile.target.triple = "i686-unknown-openbsd".into();
+        profile.target.pointer_bits = 32;
+        profile.target.byte_order = ByteOrder::Little;
+        profile.target.function_pointer = crate::PointerLayout { size: 4, alignment: 4 };
+        for kind in [IntegerKind::Long, IntegerKind::UnsignedLong] {
+            profile.target.integers.get_mut(&kind).unwrap().bits = 32;
+        }
+        profile.target.integers.remove(&IntegerKind::Int128);
+        profile.target.integers.remove(&IntegerKind::UnsignedInt128);
+        // OpenBSD retains long rank for pointer-width typedefs even on ILP32.
+        let guard = support_abi_assertions(&profile).unwrap();
+        assert!(guard.contains("target_pointer_width = \"32\""));
+        assert!(guard.contains("CSize::RANK == 4"));
+        assert!(guard.contains("CPtrDiff::RANK == 4"));
+        profile.target.ptrdiff_type = IntegerKind::LongLong;
+        assert_eq!(
+            validate_support_profile(&profile),
+            Err(SupportProfileError::PtrDiffType(IntegerKind::LongLong))
+        );
+    }
+
+    /// Complete compiler alignment profiles configure all markers while absent extensions remain
+    /// explicit unavailability sentinels instead of guessed Rust layouts.
+    #[test]
+    fn alignment_profiles_require_all_fundamental_witnesses() {
+        let mut profile = profile();
+        assert!(support_alignment_profile(&profile).unwrap().is_empty());
+        assert!(!support_rust_cfg(&profile).unwrap().contains(&"pgrx_c_alignment".into()));
+        for (marker, _) in crate::frontend::ALIGNMENT_PROBES {
+            profile
+                .target
+                .preferred_alignments
+                .insert((*marker).into(), crate::PreferredAlignment { scalar: 8, array: 8 });
+        }
+        assert!(support_rust_cfg(&profile).unwrap().contains(&"pgrx_c_alignment".into()));
+        assert!(support_alignment_profile(&profile).unwrap().contains("pub const CFloat64"));
+        profile.target.preferred_alignments.remove("CLongLong");
+        assert_eq!(
+            validate_support_profile(&profile),
+            Err(SupportProfileError::AlignmentFacts("CLongLong"))
+        );
+        profile
+            .target
+            .preferred_alignments
+            .insert("CLongLong".into(), crate::PreferredAlignment { scalar: 8, array: 8 });
+        for kind in [IntegerKind::Int128, IntegerKind::UnsignedInt128] {
+            profile.target.integers.remove(&kind);
+        }
+        for marker in ["CInt128", "CUnsignedInt128"] {
+            profile.target.preferred_alignments.remove(marker);
+        }
+        let rust = support_alignment_profile(&profile).unwrap();
+        assert!(rust.contains("pub const CInt128: (usize, usize) = (0, 0)"));
+        assert!(rust.contains("pub const CUnsignedInt128: (usize, usize) = (0, 0)"));
     }
 }

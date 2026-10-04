@@ -175,38 +175,46 @@ pub(super) struct FieldAdapters {
     pub offset_unsupported: BTreeMap<String, String>,
 }
 
-/// IDs depend on the complete immutable C catalog, so changing requested roots
-/// or removing rejected macros cannot change an already emitted field identity.
+/// Stable member-name capabilities shared across records for polymorphic field designators.
+/// Adding unrelated catalog members must not rename an existing projection.
 struct FieldIds<'a> {
-    /// Sorted immutable C member names assigned deterministic capability IDs.
-    names: BTreeMap<&'a str, u64>,
+    /// Complete catalog membership and its stable nominal Rust marker spelling.
+    names: BTreeMap<&'a str, String>,
 }
 
-/// Assign immutable catalog identities before emission demand can remove any member.
+/// Assign source-name identities before demand pruning without catalog-wide ranks.
 impl<'a> FieldIds<'a> {
-    /// Assign sorted IDs from the complete declaration catalog before requested roots are pruned.
-    fn new(declarations: &'a DeclarationCatalog) -> Result<Self, String> {
+    /// Preserve ordinary C spellings; encode other accepted spellings without collisions.
+    fn new(declarations: &'a DeclarationCatalog) -> Self {
         let mut names = BTreeMap::new();
         for record in declarations.records.values() {
             for field in &record.fields {
                 if let Some(name) = &field.name {
-                    names.entry(name.as_str()).or_insert(0);
+                    let readable = format!("Field_{name}");
+                    let marker = if readable
+                        .bytes()
+                        .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+                    {
+                        readable
+                    } else {
+                        let mut escaped = String::from("FieldHex_");
+                        for byte in name.bytes() {
+                            write!(escaped, "{byte:02x}").expect("String output");
+                        }
+                        escaped
+                    };
+                    names.entry(name.as_str()).or_insert(marker);
                 }
             }
         }
-        for (position, id) in names.values_mut().enumerate() {
-            *id = u64::try_from(position)
-                .map_err(|_| "C field identity registry exceeds u64 representation")?;
-        }
-        Ok(Self { names })
+        Self { names }
     }
 
-    /// Resolve a catalog-owned member name without fabricating an identity for missing fields.
+    /// Resolve a catalog-owned member without fabricating a missing capability.
     fn marker(&self, name: &str) -> Result<String, String> {
-        let id = self.names.get(name).ok_or_else(|| {
+        self.names.get(name).cloned().ok_or_else(|| {
             format!("C field `{name}` has no immutable declaration-catalog identity")
-        })?;
-        Ok(format!("Field{id}"))
+        })
     }
 }
 
@@ -221,7 +229,7 @@ pub(super) fn generate(
     target: &TargetFacts,
     required_types: &[TypeInfo],
 ) -> Result<FieldAdapters, String> {
-    let field_ids = FieldIds::new(declarations)?;
+    let field_ids = FieldIds::new(declarations);
     let lowering = Lowering::new_native(declarations, bindings, target);
     let records_by_path = bindings
         .records
@@ -440,7 +448,7 @@ pub(super) fn generate(
                     record.alignment,
                 );
             }
-            for step in &projection.steps {
+            for (step_index, step) in projection.steps.iter().enumerate() {
                 let parent_storage = lowering
                     .resolve(&declarations.type_shapes[step.canonical].ty)?
                     .storage
@@ -455,7 +463,14 @@ pub(super) fn generate(
                 }
                 layout_checks.field(&mut output.rust, &parent_storage, rust_field, offset);
                 let actual = lowering.storage_type(&step.binding.ty, 0)?.replace("$crate", "crate");
-                layout_checks.projection(&mut output.rust, &parent_storage, rust_field, &actual);
+                if step_index + 1 < projection.steps.len() {
+                    layout_checks.projection(
+                        &mut output.rust,
+                        &parent_storage,
+                        rust_field,
+                        &actual,
+                    );
+                }
                 if let Some(size) = step.field.ty.size {
                     layout_checks.object(
                         &mut output.rust,
@@ -500,6 +515,24 @@ pub(super) fn generate(
                    type Declared = {qualification};\n\
                    const OFFSET: usize = {offset};\n\
                  }}").expect("String output");
+            let field_path = projection
+                .steps
+                .iter()
+                .map(|step| step.binding.rust_name.as_str())
+                .collect::<Vec<_>>()
+                .join(".");
+            let mut member_storage = format!(
+                "<<{EXPRESSION}::CRecord<{storage}> as {EXPRESSION}::OrdinaryField<{field_marker}>>::Member as {EXPRESSION}::CType>::Storage"
+            );
+            // ManuallyDrop is a binding-only transparent union wrapper. The C
+            // member marker names its inner storage, so retain the wrapper in
+            // the witness while tying that inner type to the associated member.
+            let mut actual = &projection.steps.last().expect("validated leaf").binding.ty;
+            while let crate::RustBindingType::ManuallyDrop { value } = actual {
+                member_storage = format!("::core::mem::ManuallyDrop<{member_storage}>");
+                actual = value;
+            }
+            layout_checks.projection(&mut output.rust, &storage, &field_path, &member_storage);
             pending_records.push(field.ty.clone());
             if output.rust.len() > MAX_ADAPTER_BYTES {
                 return Err("generated field adapters exceed the 16 MiB source budget".into());
@@ -911,22 +944,20 @@ mod tests {
     use crate::{FieldBinding, MacroScanner, RecordBinding, RecordKind, RustBindingType, inspect};
     use std::path::PathBuf;
 
-    /// C oracle compilation support used to compare generated access against the original header.
+    /// Execute original-header C witnesses independently of field lowering.
+    ///
+    /// The shared harness owns compiler artifacts and bounds process runtime
+    /// and output. Its native observations establish layout and access behavior;
+    /// translated Rust or existing pgrx ports never supply the expected result.
     mod oracle {
-        //! Execute original-header C witnesses independently of field lowering.
-        //!
-        //! The shared harness owns compiler artifacts and bounds process runtime
-        //! and output. Its native observations establish layout and access behavior;
-        //! translated Rust or existing pgrx ports never supply the expected result.
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/oracle.rs"));
     }
-    /// Rust consumer compilation support used to exercise capability and negative type checks.
+    /// Compile actual generated field adapters in independent Rust consumers.
+    ///
+    /// Positive consumers are compared with the original C witnesses, while
+    /// negative consumers must fail type checking before linking. The shared
+    /// harness isolates artifacts and enforces the same process limits as C.
     mod rust_oracle {
-        //! Compile actual generated field adapters in independent Rust consumers.
-        //!
-        //! Positive consumers are compared with the original C witnesses, while
-        //! negative consumers must fail type checking before linking. The shared
-        //! harness isolates artifacts and enforces the same process limits as C.
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/rust_oracle.rs"));
     }
 
@@ -986,9 +1017,9 @@ mod tests {
             .expect("generated markers refer to the defining crate's local types")
     }
 
-    /// Prove field IDs are deterministic, unique, and independent of record insertion order.
+    /// Prove field IDs survive unrelated new members, source reordering, and extension spellings.
     #[test]
-    fn field_ids_are_sorted_unique_and_independent_of_record_order() {
+    fn field_ids_are_stable_unique_and_independent_of_record_order() {
         let original = registry_catalog(&[
             ("Second", &["z", "a", "self", "type"]),
             ("First", &["z", "_", "a_", "a"]),
@@ -997,14 +1028,19 @@ mod tests {
             ("First", &["a", "a_", "_", "z"]),
             ("Second", &["type", "self", "a", "z"]),
         ]);
-        let ids = FieldIds::new(&original).unwrap();
-        let reordered = FieldIds::new(&reordered).unwrap();
+        let ids = FieldIds::new(&original);
+        let reordered = FieldIds::new(&reordered);
         assert_eq!(ids.names, reordered.names);
-        assert_eq!(
-            ids.names,
-            BTreeMap::from([("_", 0), ("a", 1), ("a_", 2), ("self", 3), ("type", 4), ("z", 5)])
-        );
-        assert_eq!(ids.marker("self").unwrap(), "Field3");
+        let extended = registry_catalog(&[
+            ("First", &["new_unrelated", "a", "a_", "_", "z"]),
+            ("Second", &["type", "self", "a", "$extension"]),
+        ]);
+        let extended = FieldIds::new(&extended);
+        for name in ids.names.keys() {
+            assert_eq!(ids.marker(name).unwrap(), extended.marker(name).unwrap());
+        }
+        assert_eq!(ids.marker("self").unwrap(), "Field_self");
+        assert_eq!(extended.marker("$extension").unwrap(), "FieldHex_24657874656e73696f6e");
         assert_ne!(ids.marker("a").unwrap(), ids.marker("a_").unwrap());
     }
 
@@ -1012,21 +1048,21 @@ mod tests {
     #[test]
     fn field_ids_preserve_subset_identity_and_emit_each_local_marker_once() {
         let catalog = registry_catalog(&[("Owner", &["unrequested", "z", "a", "self"])]);
-        let ids = FieldIds::new(&catalog).unwrap();
+        let ids = FieldIds::new(&catalog);
         let mut original = empty_adapters();
         register_marker(&mut original, &ids, "z").unwrap();
         register_marker(&mut original, &ids, "self").unwrap();
         register_marker(&mut original, &ids, "z").unwrap();
         let mut subset = empty_adapters();
-        register_marker(&mut subset, &FieldIds::new(&catalog).unwrap(), "z").unwrap();
+        register_marker(&mut subset, &FieldIds::new(&catalog), "z").unwrap();
         assert_eq!(original.markers["z"], subset.markers["z"]);
-        assert_eq!(local_marker(&original, "z"), "Field3");
+        assert_eq!(local_marker(&original, "z"), "Field_z");
         assert_ne!(original.markers["z"], original.markers["self"]);
         assert_eq!(original.rust.matches("pub struct ").count(), 2);
-        assert_eq!(original.rust.matches("pub struct Field3;").count(), 1);
-        assert_eq!(original.rust.matches("pub struct Field1;").count(), 1);
-        assert_eq!(subset.rust.matches("pub struct Field3;").count(), 1);
-        assert!(!subset.rust.contains("pub struct Field1;"));
+        assert_eq!(original.rust.matches("pub struct Field_z;").count(), 1);
+        assert_eq!(original.rust.matches("pub struct Field_self;").count(), 1);
+        assert_eq!(subset.rust.matches("pub struct Field_z;").count(), 1);
+        assert!(!subset.rust.contains("pub struct Field_self;"));
         assert_eq!(original.markers.len(), 2);
         assert!(!original.markers.contains_key("unrequested"));
         syn::parse_file(&original.rust).unwrap();
@@ -1036,7 +1072,7 @@ mod tests {
     #[test]
     fn empty_and_missing_field_ids_emit_no_markers_or_fabricated_identity() {
         let catalog = DeclarationCatalog::default();
-        let ids = FieldIds::new(&catalog).unwrap();
+        let ids = FieldIds::new(&catalog);
         assert!(ids.names.is_empty());
         let mut output = empty_adapters();
         let error = register_marker(&mut output, &ids, "missing").unwrap_err();
@@ -1113,15 +1149,17 @@ mod tests {
 
     /// Supply the fixture’s include path and compiler profile for field analysis.
     fn arguments() -> Vec<String> {
-        let mut arguments = vec!["-std=c11".into()];
+        let arguments = vec!["-std=c11".into()];
         #[cfg(target_os = "macos")]
-        {
+        let arguments = {
+            let mut arguments = arguments;
             let sdk = rust_oracle::run_tool(
                 std::process::Command::new("xcrun").arg("--show-sdk-path"),
                 "locate the C oracle SDK",
             );
             arguments.extend(["-isysroot".into(), sdk.trim().into()]);
-        }
+            arguments
+        };
         arguments
     }
 
@@ -1152,7 +1190,10 @@ mod tests {
         assert_eq!(
             generated
                 .rust
-                .matches(&format!("::OrdinaryField<{}", local_marker(&generated, "count")))
+                .matches(&format!(
+                    "unsafe impl {EXPRESSION}::OrdinaryField<{}",
+                    local_marker(&generated, "count")
+                ))
                 .count(),
             1
         );
@@ -1492,7 +1533,7 @@ int main(void) {
         assert!(!generated.markers.contains_key("bits"));
         assert!(generated.markers.contains_key("array"));
         assert!(!generated.rust.contains("CRecord<crate::Outer>"));
-        let ids = FieldIds::new(frontend.declarations()).unwrap();
+        let ids = FieldIds::new(frontend.declarations());
         assert!(ids.marker("bits").is_ok(), "rejected fields retain their immutable IDs");
         let mut subset = FieldRequests::default();
         subset.field(None, Some("count"));

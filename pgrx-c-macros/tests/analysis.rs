@@ -25,6 +25,115 @@ use std::sync::Mutex;
 /// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Refuse unresolved cast/value ambiguity before creating caller captures, while retaining
+/// compiler-backed names and grouping that cannot be a C type cast.
+#[test]
+fn ambiguous_caller_casts_are_refused_without_rejecting_unambiguous_calls() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_capture_casts.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let ambiguous = [
+        "CAPTURE_UNKNOWN_SUBTRACT",
+        "CAPTURE_UNKNOWN_ADD",
+        "CAPTURE_UNKNOWN_MULTIPLY",
+        "CAPTURE_UNKNOWN_AND",
+        "CAPTURE_UNKNOWN_CALL",
+    ];
+    let unambiguous = [
+        "CAPTURE_DIRECT_CALL",
+        "CAPTURE_NESTED_CALL",
+        "CAPTURE_EMPTY_CALL",
+        "CAPTURE_POSTFIX",
+        "CAPTURE_KNOWN_VALUE",
+        "CAPTURE_KNOWN_FUNCTION",
+        "CAPTURE_KNOWN_TYPE",
+    ];
+    let names = ambiguous.into_iter().chain(unambiguous).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in ambiguous {
+        let analysis = session.analyze(name);
+        let AnalysisStatus::Skipped { reason } = &analysis.status else {
+            panic!("unresolved C type/value role must not become a capture: {analysis:?}");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType);
+        assert!(reason.message.contains("UnresolvedId"), "{reason:?}");
+        assert!(reason.tokens.is_some(), "the original ambiguous group must be identified");
+        assert_eq!(analysis.parameters.len(), 1, "no caller operand may be invented");
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }));
+    }
+    for name in unambiguous {
+        let analysis = session.analyze(name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "typedef unsigned int UnresolvedId;\n_Static_assert(CAPTURE_UNKNOWN_SUBTRACT(0xFFFFFFFFu), \"the original C uses an unsigned cast, not subtraction\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Preserve C23 keyword roles through expansion instead of inventing caller arguments for
+/// unsupported literals, types, or alignment syntax.
+#[test]
+fn c23_keywords_are_not_captured_as_runtime_identifiers() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_c23_keywords.h");
+    let frontend =
+        match inspect(&scanner, &header, &["-std=c23".into(), "-pedantic-errors".into()], None) {
+            Ok(frontend) => frontend,
+            Err(FrontendError::CompilerFailed { diagnostics, .. })
+                if diagnostics
+                    .lines()
+                    .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'")) =>
+            {
+                eprintln!("C23 keyword probe unavailable: the selected compiler rejects -std=c23");
+                return;
+            }
+            Err(error) => panic!("inspect original definitions under strict C23: {error}"),
+        };
+    let names =
+        ["KEYWORD_TRUE", "KEYWORD_FALSE", "KEYWORD_NULLPTR", "KEYWORD_BOOL", "KEYWORD_ALIGNOF"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        let analysis = session.analyze(name);
+        assert_skip(
+            &analysis,
+            if matches!(name, "KEYWORD_TRUE" | "KEYWORD_FALSE" | "KEYWORD_NULLPTR") {
+                SkipReasonCode::UnsupportedLiteral
+            } else {
+                SkipReasonCode::Statement
+            },
+        );
+        assert!(
+            analysis
+                .parameters
+                .iter()
+                .all(|parameter| { parameter.origin == pgrx_c_macros::ParameterOrigin::Formal }),
+            "keywords must not become caller captures: {analysis:?}"
+        );
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }));
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(_Generic(KEYWORD_TRUE(), bool: 1, default: 0), "true has bool type");
+_Static_assert(_Generic(KEYWORD_FALSE(), bool: 1, default: 0), "false has bool type");
+_Static_assert(KEYWORD_BOOL(4) == true, "bool is a cast type");
+_Static_assert(_Generic(KEYWORD_NULLPTR(), typeof(nullptr): 1, default: 0), "nullptr retains its dedicated type");
+_Static_assert(KEYWORD_ALIGNOF() == _Alignof(unsigned long), "alignof is an operator");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
 /// Checks that unconstrained parameters stay open to pointer and floating operands instead of
 /// acquiring an invented integer-only contract.
 #[test]

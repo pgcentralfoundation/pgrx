@@ -587,16 +587,31 @@ pub(crate) fn analyze_active_with_constants(
                 _ => None,
             })
             .collect::<BTreeSet<_>>();
+        let captures_name = |name: &str| {
+            !locals.contains(name)
+                && !catalog.integer_constants.contains_key(name)
+                && !object_constants.contains_key(name)
+                && !catalog.variables.contains_key(name)
+                && !catalog.functions.contains_key(name)
+                && !catalog.builtins.contains_key(name)
+                && !catalog.builtin_unavailable.contains_key(name)
+        };
+        for node in &syntax.nodes {
+            let ExpressionKind::Group { operand } = node.kind else { continue };
+            let ExpressionKind::Identifier { name } = &syntax.nodes[operand].kind else {
+                continue;
+            };
+            if captures_name(name) && could_start_cast_operand(&body[node.tokens.end..]) {
+                return result.skip(
+                    SkipReasonCode::UnsupportedType,
+                    format!("parenthesized caller-scope identifier {name:?} may be a C cast type or value; its role is not established"),
+                    Some(node.tokens),
+                );
+            }
+        }
         for node in &mut syntax.nodes {
             let ExpressionKind::Identifier { name } = &node.kind else { continue };
-            if locals.contains(name.as_str())
-                || catalog.integer_constants.contains_key(name)
-                || object_constants.contains_key(name)
-                || catalog.variables.contains_key(name)
-                || catalog.functions.contains_key(name)
-                || catalog.builtins.contains_key(name)
-                || catalog.builtin_unavailable.contains_key(name)
-            {
+            if !captures_name(name) {
                 continue;
             }
             let parameter = *captures.entry(name.clone()).or_insert_with(|| {
@@ -850,6 +865,22 @@ impl MacroAnalysis {
             SyntaxErrorKind::BudgetExceeded => SkipReasonCode::BudgetExceeded,
         };
         self.skip(code, error.message, Some(error.tokens))
+    }
+}
+
+/// Recognize the ambiguity after an unresolved single-name group without mistaking empty calls
+/// or terminal postfix updates for casts; comments do not change the C token grammar.
+fn could_start_cast_operand(tokens: &[Token]) -> bool {
+    let mut tokens = tokens.iter().filter(|token| token.kind != TokenKind::Comment);
+    let Some(next) = tokens.next() else { return false };
+    match next.spelling.as_str() {
+        "(" => tokens.next().is_some_and(|token| token.spelling != ")"),
+        "++" | "--" => tokens.next().is_some_and(|token| {
+            matches!(token.kind, TokenKind::Identifier | TokenKind::Keyword | TokenKind::Literal)
+                || matches!(token.spelling.as_str(), "(" | "+" | "-" | "*" | "&" | "~" | "!")
+        }),
+        "+" | "-" | "*" | "&" | "~" | "!" => true,
+        _ => matches!(next.kind, TokenKind::Identifier | TokenKind::Keyword | TokenKind::Literal),
     }
 }
 
@@ -1934,6 +1965,10 @@ mod tests {
             triple: "fixture".into(),
             pointer_bits: 64,
             size_type: IntegerKind::UnsignedLong,
+            ptrdiff_type: crate::IntegerKind::Long,
+            preferred_alignments: Default::default(),
+            arm_float_abi: None,
+            ppc64_elf_abi: None,
             offsetof_supported: true,
             function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
             char_bits: 8,

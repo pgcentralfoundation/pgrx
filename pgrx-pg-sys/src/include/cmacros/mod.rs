@@ -11,6 +11,36 @@
 // Documentation uses the versioned snapshots alongside this module.
 #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 
+/// Label Rust operands with their original C scalar identity before generated
+/// macros apply C promotion and conversion rules. A Rust alias or binding
+/// constant's storage type alone cannot establish that identity.
+pub mod c {
+    pub use crate::__pgrx_c_macros::expression::{CDouble, CFloat};
+    pub use crate::__pgrx_c_macros::{
+        CBool, CChar, CInt, CInt128, CLong, CLongLong, CPtrDiff, CShort, CSignedChar, CSize,
+        CUnsignedChar, CUnsignedInt, CUnsignedInt128, CUnsignedLong, CUnsignedLongLong,
+        CUnsignedShort, CValue,
+    };
+}
+
+/// Include items only when this installation and compiler profile emitted the
+/// named C macro. Availability can change across PostgreSQL versions or builds;
+/// the body is removed before Rust resolves names when generation refused it.
+///
+/// ```ignore
+/// pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
+///     unsafe fn check_interrupts() { pgrx::CHECK_FOR_INTERRUPTS!(); }
+/// }}
+/// ```
+#[macro_export]
+macro_rules! if_c_macro {
+    ($name:ident { $($items:tt)* }) => {
+        $crate::__pgrx_c_classify!(@if_available $name { $($items)* });
+    };
+}
+
+pub use crate::if_c_macro;
+
 /// Compile fresh PG15 macro tree from OUT_DIR for the selected installation and target.
 #[cfg(all(feature = "pg15", not(docsrs)))]
 mod pg15 {

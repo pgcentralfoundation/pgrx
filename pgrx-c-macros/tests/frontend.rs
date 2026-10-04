@@ -27,8 +27,8 @@ mod rust_oracle;
 
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, AnalysisStatus, EmissionStatus, FrontendError, IntegerKind,
-    IntegerValue, MacroKind, MacroScanner, SignedOverflow, SkipReasonCode, SupportProfileError,
-    TypeCategory, emit, inspect, validate_support_profile,
+    IntegerValue, MacroKind, MacroScanner, SignedOverflow, TypeCategory, emit, inspect,
+    support_abi_assertions, validate_support_profile,
 };
 #[cfg(all(
     target_pointer_width = "64",
@@ -397,10 +397,10 @@ _Static_assert(_Generic(FRONT_CROSS_SIZE(1), unsigned long: 1, default: 0),
     );
 }
 
-/// Prove that inspection retains real Windows LLP64 facts while runtime emission rejects them.
+/// Prove real Windows LLP64 identities survive inspection, emission, and downstream target guards.
 /// No system headers or target linker are needed, so every host can exercise this ABI boundary.
 #[test]
-fn inspected_llp64_types_remain_available_but_runtime_macros_are_rejected() {
+fn inspected_llp64_types_emit_with_their_actual_integer_ranks() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = fixture("frontend_llp64.h");
@@ -412,10 +412,13 @@ fn inspected_llp64_types_remain_available_but_runtime_macros_are_rejected() {
     assert_eq!(profile.target.size_type, IntegerKind::UnsignedLongLong);
     assert_eq!(profile.target.integers[&IntegerKind::Long].bits, 32);
     assert_eq!(profile.target.integers[&IntegerKind::LongLong].bits, 64);
-    assert_eq!(
-        validate_support_profile(profile),
-        Err(SupportProfileError::SizeType(IntegerKind::UnsignedLongLong))
-    );
+    assert_eq!(profile.target.ptrdiff_type, IntegerKind::LongLong);
+    validate_support_profile(profile).unwrap();
+    let assertions = support_abi_assertions(profile).unwrap();
+    assert!(assertions.contains("target_os = \"windows\""));
+    assert!(assertions.contains("CLong::BITS == 32"));
+    assert!(assertions.contains("CSize::RANK == 5"));
+    assert!(assertions.contains("CPtrDiff::RANK == 5"));
 
     let original = oracle::run_c(
         &profile.compiler.executable,
@@ -425,6 +428,8 @@ _Static_assert(sizeof(void *) == 8 && sizeof(long) == 4 && sizeof(long long) == 
                "original compiler's LLP64 layout");
 _Static_assert(__builtin_types_compatible_p(__typeof__(sizeof(0)), unsigned long long),
                "original sizeof identity");
+_Static_assert(__builtin_types_compatible_p(__typeof__((char *)0 - (char *)0), long long),
+               "original pointer difference identity");
 _Static_assert(_Generic(FRONT_LLP64_LONG(1), long: 1, default: 0),
                "original long cast identity");
 _Static_assert(_Generic(FRONT_LLP64_SIZE(1), unsigned long long: 1, default: 0),
@@ -440,17 +445,180 @@ _Static_assert(_Generic(FRONT_LLP64_SIZE(1), unsigned long long: 1, default: 0),
     for name in names {
         assert!(matches!(session.analyze(name).status, AnalysisStatus::Candidate));
         let emission = emit(&session, name);
-        let EmissionStatus::Skipped { reason } = emission.status else {
-            panic!(
-                "LLP64 candidate must not claim compatibility with the LP64 runtime: {emission:?}"
-            );
+        let EmissionStatus::Emitted { rust, .. } = emission.status else {
+            panic!("proved LLP64 candidate must emit: {emission:?}");
         };
-        assert_eq!(reason.code, SkipReasonCode::UnsupportedProfile);
-        assert_eq!(emission.analysis.name, name);
-        assert_eq!(
-            reason.message,
-            "runtime support requires C unsigned long size_t, found UnsignedLongLong"
+        assert!(
+            rust.contains(if name == "FRONT_LLP64_LONG" { "CLong" } else { "size_of" }),
+            "{name}: {rust}"
         );
-        assert!(reason.spans.contains(emission.analysis.provenance.as_ref().unwrap()));
+        assert_eq!(emission.analysis.name, name);
     }
+}
+
+/// Prove distro preprocessor forwarding preserves macro definitions and undefinitions without
+/// permitting forged compiler facts.
+#[test]
+fn packaging_preprocessor_forwarding_matches_original_c() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("frontend_environment.h");
+    let arguments = ["-Wp,-DFRONT_COMMAND_LINE(value)=((value)+73),-UFRONT_DELETED".into()];
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    assert!(frontend.environment().active.contains_key("FRONT_COMMAND_LINE"));
+    assert!(
+        oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &header,
+            "_Static_assert(FRONT_COMMAND_PRESENT(10) == 83, \"forwarded definition\");\n",
+            &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+    for argument in ["-Wp,-D__CHAR_BIT__=16", "-Wp,-U__SIZE_TYPE__", "-Wp,-include,other.h"] {
+        assert!(matches!(
+            inspect(&scanner, &header, &[argument.into()], None),
+            Err(FrontendError::Arguments(_))
+        ));
+    }
+}
+
+/// ARM register conventions follow effective compiler controls, including overrides that disagree
+/// with the triple's soft/hard-float spelling; generated guards require the matching Rust ABI.
+#[test]
+fn arm_procedure_call_guards_follow_original_compiler_controls() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("frontend_environment.h");
+    for (triple, float_abi, expected, cfg_abi) in [
+        ("armv7-unknown-linux-gnueabi", "soft", pgrx_c_macros::ArmFloatAbi::Base, "eabi"),
+        ("armv7-unknown-linux-gnueabi", "softfp", pgrx_c_macros::ArmFloatAbi::Base, "eabi"),
+        ("armv7-unknown-linux-gnueabi", "hard", pgrx_c_macros::ArmFloatAbi::Vfp, "eabihf"),
+        ("armv7-unknown-linux-gnueabihf", "soft", pgrx_c_macros::ArmFloatAbi::Base, "eabi"),
+    ] {
+        let arguments =
+            [format!("--target={triple}"), format!("-mfloat-abi={float_abi}"), "-std=c17".into()];
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        assert_eq!(frontend.profile().target.arm_float_abi, Some(expected));
+        assert!(frontend.profile().unsupported_options.is_empty());
+        let guard = support_abi_assertions(frontend.profile()).unwrap();
+        assert!(guard.contains(&format!("target_abi = {cfg_abi:?}")), "{guard}");
+        let vfp = if expected == pgrx_c_macros::ArmFloatAbi::Vfp { "!" } else { "" };
+        let proof = format!(
+            "#if !defined(__ARM_EABI__) || !defined(__ARM_PCS)\n#error missing ARM PCS\n#endif\n\
+             #if {vfp}defined(__ARM_PCS_VFP)\n#error unexpected ARM float register convention\n#endif\n\
+             _Static_assert(sizeof(void *) == 4, \"ARM32 pointer proof\");\n",
+        );
+        assert!(
+            oracle::run_c(
+                &frontend.profile().compiler.executable,
+                &header,
+                &proof,
+                &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+                false,
+            )
+            .is_empty()
+        );
+    }
+}
+
+/// GNU and musl PowerPC64 defaults differ in function descriptors despite matching endian and
+/// scalar widths; original compiler witnesses must select distinct downstream Rust ABI guards.
+#[test]
+fn ppc64_elf_guards_preserve_original_function_representation() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("frontend_environment.h");
+    for (triple, expected, value, cfg_abi) in [
+        ("powerpc64-unknown-linux-gnu", pgrx_c_macros::Ppc64ElfAbi::V1, 1, "elfv1"),
+        ("powerpc64-unknown-linux-musl", pgrx_c_macros::Ppc64ElfAbi::V2, 2, "elfv2"),
+        ("powerpc64le-unknown-linux-gnu", pgrx_c_macros::Ppc64ElfAbi::V2, 2, "elfv2"),
+    ] {
+        let arguments = [format!("--target={triple}"), "-std=c17".into()];
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        assert_eq!(frontend.profile().target.ppc64_elf_abi, Some(expected));
+        let guard = support_abi_assertions(frontend.profile()).unwrap();
+        assert!(guard.contains(&format!("target_abi = {cfg_abi:?}")), "{guard}");
+        assert!(
+            oracle::run_c(
+                &frontend.profile().compiler.executable,
+                &header,
+                &format!("_Static_assert(_CALL_ELF == {value}, \"native ELF ABI\");\n"),
+                &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+                false,
+            )
+            .is_empty()
+        );
+    }
+}
+
+/// Reviewed packaging codegen choices keep their original arguments and preserve C integer
+/// expressions; unknown ABI modes continue to fail the support gate separately.
+#[test]
+fn packaging_codegen_profiles_preserve_original_c_arithmetic() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("frontend_environment.h");
+    let arguments = [
+        "-fexceptions",
+        "-fno-plt",
+        "-fno-semantic-interposition",
+        "-ffile-prefix-map=/build=/source",
+        "-fdebug-prefix-map=/build=/source",
+    ]
+    .map(str::to_owned);
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    assert!(frontend.profile().unsupported_options.is_empty());
+    for argument in &arguments {
+        assert!(frontend.profile().arguments.contains(argument));
+    }
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["FRONT_REDEFINED"]).unwrap();
+    assert!(matches!(emit(&session, "FRONT_REDEFINED").status, EmissionStatus::Emitted { .. }));
+    assert!(
+        oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &header,
+            "_Static_assert(FRONT_REDEFINED(10) == 12, \"packaging arithmetic\");\n",
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+}
+
+/// Translate recorded Windows flags through both compiler paths while independently validating
+/// original clang-cl definitions, unsigned plain-char behavior, and the selected DLL runtime macros.
+#[test]
+fn recorded_windows_controls_match_original_clang_cl_c_observations() {
+    use std::process::Command;
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("frontend_llp64.h");
+    let arguments = [
+        "--target=x86_64-pc-windows-msvc",
+        "/nologo",
+        "/TC",
+        "/DFRONT_MSVC=73",
+        "/O2",
+        "/J",
+        "/MD",
+        "/std:c17",
+    ]
+    .map(str::to_owned);
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    validate_support_profile(frontend.profile()).unwrap();
+    assert!(!frontend.profile().target.char_is_signed);
+    assert!(frontend.environment().active.contains_key("FRONT_MSVC"));
+    let directory = tempfile::tempdir().unwrap();
+    let source = directory.path().join("original-cl.c");
+    std::fs::write(&source, "_Static_assert(FRONT_MSVC == 73 && (char)-1 > 0, \"original recorded control\");\n#ifndef _DLL\n#error original DLL runtime flag lost\n#endif\n#ifndef _MT\n#error original multithreaded runtime flag lost\n#endif\n_Static_assert(sizeof(long) == 4 && sizeof(void *) == 8, \"original LLP64 layout\");\n").unwrap();
+    let original = Command::new(&frontend.profile().compiler.executable)
+        .arg("--driver-mode=cl")
+        .args(&arguments)
+        .arg("-fsyntax-only")
+        .arg(source)
+        .output()
+        .unwrap();
+    assert!(original.status.success(), "{}", String::from_utf8_lossy(&original.stderr));
 }

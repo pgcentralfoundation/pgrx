@@ -411,3 +411,26 @@ fn floating_point_modes_that_rust_operators_cannot_preserve_are_rejected() {
         );
     }
 }
+
+/// Keep under-aligned typedef attributes through elaborated aliases and pointer/array edges so
+/// Rust cannot replace the original C's byte-aligned loads with aligned accesses.
+#[test]
+fn attributed_aliases_do_not_become_plain_integer_pointees() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/frontend_attributes.h");
+    let frontend = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
+    let record = &frontend.declarations().records["struct FrontAttributedPointers"];
+    assert_eq!(frontend.declarations().types["FrontUnalignedAlias"].category, TypeCategory::Other);
+    let pointer = &frontend.declarations().type_shapes[&field(record, "len").ty.canonical_spelling];
+    assert!(
+        matches!(&pointer.kind, TypeShapeKind::Pointer { pointee } if pointee.category == TypeCategory::Other)
+            || matches!(&pointer.kind, TypeShapeKind::Unsupported)
+    );
+    assert!(oracle::run_c(
+        &frontend.profile().compiler.executable, &header,
+        "_Static_assert(_Alignof(FrontUnalignedAlias) == 1, \"under-aligned alias\");\n_Static_assert(_Alignof(FrontUnalignedArray) == 1, \"under-aligned array\");\n_Static_assert(_Alignof(unsigned int) > 1, \"natural alignment differs\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(), false,
+    ).is_empty());
+}

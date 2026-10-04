@@ -43,6 +43,12 @@ pub trait CType: sealed::Sealed + Copy {
     type Value;
     /// Whether access to the declared C object requires volatile operations.
     const VOLATILE: bool = false;
+    /// Whether the selected C compiler can name this declared type.
+    const AVAILABLE: bool = true;
+    /// Preferred C type alignment, distinct from the Rust binding's ABI field alignment.
+    const C_ALIGNMENT: usize = core::mem::align_of::<Self::Storage>();
+    /// Alignment of arrays of this declared type, separately proved when C differs from storage.
+    const ARRAY_ALIGNMENT: usize = core::mem::align_of::<Self::Storage>();
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value;
     /// Extract or encode the exact binding representation for an explicit storage boundary.
@@ -80,6 +86,12 @@ impl<K: CInteger> CType for K {
     type Storage = K::Repr;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = CValue<K>;
+    /// Admit this C identity only when the inspected compiler provides its fundamental kind.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the integer kind's preferred C scalar alignment.
+    const C_ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve the integer kind's independently observed array alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         CValue::new(value)
@@ -116,6 +128,12 @@ impl<Base: CInteger, Promoted: PromotedInteger> CInteger for CBitfield<Base, Pro
     const SIGNED: bool = Base::SIGNED;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = Base::RANK;
+    /// Both the declared bitfield base and its proved promotion must exist in C.
+    const AVAILABLE: bool = Base::AVAILABLE && Promoted::AVAILABLE;
+    /// Retain the declared base alignment until an arithmetic promotion changes identity.
+    const ALIGNMENT: usize = Base::ALIGNMENT;
+    /// Retain the declared base's measured array alignment.
+    const ARRAY_ALIGNMENT: usize = <Base as CInteger>::ARRAY_ALIGNMENT;
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: Self::Repr) -> u128 {
         Base::encode(value)
@@ -150,6 +168,12 @@ impl<K: CInteger> CInteger for CNullConstant<K> {
     const SIGNED: bool = K::SIGNED;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = K::RANK;
+    /// Source-only zero metadata cannot create an absent C integer kind.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the original integer's preferred type alignment.
+    const ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve the original integer's measured array type alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: Self::Repr) -> u128 {
         let bits = K::encode(value);
@@ -197,6 +221,12 @@ impl<M: CType> CType for CVolatile<M> {
     type Value = M::Value;
     /// Whether access to the declared C object requires volatile operations.
     const VOLATILE: bool = true;
+    /// Volatile qualification does not create an unavailable C type.
+    const AVAILABLE: bool = M::AVAILABLE;
+    /// Volatile qualification preserves preferred C scalar alignment.
+    const C_ALIGNMENT: usize = M::C_ALIGNMENT;
+    /// Volatile qualification preserves the measured C array alignment.
+    const ARRAY_ALIGNMENT: usize = M::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         M::from_storage(value)
@@ -240,6 +270,12 @@ impl<K: CInteger> CType for CStoredInteger<K> {
     type Storage = CValue<K>;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = CValue<K::Boundary>;
+    /// A Rust value tag cannot manufacture an absent fundamental C identity.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Stored tags retain their declared C alignment rather than wrapper storage details.
+    const C_ALIGNMENT: usize = K::ALIGNMENT;
+    /// Arrays of tagged values retain the original declared integer alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         CValue::new(value.get())
@@ -281,6 +317,12 @@ impl<K: CInteger, R: IntegerStorage<K>> CType for CIntegerStorage<K, R> {
     type Storage = R;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = CValue<K>;
+    /// Admit this C identity only when the inspected compiler provides its fundamental kind.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the integer kind's preferred C scalar alignment.
+    const C_ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve the integer kind's independently observed array alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: R) -> Self::Value {
         value.decode()
@@ -295,32 +337,62 @@ impl<K: CInteger, R: IntegerStorage<K>> CType for CIntegerStorage<K, R> {
 impl sealed::Sealed for usize {}
 /// Keep this runtime family within crate-owned C capability registration.
 impl sealed::Sealed for isize {}
-/// Bridge verified 64-bit pointer-sized binding storage to its explicit C rank.
-#[cfg(target_pointer_width = "64")]
+/// Bridge plain-char binding bytes independently of the inspected char signedness.
+/// Both Rust byte integers admit every bit pattern; the C marker alone controls
+/// its arithmetic interpretation, so these conversions preserve storage exactly.
+macro_rules! plain_char_storage {
+    ($($storage:ty),+ $(,)?) => { $(
+        /// Preserve a binding byte while attaching the inspected plain-char identity.
+        impl IntegerStorage<super::CChar> for $storage {
+            /// Reinterpret the same byte bits with the compiler's plain-char signedness.
+            fn decode(self) -> CValue<super::CChar> {
+                CValue::new(self as super::CCharRepr)
+            }
+            /// Retain the original binding byte representation without value restrictions.
+            fn encode(value: CValue<super::CChar>) -> Self {
+                value.get() as Self
+            }
+        }
+    )+ };
+}
+plain_char_storage!(i8, u8);
+
+/// Bridge equal-width pointer-sized binding storage to its explicit C rank.
 macro_rules! pointer_sized_integer_storage {
     ($(($storage:ty, $kind:ty, $repr:ty)),+ $(,)?) => { $(
-        /// Bridge verified pointer-sized Rust storage to this explicitly selected C integer rank.
+        /// Bridge pointer-sized Rust storage to this explicitly selected equal-width C rank.
         impl IntegerStorage<$kind> for $storage {
-            /// Tag native pointer-sized storage with the explicitly selected equal-width C integer kind.
+            /// Preserve all native storage bits while attaching the selected C kind.
             fn decode(self) -> CValue<$kind> { CValue::new(self as $repr) }
-            /// Extract the tagged integer into the verified pointer-sized storage without changing its bits.
+            /// Extract the tagged integer without losing bits in pointer-sized storage.
             fn encode(value: CValue<$kind>) -> Self { value.get() as Self }
         }
     )+ };
 }
 #[cfg(target_pointer_width = "64")]
 pointer_sized_integer_storage!(
-    (usize, super::CUnsignedLong, u64),
     (usize, super::CUnsignedLongLong, u64),
-    (isize, super::CLong, i64),
     (isize, super::CLongLong, i64),
+);
+#[cfg(all(not(windows), target_pointer_width = "64"))]
+pointer_sized_integer_storage!(
+    (usize, super::CUnsignedLong, core::ffi::c_ulong),
+    (isize, super::CLong, core::ffi::c_long),
+);
+#[cfg(target_pointer_width = "32")]
+pointer_sized_integer_storage!(
+    (usize, super::CUnsignedInt, u32),
+    (usize, super::CUnsignedLong, core::ffi::c_ulong),
+    (isize, super::CInt, i32),
+    (isize, super::CLong, core::ffi::c_long),
 );
 
 /// A native binding storage type with an unambiguous C identity.
 ///
 /// Generated adapters implement this for records and checked opaque bindings.
 /// Equal-width C integer identities need explicit tags instead of an ambiguous
-/// blanket mapping for `i64`, `u64`, `isize` or `usize`.
+/// blanket mapping for `i64`, `u64` or `isize`; `usize` explicitly means size_t
+/// under the generator's verified target size_t contract.
 pub trait NativeType: sealed::Sealed + Sized {
     /// C declaration identity attached to this expression value or registered native storage.
     type Marker: CType<Storage = Self>;
@@ -332,6 +404,10 @@ pub trait NativeType: sealed::Sealed + Sized {
 /// access contract.
 // Registration stays within the defining crate. A public registration trait
 // paired with blanket sealing would let callers bypass the native type gate.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a registered C record or an admitted scalar macro input",
+    note = "tag ambiguous 64-bit integers with CValue::<CLong>, CValue::<CUnsignedLong>, CValue::<CLongLong>, or CValue::<CUnsignedLongLong>::new(value); generated bindgen records retain their compiler-verified identity"
+)]
 pub(crate) trait NativeRecord: Sized {}
 /// Keep this runtime family within crate-owned C capability registration.
 impl<R: NativeRecord> sealed::Sealed for R {}
@@ -367,7 +443,17 @@ native_integer_types!(
     (u128, super::CUnsignedInt128),
 );
 
+/// Register allocation-size storage with the profile's verified C size_t identity.
+impl NativeType for usize {
+    /// Preserve native usize storage while retaining the target size_t arithmetic rank.
+    type Marker = CIntegerStorage<super::CSize, usize>;
+}
+
 /// Normalize a native input while retaining its C identity.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no unambiguous admitted C macro operand type",
+    note = "tag ambiguous 64-bit integers with CValue::<CLong>, CValue::<CUnsignedLong>, CValue::<CLongLong>, or CValue::<CUnsignedLongLong>::new(value); a bindgen constant may need an explicit tag for its original C type"
+)]
 pub trait IntoExpression: sealed::Sealed {
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value: CExprValue;
@@ -405,6 +491,7 @@ macro_rules! integer_inputs {
     )+ };
 }
 integer_inputs!(bool, i8, u8, i16, u16, i32, u32, i128, u128);
+integer_inputs!(usize);
 /// Normalize an already evaluated caller operand into the sealed C expression family.
 pub fn input<T: IntoExpression>(value: T) -> T::Value {
     value.into_expression()
@@ -564,6 +651,9 @@ impl<M: CType, Q: Qualifier> sealed::Sealed for Pointer<M, Q> {}
 impl<M: CType, Q: Qualifier> Pointer<M, Q> {
     /// Tag an address without accessing it or creating a reference.
     pub const fn new(raw: Q::Raw<M::Storage>) -> Self {
+        const {
+            assert!(M::AVAILABLE, "the inspected C compiler does not provide this pointed-to type");
+        }
         Self {
             raw,
             access: Access { volatile: M::VOLATILE, unaligned: false },
@@ -595,6 +685,14 @@ impl<M: CType, Q: Qualifier> CType for CPointer<M, Q> {
     type Storage = Q::Raw<M::Storage>;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = Pointer<M, Q>;
+    /// A pointer cannot manufacture an absent pointed-to C identity.
+    const AVAILABLE: bool = M::AVAILABLE;
+    /// Use the original compiler's object-pointer preferred alignment.
+    #[cfg(pgrx_c_alignment)]
+    const C_ALIGNMENT: usize = crate::__pgrx_c_alignment::CPointer.0;
+    /// Use the separately proved array-of-object-pointers alignment.
+    #[cfg(pgrx_c_alignment)]
+    const ARRAY_ALIGNMENT: usize = crate::__pgrx_c_alignment::CPointer.1;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         Pointer::new(value)
@@ -705,7 +803,13 @@ impl<S: NativeFunctionSignature> FunctionSignature for S {
 /// A generated exact-signature adapter for an indirect native C call.
 /// Conversion and null checks occur before entering the PostgreSQL error guard;
 /// captured ABI storage must have no destructors, with result decoding after.
-pub trait Call<Args>: FunctionSignature {
+///
+/// # Safety
+/// Implementations must convert operands and reject null pointers before any
+/// PostgreSQL error guard, invoke only the verified native signature inside the
+/// guard, and decode its result afterward. Values live across a native nonlocal
+/// jump must have no destructors; the guard closure must not panic.
+pub unsafe trait Call<Args>: FunctionSignature {
     /// Tagged result returned after exact callback ABI decoding.
     type Output: CExprValue;
     /// Invoke this exact callback signature through its generated argument, result, and native-guard adapter.
@@ -726,7 +830,7 @@ pub trait Call<Args>: FunctionSignature {
 /// contract, including PostgreSQL backend-thread and error-guard obligations.
 pub unsafe fn invoke<S: Call<Args>, Args>(function: FunctionValue<S>, args: Args) -> S::Output {
     // SAFETY: The caller establishes the exact target and argument contract;
-    // the generated sealed adapter owns conversions and native guard placement.
+    // the trusted adapter owns conversions and native guard placement.
     unsafe { S::call(function.get(), args) }
 }
 /// Represent one exact C function-pointer object type for calls, storage, and pointer compatibility.
@@ -782,6 +886,12 @@ impl<S: FunctionSignature> CType for CFunction<S> {
     type Storage = S::Pointer;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = FunctionValue<S>;
+    /// Use the original compiler's function-pointer preferred alignment.
+    #[cfg(pgrx_c_alignment)]
+    const C_ALIGNMENT: usize = crate::__pgrx_c_alignment::CFunctionPointer.0;
+    /// Use the independently proved array-of-function-pointers alignment.
+    #[cfg(pgrx_c_alignment)]
+    const ARRAY_ALIGNMENT: usize = crate::__pgrx_c_alignment::CFunctionPointer.1;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(pointer: Self::Storage) -> Self::Value {
         FunctionValue::new(pointer)
@@ -830,7 +940,7 @@ impl<S: FunctionSignature> CastTo<CFunction<S>> for FunctionValue<S> {
 impl<S: FunctionSignature, K: CInteger> CastTo<K> for FunctionValue<S> {
     /// Apply the explicit conversion admitted for this source/destination C type pair.
     fn cast_to(self) -> CValue<K> {
-        super::cast(CValue::<super::CUnsignedLong>::new(self.address().expose_provenance() as u64))
+        super::cast(super::size_value(self.address().expose_provenance()))
     }
 }
 /// Admit this explicit C conversion without treating equal Rust layouts as equivalent C types.
@@ -877,6 +987,12 @@ impl<M: CType, const N: usize> sealed::Sealed for ArrayValue<M, N> {}
 impl<M: CType, const N: usize> ArrayValue<M, N> {
     /// Tag an already supplied native representation without reading a C object or invoking a callback.
     pub const fn new(value: [M::Storage; N]) -> Self {
+        const {
+            assert!(
+                M::AVAILABLE,
+                "the inspected C compiler does not provide this array element type"
+            );
+        }
         Self(value)
     }
     /// Extract the evaluated family's native storage at an explicit boundary without promising a C ABI.
@@ -890,6 +1006,12 @@ impl<M: CType, const N: usize> CType for CArray<M, N> {
     type Storage = [M::Storage; N];
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = ArrayValue<M, N>;
+    /// Every array element must retain a C type provided by the inspected compiler.
+    const AVAILABLE: bool = M::AVAILABLE;
+    /// Use the measured array alignment, which need not equal preferred scalar alignment.
+    const C_ALIGNMENT: usize = M::ARRAY_ALIGNMENT;
+    /// Nested arrays retain the compiler-proved element-array alignment rule.
+    const ARRAY_ALIGNMENT: usize = M::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         ArrayValue::new(value)
@@ -1065,6 +1187,12 @@ impl<M: CType, R> CType for CFlexibleArray<M, R> {
     type Storage = R;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = ();
+    /// Incomplete array identity still requires an available declared element type.
+    const AVAILABLE: bool = M::AVAILABLE;
+    /// Retain its independently measured array alignment without assuming scalar alignment.
+    const C_ALIGNMENT: usize = M::ARRAY_ALIGNMENT;
+    /// Further array nesting retains the proved array alignment rule.
+    const ARRAY_ALIGNMENT: usize = M::ARRAY_ALIGNMENT;
     /// Reject whole-value conversion because this declared C family has no loadable complete representation.
     fn from_storage(_: R) {
         panic!("a C flexible array does not have a whole storage value")
@@ -1148,6 +1276,9 @@ impl<M: CType, Q: Qualifier> Clone for Place<M, Q> {
 impl<M: CType, Q: Qualifier> Place<M, Q> {
     /// Describe an address; no read, write, reference or validity check occurs.
     pub fn new(address: Q::Raw<M::Storage>, access: Access) -> Self {
+        const {
+            assert!(M::AVAILABLE, "the inspected C compiler does not provide this object type");
+        }
         Self { address: Q::into_mut(address), access, marker: PhantomData }
     }
     /// Expose this place's tagged address without loading storage or creating a Rust reference.
@@ -1397,19 +1528,17 @@ impl<M: ScalarObject> ScalarObject for CVolatile<M> {
     type Canonical = M::Canonical;
 }
 
-/// Load one canonical C scalar using the place metadata to choose aligned, unaligned, or volatile access.
+/// Load one canonical scalar, retaining static volatility even if runtime metadata is cleared.
 ///
 /// # Safety
 /// The place must designate live, initialized, valid scalar storage with readable bounds and permissions, valid aliasing, and alignment matching its access metadata.
 unsafe fn read_scalar<M: ScalarObject, Q: Qualifier>(place: Place<M, Q>) -> M::Value {
-    assert!(
-        !(place.access.volatile && place.access.unaligned),
-        "unaligned volatile C access is unsupported"
-    );
+    let volatile = place.access.volatile || M::VOLATILE;
+    assert!(!(volatile && place.access.unaligned), "unaligned volatile C access is unsupported");
     // SAFETY: The caller establishes the object's initialized access validity;
     // metadata selects the corresponding alignment and volatile operation.
     let storage = unsafe {
-        if place.access.volatile {
+        if volatile {
             place.address.read_volatile()
         } else if place.access.unaligned {
             place.address.read_unaligned()
@@ -1419,20 +1548,18 @@ unsafe fn read_scalar<M: ScalarObject, Q: Qualifier>(place: Place<M, Q>) -> M::V
     };
     M::from_storage(storage)
 }
-/// Store converted scalar bytes without reading or dropping the old C object.
+/// Store converted scalar bytes without dropping the old object or discarding static volatility.
 ///
 /// # Safety
 /// The place must designate live writable scalar storage with sufficient bounds and aliasing permissions, and alignment matching its access metadata.
 unsafe fn write_scalar<M: ScalarObject>(place: Place<M>, value: M::Value) {
-    assert!(
-        !(place.access.volatile && place.access.unaligned),
-        "unaligned volatile C access is unsupported"
-    );
+    let volatile = place.access.volatile || M::VOLATILE;
+    assert!(!(volatile && place.access.unaligned), "unaligned volatile C access is unsupported");
     let storage = M::into_storage(value);
     // SAFETY: The caller establishes writable storage. This does not read or
     // drop any old value; metadata selects the required access operation.
     unsafe {
-        if place.access.volatile {
+        if volatile {
             place.address.write_volatile(storage);
         } else if place.access.unaligned {
             place.address.write_unaligned(storage);
@@ -1459,7 +1586,7 @@ pub unsafe trait ReadObject<Q: Qualifier>: CType {
     unsafe fn read_object(place: Place<Self, Q>) -> <Self::RValue as CType>::Value;
 }
 // SAFETY: ScalarObject establishes Copy storage and a value-preserving canonical
-// conversion; read_scalar performs exactly the metadata-selected access.
+// conversion; read_scalar retains both static and inherited volatility.
 /// Provide declared object-to-value conversion without introducing a whole-record validity requirement.
 unsafe impl<M: ScalarObject, Q: Qualifier> ReadObject<Q> for M {
     /// Canonical C expression kind after object-to-value conversion.
@@ -1469,7 +1596,8 @@ unsafe impl<M: ScalarObject, Q: Qualifier> ReadObject<Q> for M {
     /// # Safety
     /// The place must satisfy `read_scalar`: live initialized valid scalar storage
     /// with readable bounds, provenance, alignment, and aliasing permissions. Its
-    /// access metadata must preserve the declared volatile and packing requirements.
+    /// access metadata must preserve inherited volatility and packing requirements;
+    /// static qualification is retained by the object marker itself.
     unsafe fn read_object(place: Place<Self, Q>) -> <Self::RValue as CType>::Value {
         // SAFETY: The caller establishes this scalar object's load contract.
         unsafe { read_scalar(place) }
@@ -1689,9 +1817,9 @@ where
     };
 }
 
-/// Return an offset with the selected profile's verified LP64 C `size_t` identity.
-pub const fn offset_of<M: OffsetPath<P>, P>() -> CValue<super::CUnsignedLong> {
-    CValue::new(M::OFFSET as u64)
+/// Return an offset with the selected target's verified C `size_t` identity.
+pub const fn offset_of<M: OffsetPath<P>, P>() -> CValue<super::CSize> {
+    super::size_value(M::OFFSET)
 }
 
 /// Add an inherited volatile qualification to a projected object's type.
@@ -1930,16 +2058,14 @@ impl<M: CType, Q: Qualifier, N: CType, R: Qualifier> CastTo<CPointer<N, R>> for 
 impl<K: CInteger, M: CType, Q: Qualifier> CastTo<K> for Pointer<M, Q> {
     /// Apply the explicit conversion admitted for this source/destination C type pair.
     fn cast_to(self) -> CValue<K> {
-        super::cast(CValue::<super::CUnsignedLong>::new(
-            self.as_mut_address().expose_provenance() as u64
-        ))
+        super::cast(super::size_value(self.as_mut_address().expose_provenance()))
     }
 }
 /// Admit this explicit C conversion without treating equal Rust layouts as equivalent C types.
 impl<K: CInteger, M: CType, Q: Qualifier> CastTo<CPointer<M, Q>> for CValue<K> {
     /// Apply the explicit conversion admitted for this source/destination C type pair.
     fn cast_to(self) -> Pointer<M, Q> {
-        let address = super::cast::<super::CUnsignedLong, _>(self).get() as usize;
+        let address = super::cast::<super::CSize, _>(self).get() as usize;
         Pointer::new(Q::from_mut(core::ptr::with_exposed_provenance_mut(address)))
     }
 }
@@ -2245,24 +2371,31 @@ pub unsafe fn assign<P: WritePlace, V: ImplicitTo<P::Assignment>>(
 }
 
 /// Query known C storage without evaluating any expression.
-pub fn size_of<M: CompleteObject>() -> CValue<super::CUnsignedLong> {
-    CValue::new(core::mem::size_of::<M::Storage>() as u64)
+pub fn size_of<M: CompleteObject>() -> CValue<super::CSize> {
+    const {
+        assert!(M::AVAILABLE, "the inspected C compiler does not provide this object type");
+    }
+    super::size_value(core::mem::size_of::<M::Storage>())
 }
-/// Return compiler-verified object alignment with the modeled LP64 `size_t` identity.
-pub fn align_of<M: CompleteObject>() -> CValue<super::CUnsignedLong> {
-    CValue::new(core::mem::align_of::<M::Storage>() as u64)
+/// Return compiler-verified alignment with the target's verified C `size_t` identity.
+pub fn align_of<M: CompleteObject>() -> CValue<super::CSize> {
+    const {
+        assert!(M::AVAILABLE, "the inspected C compiler does not provide this object type");
+        assert!(M::C_ALIGNMENT != 0, "the inspected C alignment of this type is unavailable");
+    }
+    super::size_value(M::C_ALIGNMENT)
 }
 /// Infer an unevaluated expression's type from a guaranteed-None witness.
 /// Generated code supplies `if false { Some(operand) } else { None }`, so Rust
 /// checks the operand type without evaluating or capturing its arguments.
-pub fn size_of_value_type<V: CExprValue>(_: Option<V>) -> CValue<super::CUnsignedLong>
+pub fn size_of_value_type<V: CExprValue>(_: Option<V>) -> CValue<super::CSize>
 where
     V::Marker: CompleteObject,
 {
     size_of::<V::Marker>()
 }
 /// Size a declared place from a guaranteed-None witness, retaining array storage.
-pub fn size_of_place_type<P: SizeablePlace>(_: Option<P>) -> CValue<super::CUnsignedLong>
+pub fn size_of_place_type<P: SizeablePlace>(_: Option<P>) -> CValue<super::CSize>
 where
     P::Object: CompleteObject,
 {
@@ -2327,13 +2460,19 @@ impl<F: FloatType> IntoExpression for FloatValue<F> {
 
 /// Register a modeled floating kind and its bounded C scalar conversions for the approved profile.
 macro_rules! floating_type {
-    ($marker:ty, $storage:ty) => {
+    ($marker:ty, $storage:ty, $alignment:ident) => {
         /// Connect the modeled floating kind to its native storage and approved C conversion rules.
         impl CType for $marker {
             /// Native float representation used only under the generator-approved C floating profile.
             type Storage = $storage;
             /// Evaluated tagged C value produced from this admitted native storage.
             type Value = FloatValue<Self>;
+            /// Use the scalar type alignment proved by the original C compiler.
+            #[cfg(pgrx_c_alignment)]
+            const C_ALIGNMENT: usize = crate::__pgrx_c_alignment::$alignment.0;
+            /// Use the separately proved floating-array alignment.
+            #[cfg(pgrx_c_alignment)]
+            const ARRAY_ALIGNMENT: usize = crate::__pgrx_c_alignment::$alignment.1;
             /// Tag a native floating value without changing its approved representation.
             fn from_storage(value: $storage) -> Self::Value {
                 FloatValue::new(value)
@@ -2414,8 +2553,8 @@ macro_rules! floating_type {
         }
     };
 }
-floating_type!(CFloat, f32);
-floating_type!(CDouble, f64);
+floating_type!(CFloat, f32, CFloat32);
+floating_type!(CDouble, f64, CFloat64);
 /// Share explicit and assignment conversion between the two modeled floating representations.
 macro_rules! float_cast {
     ($from:ty, $to:ty, $repr:ty) => {
@@ -2796,7 +2935,7 @@ where
     N::Identity: NonVoidIdentity,
 {
     /// C result representation selected by this operand family's capability.
-    type Output = CValue<super::CLong>;
+    type Output = CValue<super::CPtrDiff>;
     /// Apply C subtraction with the admitted scalar or compatible-pointer result identity.
     fn sub(self, rhs: Pointer<N, R>) -> Self::Output {
         let size = core::mem::size_of::<M::Storage>();
@@ -2812,7 +2951,7 @@ where
         // one-past endpoint); callers retain that domain obligation.
         let bytes = (self.as_mut_address().addr() as i128) - (rhs.as_mut_address().addr() as i128);
         assert!(bytes % size as i128 == 0, "C pointer subtraction needs a whole element distance");
-        CValue::new(i64::try_from(bytes / size as i128).expect("C ptrdiff_t overflow"))
+        super::ptrdiff_value(isize::try_from(bytes / size as i128).expect("C ptrdiff_t overflow"))
     }
 }
 /// C permits both `pointer[index]` and `index[pointer]`.
@@ -3378,8 +3517,8 @@ mod tests {
         /// Compose the fixture's nested record and value offset markers without any object access.
         type Path = OffsetStep<NestedOffset, OffsetStep<ValueOffset, OffsetEnd>>;
         /// Compiler/layout-established byte offset used without loading object storage.
-        const OFFSET: CValue<CUnsignedLong> = offset_of::<CRecord<OffsetOuter>, Path>();
-        assert_eq!(OFFSET.get(), core::mem::offset_of!(OffsetOuter, nested.value) as u64);
+        const OFFSET: CValue<super::super::CSize> = offset_of::<CRecord<OffsetOuter>, Path>();
+        assert_eq!(OFFSET.get() as usize, core::mem::offset_of!(OffsetOuter, nested.value));
         assert_eq!(<CRecord<OffsetOuter> as OffsetPath<Path>>::DEPTH, 2);
         assert_eq!(offset_of::<CVolatile<CRecord<OffsetOuter>>, Path>().get(), OFFSET.get());
     }
@@ -3390,8 +3529,8 @@ mod tests {
         /// Select the incomplete trailing member as a leaf whose byte offset remains available.
         type Trailing = OffsetStep<TrailingOffset, OffsetEnd>;
         assert_eq!(
-            offset_of::<CRecord<OffsetOuter>, Trailing>().get(),
-            core::mem::offset_of!(OffsetOuter, trailing) as u64
+            offset_of::<CRecord<OffsetOuter>, Trailing>().get() as usize,
+            core::mem::offset_of!(OffsetOuter, trailing)
         );
         assert_eq!(offset_of::<CRecord<OffsetOuter>, OffsetStep<LeadOffset, OffsetEnd>>().get(), 0);
     }
@@ -3562,8 +3701,8 @@ mod tests {
     /// Emulate a narrow field whose declared base rank differs from its promoted expression rank.
     #[derive(Clone, Copy)]
     struct LongBitfield(
-        /// Designate fixture backing storage for a width-limited field without creating a reference.
-        *mut u64,
+        /// Designate the target unsigned-long storage without creating a reference.
+        *mut core::ffi::c_ulong,
     );
     // SAFETY: This initialized test slot models a seven-bit unsigned long field
     // whose original C compiler establishes int as its arithmetic promotion.
@@ -3576,10 +3715,10 @@ mod tests {
         /// Perform the declared place read and retain its C expression result identity.
         ///
         /// # Safety
-        /// The backing pointer must designate a live aligned initialized `u64` slot
+        /// The backing pointer must designate a live aligned initialized unsigned-long slot
         /// with sufficient readable bounds, provenance, and aliasing permissions.
         unsafe fn load(self) -> CValue<Self::Type> {
-            // SAFETY: The caller establishes an initialized live u64 allocation.
+            // SAFETY: The caller establishes a live initialized unsigned-long allocation.
             CValue::new(unsafe { self.0.read() } & 0x7f)
         }
     }
@@ -3592,12 +3731,12 @@ mod tests {
         /// Write the converted destination value without reading or dropping the previous object.
         ///
         /// # Safety
-        /// The backing pointer must designate a live aligned writable `u64` slot
+        /// The backing pointer must designate a live aligned writable unsigned-long slot
         /// with sufficient bounds, provenance, and aliasing permissions. Previous
         /// contents need not be initialized; this store does not read them.
         unsafe fn store(self, value: CValue<CUnsignedLong>) -> CValue<Self::Type> {
             let value = value.get() & 0x7f;
-            // SAFETY: The caller establishes writable storage for this u64 slot.
+            // SAFETY: The caller establishes writable unsigned-long storage.
             unsafe { self.0.write(value) };
             CValue::new(value)
         }
@@ -3607,23 +3746,32 @@ mod tests {
     #[test]
     fn bitfield_contexts_preserve_base_size_until_arithmetic_promotion() {
         let value = CValue::<CBitfield<CUnsignedLong, CInt>>::new(127);
-        assert_eq!(size_of_value_type(Some(value)).get(), 8);
+        assert_eq!(
+            size_of_value_type(Some(value)).get() as usize,
+            core::mem::size_of::<core::ffi::c_ulong>()
+        );
         assert_eq!(bitnot(value).get(), -128);
         let conditional =
             select(super::super::Either::Left::<_, CValue<CBitfield<CUnsignedLong, CInt>>>(value));
         let _: CValue<CInt> = conditional;
         assert_eq!(size_of_value_type(Some(conditional)).get(), 4);
-        let mut storage = 126_u64;
+        let mut storage = 126 as core::ffi::c_ulong;
         let target = LongBitfield(&raw mut storage);
         // SAFETY: This local test slot is initialized, live, and writable.
         let prefix = unsafe { modify(target, input(1_i32), add::<Undefined, _, _>) };
-        assert_eq!(size_of_value_type(Some(prefix)).get(), 8);
+        assert_eq!(
+            size_of_value_type(Some(prefix)).get() as usize,
+            core::mem::size_of::<core::ffi::c_ulong>()
+        );
         assert_eq!(bitnot(prefix).get(), -128);
         // SAFETY: The previous operation initialized the same live test slot.
         let postfix: CValue<CUnsignedLong> =
             unsafe { post_modify(target, input(1_i32), add::<Undefined, _, _>) };
-        assert_eq!(size_of_value_type(Some(postfix)).get(), 8);
-        assert_eq!(bitnot(postfix).get(), 18446744073709551488);
+        assert_eq!(
+            size_of_value_type(Some(postfix)).get() as usize,
+            core::mem::size_of::<core::ffi::c_ulong>()
+        );
+        assert_eq!(bitnot(postfix).get(), !(127 as core::ffi::c_ulong));
         assert_eq!(storage, 0);
     }
 
@@ -3666,13 +3814,17 @@ mod tests {
     /// Check tagged pointer casts, offsets, and differences retain declared identities and access qualifications.
     #[test]
     fn pointers_keep_rank_qualification_and_provenance_at_cast_boundaries() {
-        let mut values = [17_i64, 23_i64, 41_i64];
+        let mut values: [core::ffi::c_long; 3] = [17, 23, 41];
         let longs = Pointer::<CLong>::new(values.as_mut_ptr());
         let long_longs = cast::<CPointer<CLongLong>, _>(longs);
         let _: Pointer<CLongLong> = long_longs;
+        assert_eq!(long_longs.get().cast::<()>(), longs.get().cast::<()>());
+        // Only native long-long storage may be read through a long-long pointer.
+        let mut long_long_values = [17_i64, 23_i64, 41_i64];
+        let long_longs = Pointer::<CLongLong>::new(long_long_values.as_mut_ptr());
         let read_only = cast::<CConstPointer<CLongLong>, _>(long_longs);
         let _: *const i64 = read_only.get();
-        let address = cast::<CUnsignedLong, _>(longs);
+        let address = cast::<super::super::CSize, _>(longs);
         let restored = cast::<CPointer<CLong>, _>(address);
         // SAFETY: Integer conversion exposed the original live allocation's
         // provenance, which the restoring cast can recover for this same address.
@@ -3681,6 +3833,22 @@ mod tests {
         // SAFETY: The third element is initialized in this live array allocation.
         assert_eq!(unsafe { load(pointee(third)) }.get(), 41);
         assert_eq!(sub::<Undefined, _, _>(third, read_only).get(), 2);
+    }
+
+    /// Preserve all pointer bits through target-size integer casts, including LLP64 high bits.
+    #[test]
+    fn pointer_integer_casts_keep_full_width_when_long_is_narrower() {
+        let pointer = Pointer::<CInt>::new(core::ptr::with_exposed_provenance_mut(usize::MAX));
+        let integer: CValue<super::super::CSize> = cast::<super::super::CSize, _>(pointer);
+        assert_eq!(integer.get() as usize, usize::MAX);
+        let restored = cast::<CPointer<CInt>, _>(integer);
+        assert_eq!(restored.get().addr(), usize::MAX);
+        let narrowed = cast::<CUnsignedLong, _>(pointer);
+        assert_eq!(narrowed.get(), core::ffi::c_ulong::MAX);
+        let size: CValue<super::super::CSize> = size_of::<CLong>();
+        assert_eq!(size.get() as usize, core::mem::size_of::<core::ffi::c_long>());
+        let alignment: CValue<super::super::CSize> = align_of::<CLong>();
+        assert_eq!(alignment.get() as usize, core::mem::align_of::<core::ffi::c_long>());
     }
 
     /// Exercise an intentionally unaligned field address through the supported raw copy operations.
@@ -3904,7 +4072,7 @@ mod tests {
         assert_eq!(ordinary.get(), 0);
         let field = CValue::<CBitfield<CUnsignedLong, CInt>>::new(127);
         let ordinary: CValue<CUnsignedLong> = input(field);
-        assert_eq!(bitnot(ordinary).get(), 18446744073709551488);
+        assert_eq!(bitnot(ordinary).get(), !(127 as core::ffi::c_ulong));
         let mut storage = zero;
         let target = native_place(&raw mut storage);
         // SAFETY: The live local storage has the transparent integer wrapper's
@@ -3922,21 +4090,106 @@ mod tests {
         assert_eq!(unsafe { load(pointee(pointer)) }.get(), 1);
     }
 
-    /// Check `usize`/`isize` binding bridges retain the inspected C integer rank and all native storage bits.
-    #[cfg(target_pointer_width = "64")]
+    /// Preserve declared alignment through source tags, storage wrappers, qualifiers and nested arrays.
     #[test]
-    fn pointer_sized_binding_storage_keeps_c_rank_and_native_width() {
+    fn declared_type_alignment_survives_expression_metadata_and_arrays() {
+        #[cfg(target_pointer_width = "64")]
+        type Wrapped = CIntegerStorage<CLongLong, isize>;
+        #[cfg(target_pointer_width = "64")]
+        {
+            assert_eq!(align_of::<Wrapped>().get(), align_of::<CLongLong>().get());
+            assert_eq!(align_of::<CVolatile<Wrapped>>().get(), align_of::<CLongLong>().get());
+        }
+        assert_eq!(align_of::<CStoredInteger<CLongLong>>().get(), align_of::<CLongLong>().get());
+        assert_eq!(align_of::<CNullConstant<CLongLong>>().get(), align_of::<CLongLong>().get());
+        assert_eq!(
+            align_of::<literal::CIntegerLiteral<CLongLong, true>>().get(),
+            align_of::<CLongLong>().get()
+        );
+        assert_eq!(
+            align_of::<CArray<CDouble, 2>>().get() as usize,
+            <CDouble as CType>::ARRAY_ALIGNMENT
+        );
+        assert_eq!(
+            align_of::<CArray<CArray<CDouble, 2>, 2>>().get() as usize,
+            <CDouble as CType>::ARRAY_ALIGNMENT
+        );
+        assert_eq!(
+            align_of::<CVolatile<CArray<CLongLong, 2>>>().get() as usize,
+            <CLongLong as CType>::ARRAY_ALIGNMENT
+        );
+        assert_eq!(<CLongLong as CType>::C_ALIGNMENT, <CLongLong as CInteger>::ALIGNMENT);
+        assert_eq!(<CDouble as CType>::C_ALIGNMENT, align_of::<CDouble>().get() as usize);
+    }
+
+    /// Check pointer-sized binding bridges preserve the inspected size/difference rank and all bits.
+    #[test]
+    fn pointer_sized_bindings_use_their_selected_c_integer_identity() {
         let mut storage = usize::MAX;
-        let target = place::<CIntegerStorage<CUnsignedLong, usize>>(&raw mut storage);
+        let target = place::<CIntegerStorage<super::super::CSize, usize>>(&raw mut storage);
         // SAFETY: This initialized usize is live and read through its actual
-        // binding storage type; the adapter preserves all 64 bits.
-        let initial: CValue<CUnsignedLong> = unsafe { load(target) };
-        assert_eq!(initial.get(), u64::MAX);
-        // SAFETY: The same native storage remains writable without aliases.
-        let result: CValue<CUnsignedLong> = unsafe { assign(target, input(37_u32)) };
-        assert_eq!((result.get(), storage), (37, 37));
-        let signed = <CIntegerStorage<CLongLong, isize> as CType>::from_storage(-1);
-        assert_eq!(signed.get(), -1_i64);
+        // binding storage type; the adapter preserves every pointer-sized bit.
+        let initial: CValue<super::super::CSize> = unsafe { load(target) };
+        assert_eq!(initial.get() as usize, usize::MAX);
+        // SAFETY: The same local allocation is writable and has no competing aliases.
+        let result: CValue<super::super::CSize> = unsafe { assign(target, input(37_u32)) };
+        assert_eq!((result.get() as usize, storage), (37, 37));
+        let signed = <CIntegerStorage<super::super::CPtrDiff, isize> as CType>::from_storage(-1);
+        assert_eq!(signed.get() as isize, -1);
+    }
+
+    /// Prove opposite signed Rust binding bytes preserve every plain-char bit and its C promotion.
+    #[test]
+    fn plain_char_binding_storage_preserves_bits_and_compiler_identity() {
+        for bits in 0..=u8::MAX {
+            let signed = <i8 as IntegerStorage<super::super::CChar>>::decode(bits as i8);
+            let unsigned = <u8 as IntegerStorage<super::super::CChar>>::decode(bits);
+            assert_eq!(signed, unsigned);
+            assert_eq!(<i8 as IntegerStorage<super::super::CChar>>::encode(signed) as u8, bits);
+            assert_eq!(<u8 as IntegerStorage<super::super::CChar>>::encode(unsigned), bits);
+            let promoted: CValue<CInt> = super::super::promote(signed);
+            let expected = if <super::super::CChar as CInteger>::SIGNED {
+                bits as i8 as i32
+            } else {
+                bits as i32
+            };
+            assert_eq!(promoted.get(), expected);
+        }
+        let mut byte = -1_i8;
+        let target = place::<CIntegerStorage<super::super::CChar, i8>>(&raw mut byte);
+        // SAFETY: The live aligned byte admits all bit patterns, and no aliases
+        // access it during the read/write performed by this tested adapter.
+        let read = unsafe { load(target) };
+        assert_eq!(
+            super::super::promote(read).get(),
+            if <super::super::CChar as CInteger>::SIGNED { -1 } else { 255 }
+        );
+        // SAFETY: The same byte is writable. Assignment stores only its low eight
+        // bits and preserves the original binding representation.
+        let _ = unsafe { assign(target, input(255_u32)) };
+        assert_eq!(byte as u8, 255);
+    }
+
+    /// Prove static volatile qualification survives caller-supplied default access metadata.
+    #[test]
+    fn static_volatile_qualification_cannot_be_cleared_by_access_metadata() {
+        let mut storage = 7_i32;
+        let target = Place::<CVolatile<CInt>>::new(&raw mut storage, Access::default())
+            .with_access(Access { volatile: false, unaligned: true });
+        let read = std::panic::catch_unwind(|| {
+            // SAFETY: The live initialized scalar has valid alignment and bounds.
+            // Metadata requests unsupported volatile/unaligned access, which must
+            // be refused before dereferencing the allocation.
+            let _ = unsafe { load(target) };
+        });
+        assert!(read.is_err(), "static volatility must reject an unaligned read");
+        let write = std::panic::catch_unwind(|| {
+            // SAFETY: The same exclusively writable scalar remains live. The
+            // unsupported access combination must be refused before mutation.
+            let _ = unsafe { assign(target, input(13_i32)) };
+        });
+        assert!(write.is_err(), "static volatility must reject an unaligned write");
+        assert_eq!(storage, 7, "rejected stores must not change the object");
     }
 
     /// Register one exact native callback signature for call, address, and null-pointer tests.
@@ -3962,7 +4215,10 @@ mod tests {
         value + 1
     }
     /// Invoke this exact callback signature after converting operands and checking nullable storage.
-    impl<V: ImplicitTo<CInt>> Call<(V,)> for IncrementSignature {
+    // SAFETY: The fixture converts its operand and checks null before the native
+    // call. Its native i32 argument/result have no destructors, and increment
+    // neither invokes PostgreSQL nor performs a nonlocal jump.
+    unsafe impl<V: ImplicitTo<CInt>> Call<(V,)> for IncrementSignature {
         /// Tagged result returned after exact callback ABI decoding.
         type Output = CValue<CInt>;
         /// Invoke the exact native callback after argument conversion and null validation.
@@ -4326,7 +4582,7 @@ int main(void) {
             previous.get()
         )
         .unwrap();
-        let mut storage = 127_u64;
+        let mut storage = 127 as core::ffi::c_ulong;
         let target = LongBitfield(&raw mut storage);
         // SAFETY: These sequential operations access only this initialized live
         // slot, preserving the original C bit-field expression's context.
@@ -4500,6 +4756,87 @@ int main(void) {
         assert_eq!(copied.get().0, 11);
     }
 
+    /// Reject absent C kinds during monomorphization across values, pointers and type queries.
+    #[test]
+    fn unavailable_integer_identity_cannot_be_constructed_or_queried() {
+        let directory = OracleDirectory::new();
+        let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let support = if manifest.ends_with("pgrx-pg-sys") {
+            manifest.join("src/c_macros/support.rs")
+        } else {
+            manifest.join("../pgrx-pg-sys/src/c_macros/support.rs")
+        }
+        .canonicalize()
+        .expect("locate the actual C semantic runtime");
+        let unavailable = r#"
+/// Model a compiler-proven unavailable identity without requiring a cross-target linker.
+#[derive(Clone,Copy,Debug,PartialEq,Eq)] struct Missing;
+/// Keep the witness in the defining crate's private capability family.
+impl support::sealed::Sealed for Missing {}
+/// Supply representation facts while explicitly denying that the compiler provides this kind.
+impl support::CInteger for Missing {
+    /// Use int storage solely to isolate the availability invariant.
+    type Repr=i32;
+    /// Keep integer promotion well-formed without making this unavailable kind constructible.
+    type Promoted=support::CInt;
+    /// Preserve the absent identity across evaluated-value boundaries.
+    type Boundary=Self;
+    /// Use a supported physical width so only the missing C identity causes rejection.
+    const BITS:u32=32;
+    /// Keep representation signedness independent of availability.
+    const SIGNED:bool=true;
+    /// Use an ordinary rank so no unrelated arithmetic-table failure hides the rejection.
+    const RANK:u8=3;
+    /// Deny the identity just as an absent compiler kind's generated profile does.
+    const AVAILABLE:bool=false;
+    /// Preserve the fixture's admitted integer bits if conversion were reachable.
+    fn encode(value:i32)->u128{value as u128}
+    /// Preserve the fixture's admitted integer bits if decoding were reachable.
+    fn decode(bits:u128)->i32{bits as i32}
+}
+"#;
+        for (case, body) in [
+            ("missing_value", "let _=std::hint::black_box(support::CValue::<Missing>::new(0));"),
+            (
+                "missing_pointer",
+                "let _=std::hint::black_box(support::expression::Pointer::<Missing>::new(core::ptr::null_mut()));",
+            ),
+            (
+                "missing_size",
+                "let _=std::hint::black_box(support::expression::size_of::<Missing>());",
+            ),
+            (
+                "missing_alignment",
+                "let _=std::hint::black_box(support::expression::align_of::<Missing>());",
+            ),
+            (
+                "missing_array",
+                "let _=std::hint::black_box(support::expression::size_of::<support::expression::CArray<Missing,2>>());",
+            ),
+        ] {
+            let program = directory.0.join(format!("{case}.rs"));
+            std::fs::write(
+                &program,
+                format!("#[path={support:?}] pub mod support; {unavailable} fn main(){{{body}}}"),
+            )
+            .unwrap();
+            let output = std::process::Command::new("rustc")
+                .args(["--edition=2024", "--emit=obj", "-A", "dead_code"])
+                .arg(&program)
+                .arg("-o")
+                .arg(directory.0.join(format!("{case}.o")))
+                .output()
+                .expect("monomorphize the unavailable C identity witness");
+            let diagnostics = String::from_utf8_lossy(&output.stderr);
+            assert!(!output.status.success(), "{case} must fail monomorphization");
+            assert!(
+                diagnostics.contains("E0080")
+                    && diagnostics.contains("inspected C compiler does not provide"),
+                "{case}: {diagnostics}"
+            );
+        }
+    }
+
     /// Require Rust compilation to reject unsafe accesses, qualifier removal, and incompatible operand identities.
     #[test]
     fn access_qualification_and_explicit_unsafe_boundaries_are_checked_by_rustc() {
@@ -4539,6 +4876,11 @@ int main(void) {
                 "E0277",
             ),
             ("ambiguous_rank", "let _=expression::input(1_u64);", "E0277"),
+            (
+                "untrusted_callback_adapter",
+                "#[derive(Clone,Copy)] struct Signature; impl sealed::Sealed for Signature {} impl expression::FunctionSignature for Signature { type Pointer=Option<unsafe extern \"C\" fn()>; fn null()->Self::Pointer{None} fn address(_:Self::Pointer)->*const (){core::ptr::null()} } struct LocalArgs; impl expression::Call<LocalArgs> for Signature { type Output=(); unsafe fn call(_:Self::Pointer,_:LocalArgs){} }",
+                "E0200",
+            ),
             (
                 "non_copy_native_record_input",
                 "#[repr(C)] struct R(u32); impl expression::NativeRecord for R{} let _=expression::input(R(1));",

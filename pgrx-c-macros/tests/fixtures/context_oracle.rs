@@ -183,3 +183,35 @@ pub unsafe fn context_observe_volatile(pointer: *mut ContextRecord) {
 pub fn context_observe_size(pointer: *mut ContextRecord) -> u64 {
     CTX_SIZE!(CTX_VOLATILE!(pointer)).get() as u64
 }
+
+/// Retain declared volatility even when a caller replaces runtime access metadata.
+///
+/// # Safety
+/// `pointer` must designate a live initialized record with readable aligned
+/// volatile field storage and no concurrent conflicting access.
+#[unsafe(no_mangle)]
+pub unsafe fn context_observe_static_volatile(pointer: *mut ContextRecord) -> i32 {
+    use __pgrx_c_macros::expression::{Access, CVolatile, Place, load};
+    // SAFETY: The caller establishes the record allocation and field bounds;
+    // address formation creates no reference or scalar read.
+    let address = unsafe { core::ptr::addr_of_mut!((*pointer).volatile_field) };
+    let target = Place::<CVolatile<__pgrx_c_macros::CInt>>::new(address, Access::default());
+    // SAFETY: The caller establishes initialized aligned volatile field storage.
+    unsafe { load(target) }.get()
+}
+
+/// Retain declared volatility for stores despite cleared runtime access metadata.
+///
+/// # Safety
+/// `pointer` must designate a live writable record with aligned volatile field
+/// storage and no concurrent conflicting access.
+#[unsafe(no_mangle)]
+pub unsafe fn context_store_static_volatile(pointer: *mut ContextRecord, value: i32) {
+    use __pgrx_c_macros::expression::{Access, CVolatile, Place, assign, input};
+    // SAFETY: The caller establishes record storage and field bounds; no
+    // reference or old-value read is created while forming this address.
+    let address = unsafe { core::ptr::addr_of_mut!((*pointer).volatile_field) };
+    let target = Place::<CVolatile<__pgrx_c_macros::CInt>>::new(address, Access::default());
+    // SAFETY: The caller grants exclusive writable access to the aligned field.
+    unsafe { assign(target, input(value)) };
+}

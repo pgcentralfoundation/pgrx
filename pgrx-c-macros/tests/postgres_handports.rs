@@ -8,16 +8,12 @@
 //! counterpart across configured PostgreSQL versions with the original C macro.
 //! This catches mistakes in either implementation without blessing an old port.
 //!
-//! These generated consumers use the runtime's Linux/macOS host family. Emission
-//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+//! These generated consumers use the actual inspected C profile on each native host.
+//! Cross-profile checks retain original compiler facts without executing foreign code.
 
-#![cfg(all(
-    target_pointer_width = "64",
-    target_endian = "little",
-    any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "linux", target_os = "macos"),
-))]
-
+/// Select installed PostgreSQL header oracles from configured metadata.
+#[path = "support/postgres.rs"]
+mod installed;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
@@ -27,7 +23,7 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, PostgresConfig, SignedOverflow,
+    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, SignedOverflow,
     generate_with_bindings,
 };
 use std::collections::BTreeSet;
@@ -71,30 +67,32 @@ fn handwritten_function_names() -> BTreeSet<String> {
 
 /// Checks that every emittable handport matches each original PostgreSQL version.
 #[test]
-#[ignore = "requires configured native PostgreSQL 15 through 19 installations"]
 fn every_emittable_handport_matches_each_original_postgres_version() {
+    let installations = installed::configured();
+    if installations.is_empty() {
+        return;
+    }
     let scanner = MacroScanner::new().expect("libclang must be available");
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
         .canonicalize()
         .unwrap();
     let handwritten = handwritten_function_names();
-    for major in 15..=19 {
-        let postgres = PostgresConfig::resolve(&format!("pg{major}"))
-            .unwrap_or_else(|error| panic!("native PG{major} must be configured: {error}"));
-        assert_eq!(postgres.pg_config().major_version().unwrap(), major);
+    for postgres in installations {
+        let major = postgres.pg_config().major_version().unwrap();
         let inspection_arguments = vec!["-O2".into()];
         // ELF link-time garbage collection requires a section for each unused
         // backend routine; these code-generation flags stay in the shared profile.
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "windows"))]
         let inspection_arguments = {
             let mut arguments = inspection_arguments;
             arguments.extend(["-ffunction-sections".into(), "-fdata-sections".into()]);
             arguments
         };
-        let frontend = postgres
-            .inspect(&scanner, None, &inspection_arguments, None)
-            .unwrap_or_else(|error| panic!("inspect original PG{major} profile: {error}"));
+        let frontend = installed::inspect(&scanner, &postgres, &inspection_arguments);
+        if !installed::supports_rust_comparisons(&scanner, &frontend) {
+            continue;
+        }
         let names = frontend
             .inventory()
             .macros
@@ -194,14 +192,36 @@ fn every_emittable_handport_matches_each_original_postgres_version() {
                 .find_map(|row| row.strip_prefix("VARTAG_KIND\t"))
                 .expect("original C must identify the enum's compatible integer kind");
             let repr = match kind {
-                "CChar" | "CSignedChar" => "i8",
+                "CChar" => {
+                    if profile.target.char_is_signed {
+                        "i8"
+                    } else {
+                        "u8"
+                    }
+                }
+                "CSignedChar" => "i8",
                 "CUnsignedChar" => "u8",
                 "CShort" => "i16",
                 "CUnsignedShort" => "u16",
                 "CInt" => "i32",
                 "CUnsignedInt" => "u32",
-                "CLong" | "CLongLong" => "i64",
-                "CUnsignedLong" | "CUnsignedLongLong" => "u64",
+                "CLong" => {
+                    if profile.target.integers[&pgrx_c_macros::IntegerKind::Long].bits == 32 {
+                        "i32"
+                    } else {
+                        "i64"
+                    }
+                }
+                "CUnsignedLong" => {
+                    if profile.target.integers[&pgrx_c_macros::IntegerKind::UnsignedLong].bits == 32
+                    {
+                        "u32"
+                    } else {
+                        "u64"
+                    }
+                }
+                "CLongLong" => "i64",
+                "CUnsignedLongLong" => "u64",
                 _ => panic!(
                     "original vartag enum kind {kind:?} is outside the tested integer input domain"
                 ),
@@ -270,7 +290,7 @@ record("PageIsValid_EVAL", 0, value, first.get(), second.get());
                 .replace("// @VARTAG_METADATA@", &vartag_metadata)
                 .replace("// @VARTAG_CASES@", &vartag_cases),
         );
-        let generated = rust_oracle::run_rust_linked(
+        let generated = rust_oracle::run_rust_linked_with_cfg(
             &rust,
             &profile.compiler.executable,
             &profile.header,
@@ -280,6 +300,7 @@ record("PageIsValid_EVAL", 0, value, first.get(), second.get());
                 include_str!("fixtures/handports_postgres.c")
             ),
             &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            &pgrx_c_macros::support_rust_cfg(profile).unwrap(),
         );
         let expected_rows = 1
             + 20

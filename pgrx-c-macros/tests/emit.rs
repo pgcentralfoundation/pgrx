@@ -322,6 +322,7 @@ fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
         r#"
 #define TYPE_IS(value, type) _Static_assert(_Generic((value), type: 1, default: 0), #value)
 TYPE_IS(EMIT_ID((_Bool) 1), _Bool);
+TYPE_IS(EMIT_ID((__SIZE_TYPE__) 1), unsigned long);
 TYPE_IS(EMIT_ID((unsigned char) 255), unsigned char);
 TYPE_IS(EMIT_ADD((unsigned char) 255, (unsigned char) 1), int);
 TYPE_IS(EMIT_ADD(-1, 1U), unsigned int);
@@ -356,7 +357,6 @@ int main(void) {
         ("ambiguous_signed", "1_i64"),
         ("ambiguous_unsigned", "1_u64"),
         ("pointer_sized_signed", "1_isize"),
-        ("pointer_sized_unsigned", "1_usize"),
     ] {
         let rejected = directory.0.join(format!("reject_{label}.rs"));
         fs::write(
@@ -556,4 +556,28 @@ impl Drop for TemporaryDirectory {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }
+}
+
+/// Generated docs expose the caller's C safety obligations and operation-specific
+/// panic domains, including integer division overflow and invalid shift counts.
+#[test]
+fn generated_docs_describe_defined_c_domains() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = TemporaryDirectory::new();
+    let header = directory.0.join("runtime_docs.h");
+    fs::write(&header, "#define DOC_DIV(x,y) ((x)/(y))\n#define DOC_SHIFT(x,y) ((x)<<(y))\n")
+        .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["DOC_DIV", "DOC_SHIFT"]).unwrap();
+    let division = emit(&session, "DOC_DIV");
+    let shift = emit(&session, "DOC_SHIFT");
+    for emission in [&division, &shift] {
+        let text = source(emission);
+        assert!(text.contains("/// # Safety"), "{text}");
+        assert!(text.contains("/// # Panics"), "{text}");
+        assert!(text.contains("Rust panic is converted to PostgreSQL ERROR"), "{text}");
+    }
+    assert!(source(&division).contains("signed MIN / -1"));
+    assert!(source(&shift).contains("negative counts"));
 }

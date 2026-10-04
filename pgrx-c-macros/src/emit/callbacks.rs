@@ -290,7 +290,7 @@ pub(super) fn generate(
         let mut hash = Sha256::new();
         hash.update(&candidate.function.canonical_spelling);
         hash.update(serde_json::to_vec(&candidate.storage).map_err(|error| error.to_string())?);
-        hash.update(serde_json::to_vec(target).map_err(|error| error.to_string())?);
+        hash.update(super::semantic_target_bytes(target)?);
         let suffix =
             hash.finalize()[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
         let name = format!("Signature_{suffix}");
@@ -894,7 +894,16 @@ fn validate_adapter(
     let native_storage =
         |ty: &TypeInfo, actual: &RustBindingType| -> Result<RustBindingType, String> {
             value_type(ty)?;
-            if ty.category == TypeCategory::Enum {
+            if ty.category == TypeCategory::Integer(crate::IntegerKind::Char) {
+                lowering.resolve_with_storage(ty, actual)?;
+                let integer = target
+                    .integers
+                    .get(&crate::IntegerKind::Char)
+                    .ok_or("plain-char identity is absent from the target profile")?;
+                // Calls use the actual C prototype's extension attributes, not
+                // the sign of the binding's byte-compatible storage alias.
+                Ok(RustBindingType::Integer { signed: integer.signed, bits: integer.bits })
+            } else if ty.category == TypeCategory::Enum {
                 // A closed Rust enum cannot transport arbitrary valid C enum
                 // values. First reconcile the actual nominal enum storage,
                 // then use Clang's compatible integer type at the call ABI.
@@ -1012,14 +1021,14 @@ fn render_adapter(
     let generic =
         if generics.is_empty() { String::new() } else { format!("<{}>", generics.join(", ")) };
     let argument_name = if lowered.is_empty() { "_args" } else { "args" };
-    writeln!(rust, "impl{generic} {EXPRESSION}::Call<({args})> for {name} {{\n type Output = {output};\n unsafe fn call(pointer: Self::Pointer, {argument_name}: ({args})) -> Self::Output {{").expect("String output");
+    writeln!(rust, "// SAFETY: This adapter validates null and converts arguments before the native guard, captures only destructor-free ABI storage, and decodes results after the native call.\nunsafe impl{generic} {EXPRESSION}::Call<({args})> for {name} {{\n type Output = {output};\n unsafe fn call(pointer: Self::Pointer, {argument_name}: ({args})) -> Self::Output {{").expect("String output");
     writeln!(
         rust,
         "let function = pointer.expect(\"C indirect call requires a non-null function pointer\");"
     )
     .expect("String output");
     if let Some((original, raw)) = &adapter.native_cast {
-        writeln!(rust, "// SAFETY: Only by-value records and enums change representation. MaybeUninit<R> has R's guaranteed layout/ABI; each enum uses Clang's compatible integer type, validated against the actual Rust enum storage and the layout checks above. The calling convention is unchanged. No partially initialized record or unnamed Rust enum variant is materialized.\nlet function: {raw} = unsafe {{ ::core::mem::transmute::<{original}, {raw}>(function) }};").expect("String output");
+        writeln!(rust, "// SAFETY: The caller establishes that this address has the original C prototype, including plain-char signedness. The raw signature uses that compiler-proven char sign and enum-compatible integer ABI; MaybeUninit<R> preserves record layout/ABI. The binding signature is pointer storage only and is not invoked. Calling convention and pointer representation are unchanged; no invalid enum or uninitialized record value is materialized.\nlet function: {raw} = unsafe {{ ::core::mem::transmute::<{original}, {raw}>(function) }};").expect("String output");
     }
     for (index, ty) in lowered.iter().enumerate() {
         let marker = ty.marker.replace("$crate", "crate");
@@ -1199,6 +1208,10 @@ mod tests {
             pointer_bits: 64,
             function_pointer: PointerLayout { size: 8, alignment: 8 },
             size_type: IntegerKind::UnsignedLong,
+            ptrdiff_type: crate::IntegerKind::Long,
+            preferred_alignments: Default::default(),
+            arm_float_abi: None,
+            ppc64_elf_abi: None,
             offsetof_supported: true,
             char_bits: 8,
             char_is_signed: true,

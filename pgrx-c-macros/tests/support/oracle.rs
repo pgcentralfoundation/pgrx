@@ -2,6 +2,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+// Compile original C headers directly, preserving caller-supplied profile arguments as the
+// semantic oracle. Native runs execute bounded programs; cross-target proofs use compiler
+// static assertions and require neither a foreign linker nor a PostgreSQL backend.
+//
+// Captured output and elapsed time are limited independently, and owned temporary directories
+// release compiler artifacts on success and failure. macOS SDK lookup is explicit so header
+// inspection and execution can share the same effective native environment.
+
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -45,7 +53,7 @@ pub fn run_c(
 ) -> String {
     let directory = TemporaryDirectory::new();
     let program = directory.0.join("oracle.c");
-    let executable = directory.0.join("oracle");
+    let executable = directory.0.join(format!("oracle{}", std::env::consts::EXE_SUFFIX));
     fs::write(&program, source).expect("write C oracle source");
     let mut compiler = Command::new(compiler);
     compiler.args(["-x", "c"]).args(compiler_arguments).arg("-include").arg(header).arg(&program);
@@ -54,8 +62,10 @@ pub fn run_c(
         // symbols. Remove their unreachable linker sections without changing C input.
         #[cfg(target_os = "macos")]
         compiler.arg("-Wl,-dead_strip");
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", all(target_os = "windows", target_env = "gnu")))]
         compiler.arg("-Wl,--gc-sections");
+        #[cfg(all(target_os = "windows", target_env = "msvc"))]
+        compiler.arg("-Wl,/OPT:REF");
         compiler.arg("-o").arg(&executable);
     } else {
         compiler.arg("-fsyntax-only");

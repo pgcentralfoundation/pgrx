@@ -28,6 +28,11 @@ tempfile = "3.27"
 petgraph = "0.8.3"
 proc-macro2.workspace = true
 
+# Use the same SHA-256 identities with an assembly-backed compressor even when a
+# downstream extension compiles its build dependencies without optimization.
+[target.'cfg(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
+ring = { version = "0.17.14", default-features = false }
+
 [dev-dependencies]
 bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
 syn.workspace = true

@@ -52,7 +52,9 @@ mod dependencies;
 pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
 /// Establish one agreed compiler environment and copied C catalog before expansion or analysis.
 mod frontend;
-pub use frontend::{FrontendError, compile_native_support, inspect};
+pub use frontend::{
+    FrontendError, c_header_path, compile_native_support, inspect, split_recorded_cflags,
+};
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
 pub use syntax::{

@@ -33,7 +33,7 @@ pub(super) struct FunctionAdapters {
     pub unsupported: BTreeMap<String, String>,
 }
 
-/// Emit required thunks for static inline declarations and by-value record or enum ABI transport.
+/// Emit required thunks for static inline declarations and ABI-sensitive value transport.
 ///
 /// A profile salt includes record layouts so otherwise-identical signatures cannot
 /// reuse a native symbol across different PostgreSQL compilation profiles.
@@ -59,22 +59,28 @@ pub(super) fn generate(
         .map_err(|error| format!("cannot fingerprint inline record layouts: {error}"))?;
     let mut profile_hash = Sha256::new();
     profile_hash.update(profile_identity);
-    profile_hash.update(serde_json::to_vec(target).map_err(|error| error.to_string())?);
+    profile_hash.update(super::semantic_target_bytes(target)?);
     profile_hash.update(layouts);
     let profile_hash = profile_hash.finalize();
     for name in used_functions {
         let Some(function) = declarations.function_signatures.get(name) else {
             continue;
         };
-        let by_value_object =
-            matches!(function.signature.result.category, TypeCategory::Record | TypeCategory::Enum)
-                || function
-                    .signature
-                    .parameters
-                    .iter()
-                    .flatten()
-                    .any(|ty| matches!(ty.category, TypeCategory::Record | TypeCategory::Enum));
-        if bindings.functions.contains_key(name) && !by_value_object {
+        // A char alias's byte layout cannot prove its callable extension
+        // attributes. Let the original C compiler own those calls as it owns
+        // record and enum transport, instead of invoking bindgen's Rust wrapper.
+        let native_transport = matches!(
+            function.signature.result.category,
+            TypeCategory::Record | TypeCategory::Enum | TypeCategory::Integer(IntegerKind::Char)
+        ) || function.signature.parameters.iter().flatten().any(|ty| {
+            matches!(
+                ty.category,
+                TypeCategory::Record
+                    | TypeCategory::Enum
+                    | TypeCategory::Integer(IntegerKind::Char)
+            )
+        });
+        if bindings.functions.contains_key(name) && !native_transport {
             continue;
         }
         match adapter(
@@ -158,6 +164,19 @@ fn adapter(
             // C enums admit values outside a rustified enum's named variants. The
             // native primitive uses the compiler-proven compatible integer instead
             // of creating or encoding an invalid Rust enum at an ABI boundary.
+            // Char's binding bytes can be compatible despite different C/Rust
+            // signs. Callable extension attributes require the compiler's C
+            // sign, so the original-C thunk transports canonical scalar storage.
+            if ty.category == TypeCategory::Integer(IntegerKind::Char) {
+                if let Some(actual) = actual {
+                    lowering.resolve_with_storage(ty, actual)?;
+                }
+                let integer = target
+                    .integers
+                    .get(&IntegerKind::Char)
+                    .ok_or("plain-char identity is absent from the target profile")?;
+                return Ok(RustBindingType::Integer { signed: integer.signed, bits: integer.bits });
+            }
             let storage = match actual {
                 Some(actual) if ty.category != TypeCategory::Enum => actual.clone(),
                 _ => abi_storage(ty, declarations, bindings, target, lowering, 0)?,

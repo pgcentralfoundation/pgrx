@@ -2,17 +2,21 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! C expression support for generated macros under the checked signed-char LP64 profile.
+//! C expression support for generated macros under the inspected target ABI.
 //!
 //! C type identity survives equal Rust representations: `long` and `long long`
-//! remain different kinds even though both store an `i64`. Raw 64-bit and
-//! pointer-sized Rust integers therefore require an explicit `CValue` tag.
+//! remain different kinds even when their storage widths coincide. The target C ABI
+//! supplies long widths; the inspected profile supplies plain-char signedness and
+//! the exact integer ranks of `size_t` and `ptrdiff_t`.
+//! Ambiguous native Rust integers require an explicit `CValue` tag, while
+//! `usize` retains the verified C `size_t` identity.
 //! The integer helpers reject operations outside the accepted C value domain before
 //! an invalid Rust operation can occur. The expression module additionally models
 //! typed pointers, floats, enums, record storage and unsafe places. Generated native
 //! capabilities retain their caller access and FFI obligations.
 //!
-//! The generator must validate the C profile and emit its Rust target guard.
+//! The generator must validate the C profile, select its runtime cfg values, and
+//! emit a Rust guard that checks storage widths, signedness and typedef ranks.
 //! Unsigned arithmetic wraps. Signed arithmetic follows `Undefined` or
 //! `Wrapping`; division and shift-count restrictions apply independently.
 //! Signed right shifts use Clang's arithmetic shift implementation choice.
@@ -52,6 +56,12 @@ pub trait CInteger: sealed::Sealed + Copy + core::fmt::Debug + Eq {
     const SIGNED: bool;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8;
+    /// Whether the inspected C compiler provides this integer identity.
+    const AVAILABLE: bool = true;
+    /// Preferred C scalar type alignment, distinct from its ABI field alignment.
+    const ALIGNMENT: usize = core::mem::align_of::<Self::Repr>();
+    /// Preferred alignment of arrays of this C kind, measured independently of scalar alignment.
+    const ARRAY_ALIGNMENT: usize = core::mem::align_of::<Self::Repr>();
 
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     #[doc(hidden)]
@@ -66,7 +76,7 @@ pub trait PromotedInteger: CInteger<Promoted = Self> {}
 
 /// Define the finite C integer rank/storage table used by promotion, casts, and common-type selection.
 macro_rules! integer_kinds {
-    ($(($kind:ident, $repr:ty, $bits:literal, $signed:literal, $rank:literal, $promoted:ident)),+ $(,)?) => {
+    ($(($kind:ident, $repr:ty, $bits:expr, $signed:expr, $rank:literal, $promoted:ident)),+ $(,)?) => {
         $(
             /// Nominal marker preserving this C integer kind’s rank independently of its native Rust storage.
             #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -87,6 +97,15 @@ macro_rules! integer_kinds {
                 const SIGNED: bool = $signed;
                 /// C integer rank, preserving distinctions between equal-width Rust representations.
                 const RANK: u8 = $rank;
+                /// Require an actual compiler kind when a proved alignment profile is installed.
+                #[cfg(pgrx_c_alignment)]
+                const AVAILABLE: bool = crate::__pgrx_c_alignment::$kind.0 != 0;
+                /// Retain the compiler's preferred scalar type alignment rather than Rust field alignment.
+                #[cfg(pgrx_c_alignment)]
+                const ALIGNMENT: usize = crate::__pgrx_c_alignment::$kind.0;
+                /// Retain the compiler's separately observed array type alignment.
+                #[cfg(pgrx_c_alignment)]
+                const ARRAY_ALIGNMENT: usize = crate::__pgrx_c_alignment::$kind.1;
                 /// Encode this native integer in the shared bit carrier used by C conversion and arithmetic checks.
                 fn encode(value: Self::Repr) -> u128 { value as u128 }
                 /// Narrow checked result bits to this C kind’s native storage representation.
@@ -96,21 +115,150 @@ macro_rules! integer_kinds {
     };
 }
 
+/// Plain-char storage follows an explicit inspected compiler override when present.
+#[cfg(pgrx_c_char_signed)]
+pub type CCharRepr = i8;
+/// Plain-char storage follows an explicit inspected compiler override when present.
+#[cfg(all(pgrx_c_char_unsigned, not(pgrx_c_char_signed)))]
+pub type CCharRepr = u8;
+/// Without a compiler override, retain Rust's target C ABI plain-char representation.
+#[cfg(not(any(pgrx_c_char_signed, pgrx_c_char_unsigned)))]
+pub type CCharRepr = core::ffi::c_char;
+
+#[cfg(all(pgrx_c_char_signed, pgrx_c_char_unsigned))]
+compile_error!("the inspected C macro profile cannot have both signed and unsigned plain char");
+
 integer_kinds!(
-    (CChar, i8, 8, true, 1, CInt),
+    (CChar, CCharRepr, 8, CCharRepr::MIN != 0, 1, CInt),
     (CSignedChar, i8, 8, true, 1, CInt),
     (CUnsignedChar, u8, 8, false, 1, CInt),
     (CShort, i16, 16, true, 2, CInt),
     (CUnsignedShort, u16, 16, false, 2, CInt),
     (CInt, i32, 32, true, 3, CInt),
     (CUnsignedInt, u32, 32, false, 3, CUnsignedInt),
-    (CLong, i64, 64, true, 4, CLong),
-    (CUnsignedLong, u64, 64, false, 4, CUnsignedLong),
+    (
+        CLong,
+        core::ffi::c_long,
+        core::mem::size_of::<core::ffi::c_long>() as u32 * 8,
+        true,
+        4,
+        CLong
+    ),
+    (
+        CUnsignedLong,
+        core::ffi::c_ulong,
+        core::mem::size_of::<core::ffi::c_ulong>() as u32 * 8,
+        false,
+        4,
+        CUnsignedLong
+    ),
     (CLongLong, i64, 64, true, 5, CLongLong),
     (CUnsignedLongLong, u64, 64, false, 5, CUnsignedLongLong),
     (CInt128, i128, 128, true, 6, CInt128),
     (CUnsignedInt128, u128, 128, false, 6, CUnsignedInt128),
 );
+
+/// Preserve the compiler-proven unsigned-int identity of C `size_t`.
+#[cfg(pgrx_c_size_type = "unsigned_int")]
+pub type CSize = CUnsignedInt;
+/// Preserve the compiler-proven unsigned-long identity of C `size_t`.
+#[cfg(pgrx_c_size_type = "unsigned_long")]
+pub type CSize = CUnsignedLong;
+/// Preserve the compiler-proven unsigned-long-long identity of C `size_t`.
+#[cfg(pgrx_c_size_type = "unsigned_long_long")]
+pub type CSize = CUnsignedLongLong;
+
+/// Use the 64-bit Windows size_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_size_type = "unsigned_int",
+        pgrx_c_size_type = "unsigned_long",
+        pgrx_c_size_type = "unsigned_long_long"
+    )),
+    windows,
+    target_pointer_width = "64"
+))]
+pub type CSize = CUnsignedLongLong;
+/// Use the 64-bit Unix size_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_size_type = "unsigned_int",
+        pgrx_c_size_type = "unsigned_long",
+        pgrx_c_size_type = "unsigned_long_long"
+    )),
+    not(windows),
+    target_pointer_width = "64"
+))]
+pub type CSize = CUnsignedLong;
+/// Use the 32-bit size_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_size_type = "unsigned_int",
+        pgrx_c_size_type = "unsigned_long",
+        pgrx_c_size_type = "unsigned_long_long"
+    )),
+    target_pointer_width = "32"
+))]
+pub type CSize = CUnsignedInt;
+
+/// Preserve the compiler-proven signed-int identity of C `ptrdiff_t`.
+#[cfg(pgrx_c_ptrdiff_type = "int")]
+pub type CPtrDiff = CInt;
+/// Preserve the compiler-proven signed-long identity of C `ptrdiff_t`.
+#[cfg(pgrx_c_ptrdiff_type = "long")]
+pub type CPtrDiff = CLong;
+/// Preserve the compiler-proven signed-long-long identity of C `ptrdiff_t`.
+#[cfg(pgrx_c_ptrdiff_type = "long_long")]
+pub type CPtrDiff = CLongLong;
+
+/// Use the 64-bit Windows ptrdiff_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_ptrdiff_type = "int",
+        pgrx_c_ptrdiff_type = "long",
+        pgrx_c_ptrdiff_type = "long_long"
+    )),
+    windows,
+    target_pointer_width = "64"
+))]
+pub type CPtrDiff = CLongLong;
+/// Use the 64-bit Unix ptrdiff_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_ptrdiff_type = "int",
+        pgrx_c_ptrdiff_type = "long",
+        pgrx_c_ptrdiff_type = "long_long"
+    )),
+    not(windows),
+    target_pointer_width = "64"
+))]
+pub type CPtrDiff = CLong;
+/// Use the 32-bit ptrdiff_t default only when no inspected identity was supplied.
+#[cfg(all(
+    not(any(
+        pgrx_c_ptrdiff_type = "int",
+        pgrx_c_ptrdiff_type = "long",
+        pgrx_c_ptrdiff_type = "long_long"
+    )),
+    target_pointer_width = "32"
+))]
+pub type CPtrDiff = CInt;
+
+/// Refuse mismatched profile aliases before any pointer conversion could truncate its address.
+const _: () = {
+    assert!(CSize::BITS == usize::BITS && !CSize::SIGNED);
+    assert!(CPtrDiff::BITS == isize::BITS && CPtrDiff::SIGNED);
+};
+
+/// Tag an allocation size without losing bits or the target's verified C rank.
+pub const fn size_value(value: usize) -> CValue<CSize> {
+    CValue::new(value as <CSize as CInteger>::Repr)
+}
+
+/// Tag a representable pointer distance with the target's verified C rank.
+pub const fn ptrdiff_value(value: isize) -> CValue<CPtrDiff> {
+    CValue::new(value as <CPtrDiff as CInteger>::Repr)
+}
 
 /// Keep C `_Bool` separate from integer kinds so conversion tests truth before any narrowing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -131,6 +279,12 @@ impl CInteger for CBool {
     const SIGNED: bool = false;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = 0;
+    /// Preserve the compiler's preferred Boolean type alignment.
+    #[cfg(pgrx_c_alignment)]
+    const ALIGNMENT: usize = crate::__pgrx_c_alignment::CBool.0;
+    /// Preserve the independently observed Boolean array alignment.
+    #[cfg(pgrx_c_alignment)]
+    const ARRAY_ALIGNMENT: usize = crate::__pgrx_c_alignment::CBool.1;
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: bool) -> u128 {
         u128::from(value)
@@ -173,6 +327,9 @@ pub struct CValue<K: CInteger> {
 impl<K: CInteger> CValue<K> {
     /// Tag native storage with an explicit C identity.
     pub const fn new(repr: K::Repr) -> Self {
+        const {
+            assert!(K::AVAILABLE, "the inspected C compiler does not provide this integer type");
+        }
         Self { repr, kind: PhantomData }
     }
 
@@ -196,6 +353,10 @@ impl<K: CInteger> CValue<K> {
 impl<K: CInteger> sealed::Sealed for CValue<K> {}
 
 /// An accepted C scalar input. This trait is sealed to the documented finite family.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no unambiguous admitted C integer identity",
+    note = "tag ambiguous integers with CValue::<CLong>, CValue::<CUnsignedLong>, CValue::<CLongLong>, or CValue::<CUnsignedLongLong>::new(value); bindgen constants also need their original C type when Rust changed it"
+)]
 pub trait IntoCValue: sealed::Sealed {
     /// C integer identity retained by the admitted native or tagged scalar input.
     type Kind: CInteger;
@@ -241,6 +402,17 @@ raw_inputs!(
     (u128, CUnsignedInt128),
 );
 
+/// Admit native allocation sizes under the generator's verified C `size_t` contract.
+/// The generator verifies the selected target alias's exact rank and storage width.
+impl IntoCValue for usize {
+    /// The compiler-owned size_t identity for this target ABI.
+    type Kind = CSize;
+    /// Retain every allocation-size bit in the verified equal-width representation.
+    fn into_c_value(self) -> CValue<Self::Kind> {
+        size_value(self)
+    }
+}
+
 /// The usual arithmetic conversion between two promoted C identities.
 pub trait Common<Rhs: PromotedInteger>: PromotedInteger {
     /// C result representation selected by this operand family's capability.
@@ -254,8 +426,8 @@ impl<K: PromotedInteger> Common<K> for K {
 }
 
 // Only distinct unordered promoted pairs are listed; the rules are symmetric.
-// In LP64, unsigned long plus signed long long becomes unsigned long long:
-// the latter's higher rank cannot make its equal-width signed range sufficient.
+// Width-dependent mixed-sign pairs are separate: rank is not enough when
+// a 32-bit long and a 64-bit long long have different representable ranges.
 /// Encode both operand orders of each C usual-arithmetic-conversion pair.
 macro_rules! common_pairs {
     ($(($left:ident, $right:ident, $output:ident)),+ $(,)?) => {
@@ -279,7 +451,6 @@ common_pairs!(
     (CInt, CUnsignedLongLong, CUnsignedLongLong),
     (CInt, CInt128, CInt128),
     (CInt, CUnsignedInt128, CUnsignedInt128),
-    (CUnsignedInt, CLong, CLong),
     (CUnsignedInt, CUnsignedLong, CUnsignedLong),
     (CUnsignedInt, CLongLong, CLongLong),
     (CUnsignedInt, CUnsignedLongLong, CUnsignedLongLong),
@@ -290,7 +461,6 @@ common_pairs!(
     (CLong, CUnsignedLongLong, CUnsignedLongLong),
     (CLong, CInt128, CInt128),
     (CLong, CUnsignedInt128, CUnsignedInt128),
-    (CUnsignedLong, CLongLong, CUnsignedLongLong),
     (CUnsignedLong, CUnsignedLongLong, CUnsignedLongLong),
     (CUnsignedLong, CInt128, CInt128),
     (CUnsignedLong, CUnsignedInt128, CUnsignedInt128),
@@ -301,6 +471,15 @@ common_pairs!(
     (CUnsignedLongLong, CUnsignedInt128, CUnsignedInt128),
     (CInt128, CUnsignedInt128, CUnsignedInt128),
 );
+
+// On LP64 signed long contains every unsigned int value; equal-width signed
+// long long cannot contain every unsigned long value.
+#[cfg(all(not(windows), target_pointer_width = "64"))]
+common_pairs!((CUnsignedInt, CLong, CLong), (CUnsignedLong, CLongLong, CUnsignedLongLong),);
+// On LLP64 and ILP32 the long family is 32 bits: unsigned int plus signed
+// long requires unsigned long, while signed long long contains unsigned long.
+#[cfg(any(windows, target_pointer_width = "32"))]
+common_pairs!((CUnsignedInt, CLong, CUnsignedLong), (CUnsignedLong, CLongLong, CLongLong),);
 
 /// Two accepted inputs with a statically determined common arithmetic type.
 pub trait ArithmeticInput<Rhs: IntoCValue>: IntoCValue {
@@ -575,19 +754,131 @@ mod tests {
 
     use super::*;
 
-    /// Verify small-integer promotions and keep equal-width `long` and `long long` as distinct C ranks.
+    /// Verify narrow promotions and width-dependent common conversion retain distinct C ranks.
     #[test]
     fn identity_promotions_and_distinct_ranks() {
         let _: CValue<CUnsignedChar> = value(255_u8);
         let promoted: CValue<CInt> = promote(255_u8);
         assert_eq!(promoted.get(), 255);
-        let mixed: CValue<CUnsignedLongLong> = add::<Wrapping, _, _>(
-            CValue::<CUnsignedLong>::new(u64::MAX),
+        let mixed = add::<Wrapping, _, _>(
+            CValue::<CUnsignedLong>::new(core::ffi::c_ulong::MAX),
             CValue::<CLongLong>::new(0),
         );
-        assert_eq!(mixed.get(), u64::MAX);
-        let wider: CValue<CInt128> = add::<Undefined, _, _>(mixed, 1_i128);
-        assert_eq!(wider.get(), i128::from(u64::MAX) + 1);
+        #[cfg(all(not(windows), target_pointer_width = "64"))]
+        let _: CValue<CUnsignedLongLong> = mixed;
+        #[cfg(any(windows, target_pointer_width = "32"))]
+        let _: CValue<CLongLong> = mixed;
+        assert_eq!(mixed.get() as u128, core::ffi::c_ulong::MAX as u128);
+        #[cfg(not(pgrx_c_int128_unavailable))]
+        {
+            let wider: CValue<CInt128> = add::<Undefined, _, _>(mixed, 1_i128);
+            assert_eq!(wider.get(), core::ffi::c_ulong::MAX as i128 + 1);
+        }
+        let uint_and_long =
+            add::<Undefined, _, _>(CValue::<CUnsignedInt>::new(u32::MAX), CValue::<CLong>::new(0));
+        #[cfg(all(not(windows), target_pointer_width = "64"))]
+        let _: CValue<CLong> = uint_and_long;
+        #[cfg(any(windows, target_pointer_width = "32"))]
+        let _: CValue<CUnsignedLong> = uint_and_long;
+        assert_eq!(uint_and_long.get() as u128, u32::MAX as u128);
+    }
+
+    /// Prove configured plain-char signedness changes its value range but preserves int promotion.
+    #[test]
+    fn plain_char_uses_the_inspected_signedness() {
+        let byte = CValue::<CChar>::new(0xff_u8 as CCharRepr);
+        let promoted: CValue<CInt> = promote(byte);
+        assert_eq!(promoted.get(), if CChar::SIGNED { -1 } else { 255 });
+        assert_eq!(CChar::BITS, 8);
+        #[cfg(pgrx_c_char_signed)]
+        const {
+            assert!(CChar::SIGNED);
+        }
+        #[cfg(pgrx_c_char_unsigned)]
+        const {
+            assert!(!CChar::SIGNED);
+        }
+        #[cfg(not(any(pgrx_c_char_signed, pgrx_c_char_unsigned)))]
+        assert_eq!(CChar::SIGNED, core::ffi::c_char::MIN != 0);
+    }
+
+    /// Keep target C long widths separate from pointer-sized typedef widths and ranks.
+    #[test]
+    fn target_widths_and_pointer_typedef_ranks_agree() {
+        assert_eq!(CLong::BITS, core::mem::size_of::<core::ffi::c_long>() as u32 * 8);
+        assert_eq!(CUnsignedLong::BITS, CLong::BITS);
+        assert_eq!(CLong::RANK, 4);
+        assert_eq!(CSize::BITS, usize::BITS);
+        assert_eq!(CPtrDiff::BITS, isize::BITS);
+        const {
+            assert!(!CSize::SIGNED);
+            assert!(CPtrDiff::SIGNED);
+        }
+        let maximum: CValue<CSize> = value(usize::MAX);
+        assert_eq!(maximum.get() as u128, usize::MAX as u128);
+        assert_eq!(ptrdiff_value(isize::MIN).get() as i128, isize::MIN as i128);
+        #[cfg(all(windows, target_pointer_width = "64"))]
+        const {
+            assert!(CLong::BITS == 32);
+        }
+        #[cfg(pgrx_c_size_type = "unsigned_int")]
+        const {
+            assert!(CSize::RANK == CUnsignedInt::RANK);
+        }
+        #[cfg(pgrx_c_size_type = "unsigned_long")]
+        const {
+            assert!(CSize::RANK == CUnsignedLong::RANK);
+        }
+        #[cfg(pgrx_c_size_type = "unsigned_long_long")]
+        const {
+            assert!(CSize::RANK == CUnsignedLongLong::RANK);
+        }
+        #[cfg(pgrx_c_ptrdiff_type = "int")]
+        const {
+            assert!(CPtrDiff::RANK == CInt::RANK);
+        }
+        #[cfg(pgrx_c_ptrdiff_type = "long")]
+        const {
+            assert!(CPtrDiff::RANK == CLong::RANK);
+        }
+        #[cfg(pgrx_c_ptrdiff_type = "long_long")]
+        const {
+            assert!(CPtrDiff::RANK == CLongLong::RANK);
+        }
+        #[cfg(not(any(
+            pgrx_c_size_type = "unsigned_int",
+            pgrx_c_size_type = "unsigned_long",
+            pgrx_c_size_type = "unsigned_long_long"
+        )))]
+        const {
+            assert!(
+                CSize::RANK
+                    == if cfg!(all(windows, target_pointer_width = "64")) {
+                        5
+                    } else if cfg!(target_pointer_width = "64") {
+                        4
+                    } else {
+                        3
+                    }
+            );
+        }
+        #[cfg(not(any(
+            pgrx_c_ptrdiff_type = "int",
+            pgrx_c_ptrdiff_type = "long",
+            pgrx_c_ptrdiff_type = "long_long"
+        )))]
+        const {
+            assert!(
+                CPtrDiff::RANK
+                    == if cfg!(all(windows, target_pointer_width = "64")) {
+                        5
+                    } else if cfg!(target_pointer_width = "64") {
+                        4
+                    } else {
+                        3
+                    }
+            );
+        }
     }
 
     /// Check Boolean casts test the original value and signed integer widening preserves negative values.
@@ -595,8 +886,10 @@ mod tests {
     fn casts_test_truth_before_narrowing_and_sign_extend() {
         assert!(cast::<CBool, _>(256_i32).get());
         assert_eq!(cast::<CUnsignedChar, _>(-1_i32).get(), 255);
+        #[cfg(not(pgrx_c_int128_unavailable))]
         assert_eq!(cast::<CInt128, _>(-1_i8).get(), -1);
         assert_eq!(cast::<CInt, _>(u32::MAX).get(), -1);
+        #[cfg(not(pgrx_c_int128_unavailable))]
         assert_eq!(cast::<CUnsignedInt128, _>(-1_i32).get(), u128::MAX);
     }
 
@@ -607,6 +900,7 @@ mod tests {
         assert_eq!(neg::<Wrapping, _>(i32::MIN).get(), i32::MIN);
         assert_eq!(add::<Undefined, _, _>(u32::MAX, 1_u32).get(), 0);
         assert!(std::panic::catch_unwind(|| add::<Undefined, _, _>(i32::MAX, 1_i32)).is_err());
+        #[cfg(not(pgrx_c_int128_unavailable))]
         assert!(std::panic::catch_unwind(|| neg::<Undefined, _>(i128::MIN)).is_err());
     }
 

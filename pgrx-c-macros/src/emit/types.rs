@@ -95,6 +95,15 @@ pub(super) struct Lowering<'a> {
     ambiguous_enum_paths: BTreeSet<String>,
 }
 
+/// Distinguish value evaluation from object metadata without changing compiler facts.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum TypeUse {
+    /// Value operations must satisfy the selected floating evaluation policy.
+    Value,
+    /// Size and alignment queries require layout, and never evaluate floating values.
+    ObjectQuery,
+}
+
 /// Reconcile nominal compiler types with actual binding edges before rendering capabilities.
 impl<'a> Lowering<'a> {
     /// Build immutable reconciliation indexes with hygienic paths for exported macro rendering.
@@ -540,6 +549,12 @@ impl<'a> Lowering<'a> {
         self.resolve_at(ty, 0)
     }
 
+    /// Lower an unevaluated size/alignment operand without requiring floating arithmetic support.
+    /// Storage widths and recursive object shapes remain checked against the original C facts.
+    pub fn resolve_object_query(&self, ty: &TypeInfo) -> Result<LoweredType, String> {
+        self.resolve_for_use(ty, 0, TypeUse::ObjectQuery)
+    }
+
     /// Use the exact source typedef, never an alias guessed from its representation.
     /// The marker still carries C rank and qualifications after Rust erases aliases.
     pub fn cast_alias(
@@ -654,11 +669,21 @@ impl<'a> Lowering<'a> {
 
     /// Apply effective volatile qualification around the bounded unqualified type lowering.
     fn resolve_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
+        self.resolve_for_use(ty, depth, TypeUse::Value)
+    }
+
+    /// Preserve qualification while carrying the operation's evaluation contract through nested types.
+    fn resolve_for_use(
+        &self,
+        ty: &TypeInfo,
+        depth: usize,
+        usage: TypeUse,
+    ) -> Result<LoweredType, String> {
         let expression = self.runtime.expression();
         if depth > 64 {
             return Err("C type exceeds the bounded lowering depth".into());
         }
-        let mut lowered = self.resolve_unqualified_at(ty, depth)?;
+        let mut lowered = self.resolve_unqualified_for_use(ty, depth, usage)?;
         if ty.is_volatile {
             lowered.marker = format!("{expression}::CVolatile<{}>", lowered.marker);
         }
@@ -667,6 +692,16 @@ impl<'a> Lowering<'a> {
 
     /// Choose semantic markers and native storage for compiler-proved scalar and structural types.
     fn resolve_unqualified_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
+        self.resolve_unqualified_for_use(ty, depth, TypeUse::Value)
+    }
+
+    /// Reconcile storage recursively, retaining stricter policy checks only where values are evaluated.
+    fn resolve_unqualified_for_use(
+        &self,
+        ty: &TypeInfo,
+        depth: usize,
+        usage: TypeUse,
+    ) -> Result<LoweredType, String> {
         let expression = self.runtime.expression();
         let support = self.runtime.support();
         if let Some(callback) = self.bindings.callback_capabilities.get(&ty.canonical_spelling) {
@@ -685,7 +720,7 @@ impl<'a> Lowering<'a> {
             ..
         }) = shape
         {
-            let element = self.resolve_at(element, depth + 1)?;
+            let element = self.resolve_for_use(element, depth + 1, usage)?;
             return Ok(LoweredType {
                 marker: format!("{expression}::CArray<{}, {length}>", element.marker),
                 storage: format!("[{}; {length}]", element.storage),
@@ -713,7 +748,7 @@ impl<'a> Lowering<'a> {
             }),
             TypeCategory::Pointer => {
                 let pointee = self.pointer_pointee(ty)?;
-                let lowered = self.resolve_at(&pointee, depth + 1)?;
+                let lowered = self.resolve_for_use(&pointee, depth + 1, usage)?;
                 Ok(LoweredType {
                     marker: format!(
                         "{expression}::CPointer<{}, {expression}::{}>",
@@ -765,7 +800,9 @@ impl<'a> Lowering<'a> {
                 self.resolve_enum(&unqualified, &storage, depth)
             }
             TypeCategory::Floating => {
-                self.target.supports_float_values()?;
+                if usage == TypeUse::Value {
+                    self.target.supports_float_values()?;
+                }
                 let (name, storage) = match ty.canonical_spelling.as_str() {
                     "float" => ("CFloat", "f32"),
                     "double" => ("CDouble", "f64"),
@@ -775,6 +812,10 @@ impl<'a> Lowering<'a> {
                         );
                     }
                 };
+                let bytes = if storage == "f32" { 4 } else { 8 };
+                if ty.size != Some(bytes) {
+                    return Err("floating C object width differs from Rust storage".into());
+                }
                 Ok(LoweredType { marker: format!("{expression}::{name}"), storage: storage.into() })
             }
             TypeCategory::Function => {
@@ -923,6 +964,49 @@ impl<'a> Lowering<'a> {
                 storage: format!("[{}; {length}]", element.storage),
             });
         }
+        if storage == &RustBindingType::NativeChar {
+            if ty.category != TypeCategory::Integer(crate::IntegerKind::Char)
+                || ty.size != Some(1)
+                || ty.alignment != Some(1)
+                || self.target.char_bits != 8
+            {
+                return Err("Rust c_char storage requires a verified C plain-char byte".into());
+            }
+            let storage = "::core::ffi::c_char".to_owned();
+            let marker = format!("{expression}::CIntegerStorage<{support}::CChar, {storage}>");
+            return Ok(LoweredType {
+                marker: if ty.is_volatile {
+                    format!("{expression}::CVolatile<{marker}>")
+                } else {
+                    marker
+                },
+                storage,
+            });
+        }
+        if let (
+            TypeCategory::Integer(crate::IntegerKind::Char),
+            RustBindingType::Integer { signed, bits: 8 },
+        ) = (ty.category, storage)
+            && ty.size == Some(1)
+            && ty.alignment == Some(1)
+            && let Some(integer) = self.target.integers.get(&crate::IntegerKind::Char)
+            && integer.bits == 8
+            && integer.signed != *signed
+        {
+            // Both Rust byte integers admit all 256 representations. Preserve
+            // the binding's storage bytes while the verified plain-char marker
+            // supplies the C sign and promotion rules selected by build flags.
+            let storage = if *signed { "i8" } else { "u8" }.to_owned();
+            let marker = format!("{expression}::CIntegerStorage<{support}::CChar, {storage}>");
+            return Ok(LoweredType {
+                marker: if ty.is_volatile {
+                    format!("{expression}::CVolatile<{marker}>")
+                } else {
+                    marker
+                },
+                storage,
+            });
+        }
         if let (
             TypeCategory::Integer(kind),
             RustBindingType::PointerSizedInteger { signed, bits },
@@ -992,6 +1076,7 @@ impl<'a> Lowering<'a> {
         Ok(match storage {
             RustBindingType::Unit => "()".into(),
             RustBindingType::Bool => "bool".into(),
+            RustBindingType::NativeChar => "::core::ffi::c_char".into(),
             RustBindingType::Integer { signed, bits } => {
                 format!("{}{bits}", if *signed { 'i' } else { 'u' })
             }
@@ -1124,6 +1209,79 @@ pub(super) fn rust_path(path: &[String]) -> Result<String, String> {
 mod tests {
     use super::*;
 
+    /// A genuine x87 evaluation profile still permits unevaluated double layout
+    /// queries; arithmetic stays refused and incompatible storage widths stay errors.
+    #[test]
+    fn object_queries_do_not_require_floating_value_evaluation() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().unwrap();
+        let header = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/native_profile.h");
+        let frontend =
+            crate::inspect(&scanner, &header, &["--target=i686-unknown-openbsd".into()], None)
+                .unwrap();
+        assert_eq!(frontend.profile().target.floating_point.evaluation_method, Some(2));
+        let bindings = BindingCatalog::default();
+        let lowering =
+            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let ty = crate::analysis::resolve_type_info(
+            "double",
+            frontend.declarations(),
+            &frontend.profile().target,
+        )
+        .unwrap();
+        assert!(lowering.resolve(&ty).is_err());
+        assert!(lowering.resolve_object_query(&ty).unwrap().marker.ends_with("::CDouble"));
+        let incompatible = TypeInfo { size: Some(4), ..ty };
+        assert!(lowering.resolve_object_query(&incompatible).is_err());
+    }
+
+    /// Admit only byte-compatible plain-char storage when compiler flags change
+    /// signedness; ordinary signed-char and wider mismatches remain errors.
+    #[test]
+    fn plain_char_storage_keeps_binding_bytes_and_inspected_c_identity() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().unwrap();
+        let header =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/input_types.h");
+        let frontend =
+            crate::inspect(&scanner, &header, &["-funsigned-char".into()], None).unwrap();
+        let bindings = BindingCatalog::default();
+        let lowering =
+            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let ty = TypeInfo {
+            spelling: "char".into(),
+            canonical_spelling: "char".into(),
+            category: TypeCategory::Integer(crate::IntegerKind::Char),
+            size: Some(1),
+            alignment: Some(1),
+            is_const: false,
+            is_volatile: false,
+        };
+        let actual = RustBindingType::Integer { signed: true, bits: 8 };
+        let lowered = lowering.resolve_with_storage(&ty, &actual).unwrap();
+        assert_eq!(lowered.storage, "i8");
+        assert!(lowered.marker.ends_with("::CIntegerStorage<$crate::__pgrx_c_macros::CChar, i8>"));
+        let symbolic = lowering.resolve_with_storage(&ty, &RustBindingType::NativeChar).unwrap();
+        assert_eq!(symbolic.storage, "::core::ffi::c_char");
+        assert!(symbolic.marker.ends_with("::CChar, ::core::ffi::c_char>"));
+        assert!(
+            lowering
+                .resolve_with_storage(&ty, &RustBindingType::Integer { signed: true, bits: 16 })
+                .is_err()
+        );
+        let signed_char =
+            TypeInfo { category: TypeCategory::Integer(crate::IntegerKind::SignedChar), ..ty };
+        assert!(
+            lowering
+                .resolve_with_storage(
+                    &signed_char,
+                    &RustBindingType::Integer { signed: false, bits: 8 }
+                )
+                .is_err()
+        );
+    }
+
     /// Check native helper imports remain local while exported macros and binding storage retain correct crate paths.
     #[test]
     fn native_runtime_paths_do_not_escape_into_macro_or_storage_paths() {
@@ -1133,6 +1291,10 @@ mod tests {
             pointer_bits: 64,
             function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
             size_type: kind,
+            ptrdiff_type: crate::IntegerKind::Long,
+            preferred_alignments: Default::default(),
+            arm_float_abi: None,
+            ppc64_elf_abi: None,
             offsetof_supported: true,
             char_bits: 8,
             char_is_signed: true,

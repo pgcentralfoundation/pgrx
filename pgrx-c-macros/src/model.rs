@@ -126,12 +126,15 @@ pub struct BuildInputs {
     pub files: Vec<PathBuf>,
     /// Content identity at inspection; None records a tracked path that was absent.
     pub fingerprints: BTreeMap<PathBuf, Option<String>>,
+    /// Physical input identity at inspection; changing a symlink target invalidates provenance even
+    /// when both targets have identical bytes and the old target remains present.
+    pub file_identities: BTreeMap<PathBuf, Option<PathBuf>>,
     /// Header, resource and loaded-input search directories, including absent roots.
     pub directories: Vec<PathBuf>,
-    /// Executable lookup roots from PATH, separate from header searches.
-    ///
-    /// Build integration must track these roots or reject searches overlapping its
-    /// own output, because creating a higher-priority executable changes selection.
+    /// Legacy executable-directory watches, retained for consumers of this report format.
+    /// Compiler lookup now records attempted executable paths in `files`, including absent
+    /// predecessors, rather than watching every PATH root. Cargo integrations still need safe
+    /// parent-directory watches for absent candidates to detect their later creation.
     pub executable_search_directories: Vec<PathBuf>,
     /// Recorded optional environment values whose changes require fresh inspection.
     pub environment: BTreeMap<String, Option<String>>,
@@ -148,6 +151,14 @@ pub struct TargetFacts {
     pub function_pointer: PointerLayout,
     /// Canonical unsigned C identity of `sizeof` and `_Alignof` results.
     pub size_type: IntegerKind,
+    /// Canonical signed C identity of pointer subtraction, verified independently of its width.
+    pub ptrdiff_type: IntegerKind,
+    /// Original C `_Alignof` results for scalar and array types, separate from storage ABI alignment.
+    pub preferred_alignments: BTreeMap<String, PreferredAlignment>,
+    /// ARM EABI float argument convention from protected compiler predefines, when applicable.
+    pub arm_float_abi: Option<ArmFloatAbi>,
+    /// PowerPC64 ELF function representation from the protected `_CALL_ELF` compiler witness.
+    pub ppc64_elf_abi: Option<Ppc64ElfAbi>,
     /// The intrinsic's result identity and direct/nested/array offsets agree with Clang.
     pub offsetof_supported: bool,
     /// Bits in one C byte; supported helpers require eight-bit storage units.
@@ -174,6 +185,37 @@ pub struct PointerLayout {
     pub size: u64,
     /// Verified native function-pointer storage alignment in C bytes.
     pub alignment: u64,
+}
+
+/// C type-operator alignment can exceed the ABI alignment reported for record storage.
+/// Keeping scalar and array witnesses separate prevents Rust layout queries from silently changing
+/// original `_Alignof` expressions on targets such as i686 Linux.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct PreferredAlignment {
+    /// Original `_Alignof(T)` result for the named fundamental C type.
+    pub scalar: u64,
+    /// Original `_Alignof(T[2])` result, also checked against a nested array witness.
+    pub array: u64,
+}
+
+/// ARM's base and VFP procedure-call variants pass float arguments in different registers.
+/// The effective compiler predefines, rather than the target triple alone, select this contract.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ArmFloatAbi {
+    /// Base AAPCS uses general-purpose registers, including the softfp instruction mode.
+    Base,
+    /// AAPCS-VFP uses floating-point registers for eligible arguments.
+    Vfp,
+}
+
+/// PowerPC64's ELF variants use different function-pointer representations and native call rules.
+/// Big-endian Linux GNU and musl select different defaults even with otherwise equal scalar layouts.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum Ppc64ElfAbi {
+    /// ELFv1 function pointers address descriptors rather than direct function entry points.
+    V1,
+    /// ELFv2 function pointers identify code entry points directly.
+    V2,
 }
 
 /// Gate floating support on the verified byte representation and C evaluation mode.

@@ -946,6 +946,14 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 TokenRange { start, end: start + 1 },
             ));
         }
+        if lexeme.token.kind == TokenKind::Keyword
+            && matches!(spelling, "true" | "false" | "nullptr")
+        {
+            return Err(self.error(
+                SyntaxErrorKind::UnsupportedLiteral,
+                "C23 boolean and nullptr literals require a dedicated type and value contract",
+            ));
+        }
         if matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword) {
             // These constructs are declarations or compile-time selectors, never
             // runtime calls. Some preprocessor token streams label their names as
@@ -1974,6 +1982,24 @@ mod tests {
                 parse_expression(&input, &[], |_| false).unwrap_err().kind,
                 SyntaxErrorKind::Statement,
             );
+        }
+    }
+
+    /// Reject C23 literals before they can become caller captures, while preserving keyword
+    /// spellings when preprocessing uses them as formal parameters.
+    #[test]
+    fn c23_literal_keywords_are_never_runtime_captures() {
+        for name in ["true", "false", "nullptr"] {
+            let input = [Token { kind: TokenKind::Keyword, spelling: name.into() }];
+            assert_eq!(
+                parse_expression(&input, &[], |_| false).unwrap_err().kind,
+                SyntaxErrorKind::UnsupportedLiteral,
+            );
+            let parameter = parse_expression(&input, &[name.into()], |_| false).unwrap();
+            assert!(matches!(
+                parameter.nodes[parameter.root].kind,
+                ExpressionKind::Parameter { index: 0 }
+            ));
         }
     }
 

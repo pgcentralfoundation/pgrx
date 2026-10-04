@@ -94,6 +94,21 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
     matcher
 }
 
+/// Check caller-authored unsafe operations separately from generated unevaluated C operations.
+/// The checks remain dead and borrow no operand beyond each local closure, so
+/// they neither evaluate nor move caller values at runtime.
+pub(super) fn render_safety_checks(analysis: &MacroAnalysis) -> String {
+    let mut rust = String::from("{ if false { ");
+    for (index, parameter) in analysis.parameters.iter().enumerate() {
+        if parameter.roles.iter().any(|role| matches!(role, ParameterRole::Value)) {
+            write!(rust, "$crate::__pgrx_c_operand!(@check_safety; ${});", name(analysis, index))
+                .expect("String output");
+        }
+    }
+    rust.push_str(" } }");
+    rust
+}
+
 /// Generate linear stages for this macro's compiler-established parameter list.
 pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapter>, SkipReason> {
     if analysis.parameters.is_empty() {
@@ -318,10 +333,16 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@known [$callback:ident] $state:tt [$($path:tt)*]; {$($inner:tt)*}) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          ($($invalid:tt)*) => { compile_error!(\"invalid generated C macro argument descriptor\") };\n}\n\
          #[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_operand {\n\
+         (@check_safety; (@native [$expression:expr])) => { { let _ = || { let _ = &($expression); }; } };\n\
+         (@check_safety; (@deref [$($original:tt)*] $pointer:tt)) => { { let _ = || { let _ = &($($original)*); }; } };\n\
+         (@check_safety; (@literal $argument:tt)) => {};\n\
+         (@check_safety; (@unused)) => {};\n\
+         (@check_safety; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_check_safety; $($arguments)*) };\n\
+         (@check_safety; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => { { let _ = $($size)*; } };\n\
          (@value [$floats:tt]; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression) };\n\
          (@place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_place(::core::ptr::addr_of_mut!($expression)) };\n\
          (@read_place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_const_place(::core::ptr::addr_of!($expression)) };\n\
-         (@size; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { Some(unsafe { $crate::__pgrx_c_macros::expression::input($expression) }) } else { None }) };\n\
+         (@size; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { Some($crate::__pgrx_c_macros::expression::input($expression)) } else { None }) };\n\
          (@discard [$floats:tt]; (@native [$expression:expr])) => { { let _ = $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression); } };\n\
          (@read_place; (@deref [$($original:tt)*] [$pointer:expr])) => { { use $crate::__pgrx_c_macros::expression::NativeDerefRead as _; (&$pointer).__pgrx_c_read_deref_place() } };\n\
          (@value [$floats:tt]; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@value [$floats]; (@native [$($original)*])) };\n\

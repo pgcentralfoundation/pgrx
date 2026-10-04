@@ -223,9 +223,7 @@ impl<R> OwnedMemberObject for CVolatile<CRecord<R>> {}
 
 /// Infer a temporary record member's declared size without reading/decaying it.
 /// Bitfields have no SizeablePlace capability, including non-lvalue members.
-pub fn size_of_member_type<F, V: RecordExpression>(
-    _: Option<V>,
-) -> CValue<super::super::CUnsignedLong>
+pub fn size_of_member_type<F, V: RecordExpression>(_: Option<V>) -> CValue<super::super::CSize>
 where
     CRecord<V::Record>: Field<F, ReadOnly>,
     <CRecord<V::Record> as Field<F, ReadOnly>>::Output: SizeablePlace,
@@ -434,7 +432,7 @@ mod tests {
         let raw: Pointer<CRawRecord<Partial>> = implicit::<CPointer<CRawRecord<Partial>>, _>(first);
         assert_eq!(raw.get().cast::<Partial>(), first.get());
         let size = size_of_value_type(None::<RawRecordValue<Partial>>);
-        assert_eq!(size.get(), core::mem::size_of::<Partial>() as u64);
+        assert_eq!(size.get() as usize, core::mem::size_of::<Partial>());
     }
 
     /// Use a destructor counter to prove raw aggregate wrappers never run the hidden record destructor.

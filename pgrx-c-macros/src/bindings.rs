@@ -47,6 +47,11 @@ pub enum RustBindingType {
     Unit,
     /// A distinct boolean representation rather than an arbitrary integer-width alias.
     Bool,
+    /// Rust's target-defined C char alias, whose signedness does not change
+    /// when the inspected C invocation selects `-fsigned-char` or `-funsigned-char`.
+    /// Keeping the alias symbolic lets Rust establish its actual storage while
+    /// the separate C marker establishes the macro's conversion semantics.
+    NativeChar,
     /// Fixed-width Rust storage or a fundamental C integer category, as identified by the enclosing
     /// catalog.
     Integer {

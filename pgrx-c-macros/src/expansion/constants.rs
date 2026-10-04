@@ -386,10 +386,11 @@ fn expand_bodies(
         writeln!(&mut snapshot, "#define {prefix}constant_tokens_{index} {body}")
             .expect("writing to a String cannot fail");
     }
-    let mut definitions = crate::frontend::tokenize_snapshot(scanner, &snapshot)?
-        .into_iter()
-        .map(|definition| (definition.name.clone(), definition))
-        .collect::<HashMap<_, _>>();
+    let mut definitions =
+        crate::frontend::tokenize_snapshot(scanner, &snapshot, &frontend.profile().arguments)?
+            .into_iter()
+            .map(|definition| (definition.name.clone(), definition))
+            .collect::<HashMap<_, _>>();
     let mut total_tokens = 0usize;
     (0..prepared.len())
         .map(|index| {

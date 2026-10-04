@@ -99,16 +99,27 @@ fn unused_field_witnesses_check_exact_storage_and_eager_layout() {
         macros.push_str(&rust);
     }
     let adapters = generated.support.rust;
-    assert!(adapters.contains("Projection<crate::WitnessPlain, u32>"));
+    assert!(adapters.contains("Projection<crate::WitnessPlain, <<c::expression::CRecord<crate::WitnessPlain> as c::expression::OrdinaryField<Field_scalar>>::Member as c::expression::CType>::Storage>"));
     assert!(!adapters.contains("const WITNESS:"));
     assert!(adapters.contains("ManuallyDrop<crate::WitnessPayload>"));
     assert!(adapters.contains(
-        "Projection<crate::WitnessWrapped, ::core::mem::ManuallyDrop<crate::WitnessPayload>>"
+        "Projection<crate::WitnessWrapped, ::core::mem::ManuallyDrop<<<c::expression::CRecord<crate::WitnessWrapped> as c::expression::OrdinaryField<Field_payload>>::Member as c::expression::CType>::Storage>>"
     ));
     assert!(
         adapters
             .contains("Projection<crate::WitnessPromoted, crate::WitnessPromoted__bindgen_ty_1>")
     );
+
+    // Corrupt only the C member marker, leaving the actual binding field and
+    // its layout untouched. The adapter's storage proof must connect to Member.
+    let mismatched_member =
+        adapters.replace("type Member = c::CUnsignedInt;", "type Member = c::CInt;");
+    assert_ne!(mismatched_member, adapters, "fixture has an unsigned int field");
+    let diagnostics = rust_oracle::reject_rust(&format!(
+        "#[path={support:?}] pub mod __pgrx_c_macros; {native} {mismatched_member} fn main() {{}}",
+    ));
+    assert!(diagnostics.contains("E0308"), "marker/storage mismatch: {diagnostics}");
+    assert!(!diagnostics.contains("E0080"), "equal layouts must pass: {diagnostics}");
 
     for (member, replacement) in [
         ("scalar", syn::parse_quote!(i32)),

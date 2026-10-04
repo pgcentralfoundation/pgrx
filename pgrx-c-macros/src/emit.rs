@@ -500,7 +500,10 @@ pub fn generate_with_bindings(
         // Marker identities depend on C/ABI facts, not the requested root set.
         adapters = generated_adapters(session, &final_requests, bindings)?;
     }
-    let support = render_adapters(adapters, &macros)?;
+    let mut support = render_adapters(adapters, &macros)?;
+    if let Ok(alignment) = crate::support_alignment_profile(session.frontend().profile()) {
+        support.rust.push_str(&alignment);
+    }
     Ok(MacroGeneration { macros, support })
 }
 
@@ -575,6 +578,17 @@ struct GeneratedAdapters {
     enumerations: enumerations::EnumAdapters,
 }
 
+/// Hash compiler-established representations and language modes rather than
+/// installation paths, working directories, environment values or OS versions.
+/// Full input fingerprints still control verification and rebuilds independently.
+fn semantic_target_bytes(target: &crate::TargetFacts) -> Result<Vec<u8>, String> {
+    let mut facts = serde_json::to_value(target).map_err(|error| error.to_string())?;
+    // Calling conventions and layouts are separate compiler witnesses. The
+    // spelling of the target triple adds no representation fact to these IDs.
+    facts.as_object_mut().expect("TargetFacts serializes as an object").remove("triple");
+    serde_json::to_vec(&facts).map_err(|error| error.to_string())
+}
+
 /// Build capability families in dependency order from the planned batch requirements.
 ///
 /// Callback witnesses establish signatures before function thunks are generated;
@@ -586,10 +600,15 @@ fn generated_adapters(
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
     use sha2::{Digest, Sha256};
-    let profile = serde_json::to_vec(frontend.profile())
-        .map_err(|error| format!("cannot fingerprint the C function profile: {error}"))?;
+    let target = semantic_target_bytes(&frontend.profile().target)?;
+    let mut hash = Sha256::new();
+    hash.update(target);
+    hash.update(
+        serde_json::to_vec(&frontend.profile().signed_overflow)
+            .map_err(|error| error.to_string())?,
+    );
     let profile_identity =
-        Sha256::digest(profile).iter().map(|byte| format!("{byte:02x}")).collect::<String>();
+        hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect::<String>();
     let callbacks = callbacks::generate(
         frontend.declarations(),
         bindings,
@@ -908,6 +927,46 @@ fn render(
         }
         comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
+    comment.push_str("\n\n# Safety\n\nPreserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.");
+    let mut failures = std::collections::BTreeSet::new();
+    for node in &expression.syntax.nodes {
+        match &node.kind {
+            ExpressionKind::Binary { operator, .. }
+            | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
+                crate::BinaryOperator::Divide | crate::BinaryOperator::Remainder => {
+                    failures.insert("Integer division/remainder rejects zero divisors and signed MIN / -1 overflow.");
+                }
+                crate::BinaryOperator::ShiftLeft | crate::BinaryOperator::ShiftRight => {
+                    failures.insert("Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain.");
+                }
+                crate::BinaryOperator::Add
+                | crate::BinaryOperator::Subtract
+                | crate::BinaryOperator::Multiply => {
+                    failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds.");
+                }
+                _ => {}
+            },
+            ExpressionKind::Unary { operator: crate::UnaryOperator::Negate, .. }
+            | ExpressionKind::Update { .. } => {
+                failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping.");
+            }
+            ExpressionKind::Cast { .. } | ExpressionKind::TypeParameterCast { .. } => {
+                failures.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
+            }
+            ExpressionKind::Call { .. } => {
+                failures.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
+            }
+            _ => {}
+        }
+    }
+    if !failures.is_empty() {
+        comment.push_str("\n\n# Panics\n\n");
+        for failure in failures {
+            comment.push_str(failure);
+            comment.push(' ');
+        }
+        comment.push_str("These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.");
+    }
     write_doc_comments(&mut rust, &comment).ok_or_else(|| {
         skip(
             analysis,
@@ -916,12 +975,21 @@ fn render(
             None,
         )
     })?;
+    if matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate") {
+        rust.push_str("#[doc(hidden)]\n");
+    }
     write!(&mut rust, "#[macro_export]\nmacro_rules! {identifier} {{\n").expect("String output");
     let matcher = arguments::matcher(analysis);
     let operands = (0..analysis.parameters.len())
         .map(|index| format!("${}", arguments::name(analysis, index)))
         .collect::<Vec<_>>()
         .join(", ");
+    let safety_checks = arguments::render_safety_checks(analysis);
+    writeln!(&mut rust, "(@__pgrx_emit_check_safety; {matcher}) => {{ {safety_checks} }};")
+        .expect("String output");
+    let safety_call = invoke("__pgrx_emit_check_safety", "");
+    writeln!(&mut rust, "(@__pgrx_c_check_safety; $($raw:tt)*) => {{ {safety_call} }};")
+        .expect("String output");
     let public_body = if statement_body.is_some() {
         value.clone()
     } else if empty {
@@ -1675,28 +1743,21 @@ mod tests {
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
 
-    /// Check that batch generation propagates profile serialization errors instead of emitting partial support.
-    #[cfg(unix)]
+    /// Helper identities ignore deployment triple spelling while retaining
+    /// actual C layout and language facts; input verification remains separate.
     #[test]
-    fn batch_emission_reports_shared_profile_fingerprint_errors() {
-        use std::os::unix::ffi::OsStringExt;
+    fn semantic_identity_ignores_os_versions_but_retains_layout() {
         let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         let scanner = crate::MacroScanner::new().expect("libclang required");
         let header = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("tests/fixtures/emit_scalar.h");
-        let mut frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
-        // A missing tracked input is a valid recorded state, but this spelling
-        // cannot be serialized into the shared profile's JSON fingerprint.
-        let input = std::path::PathBuf::from(std::ffi::OsString::from_vec(vec![0xff]));
-        frontend.profile.inputs.fingerprints.insert(input, None);
-        let session = crate::AnalysisSession::prepare(&scanner, &frontend, &["EMIT_ID"]).unwrap();
-        let error = super::emit_batch_with_bindings(
-            &session,
-            &["EMIT_ID"],
-            &crate::BindingCatalog::default(),
-        )
-        .unwrap_err();
-        assert!(error.contains("cannot fingerprint the C function profile"), "{error}");
+        let frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
+        let mut target = frontend.profile().target.clone();
+        let identity = super::semantic_target_bytes(&target).unwrap();
+        target.triple = "arm64-apple-darwin99.0.0".into();
+        assert_eq!(identity, super::semantic_target_bytes(&target).unwrap());
+        target.pointer_bits = 32;
+        assert_ne!(identity, super::semantic_target_bytes(&target).unwrap());
     }
 
     /// Check that large retained C definitions account for both source text and documentation fences.

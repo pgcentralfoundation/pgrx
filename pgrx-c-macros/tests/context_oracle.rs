@@ -213,6 +213,16 @@ fn nested_macro_contexts_match_original_c_values_types_and_evaluation() {
         function_body(&llvm, "context_observe_volatile").matches("load volatile").count(),
         original_volatile
     );
+    assert_eq!(
+        function_body(&llvm, "context_observe_static_volatile").matches("load volatile").count(),
+        original_volatile,
+        "CVolatile must force volatile loads when runtime metadata is cleared",
+    );
+    assert_eq!(
+        function_body(&llvm, "context_store_static_volatile").matches("store volatile").count(),
+        1,
+        "CVolatile must force volatile stores when runtime metadata is cleared",
+    );
     let unevaluated = function_body(&llvm, "context_observe_size");
     assert!(!unevaluated.contains("load "), "sizeof must not access any storage: {unevaluated}");
     assert!(!unevaluated.contains("call "), "sizeof must not evaluate an operand: {unevaluated}");
@@ -279,6 +289,46 @@ fn invalid_c_lvalue_contexts_and_unsafe_obligations_are_rejected() {
             "field access must expose its caller obligation: {error}"
         );
     }
+    for invocation in [
+        "CTX_SIZE!(*scalar)",
+        "CTX_SIZE!(dangerous())",
+        "CTX_SIZE!(CTX_IDENTITY!(*scalar))",
+        "CTX_SIZE!(CTX_FIELD!(dangerous_pointer()))",
+    ] {
+        let error = rust_oracle::reject_rust(&format!(
+            "{rust}\nunsafe fn dangerous() -> i32 {{ 7 }}\nunsafe fn dangerous_pointer() -> *mut ContextRecord {{ core::ptr::null_mut() }}\nfn main() {{ let scalar = core::ptr::null::<i32>(); let _ = {invocation}; }}\n"
+        ));
+        assert!(error.contains("E0133"), "caller unsafe tokens must remain visible: {error}");
+    }
+    let caller_function = rust_oracle::reject_rust(&format!(
+        "{rust}\n#[deny(unsafe_op_in_unsafe_fn)] unsafe fn caller(pointer: *const i32) {{ let _ = CTX_SIZE!(*pointer); }} fn main() {{}}\n"
+    ));
+    assert!(
+        caller_function.contains("E0133"),
+        "unsafe fn still requires an explicit caller block: {caller_function}"
+    );
+    let actual = rust_oracle::run_rust(&format!(
+        r#"{rust}
+/// Supply an unsafe Rust call whose expression is only type checked.
+unsafe fn dangerous() -> i32 {{ panic!("sizeof must not call its operand") }}
+/// Supply an unsafe record-pointer call whose expression is only type checked.
+unsafe fn dangerous_pointer() -> *mut ContextRecord {{ panic!("sizeof must not call its operand") }}
+fn main() {{
+    let scalar = core::ptr::null::<i32>();
+    // SAFETY: All operands occur only in generated dead size witnesses; no
+    // pointer is read and neither panic-producing call can execute.
+    unsafe {{ println!("{{}} {{}} {{}} {{}}", CTX_SIZE!(*scalar).get(), CTX_SIZE!(dangerous()).get(), CTX_SIZE!(CTX_IDENTITY!(*scalar)).get(), CTX_SIZE!(CTX_FIELD!(dangerous_pointer())).get()); }}
+}}
+"#,
+    ));
+    let expected = oracle::run_c(
+        &profile.compiler.executable,
+        &header(),
+        "#include <stdio.h>\nint dangerous(void); ContextRecord *dangerous_pointer(void); int main(void) { int *scalar=0; printf(\"%zu %zu %zu %zu\\n\", CTX_SIZE(*scalar), CTX_SIZE(dangerous()), CTX_SIZE(CTX_IDENTITY(*scalar)), CTX_SIZE(CTX_FIELD(dangerous_pointer()))); }\n",
+        &arguments,
+        true,
+    );
+    assert_eq!(actual, expected, "explicit Rust unsafe must preserve unevaluated original C sizes");
     let atomic = rust_oracle::reject_rust(&format!(
         "{rust}\nfn main() {{ let _ = CTX_ATOMIC!(1_i32 + 2_i32); }}\n"
     ));

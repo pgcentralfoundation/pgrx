@@ -8,16 +8,12 @@
 //! including the SQLSTATE macros from a configured PostgreSQL installation.
 //! Unsupported character forms stay explicit skips rather than guessed strings.
 //!
-//! These generated consumers use the runtime's Linux/macOS host family. Emission
-//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+//! These generated consumers use the actual inspected C profile on each native host.
+//! Cross-profile checks retain original compiler facts without executing foreign code.
 
-#![cfg(all(
-    target_pointer_width = "64",
-    target_endian = "little",
-    any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "linux", target_os = "macos"),
-))]
-
+/// Select installed PostgreSQL header oracles from configured metadata.
+#[path = "support/postgres.rs"]
+mod installed;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
@@ -27,8 +23,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, ConstCapability, EmissionStatus, FrontendOutput, MacroScanner, PostgresConfig,
-    SkipReasonCode, emit, inspect,
+    AnalysisSession, ConstCapability, EmissionStatus, FrontendOutput, MacroScanner, SkipReasonCode,
+    emit, inspect,
 };
 use std::fmt::Write;
 use std::path::PathBuf;
@@ -95,10 +91,12 @@ static unsigned evaluations;
 static int argument(void) { ++evaluations; return 7; }
 #define RECORD(name, expression) do { \
     __typeof__(expression) value = (expression); \
-    const unsigned __int128 bits = (unsigned __int128)value; \
+    const unsigned long long low = (unsigned long long)value; \
+    const unsigned long long high = _Generic((value), int: 1, unsigned int: 0, \
+        long: 1, unsigned long: 0, long long: 1, unsigned long long: 0) \
+        && (long long)value < 0 ? ~0ULL : 0; \
     printf("%s\t%s\t%u\t%016llx%016llx\t%u\n", name, KIND(value), \
-        (unsigned)(sizeof(value) * CHAR_BIT), (unsigned long long)(bits >> 64), \
-        (unsigned long long)bits, evaluations); \
+        (unsigned)(sizeof(value) * CHAR_BIT), high, low, evaluations); \
 } while (0)
 int main(void) {
 "#;
@@ -157,7 +155,8 @@ fn compare_original(frontend: &FrontendOutput, c: &str, rust: &str, records: usi
         &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
         true,
     );
-    let generated = rust_oracle::run_rust(rust);
+    let generated =
+        rust_oracle::run_rust_with_cfg(rust, &pgrx_c_macros::support_rust_cfg(profile).unwrap());
     assert_eq!(original.lines().count(), records, "original C corpus completeness");
     assert_eq!(generated.lines().count(), records, "generated Rust corpus completeness");
     for (index, (c, rust)) in original.lines().zip(generated.lines()).enumerate() {
@@ -286,72 +285,82 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
     compare_original(&frontend, &c, &rust, CONSTANTS.len() + OPERATORS.len() * (samples.len() + 5));
 }
 
-/// Checks that postgres sqlstate macros match original C at runtime.
+/// Check SQLSTATE character operations against every selected installed PostgreSQL
+/// definition, including original types and independently counted argument occurrences.
 #[test]
-#[ignore = "requires a configured native PostgreSQL 18 installation"]
 fn postgres_sqlstate_macros_match_original_c_at_runtime() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    let postgres = PostgresConfig::resolve("pg18").expect("native PG18 must be configured");
+    let installations = installed::configured();
+    if installations.is_empty() {
+        return;
+    }
     let scanner = MacroScanner::new().expect("libclang must be available");
-    let frontend = postgres.inspect(&scanner, None, &[], None).unwrap();
-    let names = ["PGSIXBIT", "MAKE_SQLSTATE"];
-    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-    let mut c = String::from(C_RECORDING);
-    let mut rust = generated_source(&session, &names);
-    let mut records = 0;
-    for value in -256..=255 {
-        writeln!(c, "RECORD(\"PGSIXBIT_{value}\", PGSIXBIT({value}));").unwrap();
-        writeln!(rust, "record(\"PGSIXBIT_{value}\", PGSIXBIT!({value}_i32), 0);").unwrap();
+    for postgres in installations {
+        let major = postgres.pg_config().major_version().unwrap();
+        let frontend = installed::inspect(&scanner, &postgres, &[]);
+        if !installed::supports_rust_comparisons(&scanner, &frontend) {
+            continue;
+        }
+        let names = ["PGSIXBIT", "MAKE_SQLSTATE"];
+        let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+        let mut c = String::from(C_RECORDING);
+        let mut rust = generated_source(&session, &names);
+        let mut records = 0;
+        for value in -256..=255 {
+            writeln!(c, "RECORD(\"PGSIXBIT_{value}\", PGSIXBIT({value}));").unwrap();
+            writeln!(rust, "record(\"PGSIXBIT_{value}\", PGSIXBIT!({value}_i32), 0);").unwrap();
+            records += 1;
+        }
+        for (label, c_value, rust_value) in [
+            ("UNSIGNED", "0xFFFFFFFFU", "u32::MAX"),
+            ("UCHAR", "(unsigned char)255", "255_u8"),
+            ("LONG", "-1L", "CValue::<CLong>::new(-1)"),
+            ("ULONG", "0UL", "CValue::<CUnsignedLong>::new(0)"),
+        ] {
+            writeln!(c, "RECORD(\"PGSIXBIT_{label}\", PGSIXBIT({c_value}));").unwrap();
+            writeln!(rust, "record(\"PGSIXBIT_{label}\", PGSIXBIT!({rust_value}), 0);").unwrap();
+            records += 1;
+        }
+        for (index, code) in
+            ["00000", "01000", "23505", "42P01", "XX000", "P0001", "ZZZZZ"].into_iter().enumerate()
+        {
+            let c_args = code.chars().map(|ch| format!("'{ch}'")).collect::<Vec<_>>().join(", ");
+            let rust_args =
+                code.bytes().map(|byte| format!("{byte}_i32")).collect::<Vec<_>>().join(", ");
+            writeln!(c, "RECORD(\"MAKE_SQLSTATE_{index}\", MAKE_SQLSTATE({c_args}));").unwrap();
+            writeln!(rust, "record(\"MAKE_SQLSTATE_{index}\", MAKE_SQLSTATE!({rust_args}), 0);")
+                .unwrap();
+            records += 1;
+        }
+        for value in 0..=127 {
+            // Six-bit masking keeps every shifted signed operand representable in C int.
+            writeln!(c, "RECORD(\"MAKE_SQLSTATE_ASCII_{value}\", MAKE_SQLSTATE({value}, {value}, {value}, {value}, {value}));").unwrap();
+            writeln!(rust, "record(\"MAKE_SQLSTATE_ASCII_{value}\", MAKE_SQLSTATE!({value}_i32, {value}_i32, {value}_i32, {value}_i32, {value}_i32), 0);").unwrap();
+            records += 1;
+        }
+        writeln!(c, "evaluations = 0; RECORD(\"PGSIXBIT_EVAL\", PGSIXBIT(argument()));").unwrap();
+        writeln!(rust, "evaluations.set(0); let value = PGSIXBIT!(argument()); record(\"PGSIXBIT_EVAL\", value, evaluations.get());").unwrap();
         records += 1;
-    }
-    for (label, c_value, rust_value) in [
-        ("UNSIGNED", "0xFFFFFFFFU", "u32::MAX"),
-        ("UCHAR", "(unsigned char)255", "255_u8"),
-        ("LONG", "-1L", "CValue::<CLong>::new(-1)"),
-        ("ULONG", "0UL", "CValue::<CUnsignedLong>::new(0)"),
-    ] {
-        writeln!(c, "RECORD(\"PGSIXBIT_{label}\", PGSIXBIT({c_value}));").unwrap();
-        writeln!(rust, "record(\"PGSIXBIT_{label}\", PGSIXBIT!({rust_value}), 0);").unwrap();
-        records += 1;
-    }
-    for (index, code) in
-        ["00000", "01000", "23505", "42P01", "XX000", "P0001", "ZZZZZ"].into_iter().enumerate()
-    {
-        let c_args = code.chars().map(|ch| format!("'{ch}'")).collect::<Vec<_>>().join(", ");
-        let rust_args =
-            code.bytes().map(|byte| format!("{byte}_i32")).collect::<Vec<_>>().join(", ");
-        writeln!(c, "RECORD(\"MAKE_SQLSTATE_{index}\", MAKE_SQLSTATE({c_args}));").unwrap();
-        writeln!(rust, "record(\"MAKE_SQLSTATE_{index}\", MAKE_SQLSTATE!({rust_args}), 0);")
+        let mut helpers = String::from("static unsigned argument_counts[5];\n");
+        for index in 0..5 {
+            writeln!(helpers, "static int argument_{index}(void) {{ ++argument_counts[{index}]; return 'A' + {index}; }}")
             .unwrap();
-        records += 1;
-    }
-    for value in 0..=127 {
-        // Six-bit masking keeps every shifted signed operand representable in C int.
-        writeln!(c, "RECORD(\"MAKE_SQLSTATE_ASCII_{value}\", MAKE_SQLSTATE({value}, {value}, {value}, {value}, {value}));").unwrap();
-        writeln!(rust, "record(\"MAKE_SQLSTATE_ASCII_{value}\", MAKE_SQLSTATE!({value}_i32, {value}_i32, {value}_i32, {value}_i32, {value}_i32), 0);").unwrap();
-        records += 1;
-    }
-    writeln!(c, "evaluations = 0; RECORD(\"PGSIXBIT_EVAL\", PGSIXBIT(argument()));").unwrap();
-    writeln!(rust, "evaluations.set(0); let value = PGSIXBIT!(argument()); record(\"PGSIXBIT_EVAL\", value, evaluations.get());").unwrap();
-    records += 1;
-    let mut helpers = String::from("static unsigned argument_counts[5];\n");
-    for index in 0..5 {
-        writeln!(helpers, "static int argument_{index}(void) {{ ++argument_counts[{index}]; return 'A' + {index}; }}")
+        }
+        c = c.replace("int main(void) {", &format!("{helpers}int main(void) {{"));
+        // Separate scalar objects make the unspecified C operand order well-defined.
+        c.push_str("evaluations = 0; RECORD(\"MAKE_SQLSTATE_EVAL\", MAKE_SQLSTATE(argument_0(), argument_1(), argument_2(), argument_3(), argument_4()));\n");
+        c.push_str("printf(\"MAKE_SQLSTATE_COUNTS\\t%u\\t%u\\t%u\\t%u\\t%u\\n\", argument_counts[0], argument_counts[1], argument_counts[2], argument_counts[3], argument_counts[4]);\n");
+        rust.push_str("evaluations.set(0); let counts = [const { Cell::new(0_u32) }; 5];\n");
+        for index in 0..5 {
+            writeln!(rust, "let argument_{index} = || {{ counts[{index}].set(counts[{index}].get() + 1); 65_i32 + {index} }};")
             .unwrap();
+        }
+        rust.push_str("let value = MAKE_SQLSTATE!(argument_0(), argument_1(), argument_2(), argument_3(), argument_4()); record(\"MAKE_SQLSTATE_EVAL\", value, evaluations.get());\n");
+        rust.push_str("println!(\"MAKE_SQLSTATE_COUNTS\\t{}\\t{}\\t{}\\t{}\\t{}\", counts[0].get(), counts[1].get(), counts[2].get(), counts[3].get(), counts[4].get());\n");
+        records += 2;
+        c.push_str("return 0; }\n");
+        rust.push_str("}\n");
+        compare_original(&frontend, &c, &rust, records);
+        eprintln!("PG{major}: {records} SQLSTATE C/Rust records");
     }
-    c = c.replace("int main(void) {", &format!("{helpers}int main(void) {{"));
-    // Separate scalar objects make the unspecified C operand order well-defined.
-    c.push_str("evaluations = 0; RECORD(\"MAKE_SQLSTATE_EVAL\", MAKE_SQLSTATE(argument_0(), argument_1(), argument_2(), argument_3(), argument_4()));\n");
-    c.push_str("printf(\"MAKE_SQLSTATE_COUNTS\\t%u\\t%u\\t%u\\t%u\\t%u\\n\", argument_counts[0], argument_counts[1], argument_counts[2], argument_counts[3], argument_counts[4]);\n");
-    rust.push_str("evaluations.set(0); let counts = [const { Cell::new(0_u32) }; 5];\n");
-    for index in 0..5 {
-        writeln!(rust, "let argument_{index} = || {{ counts[{index}].set(counts[{index}].get() + 1); 65_i32 + {index} }};")
-            .unwrap();
-    }
-    rust.push_str("let value = MAKE_SQLSTATE!(argument_0(), argument_1(), argument_2(), argument_3(), argument_4()); record(\"MAKE_SQLSTATE_EVAL\", value, evaluations.get());\n");
-    rust.push_str("println!(\"MAKE_SQLSTATE_COUNTS\\t{}\\t{}\\t{}\\t{}\\t{}\", counts[0].get(), counts[1].get(), counts[2].get(), counts[3].get(), counts[4].get());\n");
-    records += 2;
-    c.push_str("return 0; }\n");
-    rust.push_str("}\n");
-    compare_original(&frontend, &c, &rust, records);
 }

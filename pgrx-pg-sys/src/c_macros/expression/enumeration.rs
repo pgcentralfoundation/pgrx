@@ -42,6 +42,12 @@ impl<I: EnumIdentity, K: CInteger> CInteger for CEnum<I, K> {
     const SIGNED: bool = K::SIGNED;
     /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = K::RANK;
+    /// Metadata and nominal enum identity cannot create an absent underlying C integer.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the underlying C integer's preferred scalar alignment.
+    const ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve its independently measured array alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: Self::Repr) -> u128 {
         K::encode(value)
@@ -151,6 +157,12 @@ impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> CType for CEnumObject<I
     type Storage = R;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = CValue<CEnum<I, K>>;
+    /// Nominal enum storage requires its compiler-proved compatible integer type.
+    const AVAILABLE: bool = K::AVAILABLE;
+    /// Preserve the compatible C type alignment independently of Rust enum storage.
+    const C_ALIGNMENT: usize = K::ALIGNMENT;
+    /// Preserve the compatible integer's measured C array alignment.
+    const ARRAY_ALIGNMENT: usize = <K as CInteger>::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: R) -> Self::Value {
         CValue::new(R::decode(value))

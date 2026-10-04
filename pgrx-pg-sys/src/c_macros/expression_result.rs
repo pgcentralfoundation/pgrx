@@ -192,7 +192,7 @@ mod tests {
         let falsehood: bool = return_value(CValue::<CInt>::new(0));
         assert!(!falsehood);
         let explicit = return_value_as::<super::super::CUnsignedLong, _>(CValue::<CInt>::new(-1));
-        assert_eq!(explicit, u64::MAX);
+        assert_eq!(explicit, core::ffi::c_ulong::MAX);
     }
 
     /// Check return assignment conversion accepts qualifier addition and source-proved null constants.

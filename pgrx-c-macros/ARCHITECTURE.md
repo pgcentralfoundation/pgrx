@@ -171,7 +171,8 @@ cannot become ordinary scalars just because canonicalization erased the attribut
 positional version after a CLI subcommand accepts forms such as `pg18` and `18`.
 Configuration includes `PGRX_HOME/config.toml` and the `PGRX_PG_CONFIG_PATH`
 override. `pg_config` supplies the server include root and recorded C arguments.
-The default input is pgrx's corresponding `pgrx-pg-sys/include/pgNN.h` wrapper.
+The default input is the corresponding canonical pgrx wrapper, embedded in the
+crate and materialized under PGRX_HOME independently of the source checkout.
 Optional caller arguments follow the recorded settings; their order matters.
 
 There are two different inspection paths:
@@ -575,7 +576,9 @@ as the hidden `pgrx-pg-sys::__pgrx_c_macros` module so exported macros can use
 
 `CInteger` markers encode representation, width, signedness, rank, promoted
 identity, and value-boundary identity. `CValue<K>` stores a value tagged with
-marker `K`. The modeled target is signed-char, little-endian LP64:
+marker `K`. Compiler facts select LP64, LLP64, or ILP32 representation;
+plain `char` can be signed or unsigned, independently of Rust's native `c_char`.
+The baseline families are:
 
 | C family | Bits | Rank | Ordinary promotion |
 | --- | ---: | ---: | --- |
@@ -583,9 +586,9 @@ marker `K`. The modeled target is signed-char, little-endian LP64:
 | `char`, signed/unsigned `char` | 8 | 1 | `int` |
 | signed/unsigned `short` | 16 | 2 | `int` |
 | signed/unsigned `int` | 32 | 3 | Same kind |
-| signed/unsigned `long` | 64 | 4 | Same kind |
+| signed/unsigned `long` | 32 or 64 | 4 | Same kind |
 | signed/unsigned `long long` | 64 | 5 | Same kind |
-| signed/unsigned `__int128` | 128 | 6 | Same kind |
+| signed/unsigned `__int128`, when available | 128 | 6 | Same kind |
 
 Implement integer promotions first, then usual arithmetic conversions:
 
@@ -596,6 +599,15 @@ Implement integer promotions first, then usual arithmetic conversions:
 4. Otherwise select the signed type if it represents every value of the
    unsigned type.
 5. Otherwise select the unsigned counterpart of the signed type.
+
+The compiler separately measures the preferred scalar and array alignments used
+by C type operators. A singleton-record witness supplies ABI storage alignment;
+these can differ, as with 32-bit x86 `double` and `long long`. Generated
+`__pgrx_c_alignment` constants drive the runtime's alignment operators under
+`pgrx_c_alignment`, while loads and layout checks keep using actual binding
+storage. Nested arrays and qualifier/storage adapters preserve the appropriate
+C alignment. An unavailable extension type has a zero sentinel and is rejected
+at monomorphization instead of acquiring a guessed C representation.
 
 `Common<Rhs>` encodes that finite table. Arithmetic and comparison helpers
 convert both operands to the resulting identity. Shifts promote operands
@@ -1000,8 +1012,15 @@ encoder, which rejects values with no Rust variant. Do not read padding or
 uninitialized fields as initialized bytes, or construct a Rust enum with an
 unnamed discriminant. Materializing a Rust record requires valid initialized
 fields and its ownership contract; padding need not be initialized.
-Callback representation adaptation requires its own proved unchanged ABI/layout
-before transmuting the exact function-pointer representation.
+Plain-char field storage can have a different Rust sign while preserving every
+byte, but that does not prove a callable ABI: narrow argument/result extension
+attributes also matter. Direct C thunks therefore transport the compiler's
+canonical char scalar. Indirect calls reinterpret only function-pointer storage
+and invoke the exact original C signature, including its char sign; callers must
+supply an address that actually has that prototype. A differently declared Rust
+callback does not satisfy that obligation merely because its bytes have the same
+width. Callback representation adaptation requires its own proved unchanged
+ABI/layout before transmuting the exact function-pointer representation.
 
 For adapters that can call PostgreSQL, `BindingCatalog::ffi_boundary` supplies
 the crate's existing `pg_guard_ffi_boundary` path. Perform fallible argument
@@ -1135,10 +1154,12 @@ CLI commands retain their own requested output and stderr diagnostics.
 `pgrx-bindgen/src/build.rs` orchestrates the production path:
 
 1. Resolve configurations and active Cargo major.
-2. Inspect C with the same effective arguments that will be passed to bindgen.
+2. Inspect optional macros with recorded CFLAGS plus the established binding
+   target, CPPFLAGS, include settings and environment overrides.
 3. Select PostgreSQL function macro names and prepare one session.
 4. Establish target guards and pgrx opaque integer bridges.
-5. Run bindgen with that agreed argument profile; parse its fresh output.
+5. Run bindgen with its established CPPFLAGS/include/target invocation; verify
+   that the inspected inputs stayed unchanged, then parse its fresh output.
 6. Normalize the parsed copy's C foreign/callback ABI to the final binding
    storage's `C-unwind` ABI, then collect the actual `BindingCatalog` and its FFI
    guard path. The existing foreign-function guard rewrite happens afterward.
@@ -1147,6 +1168,13 @@ CLI commands retain their own requested output and stderr diagnostics.
    required, then verify inputs again.
 9. Apply the existing foreign-function guards and binding rewrites, render the
    macro tree, reports, bindings, and OIDs, and publish fresh artifacts.
+
+If an optional step fails, keep already generated ordinary bindings (or generate
+them with the established invocation), write an unavailable macro report and
+classifier, and compile the ordinary C shim when enabled. No native macro
+linkage is published on that path. Unsupported target families and
+`PGRX_C_MACROS=0` skip inspection altogether. Compiler inspection is still
+required for a successful macro artifact; fallback never guesses C semantics.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,
@@ -1231,17 +1259,33 @@ on a rerun. Track an absent optional path through its nearest existing parent
 so a missing file does not make every build dirty and its later creation is
 still detected.
 
-Unavailable inspection paths, including the existing Windows/pre-generated
-target-info integration cases, produce an explicit unavailable report and a
+Unavailable inspection paths produce an explicit unavailable report and a
 compilable macro index whose classifier answers every availability query as absent.
 Every normal artifact also includes the classifier, even when every candidate was
 skipped or the successful macros take no value operands. Operand adapters are
 retained only when successful macros need them; availability needs no C ABI facts.
 The discovery library's ability to inspect some targets does not imply that the
-current runtime supports their ABI. The runtime gate requires signed-char LP64,
-64-bit pointers, C unsigned-long `size_t`, the
-verified integer table, little endian, and a recognized Rust architecture/OS
-guard; LLP64 Windows is outside it.
+current runtime supports their ABI. The runtime gate checks the integer table,
+floating and pointer representations, byte order, and a recognized Rust
+architecture/OS guard. ARM EABI soft/hard-float and PowerPC64 ELFv1/ELFv2
+come from protected compiler witnesses, with matching Rust `target_abi` guards;
+integer width agreement cannot establish those procedure-call conventions.
+Unmodeled explicit ABI switches remain refused. It admits LP64, LLP64, and ILP32 with either plain-char
+signedness and byte order. The compiler proves `size_t` and pointer-difference
+rank separately; equal widths do not identify C types. Build-script cfg values
+select these runtime identities for the active PostgreSQL version.
+
+Rust's `core::ffi::c_char` remains symbolic in the binding catalog because C
+char flags do not change the Rust alias. A verified one-byte, all-bit-patterns
+valid storage bridge carries its bytes while the inspected C char marker supplies
+signedness and promotion. Other incompatible representations still fail proof.
+
+When `pg_config` lacks historical CFLAGS, the current header/target invocation
+defines the macro profile, and the audit report records `cflags_recorded: false`.
+Real subprocess errors and malformed flags are errors, not absent metadata.
+Windows recorded flags use Microsoft quote/backslash rules and a bounded MSVC
+option translation; Unix flags use shell quoting. Ordinary bindgen retains its
+established CPPFLAGS invocation independently of this optional inspection.
 
 ## 16. A complete generation algorithm
 
@@ -1257,7 +1301,8 @@ generate(version, extra_arguments):
     session = prepare_expansions_constants_and_zero_proofs(frontend, names)
 
     target_guard_and_integer_bridges = validate_runtime_profile(frontend)
-    fresh_rust = run_bindgen_using_verified_arguments(frontend)
+    fresh_rust = run_bindgen_using_existing_cppflags_includes_target_environment(installation)
+    verify_session_inputs_again(session)
     binding_ast = parse_fresh_bindings(fresh_rust)
     normalize_c_to_c_unwind_abi(binding_ast)
     bindings = collect_actual_rust_binding_storage(binding_ast)
@@ -1279,7 +1324,9 @@ generate(version, extra_arguments):
     verify_session_inputs_again(session)
     files = organize_by_header_provenance(support.rust, emissions)
     final_rust = apply_existing_guards_and_binding_rewrites(fresh_rust)
-    format_stage_and_publish(files, final_rust, report(frontend, emissions))
+    record = report(frontend, emissions)
+    publish_verified_native_linkage_if_present(support)
+    format_stage_and_publish(files, final_rust, record)
     track_cargo_inputs(session.inputs)
 ```
 
@@ -1411,14 +1458,16 @@ cargo test -p pgrx-c-macros
 cargo test -p pgrx-bindgen --lib
 ```
 
-Installation-dependent and full generated-binding tests are separate explicit
-tests; choose configured versions and run them when their target contracts are
-affected. The handport-name coverage test needs configured PG15 through PG19;
-the PostgreSQL emission oracle selects its configured PG18 fixture:
+Installed-header comparisons run in ordinary tests against all configured
+supported versions, or the exact `PG_VER` selected by CI. An explicit selection
+must resolve an installation; unselected runs without configuration report
+omitted coverage. Unsupported runtime profiles must prove an exact macro
+refusal before omitting C/Rust comparisons. Full generated-binding and release
+tests remain separate explicit tests:
 
 ```sh
-cargo test -p pgrx-c-macros --test postgres_emission -- --ignored
-cargo test -p pgrx-c-macros --test postgres_handports -- --ignored
+cargo test -p pgrx-c-macros --test postgres_emission
+cargo test -p pgrx-c-macros --test postgres_handports
 cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 cargo test -p pgrx --test c_macros --no-default-features --features pg18,cshim
@@ -1482,3 +1531,36 @@ generalized; do not add a macro-name exception.
 For commands, user-facing invocation details, and the library's public surface,
 also read the [crate README](README.md) and item documentation. The algorithms
 and phase contracts above explain why those APIs are ordered as they are.
+
+## Optional integration and stable identities
+
+Ordinary bindgen generation uses pgrx's existing CPPFLAGS, target includes, and
+bindgen environment arguments independently of macro generation. The macro
+frontend additionally observes the installation's recorded CFLAGS, and checks
+its C declarations against that fresh binding catalog. Rust type storage is
+never repaired to make an incompatible C profile appear supported. Failed
+inspection or native compilation publishes an unavailable report and classifier,
+with no macro definitions or native linkage. `PGRX_C_MACROS=0` skips this optional
+work; `PGRX_MACRO_DEBUG=1` enables its Cargo diagnostics. Cross builds require
+target PostgreSQL metadata, rather than importing the host's recorded CFLAGS.
+
+Input content fingerprints determine when compiler facts expire. Generated
+helper names instead hash semantic target representations, callable signatures,
+C overflow policy and layout facts. They do not hash PATH, HOME, working
+directories, compiler installation paths or OS deployment versions. Field
+markers use the original member name, retaining polymorphic projection across
+records without renumbering unrelated fields.
+
+The CLI embeds packaged copies of the canonical wrapper headers. A default
+wrapper is published atomically under PGRX_HOME in a directory keyed by its
+contents, so its path remains valid after a PostgresConfig is dropped. Explicit
+headers bypass materialization. Tests require the packaged wrappers to match
+the binding generator's canonical files byte for byte.
+
+Input verification records each file's canonical target separately from its
+SHA-256 content identity, so even a same-content symlink retarget invalidates
+the inspection. Each verification pass opens and hashes every distinct canonical
+input, sharing bytes among aliases only within that pass. Supported Linux/macOS
+generator hosts use ring's assembly-backed SHA-256 (built with a host C compiler);
+other hosts use SHA2. Backend equivalence tests preserve the report's digest
+format, and no mtime-only or cross-pass cache can certify unchanged input bytes.

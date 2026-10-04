@@ -9,7 +9,7 @@
 //! pointers, arrays, and function signatures. Record identity, field offsets, qualifiers, and
 //! linkage survive the copy so native adapters can check layout and C compatibility later.
 
-use super::type_info;
+use super::{has_type_attributes, type_info};
 use crate::{
     ArrayKind, DeclarationCatalog, DeclarationLinkage, FieldInfo, FunctionInfo, FunctionSignature,
     RecordInfo, RecordKind, TypeShape, TypeShapeKind,
@@ -82,12 +82,28 @@ impl<'tu> Collector<'_, 'tu> {
     fn collect_shape(&mut self, ty: Type<'tu>) {
         let canonical = ty.get_canonical_type();
         let spelling = canonical.get_display_name();
+        // Attributed aliases can share a canonical key with ordinary types. An
+        // unsafe edge must invalidate that key even when a plain edge was visited
+        // first; otherwise traversal order would decide whether loads are aligned.
+        if unsupported_edge_attributes(ty) {
+            self.visited.insert(spelling.clone());
+            self.catalog.type_shapes.insert(
+                spelling,
+                TypeShape {
+                    ty: type_info(ty),
+                    is_restrict: ty.is_restrict_qualified(),
+                    kind: TypeShapeKind::Unsupported,
+                },
+            );
+            return;
+        }
         // Mark before traversing edges: records routinely contain pointers to themselves.
         if !self.visited.insert(spelling.clone()) {
             return;
         }
+        let sugared = unwrap_alias(ty);
         let kind = match canonical.get_kind() {
-            TypeKind::Pointer => match canonical.get_pointee_type() {
+            TypeKind::Pointer => match sugared.get_pointee_type() {
                 Some(pointee) => {
                     self.pending.push(pointee);
                     TypeShapeKind::Pointer { pointee: type_info(pointee) }
@@ -97,7 +113,7 @@ impl<'tu> Collector<'_, 'tu> {
             array_kind @ (TypeKind::ConstantArray
             | TypeKind::IncompleteArray
             | TypeKind::VariableArray
-            | TypeKind::DependentSizedArray) => match canonical.get_element_type() {
+            | TypeKind::DependentSizedArray) => match sugared.get_element_type() {
                 Some(element) => {
                     self.pending.push(element);
                     TypeShapeKind::Array {
@@ -115,7 +131,7 @@ impl<'tu> Collector<'_, 'tu> {
                 None => TypeShapeKind::Unsupported,
             },
             TypeKind::FunctionPrototype | TypeKind::FunctionNoPrototype => {
-                match self.collect_signature(canonical) {
+                match self.collect_signature(sugared) {
                     Some(signature) => TypeShapeKind::Function { signature },
                     None => TypeShapeKind::Unsupported,
                 }
@@ -273,4 +289,44 @@ fn anonymous_offset(owner: Type<'_>, member: Type<'_>) -> Option<u64> {
         let inner = member.get_offsetof(&name).ok()?;
         outer.checked_sub(inner).map(|offset| offset as u64)
     })
+}
+
+/// Follow only typedef and elaborated wrappers, preserving attributes and aliases on nested
+/// pointee/element edges instead of erasing them with whole-type canonicalization.
+fn unwrap_alias(mut ty: Type<'_>) -> Type<'_> {
+    for _ in 0..64 {
+        let next = match ty.get_kind() {
+            TypeKind::Elaborated => ty.get_elaborated_type(),
+            TypeKind::Typedef => ty
+                .get_declaration()
+                .and_then(|declaration| declaration.get_typedef_underlying_type()),
+            _ => return ty,
+        };
+        let Some(next) = next else { return ty };
+        ty = next;
+    }
+    ty
+}
+
+/// Refuse any scalar attribute hidden behind pointer/array sugar before sharing a canonical shape
+/// with naturally aligned Rust types. Record layout attributes remain governed by copied layout
+/// facts and individual field capabilities.
+fn unsupported_edge_attributes(mut ty: Type<'_>) -> bool {
+    for _ in 0..64 {
+        if has_type_attributes(ty) {
+            return true;
+        }
+        let sugared = unwrap_alias(ty);
+        let next = match sugared.get_kind() {
+            TypeKind::Pointer => sugared.get_pointee_type(),
+            TypeKind::ConstantArray
+            | TypeKind::IncompleteArray
+            | TypeKind::VariableArray
+            | TypeKind::DependentSizedArray => sugared.get_element_type(),
+            _ => return false,
+        };
+        let Some(next) = next else { return true };
+        ty = next;
+    }
+    true
 }

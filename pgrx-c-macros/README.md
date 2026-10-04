@@ -13,6 +13,8 @@ contracts, C semantics, generated native adapters, and validation strategy.
 
 The tool requires libclang, as pgrx's bindgen generator does. Set
 `LIBCLANG_PATH` if the shared library is outside its usual installation paths.
+On supported Linux/macOS hosts, building the assembly-backed SHA-256 dependency
+also requires a host C compiler; other hosts use the portable Rust backend.
 
 Select a configured PostgreSQL major version as the first positional argument
 after `list`, following cargo-pgrx's CLI convention. Both `18` and `pg18` are accepted.
@@ -26,11 +28,10 @@ List function-like macros across the headers pgrx uses for that version:
 cargo run -p pgrx-c-macros -- list pg18
 ```
 
-The default input is this checkout's `pgrx-pg-sys/include/pg18.h` for PG18,
-or the matching wrapper for another selected version. This is the same header
-list used by pgrx's binding generator. The default wrapper comes from the pgrx
-source checkout used to build this tool; keep that checkout available when
-running it. A caller can also supply its own wrapper header.
+The crate embeds the matching pgrx wrapper for each supported version and
+materializes it in a content-addressed directory under `$PGRX_HOME/c-macros/headers/`.
+It contains the same header list as pgrx's binding generator. Installed CLI tools
+work without a source checkout. A caller can also supply its own wrapper header.
 
 Only function-like definitions physically inside the selected installation's
 `pg_config --includedir-server` tree are candidates. This is the installed copy
@@ -182,19 +183,22 @@ Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes the module tre
 to `pgrx-pg-sys/src/include/cmacros/pgN/`, alongside the shipped bindings and OIDs. These
 documentation snapshots include the generated adapters. Their target guards
 remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
-Generate release snapshots on Linux with the matching PostgreSQL bindings. The
-snapshot values and layouts describe that release target, not the build host of
-a later user.
+Generate release snapshots alongside matching PostgreSQL bindings on the
+selected release target. Their values and layouts describe that target, not the
+build host of a later user.
 
-Binding and macro inspection share the complete flags, target, include directories
-and compiler resource directory. Recorded CFLAGS precede CPPFLAGS, and bindgen's
-environment overrides apply once at the end. Native C shims also receive recorded
-CFLAGS before CPPFLAGS. Cargo tracks consumed headers, header
-search directories, configuration, compiler/library files and relevant environment
-values. Creating optional or shadowing headers also triggers regeneration. Compiler
-lookup tracks rejected candidates and searched PATH roots. Set an absolute `CLANG_PATH`
-when those roots include Cargo's generated output; recursive tracking would cause
-repeated generation, while omitting them could miss a compiler selection change.
+Ordinary bindgen and the fallback C shim retain their established target,
+CPPFLAGS and include settings. Optional macro inspection additionally observes
+recorded CFLAGS before CPPFLAGS, with bindgen's environment overrides at the
+end, and reconciles those C facts with the fresh bindings' actual storage.
+Successful macros require unchanged compiler/header inputs around binding
+and native generation. Cargo tracks consumed headers, search directories,
+configuration, compiler/library files and relevant environment values. Compiler
+lookup tracks only attempted executable paths and PATH when it was actually
+searched. Earlier absent candidates require safe parent-directory watches so
+creating a preferred compiler invalidates selection; absolute successful
+selection does not add PATH dependencies. Same-content symlink retargets also
+invalidate the recorded input identity.
 Custom compiler or `pg_config` wrappers must declare hidden inputs in their build
 script so changes to those inputs can trigger generation.
 
@@ -220,15 +224,16 @@ Unset the variable or set `PGRX_MACRO_DEBUG=0` for normal quiet builds; only the
 exact value `1` enables these warnings. Cargo tracks the variable, so changing it
 reruns the binding build. Every completed generation writes
 `pgN_macro_report.json` in `OUT_DIR`, retaining skip reasons and available
-compiler facts regardless of the switch. Compiler invocations and generation
-errors still fail the build. This switch
+compiler facts regardless of the switch. Ordinary binding errors still fail
+the build; optional inspection or native-generation failures record unavailable
+macros without publishing guessed code or linkage. This switch
 controls the binding build's diagnostics; explicit CLI `analyze` and `emit`
 commands continue to print their requested output and skip reasons.
 
 ### Translation behavior
 
 The runtime models C integer promotions, conversions, casts, comparisons, shifts,
-and lazy logical and conditional operators on checked signed-char LP64 targets.
+and lazy logical and conditional operators on compiler-verified LP64, LLP64, and ILP32 targets.
 Emitted literals keep their radix and digit spelling. C suffixes, octal notation
 and character escapes are adjusted to Rust syntax without changing the inferred
 C type or value.
@@ -533,13 +538,35 @@ operands, nested macro contexts, `$crate` hygiene and invalid invocations. These
 checks use the original C definitions as the oracle. Handwritten pgrx ports only
 identify additional test targets.
 
-Installation-dependent comparisons and isolated build/release/docs.rs tests run
-explicitly with:
+Installed-header comparisons also run as ordinary tests for every configured
+version, or the exact `PG_VER` selection used by CI. An explicit selection without
+an installation fails; without a selection, missing installations are reported
+as omitted coverage. The isolated build/release/docs.rs tests remain explicit:
 
 ```text
-cargo test -p pgrx-c-macros --test postgres_emission -- --ignored
-cargo test -p pgrx-c-macros --test postgres_handports -- --ignored
-cargo test -p pgrx-c-macros --test character_literals -- --include-ignored
+cargo test -p pgrx-c-macros --test postgres_emission --test postgres_handports --test character_literals --test oracle
 cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```
+
+## Optional generation in extension builds
+
+`pgrx-pg-sys` generates ordinary bindings independently of macro inspection.
+A missing matching Clang driver, refused profile, or failed native support build
+produces an unavailable macro report and an empty availability map, while
+ordinary binding generation continues. Set `PGRX_C_MACROS=0` to disable this
+optional work. `PGRX_MACRO_DEBUG=1` enables refusal warnings; normal builds stay
+quiet. The CLI inspection and analysis commands still report their own errors.
+
+The runtime checks the selected compiler's LP64, LLP64, or ILP32 representation,
+including plain-char signedness, C long width, and the distinct ranks of `size_t`
+and pointer differences. This includes unsigned-char Linux AArch64 and Windows
+LLP64; both byte orders are admitted when the C and Rust target agree. Cross
+compilation needs target PostgreSQL metadata through `PGRX_PG_CONFIG_AS_ENV`;
+a host installation's CFLAGS are not target evidence.
+
+Some installations do not record historical CFLAGS. In that case, the selected
+headers, target, and current compiler invocation define the macro profile. The
+build report records `cflags_recorded: false`; it does not infer the server's
+unrecorded build options. Recorded flags use the host platform's quoting rules,
+with reviewed MSVC options translated to equivalent Clang options on Windows.

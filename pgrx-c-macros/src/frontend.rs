@@ -18,7 +18,6 @@ use crate::{
     TokenKind, TypeCategory, TypeInfo,
 };
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
@@ -27,13 +26,19 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
 
+/// Decode historical flags without losing Windows paths or inventing missing compiler options.
+mod arguments;
 /// Probe implementation-specific field promotions and access units before admitting native bitfield
 /// capabilities.
 mod bitfields;
+pub use arguments::split_recorded_cflags;
 /// Prove supported compiler operations by prototype and bounded LLVM effect witnesses.
 mod builtins;
 /// Reparse original inline bodies to prove local definitions match the declaration-only catalog.
 mod definitions;
+/// Recheck complete input bytes with a host-appropriate SHA-256 backend and per-pass alias sharing.
+mod fingerprints;
+pub(crate) use fingerprints::{file_identities, fingerprint_files};
 /// Copy canonical C shape graphs while translation-unit handles remain live, preserving nominal
 /// identity and layout.
 mod types;
@@ -67,9 +72,32 @@ const VALUE_OPTIONS: &[&str] = &[
     "-std",
     "-B",
     "-ccc-gcc-name",
+    "--gcc-triple",
     "--gcc-toolchain",
     "-gcc-toolchain",
     "--gcc-install-dir",
+];
+
+/// Query original C type-operator alignment separately from each type's native storage layout.
+pub(crate) const ALIGNMENT_PROBES: &[(&str, &str)] = &[
+    ("CBool", "_Bool"),
+    ("CChar", "char"),
+    ("CSignedChar", "signed char"),
+    ("CUnsignedChar", "unsigned char"),
+    ("CShort", "short"),
+    ("CUnsignedShort", "unsigned short"),
+    ("CInt", "int"),
+    ("CUnsignedInt", "unsigned int"),
+    ("CLong", "long"),
+    ("CUnsignedLong", "unsigned long"),
+    ("CLongLong", "long long"),
+    ("CUnsignedLongLong", "unsigned long long"),
+    ("CInt128", "__int128"),
+    ("CUnsignedInt128", "unsigned __int128"),
+    ("CFloat32", "float"),
+    ("CFloat64", "double"),
+    ("CPointer", "void *"),
+    ("CFunctionPointer", "__pgrx_c_function_pointer"),
 ];
 
 /// Failure to establish an agreed compiler environment or obtain its declarations.
@@ -177,7 +205,8 @@ pub(crate) fn inspect_with_compiler_hint(
     preferred_compiler: Option<&Path>,
     configured_compiler: Option<&Path>,
 ) -> Result<FrontendOutput, FrontendError> {
-    validate_arguments(arguments)?;
+    let arguments = normalize_arguments(arguments)?;
+    validate_arguments(&arguments)?;
     let requested_header = input_path(header)?;
     // The supplied spelling determines quoted-include lookup, including through
     // symlink wrappers. Canonical paths are only identities for comparison/tracking.
@@ -193,7 +222,7 @@ pub(crate) fn inspect_with_compiler_hint(
             compiler.display()
         )));
     }
-    let mut arguments = arguments.to_vec();
+    let mut arguments = arguments;
     if !arguments.iter().any(|arg| arg == "-resource-dir" || arg.starts_with("-resource-dir=")) {
         let resource = run_compiler(&compiler, &["-print-resource-dir".into()])?;
         let resource = input_path(Path::new(resource.stdout.trim()))?;
@@ -201,7 +230,7 @@ pub(crate) fn inspect_with_compiler_hint(
     }
     let preprocessing = preprocess(&compiler, &header, &arguments, &["-E", "-dM", "-v", "-H"])?;
     validate_driver_configuration(&preprocessing.stderr)?;
-    let live = tokenize_snapshot(scanner, &preprocessing.stdout)?;
+    let live = tokenize_snapshot(scanner, &preprocessing.stdout, &arguments)?;
     let dependencies = preprocess(&compiler, &header, &arguments, &["-M", "-MT", "pgrx_c_macros"])?;
     let driver_files = parse_dependencies(&dependencies.stdout)?;
     let (inventory, declarations, target, included) =
@@ -307,6 +336,27 @@ fn path_string(path: &Path) -> Result<&str, FrontendError> {
         .ok_or_else(|| FrontendError::Arguments(format!("path {} is not UTF-8", path.display())))
 }
 
+/// Render the contents of a quoted C include without treating header names as C string literals.
+/// Windows separators and verbatim prefixes are normalized for Clang; on Unix, backslashes are
+/// ordinary filename bytes and remain literal. Delimiters and line breaks cannot be escaped in a
+/// header-name token, so they are rejected instead of permitting an injected directive.
+pub fn c_header_path(path: &Path) -> Result<String, FrontendError> {
+    let spelling = path_string(path)?;
+    if spelling.contains(['"', '\n', '\r', '\0']) {
+        return Err(FrontendError::Arguments("invalid C include header path".into()));
+    }
+    if cfg!(windows) {
+        let spelling = if let Some(unc) = spelling.strip_prefix("\\\\?\\UNC\\") {
+            format!("//{unc}")
+        } else {
+            spelling.strip_prefix("\\\\?\\").unwrap_or(spelling).to_owned()
+        };
+        Ok(spelling.replace('\\', "/"))
+    } else {
+        Ok(spelling.to_owned())
+    }
+}
+
 /// Change-sensitive driver lookup history, including absent candidates whose creation could change
 /// tool selection.
 #[derive(Default)]
@@ -314,8 +364,8 @@ struct CompilerSearch {
     /// Observed or change-sensitive file inputs retained for content fingerprinting and rebuild
     /// invalidation.
     files: BTreeSet<PathBuf>,
-    /// PATH search roots whose contents can change which executable wins.
-    directories: BTreeSet<PathBuf>,
+    /// Whether any compiler hint needed PATH lookup, making that environment value relevant.
+    searched_path: bool,
     /// Direct directory hints whose later replacement can make them valid executables.
     required_directories: BTreeSet<PathBuf>,
 }
@@ -410,12 +460,17 @@ impl CompilerSearch {
             }
             return Ok(path.is_file().then_some(path));
         }
+        self.searched_path = true;
         for root in search_roots {
-            let root = input_path(root)?;
-            self.directories.insert(root.clone());
-            let candidate = root.join(path);
-            if candidate.is_file() {
+            let candidate = input_path(root)?.join(path);
+            if candidate.is_dir() {
+                self.required_directories.insert(candidate.clone());
+            } else {
+                // Missing candidates are change-sensitive files too: creating a
+                // higher-priority executable must invalidate this selection.
                 self.record_file(&candidate);
+            }
+            if candidate.is_file() {
                 return Ok(Some(candidate));
             }
         }
@@ -493,6 +548,7 @@ fn parse_include_trace(verbose: &str) -> Result<BTreeSet<PathBuf>, FrontendError
 pub(crate) fn tokenize_snapshot(
     scanner: &MacroScanner,
     contents: &str,
+    arguments: &[String],
 ) -> Result<Vec<MacroDefinition>, FrontendError> {
     // Clang emits one complete definition per dump line. A literal terminal
     // backslash must not splice that line into the next definition when replayed.
@@ -522,12 +578,32 @@ pub(crate) fn tokenize_snapshot(
         protected.push_str(&marker);
         protected.push('\n');
     }
+    // Macro dumps contain no declarations. Strict ISO modes reject an otherwise
+    // empty translation unit; a fresh declaration keeps token replay valid without
+    // introducing or changing any active macro definition.
+    let mut declaration = format!("__pgrx_c_snapshot_declaration_{number}");
+    while contents.contains(&declaration) {
+        number += 1;
+        declaration = format!("__pgrx_c_snapshot_declaration_{number}");
+    }
+    protected.push_str(&format!("typedef int {declaration};\n"));
     let header = std::env::temp_dir().join("pgrx-c-macros-snapshot.h");
-    let inventory = scanner.scan_unsaved(
-        &header,
-        &protected,
-        &["-undef".into(), "-Wno-builtin-macro-redefined".into()],
-    )?;
+    // Replay declarations in the inspected dialect, without replaying command-line
+    // definitions or forced headers over the already final macro snapshot.
+    let mut replay = Vec::new();
+    let mut arguments = arguments.iter();
+    while let Some(argument) = arguments.next() {
+        if matches!(argument.as_str(), "-D" | "-U" | "-include" | "-imacros") {
+            arguments.next();
+        } else if !["-D", "-U", "-include", "-imacros"]
+            .iter()
+            .any(|prefix| argument.starts_with(prefix))
+        {
+            replay.push(argument.clone());
+        }
+    }
+    replay.extend(["-undef".into(), "-Wno-builtin-macro-redefined".into()]);
+    let inventory = scanner.scan_unsaved(&header, &protected, &replay)?;
     Ok(inventory
         .macros
         .into_iter()
@@ -704,8 +780,14 @@ pub(crate) fn type_info(ty: Type<'_>) -> TypeInfo {
 /// Reject type spellings with attributes that ordinary canonical type facts cannot fully model.
 fn has_type_attributes(mut ty: Type<'_>) -> bool {
     for _ in 0..64 {
-        if ty.get_kind() == TypeKind::Attributed {
-            return true;
+        match ty.get_kind() {
+            TypeKind::Attributed => return true,
+            TypeKind::Elaborated => {
+                let Some(named) = ty.get_elaborated_type() else { return true };
+                ty = named;
+                continue;
+            }
+            _ => {}
         }
         let Some(declaration) = ty.get_declaration() else {
             return false;
@@ -771,6 +853,10 @@ struct VerifiedPredefines {
     integers: BTreeMap<IntegerKind, IntegerType>,
     /// Canonical unsigned C identity of sizeof/alignment results verified by both compiler paths.
     size_type: IntegerKind,
+    /// Canonical signed C identity of pointer differences verified by both compiler paths.
+    ptrdiff_type: IntegerKind,
+    /// Actual C scalar/array type-operator results, distinct from ABI field storage alignment.
+    preferred_alignments: BTreeMap<String, crate::PreferredAlignment>,
     /// Whether optional intrinsic offset witnesses passed without hiding required fact errors.
     offsetof_supported: bool,
     /// Whether supported ASCII characters and basic escapes match the bounded literal decoder.
@@ -802,7 +888,7 @@ fn verify_predefines(
     let mut command = driver_arguments(&without_includes, &["-E", "-dM"], None);
     command.push("-".into());
     let dump = run_compiler(compiler, &command)?;
-    let predefines = tokenize_snapshot(scanner, &dump.stdout)?;
+    let predefines = tokenize_snapshot(scanner, &dump.stdout, &without_includes)?;
     let actual: BTreeMap<_, _> =
         predefines.iter().map(|definition| (definition.name.as_str(), definition)).collect();
     for name in
@@ -842,10 +928,14 @@ typedef unsigned long __pgrx_c_ulong;\n\
 typedef long long __pgrx_c_llong;\n\
 typedef unsigned long long __pgrx_c_ullong;\n\
 typedef __typeof__(sizeof(0)) __pgrx_c_size_type;\n\
+typedef __typeof__((char *)0 - (char *)0) __pgrx_c_ptrdiff_type;\n\
 typedef __typeof__(_Alignof(int)) __pgrx_c_align_type;\n\
 typedef float __pgrx_c_float;\n\
 typedef double __pgrx_c_double;\n\
 typedef long double __pgrx_c_ldouble;\n\
+typedef struct { float __pgrx_c_storage; } __pgrx_c_float_storage;\n\
+typedef struct { double __pgrx_c_storage; } __pgrx_c_double_storage;\n\
+typedef struct { long double __pgrx_c_storage; } __pgrx_c_ldouble_storage;\n\
 typedef void (*__pgrx_c_function_pointer)(void);\n\
 enum { __pgrx_c_float_eval_method = __FLT_EVAL_METHOD__ };\n\
 #ifdef __SIZEOF_INT128__\n\
@@ -867,8 +957,18 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     } else {
         ""
     };
-    let fundamental_source =
+    let mut fundamental_source =
         format!("{fundamental_source}\nenum {{ __pgrx_c_ascii = ({ascii}) }};\n{offsetof_source}");
+    let alignment_probes = ALIGNMENT_PROBES
+        .iter()
+        .copied()
+        .filter(|(_, spelling)| {
+            !spelling.contains("__int128") || actual.contains_key("__SIZEOF_INT128__")
+        })
+        .collect::<Vec<_>>();
+    for (marker, spelling) in &alignment_probes {
+        fundamental_source.push_str(&format!("enum {{ __pgrx_c_alignment_{marker} = _Alignof({spelling}), __pgrx_c_array_alignment_{marker} = _Alignof({spelling}[2]), __pgrx_c_nested_array_alignment_{marker} = _Alignof({spelling}[2][2]) }};\n"));
+    }
     let mut probe = driver_arguments(
         &without_includes,
         &[
@@ -895,10 +995,13 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         (
             widths,
             floating_types,
+            floating_record_alignments,
             library_ascii,
             evaluation_method,
             function_pointer,
             size_type,
+            ptrdiff_type,
+            preferred_alignments,
             offsetof,
         ),
     ) = scanner.with_translation_unit(
@@ -909,9 +1012,12 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
             let mut widths = BTreeMap::new();
             let mut library_ascii = false;
             let mut floating_types = BTreeMap::new();
+            let mut floating_record_alignments = BTreeMap::new();
             let mut evaluation_method = None;
             let mut function_pointer = None;
             let mut size_type = None;
+            let mut ptrdiff_type = None;
+            let mut alignment_values = BTreeMap::new();
             let mut align_type = None;
             let mut offsetof_type = None;
             let mut offsetof_values = BTreeMap::new();
@@ -930,6 +1036,14 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                             evaluation_method = constant
                                 .get_enum_constant_value()
                                 .and_then(|(value, _)| i32::try_from(value).ok());
+                        } else if let Some(name) = constant.get_name()
+                            && (name.starts_with("__pgrx_c_alignment_")
+                                || name.starts_with("__pgrx_c_array_alignment_")
+                                || name.starts_with("__pgrx_c_nested_array_alignment_"))
+                            && let Some((value, _)) = constant.get_enum_constant_value()
+                            && let Ok(value) = u64::try_from(value)
+                        {
+                            alignment_values.insert(name, value);
                         } else if let Some(name) = constant.get_name()
                             && matches!(
                                 name.as_str(),
@@ -957,8 +1071,18 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                     && let Some(ty) =
                         entity.get_typedef_underlying_type().map(|ty| ty.get_canonical_type())
                 {
+                    let storage_kind = match entity.get_name().as_deref() {
+                        Some("__pgrx_c_float_storage") => Some(FloatingKind::Float),
+                        Some("__pgrx_c_double_storage") => Some(FloatingKind::Double),
+                        Some("__pgrx_c_ldouble_storage") => Some(FloatingKind::LongDouble),
+                        _ => None,
+                    };
+                    if let (Some(kind), Ok(alignment)) = (storage_kind, ty.get_alignof()) {
+                        floating_record_alignments.insert(kind, alignment as u64);
+                    }
                     match entity.get_name().as_deref() {
                         Some("__pgrx_c_size_type") => size_type = integer_kind(ty.get_kind()),
+                        Some("__pgrx_c_ptrdiff_type") => ptrdiff_type = integer_kind(ty.get_kind()),
                         Some("__pgrx_c_align_type") => align_type = integer_kind(ty.get_kind()),
                         Some("__pgrx_c_offset_type") => offsetof_type = integer_kind(ty.get_kind()),
                         _ => {}
@@ -993,6 +1117,25 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                 return Err(Error::InvalidInput(
                     "libclang sizeof and _Alignof canonical result identities differ".into(),
                 ));
+            }
+            let mut preferred_alignments = BTreeMap::new();
+            for (marker, _) in &alignment_probes {
+                let scalar = alignment_values.get(&format!("__pgrx_c_alignment_{marker}"));
+                let array = alignment_values.get(&format!("__pgrx_c_array_alignment_{marker}"));
+                let nested =
+                    alignment_values.get(&format!("__pgrx_c_nested_array_alignment_{marker}"));
+                let (Some(&scalar), Some(&array), Some(&nested)) = (scalar, array, nested) else {
+                    return Err(Error::InvalidInput(format!(
+                        "missing preferred C alignment witness for {marker}"
+                    )));
+                };
+                if !scalar.is_power_of_two() || !array.is_power_of_two() || nested != array {
+                    return Err(Error::InvalidInput(format!(
+                        "unsupported scalar/array C alignment witnesses for {marker}"
+                    )));
+                }
+                preferred_alignments
+                    .insert((*marker).to_owned(), crate::PreferredAlignment { scalar, array });
             }
             let offsetof = (|| {
                 let nested = offset_nested?;
@@ -1030,10 +1173,13 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                 (
                     widths,
                     floating_types,
+                    floating_record_alignments,
                     library_ascii,
                     evaluation_method,
                     function_pointer,
                     size_type,
+                    ptrdiff_type,
+                    preferred_alignments,
                     offsetof,
                 ),
             ))
@@ -1087,6 +1233,22 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     let size_type = size_type.ok_or_else(|| {
         FrontendError::Output("libclang did not establish the sizeof result identity".into())
     })?;
+    let ptrdiff_type = ptrdiff_type.ok_or_else(|| {
+        FrontendError::Output("libclang did not establish the pointer difference identity".into())
+    })?;
+    let ptrdiff_spelling = match ptrdiff_type {
+        IntegerKind::SignedChar => "signed char",
+        IntegerKind::Short => "short",
+        IntegerKind::Int => "int",
+        IntegerKind::Long => "long",
+        IntegerKind::LongLong => "long long",
+        IntegerKind::Int128 => "__int128",
+        _ => {
+            return Err(FrontendError::Environment(format!(
+                "pointer difference has non-signed canonical result {ptrdiff_type:?}"
+            )));
+        }
+    };
     let size_spelling = match size_type {
         IntegerKind::UnsignedChar => "unsigned char",
         IntegerKind::UnsignedShort => "unsigned short",
@@ -1107,6 +1269,9 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         "_Static_assert(__builtin_types_compatible_p(__typeof__(sizeof(0)), {size_spelling}), \"pgrx_size_type\");\n"
     ));
     float_source.push_str(&format!(
+        "_Static_assert(__builtin_types_compatible_p(__typeof__((char *)0 - (char *)0), {ptrdiff_spelling}), \"pgrx_ptrdiff_type\");\n"
+    ));
+    float_source.push_str(&format!(
         "_Static_assert(__builtin_types_compatible_p(__typeof__(_Alignof(int)), {size_spelling}), \"pgrx_align_type\");\n"
     ));
     float_source.push_str(&format!("typedef void (*__pgrx_c_function_pointer)(void);\n_Static_assert(sizeof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_size\");\n_Static_assert(_Alignof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_alignment\");\n", function_pointer.size, function_pointer.alignment));
@@ -1115,14 +1280,27 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         (FloatingKind::Double, "double"),
         (FloatingKind::LongDouble, "long double"),
     ] {
-        if let Some(&(size, alignment)) = floating_types.get(&kind) {
+        if let Some(&(size, _)) = floating_types.get(&kind) {
             float_source.push_str(&format!(
                 "_Static_assert(sizeof({spelling}) == {size}, \"pgrx_float_size\");\n"
             ));
-            if let Some(alignment) = alignment {
-                float_source.push_str(&format!("_Static_assert(_Alignof({spelling}) == {alignment}, \"pgrx_float_alignment\");\n"));
-            }
+            let alignment = floating_record_alignments.get(&kind).ok_or_else(|| {
+                FrontendError::Output(format!(
+                    "libclang did not establish singleton-record alignment for {kind:?}"
+                ))
+            })?;
+            // libclang's type layout reports ABI alignment. Some targets
+            // give standalone scalar _Alignof a stronger preferred alignment
+            // (i686 double is ABI4 but _Alignof8), so verify record storage
+            // rather than equating those independently observable C facts.
+            // Query the actual singleton record on both sides: packing flags
+            // can reduce record alignment without changing scalar layout.
+            float_source.push_str(&format!("_Static_assert(_Alignof(struct {{ {spelling} __pgrx_c_storage; }}) == {alignment}, \"pgrx_float_alignment\");\n"));
         }
+    }
+    for (marker, spelling) in &alignment_probes {
+        let observed = preferred_alignments[*marker];
+        float_source.push_str(&format!("_Static_assert(_Alignof({spelling}) == {}, \"pgrx_preferred_scalar_alignment\");\n_Static_assert(_Alignof({spelling}[2]) == {}, \"pgrx_preferred_array_alignment\");\n_Static_assert(_Alignof({spelling}[2][2]) == {}, \"pgrx_preferred_nested_array_alignment\");\n", observed.scalar, observed.array, observed.array));
     }
     if let Some(offsets) = offsetof {
         // Optional failures must be attributable to this final capability block.
@@ -1189,6 +1367,8 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
         macros: predefines,
         integers,
         size_type,
+        ptrdiff_type,
+        preferred_alignments,
         offsetof_supported,
         ascii_execution_charset: driver_ascii && library_ascii,
         floating_types,
@@ -1279,6 +1459,8 @@ fn target_facts(
         macros: predefines,
         integers,
         size_type,
+        ptrdiff_type,
+        preferred_alignments,
         offsetof_supported,
         ascii_execution_charset,
         floating_types,
@@ -1367,11 +1549,47 @@ fn target_facts(
     };
     let floating_point =
         floating_point_facts(&macros, floating_types, char_bits, evaluation_method, verbose)?;
+    let arm_float_abi = if macros.contains_key("__ARM_EABI__") {
+        if macro_number(&macros, "__ARM_EABI__")? != 1 || macro_number(&macros, "__ARM_PCS")? != 1 {
+            return Err(FrontendError::Environment(
+                "compiler did not establish the ARM EABI procedure-call convention".into(),
+            ));
+        }
+        Some(if macros.contains_key("__ARM_PCS_VFP") {
+            if macro_number(&macros, "__ARM_PCS_VFP")? != 1 {
+                return Err(FrontendError::Environment(
+                    "compiler reported an invalid ARM VFP procedure-call witness".into(),
+                ));
+            }
+            crate::ArmFloatAbi::Vfp
+        } else {
+            crate::ArmFloatAbi::Base
+        })
+    } else {
+        None
+    };
+    let ppc64_elf_abi = if macros.contains_key("_CALL_ELF") {
+        Some(match macro_number(&macros, "_CALL_ELF")? {
+            1 => crate::Ppc64ElfAbi::V1,
+            2 => crate::Ppc64ElfAbi::V2,
+            value => {
+                return Err(FrontendError::Environment(format!(
+                    "compiler reported an unknown PowerPC64 ELF procedure-call witness {value}"
+                )));
+            }
+        })
+    } else {
+        None
+    };
     Ok(TargetFacts {
         triple,
         pointer_bits,
         function_pointer,
         size_type,
+        ptrdiff_type,
+        preferred_alignments,
+        arm_float_abi,
+        ppc64_elf_abi,
         offsetof_supported,
         char_bits,
         char_is_signed,
@@ -1541,6 +1759,7 @@ fn semantic_options(
     for argument in arguments {
         if argument.starts_with("-f")
             && !is_floating_point_option(argument)
+            && !is_packaging_codegen_option(argument)
             && !matches!(
                 argument.as_str(),
                 "-fwrapv"
@@ -1596,13 +1815,52 @@ fn semantic_options(
                     // obtained from the compiler and reconciled with bindgen.
                     | "-fshort-enums"
                     | "-fno-short-enums"
+                    // Packaging flags change instrumentation, linkage codegen or
+                    // unwind metadata. Original preprocessing still establishes
+                    // their feature macros and file-mapping effects.
+                    | "-fexceptions"
+                    | "-fno-exceptions"
+                    | "-fplt"
+                    | "-fno-plt"
+                    | "-fsemantic-interposition"
+                    | "-fno-semantic-interposition"
+                    | "-fprofile-arcs"
+                    | "-fno-profile-arcs"
+                    | "-ftest-coverage"
+                    | "-fno-test-coverage"
             )
             || argument == "-Ofast"
+            // Explicit alternate ABIs can change native function register/stack
+            // contracts even when all scalar layouts remain identical. ARM's
+            // float ABI is modeled separately through protected PCS witnesses.
+            || argument.starts_with("-mabi=")
+            || argument.starts_with("-mregparm=")
+            || argument == "-mrtd"
         {
             unsupported.push(argument.clone());
         }
     }
     Ok((overflow, unsupported))
+}
+
+/// Recognize only reviewed path mapping and register-clear modes; unrecognized `-f` options still
+/// reject the profile so a new ABI or language mode cannot silently enter Rust lowering.
+fn is_packaging_codegen_option(argument: &str) -> bool {
+    ["-ffile-prefix-map=", "-fdebug-prefix-map=", "-fmacro-prefix-map="]
+        .into_iter()
+        .any(|prefix| argument.strip_prefix(prefix).is_some_and(|mapping| mapping.contains('=')))
+        || matches!(
+            argument,
+            "-fzero-call-used-regs=skip"
+                | "-fzero-call-used-regs=used-gpr"
+                | "-fzero-call-used-regs=all-gpr"
+                | "-fzero-call-used-regs=used"
+                | "-fzero-call-used-regs=all"
+                | "-fms-runtime-lib=dll"
+                | "-fms-runtime-lib=dll_dbg"
+                | "-fms-runtime-lib=static"
+                | "-fms-runtime-lib=static_dbg"
+        )
 }
 
 /// Identify flags that can alter floating arithmetic and therefore require explicit profile
@@ -1802,6 +2060,7 @@ fn build_inputs(
         "INCLUDE",
     ]
     .into_iter()
+    .filter(|name| *name != "PATH" || compiler_search.searched_path)
     .map(|name| {
         let value = match std::env::var(name) {
             Ok(value) => Some(value),
@@ -1815,59 +2074,44 @@ fn build_inputs(
         Ok((name.into(), value))
     })
     .collect::<Result<_, _>>()?;
+    let file_identities = fingerprints::file_identities(files.iter())?;
     let fingerprints = fingerprint_files(files.iter())?;
+    if fingerprints::file_identities(files.iter())? != file_identities {
+        return Err(FrontendError::Environment(
+            "an input target changed while recording fingerprints".into(),
+        ));
+    }
     Ok(BuildInputs {
         current_directory: std::env::current_dir().map_err(|error| {
             FrontendError::Environment(format!("could not record working directory: {error}"))
         })?,
         files: files.into_iter().collect(),
         fingerprints,
+        file_identities,
         directories: directories.into_iter().collect(),
-        executable_search_directories: compiler_search.directories.into_iter().collect(),
+        executable_search_directories: Vec::new(),
         environment,
     })
 }
 
-/// Snapshot file bytes, following each requested spelling so symlink replacement is observed.
-pub(crate) fn fingerprint_files<'a>(
-    files: impl IntoIterator<Item = &'a PathBuf>,
-) -> Result<BTreeMap<PathBuf, Option<String>>, FrontendError> {
-    let mut fingerprints = BTreeMap::new();
-    let mut buffer = [0u8; 65536];
-    for path in files {
-        let mut file = match std::fs::File::open(path) {
-            Ok(file) => file,
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
-                fingerprints.insert(path.clone(), None);
-                continue;
-            }
-            Err(source) => {
-                return Err(FrontendError::CompilerIo { compiler: path.clone(), source });
-            }
-        };
-        let mut digest = Sha256::new();
-        loop {
-            let length = file
-                .read(&mut buffer)
-                .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
-            if length == 0 {
-                break;
-            }
-            digest.update(&buffer[..length]);
-        }
-        use std::fmt::Write as _;
-        let mut fingerprint = String::with_capacity(64);
-        for byte in digest.finalize() {
-            write!(&mut fingerprint, "{byte:02x}").expect("writing to a String cannot fail");
-        }
-        fingerprints.insert(path.clone(), Some(fingerprint));
-    }
-    Ok(fingerprints)
-}
-
 /// Reject file-content changes after inspection before later phases combine stale and fresh facts.
 pub(crate) fn verify_input_files(inputs: &BuildInputs) -> Result<(), FrontendError> {
+    let identities = fingerprints::file_identities(inputs.file_identities.keys())?;
+    if let Some((path, _)) = identities
+        .iter()
+        .find(|(path, identity)| inputs.file_identities.get(*path) != Some(*identity))
+    {
+        return Err(FrontendError::Environment(format!(
+            "{} target changed after inspection",
+            path.display()
+        )));
+    }
     let actual = fingerprint_files(inputs.fingerprints.keys())?;
+    if fingerprints::file_identities(inputs.file_identities.keys())? != identities {
+        return Err(FrontendError::Environment(
+            "an input target changed while verifying fingerprints".into(),
+        ));
+    }
     if let Some((path, _)) =
         actual.iter().find(|(path, digest)| inputs.fingerprints.get(*path) != Some(*digest))
     {
@@ -1960,19 +2204,55 @@ pub fn compile_native_support(
         // cpp-output; suppress its unused-argument diagnostic even with -Werror.
         "-Qunused-arguments".into(),
         "-c".into(),
-        "-fPIC".into(),
         "-fno-lto".into(),
+        // Coverage is an observation facility, not an expression semantic.
+        // PostgreSQL's coverage runtime is not linked into Rust extensions.
+        "-fno-profile-arcs".into(),
+        "-fno-test-coverage".into(),
         "-ffunction-sections".into(),
         "-fdata-sections".into(),
         path(&staged_source)?,
         "-o".into(),
         path(&staged_object)?,
     ]);
+    let windows_target = profile
+        .target
+        .triple
+        .split('-')
+        .any(|part| matches!(part, "windows" | "win32" | "mingw32"));
+    if !windows_target {
+        args.push("-fPIC".into());
+    }
     run_compiler(&profile.compiler.executable, &args)?;
     require_native_artifact(&staged_object, "object")?;
-    let adjacent = profile.compiler.executable.with_file_name("llvm-ar");
-    let archiver = if adjacent.is_file() { adjacent } else { PathBuf::from("ar") };
-    run_compiler(&archiver, &["crs".into(), path(&staged_archive)?, path(&staged_object)?])?;
+    let adjacent = profile
+        .compiler
+        .executable
+        .with_file_name(format!("llvm-ar{}", std::env::consts::EXE_SUFFIX));
+    let librarian = profile
+        .compiler
+        .executable
+        .with_file_name(format!("llvm-lib{}", std::env::consts::EXE_SUFFIX));
+    let archiver = if windows_target && librarian.is_file() {
+        librarian
+    } else if adjacent.is_file() {
+        adjacent
+    } else if windows_target {
+        PathBuf::from(format!("llvm-ar{}", std::env::consts::EXE_SUFFIX))
+    } else {
+        PathBuf::from("ar")
+    };
+    let archive_args =
+        if windows_target && archiver.file_stem().is_some_and(|name| name == "llvm-lib") {
+            vec![format!("/OUT:{}", path(&staged_archive)?), path(&staged_object)?]
+        } else {
+            let mut args = vec!["crs".into(), path(&staged_archive)?, path(&staged_object)?];
+            if windows_target {
+                args.insert(0, "--format=coff".into());
+            }
+            args
+        };
+    run_compiler(&archiver, &archive_args)?;
     require_native_artifact(&staged_archive, "archive")?;
     std::fs::rename(&staged_object, object)
         .map_err(|source| FrontendError::NativeIo { path: object.into(), source })?;
@@ -2024,6 +2304,12 @@ fn run_compiler_with_input(
         Command::new(compiler)
             .args(arguments)
             .env("LC_ALL", "C")
+            // Driver-only edits bypass libclang and the recorded argument profile.
+            .env_remove("CCC_OVERRIDE_OPTIONS")
+            .env_remove("CL")
+            .env_remove("_CL_")
+            .env_remove("CLANG_SPAWN_CC1")
+            .env_remove("CLANG_NO_INTEGRATED_CC1")
             .stdin(if source.is_some() { Stdio::piped() } else { Stdio::null() })
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -2152,6 +2438,90 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
     Ok(())
 }
 
+/// Normalize the narrowly supported preprocessor forwarding forms used by packaged PostgreSQL.
+/// Every forwarded definition still passes the protected target-fact checks; other preprocessor
+/// actions remain refused rather than silently changing the inspected inputs.
+fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
+    let mut normalized = Vec::with_capacity(arguments.len());
+    let windows = cfg!(windows)
+        || arguments.iter().any(|arg| {
+            arg.contains("-windows-") || arg.ends_with("-win32") || arg.ends_with("-mingw32")
+        });
+    let mut arguments = arguments.iter();
+    while let Some(argument) = arguments.next() {
+        // Option operands are paths or definitions, not independent switches.
+        if VALUE_OPTIONS.contains(&argument.as_str()) {
+            normalized.push(argument.clone());
+            if let Some(value) = arguments.next() {
+                normalized.push(value.clone());
+            }
+            continue;
+        }
+        if windows && argument.starts_with('/') {
+            if let Some((operation, value)) = ["/D", "/U", "/I"]
+                .into_iter()
+                .find_map(|prefix| argument.strip_prefix(prefix).map(|value| (prefix, value)))
+            {
+                let value = if value.is_empty() {
+                    arguments
+                        .next()
+                        .ok_or_else(|| {
+                            FrontendError::Arguments(format!("{operation} requires a value"))
+                        })?
+                        .as_str()
+                } else {
+                    value
+                };
+                normalized.push(format!("-{}{value}", &operation[1..]));
+                continue;
+            }
+            let translated = match argument.as_str() {
+                "/nologo" | "/TC" => None,
+                "/O1" => Some("-Os"),
+                "/O2" => Some("-O2"),
+                "/Od" => Some("-O0"),
+                "/J" => Some("-funsigned-char"),
+                "/MD" => Some("-fms-runtime-lib=dll"),
+                "/MDd" => Some("-fms-runtime-lib=dll_dbg"),
+                "/MT" => Some("-fms-runtime-lib=static"),
+                "/MTd" => Some("-fms-runtime-lib=static_dbg"),
+                "/std:c11" => Some("-std=c11"),
+                "/std:c17" => Some("-std=c17"),
+                _ => {
+                    return Err(FrontendError::Arguments(format!(
+                        "{argument} is an unmodeled MSVC compiler option"
+                    )));
+                }
+            };
+            normalized.extend(translated.map(str::to_owned));
+            continue;
+        }
+        let Some(forwarded) = argument.strip_prefix("-Wp,") else {
+            normalized.push(argument.clone());
+            continue;
+        };
+        let mut forwarded = forwarded.split(',');
+        while let Some(option) = forwarded.next() {
+            let definition = if matches!(option, "-D" | "-U") {
+                let value =
+                    forwarded.next().filter(|value| !value.is_empty()).ok_or_else(|| {
+                        FrontendError::Arguments(format!("{argument} requires a macro name"))
+                    })?;
+                format!("{option}{value}")
+            } else if option.starts_with("-D") || option.starts_with("-U") {
+                option.to_owned()
+            } else {
+                return Err(FrontendError::Arguments(format!(
+                    "{argument} forwards an unsupported preprocessor action {option}"
+                )));
+            };
+            validate_fact_override(&definition[2..])?;
+            normalized.push(definition);
+        }
+    }
+    Ok(normalized)
+}
+
 /// Reject extra inputs, driver actions, and hidden configuration that could change or bypass the
 /// inspected C phase.
 fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
@@ -2268,6 +2638,13 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
             | "__UINTPTR_TYPE__"
             | "__WCHAR_TYPE__"
             | "__WINT_TYPE__"
+            | "__ARM_EABI__"
+            | "__ARM_PCS"
+            | "__ARM_PCS_VFP"
+            | "_CALL_ELF"
+            | "__riscv_float_abi_soft"
+            | "__riscv_float_abi_single"
+            | "__riscv_float_abi_double"
     ) || name.starts_with("__SIZEOF_")
         || name.starts_with("__pgrx_c_")
         || (name.ends_with("_TYPE__") && (name.starts_with("__INT") || name.starts_with("__UINT")));
@@ -2285,6 +2662,84 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use crate::SCANNER_LOCK;
+
+    /// Native Windows switches retain definitions, paths, optimization, and plain-char choices,
+    /// without reinterpreting option operands or allowing protected C fact overrides.
+    #[test]
+    fn msvc_argument_normalization_preserves_profile_controls_and_paths() {
+        let original = [
+            "--target=x86_64-pc-windows-msvc",
+            "/DNAME=73",
+            "/UOLD",
+            "/I",
+            r"C:\Program Files\Postgres\include",
+            "/O2",
+            "/J",
+            "/MD",
+            "/std:c17",
+            "/TC",
+            "/nologo",
+            "-I",
+            "/Data/include",
+        ]
+        .map(str::to_owned);
+        let normalized = normalize_arguments(&original).unwrap();
+        assert_eq!(
+            normalized,
+            [
+                "--target=x86_64-pc-windows-msvc",
+                "-DNAME=73",
+                "-UOLD",
+                r"-IC:\Program Files\Postgres\include",
+                "-O2",
+                "-funsigned-char",
+                "-fms-runtime-lib=dll",
+                "-std=c17",
+                "-I",
+                "/Data/include"
+            ]
+        );
+        validate_arguments(&normalized).unwrap();
+        assert!(
+            normalize_arguments(&[
+                "--target=x86_64-pc-windows-msvc".into(),
+                "/unknown-semantics".into()
+            ])
+            .is_err()
+        );
+        assert!(
+            validate_arguments(
+                &normalize_arguments(&[
+                    "--target=x86_64-pc-windows-msvc".into(),
+                    "/D__SIZE_TYPE__=unsigned int".into()
+                ])
+                .unwrap()
+            )
+            .is_err()
+        );
+    }
+
+    /// Header-name tokens reject delimiters and line breaks instead of applying C string escaping.
+    #[test]
+    fn header_paths_are_checked_as_header_name_tokens() {
+        for spelling in ["bad\"name.h", "bad\nname.h", "bad\rname.h", "bad\0name.h"] {
+            assert!(c_header_path(Path::new(spelling)).is_err());
+        }
+        if cfg!(windows) {
+            assert_eq!(
+                c_header_path(Path::new(r"\\?\C:\pg\include\test.h")).unwrap(),
+                "C:/pg/include/test.h"
+            );
+            assert_eq!(
+                c_header_path(Path::new(r"\\?\UNC\server\share\test.h")).unwrap(),
+                "//server/share/test.h"
+            );
+        } else {
+            assert_eq!(c_header_path(Path::new(r"back\slash.h")).unwrap(), r"back\slash.h");
+        }
+    }
 
     /// Preserve native drive, UNC, and ordinary backslash spellings in Clang dependencies.
     #[test]
@@ -2427,6 +2882,97 @@ mod tests {
         }
     }
 
+    /// Admit reviewed packaging effects while preserving rejection of unknown value, ABI, or
+    /// language changes and malformed forms of reviewed options.
+    #[test]
+    fn packaging_codegen_options_are_bounded_to_reviewed_effects() {
+        for option in [
+            "-fexceptions",
+            "-fno-exceptions",
+            "-fplt",
+            "-fno-plt",
+            "-fsemantic-interposition",
+            "-fno-semantic-interposition",
+            "-fprofile-arcs",
+            "-fno-profile-arcs",
+            "-ftest-coverage",
+            "-fno-test-coverage",
+            "-ffile-prefix-map=/build=/source",
+            "-fdebug-prefix-map=/build=/source",
+            "-fmacro-prefix-map=/build=/source",
+            "-fzero-call-used-regs=used-gpr",
+        ] {
+            assert!(
+                semantic_options(&[option.into()], "clang -cc1\n").unwrap().1.is_empty(),
+                "{option}"
+            );
+        }
+        for option in [
+            "-fzero-call-used-regs=unknown",
+            "-ffile-prefix-map=missing",
+            "-fpack-struct=1",
+            "-fnon-call-exceptions",
+            "-funknown-semantics",
+            "-mabi=elfv2",
+            "-mabi=lp64",
+            "-mregparm=3",
+            "-mrtd",
+        ] {
+            assert_eq!(semantic_options(&[option.into()], "clang -cc1\n").unwrap().1, [option]);
+        }
+    }
+
+    /// Replay every snapshot in the requested dialect rather than libclang's default dialect,
+    /// including refusing an invalid standard instead of silently tokenizing it as GNU C17.
+    #[test]
+    fn snapshot_tokenization_preserves_language_arguments() {
+        let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().unwrap();
+        let snapshot = "#define DIALECT(value) (restrict + (value))\n";
+        for (standard, expected) in [("c89", TokenKind::Identifier), ("c99", TokenKind::Keyword)] {
+            let arguments = [format!("-std={standard}"), "-pedantic-errors".into()];
+            let definitions = tokenize_snapshot(&scanner, snapshot, &arguments).unwrap();
+            let token =
+                definitions[0].tokens.iter().find(|token| token.spelling == "restrict").unwrap();
+            assert_eq!(token.kind, expected, "{standard} token must follow its keyword set");
+        }
+        assert!(tokenize_snapshot(&scanner, snapshot, &["-std=not-a-c-standard".into()]).is_err());
+    }
+
+    /// Scrub driver-only option edits in an isolated child process, proving they cannot change enum
+    /// layout between a recorded libclang profile and a native compiler witness.
+    #[test]
+    fn driver_override_environment_cannot_change_enum_layout() {
+        /// Mark only this owned subprocess so its inherited driver override does not touch sibling tests.
+        const CHILD: &str = "PGRX_C_MACROS_OVERRIDE_TEST_CHILD";
+        if std::env::var_os(CHILD).is_some() {
+            let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let scanner = MacroScanner::new().unwrap();
+            let selection = find_compiler(None, None, &clang::get_version()).unwrap();
+            let args = driver_arguments(&[], &["-fsyntax-only", "-"], None);
+            run_compiler_with_input(&selection.executable, &args,
+                Some("enum Probe { ZERO };\n_Static_assert(sizeof(enum Probe) == sizeof(int), \"driver override must not shorten enum\");\n".into())).unwrap();
+            drop(scanner);
+            return;
+        }
+        let output = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "frontend::tests::driver_override_environment_cannot_change_enum_layout",
+                "--nocapture",
+            ])
+            .env(CHILD, "1")
+            .env("CCC_OVERRIDE_OPTIONS", "+-fshort-enums")
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
     /// Exercise driver preference and change-sensitive filesystem searches with isolated synthetic
     /// executables.
     #[cfg(unix)]
@@ -2458,8 +3004,16 @@ mod tests {
             let selection = select_compiler(None, None, Some(&adjacent), 21, &roots).unwrap();
             assert_eq!(selection.executable, path_compiler);
             assert_eq!(
-                selection.search.directories,
-                BTreeSet::from([roots[0].clone(), roots[1].clone()])
+                selection
+                    .search
+                    .files
+                    .intersection(&BTreeSet::from([
+                        roots[0].join("clang-21"),
+                        roots[1].join("clang-21")
+                    ]))
+                    .cloned()
+                    .collect::<BTreeSet<_>>(),
+                BTreeSet::from([roots[0].join("clang-21"), roots[1].join("clang-21")])
             );
             let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
             assert!(inputs.files.contains(&adjacent));
@@ -2471,7 +3025,7 @@ mod tests {
             let selection = select_compiler(None, None, Some(&adjacent), 21, &roots).unwrap();
             assert_eq!(selection.executable, adjacent);
             assert!(
-                selection.search.directories.is_empty(),
+                !selection.search.searched_path,
                 "a matching adjacent tool needs no PATH search"
             );
             assert!(selection.search.files.contains(&adjacent));
@@ -2528,12 +3082,12 @@ mod tests {
             assert_eq!(selection.executable, adjacent);
             assert!(selection.search.files.contains(&first));
             assert!(!selection.search.files.contains(&later));
-            assert_eq!(selection.search.directories, BTreeSet::from([roots[0].clone()]));
+            assert!(selection.search.searched_path);
 
             compiler(&first, 21);
             let selection = select_compiler(None, Some(hint), Some(&adjacent), 21, &roots).unwrap();
             assert_eq!(selection.executable, first);
-            assert_eq!(selection.search.directories, BTreeSet::from([roots[0].clone()]));
+            assert!(selection.search.searched_path);
             let missing = fixture.0.join("missing-explicit-clang");
             assert!(matches!(
                 select_compiler(Some(&missing), Some(hint), Some(&adjacent), 21, &roots),
@@ -2554,7 +3108,7 @@ mod tests {
             let selection =
                 select_compiler(None, Some(&configured), Some(&adjacent), 21, &[]).unwrap();
             assert_eq!(selection.executable, adjacent);
-            assert!(selection.search.directories.is_empty());
+            assert!(!selection.search.searched_path);
             let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
             assert!(inputs.directories.contains(&configured));
             assert!(inputs.directories.contains(&actual.canonicalize().unwrap()));
@@ -2572,6 +3126,46 @@ mod tests {
             assert!(selection.search.required_directories.is_empty());
             assert!(selection.search.files.contains(&configured));
             assert!(selection.search.files.contains(&actual.canonicalize().unwrap()));
+        }
+
+        /// Shared alias digests belong to one verification pass; changing equal-length bytes while
+        /// restoring the mtime must still invalidate both the spelling and the physical input.
+        #[test]
+        fn alias_fingerprints_recheck_bytes_even_when_metadata_is_restored() {
+            let fixture = Fixture::new();
+            let file = fixture.0.join("physical-input");
+            let alias = fixture.0.join("input-alias");
+            fs::write(&file, "original").unwrap();
+            std::os::unix::fs::symlink(&file, &alias).unwrap();
+            let files = [file.clone(), alias.clone()];
+            let before = fingerprint_files(&files).unwrap();
+            let modified = fs::metadata(&file).unwrap().modified().unwrap();
+            fs::write(&file, "modified").unwrap();
+            fs::File::options()
+                .write(true)
+                .open(&file)
+                .unwrap()
+                .set_times(fs::FileTimes::new().set_modified(modified))
+                .unwrap();
+            assert_eq!(fs::metadata(&file).unwrap().modified().unwrap(), modified);
+            let after = fingerprint_files(&files).unwrap();
+            assert_eq!(after[&file], after[&alias]);
+            assert_ne!(before[&file], after[&file]);
+        }
+
+        /// Absolute overrides neither watch PATH roots nor record PATH as an input, while fallback
+        /// lookup records exactly the attempted executable files, including absent predecessors.
+        #[test]
+        fn absolute_overrides_and_path_candidates_have_narrow_rebuild_inputs() {
+            let fixture = Fixture::new();
+            let compiler_path = fixture.0.join("exact-clang");
+            compiler(&compiler_path, 21);
+            let roots = [fixture.0.join("unused-root")];
+            let selection = select_compiler(Some(&compiler_path), None, None, 21, &roots).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            assert!(!inputs.environment.contains_key("PATH"));
+            assert!(inputs.executable_search_directories.is_empty());
+            assert!(inputs.directories.is_empty());
         }
 
         /// Create a synthetic executable whose version response exercises driver preference and
@@ -2628,6 +3222,11 @@ mod tests {
             vec!["-D__BYTE_ORDER__=__ORDER_BIG_ENDIAN__"],
             vec!["-D", "__STDC_VERSION__=202311L"],
             vec!["-U__CHAR_UNSIGNED__"],
+            vec!["-D__ARM_PCS_VFP=1"],
+            vec!["-U__ARM_PCS"],
+            vec!["-D__ARM_EABI__=1"],
+            vec!["-D_CALL_ELF=2"],
+            vec!["-U__riscv_float_abi_double"],
             vec!["-U", "__SIZEOF_POINTER__"],
             vec!["-D__INT_MAX__(x)=x"],
             vec!["-D__UINT64_TYPE__=unsigned_char"],

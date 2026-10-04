@@ -781,6 +781,9 @@ fn binding_type(
                 || matches!(parts.as_slice(), [root, os, raw, _] if root == "std" && os == "os" && raw == "raw")
                 || matches!(parts.as_slice(), [root, _] if root == "libc")
             {
+                if last.ident == "c_char" {
+                    return Some(RustBindingType::NativeChar);
+                }
                 if last.ident == "c_float" {
                     return Some(RustBindingType::Float { bits: 32 });
                 }
@@ -972,7 +975,10 @@ fn storage(
         return None;
     }
     let kind = match name.as_str() {
-        "c_char" => IntegerKind::Char,
+        // C compiler char flags cannot establish the signedness of Rust's
+        // target-defined alias. Preserve it symbolically for structural types;
+        // constant interpretation requires independently known Rust storage.
+        "c_char" => return None,
         "c_schar" => IntegerKind::SignedChar,
         "c_uchar" => IntegerKind::UnsignedChar,
         "c_short" => IntegerKind::Short,
@@ -1022,14 +1028,12 @@ fn rust_value(expr: &Expr) -> Option<IntegerValue> {
 
 /// Check catalog, publication, and invalidation invariants directly against the private
 /// binding-build implementation.
+///
+/// The tests inspect real parsed output, generated leaf maps, and compiler dependency
+/// directives. Temporary input trees make success and rejection conditions explicit without
+/// relying on a configured server.
 #[cfg(test)]
 mod tests {
-    //! Check catalog, publication, and invalidation invariants directly against the private
-    //! binding-build implementation.
-    //!
-    //! The tests inspect real parsed output, generated leaf maps, and compiler dependency
-    //! directives. Temporary input trees make success and rejection conditions explicit without
-    //! relying on a configured server.
 
     use super::*;
     use pgrx_c_macros::{ByteOrder, IntegerType, TypeCategory, TypeInfo};
@@ -1043,6 +1047,10 @@ mod tests {
             pointer_bits: 64,
             function_pointer: pgrx_c_macros::PointerLayout { size: 8, alignment: 8 },
             size_type: IntegerKind::UnsignedLong,
+            ptrdiff_type: pgrx_c_macros::IntegerKind::Long,
+            preferred_alignments: Default::default(),
+            arm_float_abi: None,
+            ppc64_elf_abi: None,
             offsetof_supported: true,
             char_bits: 8,
             char_is_signed: true,
@@ -1060,6 +1068,28 @@ mod tests {
             .map(|(kind, signed, bits, rank)| (kind, IntegerType { kind, signed, bits, rank }))
             .collect(),
         }
+    }
+
+    /// C char signedness flags must not rewrite the actual Rust c_char alias
+    /// when collecting fresh fields, parameters, and typedef storage.
+    #[test]
+    fn native_char_binding_storage_is_independent_of_c_char_flags() {
+        let mut target = target();
+        target.char_is_signed = false;
+        for ty in [
+            syn::parse_quote!(::core::ffi::c_char),
+            syn::parse_quote!(::std::ffi::c_char),
+            syn::parse_quote!(::std::os::raw::c_char),
+        ] {
+            assert_eq!(
+                binding_type(&ty, &[], &target, 0, &BTreeSet::new()),
+                Some(RustBindingType::NativeChar)
+            );
+        }
+        assert!(
+            storage(&syn::parse_quote!(::core::ffi::c_char), &BTreeMap::new(), &target, 0)
+                .is_none()
+        );
     }
 
     /// Construct a compiler-side integer constant used to test reconciliation with

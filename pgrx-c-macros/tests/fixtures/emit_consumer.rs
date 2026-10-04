@@ -140,4 +140,6 @@ fn main() {
 
     // The module remains a meaningful shadowing fixture without warning suppression.
     let _ = __pgrx_c_macros::value as fn(u8) -> !;
+    let size: CValue<CUnsignedLong> = renamed_generated::EMIT_ID!(1_usize).into_value();
+    assert_eq!(size.get(), 1_u64);
 }

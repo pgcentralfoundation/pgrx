@@ -515,14 +515,12 @@ fn partition_support(
 
 /// Check catalog, publication, and invalidation invariants directly against the private
 /// binding-build implementation.
+///
+/// The tests inspect real parsed output, generated leaf maps, and compiler dependency
+/// directives. Temporary input trees make success and rejection conditions explicit without
+/// relying on a configured server.
 #[cfg(test)]
 mod tests {
-    //! Check catalog, publication, and invalidation invariants directly against the private
-    //! binding-build implementation.
-    //!
-    //! The tests inspect real parsed output, generated leaf maps, and compiler dependency
-    //! directives. Temporary input trees make success and rejection conditions explicit without
-    //! relying on a configured server.
 
     use super::*;
     use pgrx_c_macros::{

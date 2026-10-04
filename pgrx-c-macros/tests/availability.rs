@@ -37,14 +37,20 @@ fn unavailable_support_answers_queries_without_runtime_capabilities() {
     assert!(!support.contains("__pgrx_c_macros"));
 }
 
-/// Prove refused unsigned-char profiles and empty selections publish no available C macros.
+/// Prove genuinely unsupported trapping-overflow profiles and empty selections publish no
+/// available C macros, independently of the target's supported plain-char signedness.
 #[test]
 fn all_skipped_and_empty_batches_still_answer_availability_queries() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/availability.h");
-    let frontend =
-        inspect(&scanner, &header, &["--target=aarch64-unknown-linux-gnu".into()], None).unwrap();
+    let frontend = inspect(
+        &scanner,
+        &header,
+        &["--target=aarch64-unknown-linux-gnu".into(), "-ftrapv".into()],
+        None,
+    )
+    .unwrap();
     assert!(!frontend.profile().target.char_is_signed);
     let names = ["AVAIL_ZERO", "AVAIL_VALUE"];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
@@ -52,10 +58,10 @@ fn all_skipped_and_empty_batches_still_answer_availability_queries() {
     assert_eq!(refused.macros.len(), names.len());
     for emission in &refused.macros {
         let EmissionStatus::Skipped { reason } = &emission.status else {
-            panic!("unsigned-char runtime must remain unsupported: {emission:?}");
+            panic!("trapping-overflow runtime must remain unsupported: {emission:?}");
         };
         assert_eq!(reason.code, SkipReasonCode::UnsupportedProfile);
-        assert!(reason.message.contains("signed plain char"), "{reason:?}");
+        assert!(reason.message.contains("trapping signed overflow"), "{reason:?}");
     }
     let empty =
         generate_with_bindings(&session, &[] as &[&str], &BindingCatalog::default()).unwrap();

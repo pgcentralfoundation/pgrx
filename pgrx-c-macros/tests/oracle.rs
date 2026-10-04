@@ -8,6 +8,9 @@
 //! counts. These expectations cover synthetic integer macros and configured
 //! PostgreSQL headers; handwritten pgrx ports are never the semantic oracle.
 
+/// Select installed PostgreSQL header oracles from configured metadata.
+#[path = "support/postgres.rs"]
+mod installed;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
@@ -182,25 +185,28 @@ int main(void) {
     assert_eq!(records.len(), 23 + 256 * 16);
 }
 
-/// Checks that configured PostgreSQL 18 original headers establish scalar semantics.
+/// Check each selected installed PostgreSQL header establishes the scalar C types,
+/// defined wrapping boundaries, and repeated argument evaluations assumed by the corpus.
 #[test]
-#[ignore = "requires a configured native PostgreSQL 18 installation"]
-fn configured_postgres_18_original_headers_establish_scalar_semantics() {
-    use pgrx_c_macros::{MacroScanner, PostgresConfig};
+fn configured_postgres_original_headers_establish_scalar_semantics() {
+    use pgrx_c_macros::MacroScanner;
 
-    let postgres = PostgresConfig::resolve("pg18").expect("a native PG18 must be configured");
-    assert_eq!(postgres.pg_config().major_version().unwrap(), 18);
+    let installations = installed::configured();
+    if installations.is_empty() {
+        return;
+    }
     let scanner = MacroScanner::new().expect("libclang must be available");
-    let frontend =
-        postgres.inspect(&scanner, None, &[], None).expect("resolve the native PG18 profile");
-    let profile = frontend.profile();
-    let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
-    let stdout = oracle::run_c(
-        &profile.compiler.executable,
-        &profile.header,
-        include_str!("fixtures/oracle_postgres.c"),
-        &arguments,
-        true,
-    );
-    assert!(stdout.is_empty(), "the native oracle communicates failures by its exit code");
+    for postgres in installations {
+        let frontend = installed::inspect(&scanner, &postgres, &[]);
+        let profile = frontend.profile();
+        let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
+        let stdout = oracle::run_c(
+            &profile.compiler.executable,
+            &profile.header,
+            include_str!("fixtures/oracle_postgres.c"),
+            &arguments,
+            true,
+        );
+        assert!(stdout.is_empty(), "the native oracle communicates failures by its exit code");
+    }
 }

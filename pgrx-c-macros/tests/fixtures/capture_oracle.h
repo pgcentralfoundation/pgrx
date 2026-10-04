@@ -6,4 +6,4 @@ struct Capture { int slots[3]; };
 #define CAP_COUNTER(d) ((counter) += (d))
 #define CAP_LAZY(c) ((c) ? scope->slots[0] : 17)
 #define CAP_SIZE() (sizeof(scope->slots))
-#define CAP_TWO() ((left) - (right))
+#define CAP_TWO() (left - right)

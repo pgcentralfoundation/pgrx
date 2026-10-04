@@ -200,9 +200,9 @@ pub(crate) fn probe(
     while let Some((start, end)) = pending.pop() {
         runs += 1;
         if runs > MAX_PROBE_RUNS {
-            return Err(FrontendError::Output(
-                "integer ICE proofs exceed the 64-run budget".into(),
-            ));
+            // Missing optional witnesses cannot admit null-pointer conversions.
+            // Keep proven identities and leave the remaining expressions unproved.
+            break;
         }
         let source = source(session, &candidates[start..end])?;
         match collect(scanner, session, &source) {
@@ -236,16 +236,7 @@ fn source(
     session: &AnalysisSession<'_>,
     candidates: &[Candidate],
 ) -> Result<String, FrontendError> {
-    let header = session
-        .frontend()
-        .profile()
-        .header
-        .to_str()
-        .ok_or_else(|| FrontendError::Output("integer ICE probe header is not UTF-8".into()))?;
-    if header.chars().any(|character| matches!(character, '\n' | '\r' | '\0')) {
-        return Err(FrontendError::Output("invalid integer ICE probe header path".into()));
-    }
-    let header = header.replace('\\', "\\\\").replace('"', "\\\"");
+    let header = super::c_header_path(&session.frontend().profile().header)?;
     let mut source = format!("#include \"{header}\"\n");
     for (index, candidate) in candidates.iter().enumerate() {
         writeln!(

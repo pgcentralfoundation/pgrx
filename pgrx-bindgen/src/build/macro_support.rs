@@ -13,7 +13,7 @@
 //! headers can define external functions, and including them in two linked
 //! objects would give those functions duplicate definitions.
 
-use eyre::{WrapErr, eyre};
+use eyre::WrapErr;
 use pgrx_c_macros::CompilationProfile;
 use std::path::Path;
 
@@ -29,7 +29,7 @@ pub(super) struct NativeBuild<'a> {
 }
 
 /// Compile and archive generated C access primitives with the inspected invocation profile,
-/// then emit Cargo linkage for the selected PostgreSQL version. The result says
+/// without publishing Cargo linkage until all macro proofs succeed. The result says
 /// whether this artifact also contains the C shim, so the caller can avoid
 /// compiling a second object containing the same PostgreSQL header definitions.
 pub(super) fn compile_macro_support(
@@ -41,16 +41,22 @@ pub(super) fn compile_macro_support(
     let out_dir = build.out_dir;
     let stem = format!("pgrx_c_macros_pg{major}");
     let c_path = out_dir.join(format!("{stem}.c"));
-    let object = out_dir.join(format!("{stem}.o"));
-    let archive = out_dir.join(format!("lib{stem}.a"));
+    let msvc = profile.target.triple.ends_with("-msvc");
+    let object = out_dir.join(format!("{stem}.{}", if msvc { "obj" } else { "o" }));
+    let archive = out_dir.join(if msvc { format!("{stem}.lib") } else { format!("lib{stem}.a") });
     let wrapper = out_dir.join(format!("{}.c", super::cshim_static_wrapper_name(major)));
     let translation_unit = native_source(&wrapper, &profile.header, source, build.cshim)?;
     super::write_content_stable(&c_path, translation_unit.as_bytes())?;
     pgrx_c_macros::compile_native_support(profile, &c_path, &object, &archive)
         .wrap_err("could not compile and archive generated C access support")?;
-    println!("cargo:rustc-link-search=native={}", out_dir.display());
-    println!("cargo:rustc-link-lib=static={stem}");
     Ok(build.cshim.is_some())
+}
+
+/// Publish the previously verified native archive only once the Rust macro tree
+/// and audit report are ready, so a refused optional build cannot leak linkage.
+pub(super) fn link_macro_support(major: u16, out_dir: &Path) {
+    println!("cargo:rustc-link-search=native={}", out_dir.display());
+    println!("cargo:rustc-link-lib=static=pgrx_c_macros_pg{major}");
 }
 
 /// Include the inspected header exactly once, either directly or through
@@ -75,23 +81,17 @@ fn native_source(
     Ok(format!("{prefix}{source}"))
 }
 
-/// Admit only paths whose bytes can appear unchanged inside a quoted C include
-/// directive, avoiding accidental escape processing or preprocessor injection.
-fn native_include_path(path: &Path) -> eyre::Result<&str> {
-    let path = path.to_str().ok_or_else(|| eyre!("native support include is not UTF-8"))?;
-    if path.contains(['\n', '\r', '"', '\\']) {
-        return Err(eyre!("native support path cannot be represented in an include directive"));
-    }
-    Ok(path)
+/// Use the frontend's checked header-name spelling so inspection and native
+/// compilation select the same file on Unix, Windows drive paths, and UNC paths.
+fn native_include_path(path: &Path) -> eyre::Result<String> {
+    Ok(pgrx_c_macros::c_header_path(path)?)
 }
 
-/// Verify include ownership and linkage with isolated sources instead of
-/// relying on a previously generated output directory.
+/// The C shim owns the header include in a combined artifact. These tests
+/// keep that ownership explicit, including version selection and invalid
+/// include paths, before native compilation can change any output files.
 #[cfg(test)]
 mod tests {
-    //! The C shim owns the header include in a combined artifact. These tests
-    //! keep that ownership explicit, including version selection and invalid
-    //! include paths, before native compilation can change any output files.
 
     use super::native_source;
     #[cfg(unix)]
@@ -173,7 +173,7 @@ mod tests {
     /// directive before either compiler output is published.
     #[test]
     fn invalid_include_paths_cannot_change_the_translation_unit() {
-        for invalid in ["header\n.h", "header\r.h", "header\".h", "header\\.h"] {
+        for invalid in ["header\n.h", "header\r.h", "header\".h", "header\0.h"] {
             assert!(native_source(Path::new("unused.c"), Path::new(invalid), "", None).is_err());
             assert!(
                 native_source(

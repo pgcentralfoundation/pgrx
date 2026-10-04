@@ -100,9 +100,9 @@ pub(super) fn probe(
         }
         runs += 1;
         if runs > MAX_PROBE_RUNS {
-            return Err(FrontendError::Output(
-                "bitfield type probes exceed the 128-run budget".into(),
-            ));
+            // A field without witnesses receives no capability. Preserve the
+            // independently proved fields instead of failing unrelated macros.
+            break;
         }
         let source = source(frontend, &candidates[start..end])?;
         match collect(scanner, frontend, &source) {
@@ -173,22 +173,7 @@ fn identifier(value: &str) -> bool {
 /// Generate bounded type and access witnesses for original, unaligned, and enclosing-record bitfield
 /// expressions.
 fn source(frontend: &FrontendOutput, candidates: &[Candidate]) -> Result<String, FrontendError> {
-    let header = frontend
-        .profile()
-        .header
-        .to_str()
-        .ok_or_else(|| FrontendError::Output("bitfield probe header is not UTF-8".into()))?;
-    let mut quoted = String::new();
-    for character in header.chars() {
-        match character {
-            '\\' => quoted.push_str("\\\\"),
-            '"' => quoted.push_str("\\\""),
-            '\n' | '\r' | '\0' => {
-                return Err(FrontendError::Output("invalid bitfield probe header path".into()));
-            }
-            _ => quoted.push(character),
-        }
-    }
+    let quoted = super::c_header_path(&frontend.profile().header)?;
     let mut source = format!("#include \"{quoted}\"\n");
     for (index, candidate) in candidates.iter().enumerate() {
         let place = format!("(({} *)0)->{}", candidate.record_type, candidate.field);

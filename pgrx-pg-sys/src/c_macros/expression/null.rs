@@ -63,6 +63,10 @@ impl CType for CNullVoid {
     type Storage = *mut core::ffi::c_void;
     /// Evaluated C expression representation produced by this type or input conversion.
     type Value = NullVoidPointer;
+    /// Null-constant source metadata retains the declared object-pointer alignment.
+    const C_ALIGNMENT: usize = <super::CPointer<CVoid> as CType>::C_ALIGNMENT;
+    /// Null-constant metadata also retains the original pointer-array alignment.
+    const ARRAY_ALIGNMENT: usize = <super::CPointer<CVoid> as CType>::ARRAY_ALIGNMENT;
     /// Wrap admitted binding storage with the declared C value identity.
     fn from_storage(value: Self::Storage) -> Self::Value {
         null_void(Pointer::new(value))

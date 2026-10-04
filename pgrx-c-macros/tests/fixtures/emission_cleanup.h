@@ -8,7 +8,7 @@ unsigned int cleanup_value(void);
 
 #define CLEAN_EXPR_ZERO() 7
 #define CLEAN_EXPR_BOUNDARY() 1 + 2
-#define CLEAN_CAPTURE_ZERO() ((free_value) + 1)
+#define CLEAN_CAPTURE_ZERO() (free_value + 1)
 #define CLEAN_STMT_ZERO() do { cleanup_tick(); } while (0)
 #define CLEAN_STMT_BOUNDARY() if (0) cleanup_tick()
 #define CLEAN_LOCAL_ZERO() do { int temporary = 3; (void) temporary; cleanup_tick(); } while (0)
