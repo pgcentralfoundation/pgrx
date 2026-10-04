@@ -379,7 +379,8 @@ mod internal {
         /// Re-export at the crate root for code written against older pgrx bindings.
         pub const BUFFER_LOCK_UNLOCK: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_UNLOCK as u32;
         pub const BUFFER_LOCK_SHARE: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_SHARE as u32;
-        pub const BUFFER_LOCK_EXCLUSIVE: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_EXCLUSIVE as u32;
+        pub const BUFFER_LOCK_EXCLUSIVE: u32 =
+            crate::pg19::BufferLockMode::BUFFER_LOCK_EXCLUSIVE as u32;
 
         /// PG19 renamed `PageSetChecksumInplace` to `PageSetChecksum`.
         #[inline]
