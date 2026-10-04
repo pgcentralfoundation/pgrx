@@ -17,7 +17,7 @@ use crate::memcx;
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::seal::Sealed;
 use crate::{
-    Array, FromDatum, IntoDatum, direct_function_call, is_a, list::List, pg_sys, pg_sys::AsPgCStr,
+    Array, FromDatum, IntoDatum, direct_function_call, list::List, pg_sys, pg_sys::AsPgCStr,
 };
 
 /// Augments types that can be used as [`fn_call`] arguments.  This is only implemented for the
@@ -280,39 +280,39 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         // SAFETY: we allocate enough zeroed space for the base FunctionCallInfoBaseData *plus* the number of arguments
         // we have, and we've asserted that we have the correct number of arguments
         assert_eq!(nargs, pg_proc.pronargs());
-        let fcinfo = pg_sys::palloc0(
-            std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-                + std::mem::size_of::<pg_sys::NullableDatum>() * nargs,
-        ) as *mut pg_sys::FunctionCallInfoBaseData;
+        let nargs_c = i16::try_from(nargs).expect("function argument count fits PostgreSQL nargs");
+        let fcinfo = pg_sys::palloc0(pg_sys::SizeForFunctionCallInfo!(nargs_c).get() as usize)
+            .cast::<pg_sys::FunctionCallInfoBaseData>();
 
         // initialize it
         // SAFETY: we just palloc'd the `fcinfo` instance so it's de-referencable
-        let fcinfo_ref = &mut *fcinfo;
-        fcinfo_ref.flinfo = &mut flinfo;
-        fcinfo_ref.fncollation = collation;
-        fcinfo_ref.context = std::ptr::null_mut();
-        fcinfo_ref.resultinfo = std::ptr::null_mut();
-        fcinfo_ref.isnull = false;
-        fcinfo_ref.nargs = nargs as _;
+        pg_sys::InitFunctionCallInfoData!(
+            *fcinfo,
+            &raw mut flinfo,
+            nargs_c,
+            collation,
+            std::ptr::null_mut::<pg_sys::Node>(),
+            std::ptr::null_mut::<pg_sys::Node>()
+        );
 
         // setup the argument array
-        // SAFETY:  `fcinfo_ref.args` is the over-allocated space we palloc0'd above.  it's an array
+        // SAFETY:  `fcinfo.args` is the over-allocated space we palloc0'd above.  it's an array
         // of `nargs` `NullableDatum` instances.
-        let args_slice = fcinfo_ref.args.as_mut_slice(nargs);
-        for (i, datum) in arg_datums.into_iter().enumerate() {
-            assert!(!isstrict || datum.is_some()); // no NULL datums if this function is STRICT
+        {
+            let args_slice = (*fcinfo).args.as_mut_slice(nargs);
+            for (i, datum) in arg_datums.into_iter().enumerate() {
+                assert!(!isstrict || datum.is_some()); // no NULL datums if this function is STRICT
 
-            let arg = &mut args_slice[i];
-            (arg.value, arg.isnull) =
-                datum.map(|d| (d, false)).unwrap_or_else(|| (pg_sys::Datum::from(0), true));
+                let arg = &mut args_slice[i];
+                (arg.value, arg.isnull) =
+                    datum.map(|d| (d, false)).unwrap_or_else(|| (pg_sys::Datum::from(0), true));
+            }
         }
 
         // call the function
         // SAFETY: `flinfo` was create for us by `fmgr_info` above and `fn_addr` would have been properly set
-        let func = *(*fcinfo_ref.flinfo)
-            .fn_addr
-            .as_ref()
-            .expect("function initialization problem: fn_addr not set");
+        let func =
+            *flinfo.fn_addr.as_ref().expect("function initialization problem: fn_addr not set");
 
         // SAFETY: `func` is most likely a function pointer on the other side of the Postgres FFI
         // boundary, and we must guard that boundary to ensure any ERRORs will still properly unwind
@@ -320,7 +320,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         let result_datum = pg_guard_ffi_boundary(|| func(fcinfo));
 
         // Postgres' "OidFunctionCall" doesn't support returning null, but we can
-        let result = R::from_datum(result_datum, fcinfo_ref.isnull);
+        let result = R::from_datum(result_datum, (*fcinfo).isnull);
 
         // cleanup things we heap allocated
         // SAFETY: we allocated `fcinfo` and we're done with it and nothing we're about to return
@@ -366,7 +366,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
                 true,
             );
 
-            if fnoid == pg_sys::InvalidOid {
+            if fnoid == pg_sys::Oid::INVALID {
                 // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
                 // where Postgres will consider that
                 fnoid = pg_sys::LookupFuncName(
@@ -451,7 +451,11 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
         let evaluated = pg_sys::eval_const_expressions(std::ptr::null_mut(), node.cast());
 
         // SAFETY:  evaluated is a valid Node* as that's all `eval_const_expressions` can return
-        if is_a(evaluated.cast(), pg_sys::NodeTag::T_Const) {
+        if !evaluated.is_null()
+            && pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::NodeTag, _>(
+                pg_sys::nodeTag!(evaluated).into_value(),
+            ) == pg_sys::NodeTag::T_Const
+        {
             let con: *mut pg_sys::Const = evaluated.cast();
             let con_ref = &*con;
 

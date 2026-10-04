@@ -18,11 +18,6 @@ use super::{
 use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 
-const JULIAN_DAY_ZERO: i32 = pg_sys::DATETIME_MIN_JULIAN as i32 - POSTGRES_EPOCH_JDATE;
-const LAST_JULIAN_DAY: i32 = pg_sys::DATE_END_JULIAN as i32 - POSTGRES_EPOCH_JDATE - 1;
-const LT_JULIAN_DAY_ZERO: i32 = JULIAN_DAY_ZERO - 1;
-const GT_LAST_JULIAN_DAY: i32 = LAST_JULIAN_DAY + 1;
-
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
@@ -65,11 +60,12 @@ impl TryFrom<pg_sys::DateADT> for Date {
     type Error = DateTimeConversionError;
     #[inline]
     fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
-        match value {
-            i32::MIN | i32::MAX | JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Ok(Date(value)),
-            // these aren't quite overflows, semantically...
-            ..=LT_JULIAN_DAY_ZERO => Err(DateTimeConversionError::OutOfRange),
-            GT_LAST_JULIAN_DAY.. => Err(DateTimeConversionError::OutOfRange),
+        // Values can fit DateADT but lie outside PostgreSQL's supported calendar
+        // range. Those are range errors; its two infinity sentinels remain valid.
+        if pg_sys::DATE_NOT_FINITE!(value).get() != 0 || pg_sys::IS_VALID_DATE!(value).get() != 0 {
+            Ok(Date(value))
+        } else {
+            Err(DateTimeConversionError::OutOfRange)
         }
     }
 }
@@ -99,7 +95,7 @@ impl FromDatum for Date {
 
 impl IntoDatum for Date {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
+        self.0.into_datum()
     }
     fn type_oid() -> pg_sys::Oid {
         pg_sys::DATEOID
@@ -107,8 +103,8 @@ impl IntoDatum for Date {
 }
 
 impl Date {
-    const NEG_INFINITY: pg_sys::DateADT = pg_sys::DateADT::MIN;
-    const INFINITY: pg_sys::DateADT = pg_sys::DateADT::MAX;
+    const NEG_INFINITY: pg_sys::DateADT = pg_sys::DATEVAL_NOBEGIN as _;
+    const INFINITY: pg_sys::DateADT = pg_sys::DATEVAL_NOEND as _;
 
     /// Construct a new [`Date`] from its constituent parts.
     ///
@@ -161,10 +157,10 @@ impl Date {
     /// the nearest `infinity` if out-of-bounds.
     #[inline]
     pub fn saturating_from_raw(date_int: pg_sys::DateADT) -> Date {
-        match date_int {
-            ..=LT_JULIAN_DAY_ZERO => Date(i32::MIN),
-            JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Date(date_int),
-            GT_LAST_JULIAN_DAY.. => Date(i32::MAX),
+        match Self::try_from(date_int) {
+            Ok(date) => date,
+            Err(_) if date_int.is_negative() => Self::negative_infinity(),
+            Err(_) => Self::positive_infinity(),
         }
     }
 
@@ -208,13 +204,13 @@ impl Date {
     /// Does this [`Date`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        self.0 == Self::INFINITY
+        pg_sys::DATE_IS_NOEND!(self.0).get() != 0
     }
 
     /// Does this [`Date`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        self.0 == Self::NEG_INFINITY
+        pg_sys::DATE_IS_NOBEGIN!(self.0).get() != 0
     }
 
     /// Return the Julian days value of this [`Date`]
@@ -244,7 +240,7 @@ impl Date {
     }
 
     pub fn is_finite(&self) -> bool {
-        !matches!(self.0, pg_sys::DateADT::MIN | pg_sys::DateADT::MAX)
+        pg_sys::DATE_NOT_FINITE!(self.0).get() == 0
     }
 
     /// Return the backing [`pg_sys::DateADT`] value.

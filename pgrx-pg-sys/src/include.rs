@@ -170,35 +170,6 @@ mod internal {
         pub use crate::pg15::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg15::QTW_EXAMINE_RTES_BEFORE;
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            let heap_relation_ref = heap_relation.as_ref().unwrap();
-            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
-
-            table_am.index_build_range_scan.unwrap()(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                false,
-                true,
-                0,
-                crate::InvalidBlockNumber,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-                std::ptr::null_mut(),
-            );
-        }
     }
 
     #[cfg(feature = "pg16")]
@@ -206,35 +177,6 @@ mod internal {
         pub use crate::pg16::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg16::QTW_EXAMINE_RTES_BEFORE;
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            let heap_relation_ref = heap_relation.as_ref().unwrap();
-            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
-
-            table_am.index_build_range_scan.unwrap()(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                false,
-                true,
-                0,
-                crate::InvalidBlockNumber,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-                std::ptr::null_mut(),
-            );
-        }
     }
 
     #[cfg(feature = "pg17")]
@@ -242,35 +184,6 @@ mod internal {
         pub use crate::pg17::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg17::QTW_EXAMINE_RTES_BEFORE;
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            let heap_relation_ref = heap_relation.as_ref().unwrap();
-            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
-
-            table_am.index_build_range_scan.unwrap()(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                false,
-                true,
-                0,
-                crate::InvalidBlockNumber,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-                std::ptr::null_mut(),
-            );
-        }
     }
 
     #[cfg(feature = "pg18")]
@@ -278,35 +191,6 @@ mod internal {
         pub use crate::pg18::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg18::QTW_EXAMINE_RTES_BEFORE;
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            let heap_relation_ref = heap_relation.as_ref().unwrap();
-            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
-
-            table_am.index_build_range_scan.unwrap()(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                false,
-                true,
-                0,
-                crate::InvalidBlockNumber,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-                std::ptr::null_mut(),
-            );
-        }
     }
 
     #[cfg(feature = "pg19")]
@@ -329,35 +213,6 @@ mod internal {
         #[inline]
         pub unsafe fn PageSetChecksumInplace(page: crate::Page, blkno: crate::BlockNumber) {
             crate::pg19::PageSetChecksum(page, blkno);
-        }
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            let heap_relation_ref = heap_relation.as_ref().unwrap();
-            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
-
-            table_am.index_build_range_scan.unwrap()(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                false,
-                true,
-                0,
-                crate::InvalidBlockNumber,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-                std::ptr::null_mut(),
-            );
         }
     }
 }

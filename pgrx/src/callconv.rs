@@ -372,9 +372,6 @@ pub unsafe trait RetAbi: Sized {
         let fcinfo = fcinfo.0;
         unsafe { Self::ret_from_fcinfo_fcx(fcinfo) }
     }
-
-    /// must be called with a valid fcinfo
-    unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 /// Simplified variant of *RetAbi*.
@@ -421,7 +418,6 @@ where
     unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         unimplemented!()
     }
-    unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 /// Control flow for RetAbi
@@ -492,17 +488,16 @@ where
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         unsafe { T::ret_from_fcinfo_fcx(fcinfo) }
     }
-
-    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe { T::finish_call_fcinfo(fcinfo) }
-    }
 }
 
 macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
         $(  unsafe impl BoxRet for $scalar {
                 unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-                    unsafe { fcinfo.return_raw_datum($crate::pg_sys::Datum::from(self)) }
+                    // SAFETY: IntoDatum encodes this non-null scalar in its declared SQL
+                    // representation. It retains no borrowed data, and fcinfo exclusively
+                    // owns the live call frame used to package the result lifetime.
+                    unsafe { fcinfo.return_raw_datum(self.into_datum().expect("primitive datum is non-null")) }
                 }
             }
         )*
@@ -519,13 +514,21 @@ unsafe impl BoxRet for () {
 
 unsafe impl BoxRet for f32 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
+        // SAFETY: IntoDatum supplies the canonical non-null float4 representation,
+        // without a borrowed payload; fcinfo exclusively owns the live result frame.
+        unsafe {
+            fcinfo.return_raw_datum(self.into_datum().expect("floating-point datum is non-null"))
+        }
     }
 }
 
 unsafe impl BoxRet for f64 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
+        // SAFETY: IntoDatum supplies the canonical non-null float8 representation,
+        // without a borrowed payload; fcinfo exclusively owns the live result frame.
+        unsafe {
+            fcinfo.return_raw_datum(self.into_datum().expect("floating-point datum is non-null"))
+        }
     }
 }
 
@@ -656,6 +659,8 @@ impl<'fcx> FcInfo<'fcx> {
     /// Modifies the function call's return to be null
     ///
     /// Returns a null-pointer Datum for use as the calling function's return value.
+    /// This adapter retains the call lifetime required by BoxRet while its caller packages
+    /// the final return; the C return macro exits immediately with an unbounded raw Datum.
     ///
     /// If this flag is set, regardless of what your function actually returns,
     /// Postgres will presume it is null and discard it. This means that, if you call this
@@ -674,7 +679,8 @@ impl<'fcx> FcInfo<'fcx> {
     /// ```
     #[inline]
     pub fn return_null(&mut self) -> Datum<'fcx> {
-        // SAFETY: returning null is always safe
+        // SAFETY: FcInfo::from_ptr establishes live writable call storage. A null result
+        // contains no borrowed payload and is valid for the call lifetime.
         unsafe { *self.set_return_is_null() = true };
         Datum::null()
     }
@@ -721,8 +727,8 @@ impl<'fcx> FcInfo<'fcx> {
     #[inline]
     pub fn get_collation(&self) -> Option<pg_sys::Oid> {
         // SAFETY: see FcInfo::from_ptr
-        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
-        (fcinfo.fncollation.to_u32() != 0).then_some(fcinfo.fncollation)
+        let oid = pg_sys::Oid::from(unsafe { pg_sys::PG_GET_COLLATION!(self.0).get() });
+        (oid != pg_sys::Oid::INVALID).then_some(oid)
     }
 
     /// Retrieve the type (as an Oid) of argument number `num`.
@@ -763,61 +769,6 @@ impl<'fcx> FcInfo<'fcx> {
 
             // Safety: can new_unchecked() here because we just initialized it.
             NonNull::new_unchecked(flinfo.as_mut().fn_extra as *mut pg_sys::FuncCallContext)
-        }
-    }
-
-    #[inline]
-    pub fn srf_is_initialized(&self) -> bool {
-        // Safety: User must supply a valid fcinfo to from_ptr() in order
-        // to construct a FcInfo. If that constraint is maintained, this should
-        // be safe.
-        unsafe { !(*(*self.0).flinfo).fn_extra.is_null() }
-    }
-
-    /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
-    /// because this structure's FunctionCallInfo is a private field.
-    ///
-    /// This should initialize `self.0.flinfo.fn_extra`
-    #[inline]
-    pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
-        unsafe {
-            let fcx: *mut pg_sys::FuncCallContext = pg_sys::init_MultiFuncCall(self.0);
-            debug_assert!(!fcx.is_null());
-            &mut *fcx
-        }
-    }
-
-    /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
-    /// constraint.
-    ///
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
-    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
-    #[inline]
-    pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
-        unsafe {
-            let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
-            debug_assert!(!fcx.is_null());
-            &mut *fcx
-        }
-    }
-
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
-    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
-    #[inline]
-    pub unsafe fn srf_return_next(&mut self) {
-        unsafe {
-            self.deref_fcx().call_cntr += 1;
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprMultipleResult);
-        }
-    }
-
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
-    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
-    #[inline]
-    pub unsafe fn srf_return_done(&mut self) {
-        unsafe {
-            pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprEndResult);
         }
     }
 

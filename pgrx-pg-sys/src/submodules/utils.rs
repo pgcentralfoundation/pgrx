@@ -16,9 +16,13 @@ use crate as pg_sys;
 /// of the provided `pg_sys::NameData`
 #[inline]
 pub fn name_data_to_str(name_data: &pg_sys::NameData) -> &str {
-    fn transmute<const N: usize>(x: &[core::ffi::c_char; N]) -> &[core::ffi::c_uchar; N] {
-        unsafe { std::mem::transmute(x) }
-    }
-
-    core::ffi::CStr::from_bytes_until_nul(transmute(&name_data.data)).unwrap().to_str().unwrap()
+    // SAFETY: name_data borrows a live, initialized NameData. NameStr projects
+    // its fixed NAMEDATALEN-byte array without loading a record temporary. All
+    // char bit patterns are valid bytes, and the shared borrow permits reading
+    // those bytes for the lifetime of the returned string.
+    let bytes = unsafe {
+        let name = pg_sys::NameStr!(*name_data).get();
+        core::slice::from_raw_parts(name.cast::<u8>(), pg_sys::NAMEDATALEN as usize)
+    };
+    core::ffi::CStr::from_bytes_until_nul(bytes).unwrap().to_str().unwrap()
 }

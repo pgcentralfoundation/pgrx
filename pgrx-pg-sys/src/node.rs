@@ -43,15 +43,24 @@ pub trait PgNode: crate::seal::Sealed + Sized {
         unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
 
+    /// Test this node's stored tag against a PostgreSQL node kind.
     #[doc(alias = "IsA")]
     #[inline]
     fn is_a(&self, tag: crate::NodeTag) -> bool {
         self.node_tag() == tag
     }
 
+    /// Return the initialized node tag using PostgreSQL's header accessor.
     #[inline]
     fn node_tag(&self) -> crate::NodeTag {
-        self.as_node().type_
+        // SAFETY: Sealed PgNode implementations begin with a Node header. The
+        // shared borrow keeps that initialized header readable, and its tag is
+        // already a valid Rust NodeTag for the checked storage conversion.
+        unsafe {
+            crate::__pgrx_c_macros::expression_result::return_value::<crate::NodeTag, _>(
+                crate::nodeTag!(core::ptr::from_ref(self.as_node())).into_value(),
+            )
+        }
     }
 
     /// Try to safely cast self to T

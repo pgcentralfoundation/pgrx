@@ -9,8 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
 use crate::{
-    FromDatum, IntoDatum, PgMemoryContexts, StringInfo, pg_sys, rust_regtypein, set_varsize_4b,
-    set_varsize_short, vardata_any, varsize_any, varsize_any_exhdr, void_mut_ptr,
+    FromDatum, IntoDatum, PgMemoryContexts, StringInfo, pg_sys, rust_regtypein, void_mut_ptr,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
@@ -130,22 +129,31 @@ where
     pub fn new() -> Self {
         let size_of = std::mem::size_of::<T>();
 
-        let ptr = unsafe { pg_sys::palloc0(pg_sys::VARHDRSZ + size_of) as *mut pg_sys::varlena };
+        let ptr =
+            unsafe { pg_sys::palloc0(pg_sys::VARHDRSZ as usize + size_of) as *mut pg_sys::varlena };
 
-        // safe: ptr will halready be allocated
+        // SAFETY: palloc0 provides live aligned storage including the writable header
+        // prefix, with no competing borrow. The short branch checks that its encoded
+        // size fits the one-byte header; the other branch writes the four-byte header.
         unsafe {
-            if size_of + pg_sys::VARHDRSZ_SHORT <= pg_sys::VARATT_SHORT_MAX as usize {
+            if size_of + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
                 // we can use the short header size
-                set_varsize_short(ptr, (size_of + pg_sys::VARHDRSZ_SHORT) as i32);
+                pg_sys::SET_VARSIZE_SHORT!(ptr, (size_of + pg_sys::VARHDRSZ_SHORT as usize) as i32)
+                    .get();
             } else {
                 // gotta use the full 4-byte header
-                set_varsize_4b(ptr, (size_of + pg_sys::VARHDRSZ) as i32);
+                pg_sys::SET_VARSIZE_4B!(ptr, (size_of + pg_sys::VARHDRSZ as usize) as i32).get();
             }
         }
 
         PgVarlena {
             leaked: None,
-            varlena: Cow::Owned(PallocdVarlena { ptr, len: unsafe { varsize_any(ptr) } }),
+            varlena: Cow::Owned(PallocdVarlena {
+                ptr,
+                // SAFETY: The header was initialized above and its allocation remains
+                // live. This reads the encoded length without accessing payload values.
+                len: unsafe { pg_sys::VARSIZE_ANY!(ptr).get() as usize },
+            }),
             need_free: true,
             __marker: PhantomData,
         }
@@ -165,7 +173,9 @@ where
     /// valid `*mut pg_sys::varlena`.
     pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
         let ptr = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
-        let len = varsize_any(ptr);
+        // SAFETY: the caller's valid varlena datum was detoasted into live storage
+        // with an initialized header whose size describes the complete allocation.
+        let len = unsafe { pg_sys::VARSIZE_ANY!(ptr).get() as usize };
 
         if ptr == datum.cast_mut_ptr() {
             // no detoasting happened so we're using borrowed memory
@@ -285,7 +295,7 @@ where
     fn as_ref(&self) -> &T {
         unsafe {
             // safe: ptr will never be null
-            let ptr = vardata_any(self.varlena.ptr) as *const T;
+            let ptr = pg_sys::VARDATA_ANY!(self.varlena.ptr).get() as *const T;
             ptr.as_ref().unwrap()
         }
     }
@@ -310,7 +320,8 @@ where
     fn as_mut(&mut self) -> &mut T {
         unsafe {
             // safe: ptr will never be null
-            let ptr = vardata_any(self.varlena.to_mut().ptr) as *mut T;
+            let varlena = self.varlena.to_mut().ptr;
+            let ptr = pg_sys::VARDATA_ANY!(varlena).get() as *mut T;
             ptr.as_mut().unwrap()
         }
     }
@@ -380,13 +391,17 @@ where
 {
     let mut serialized = StringInfo::new();
 
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
+    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ as usize]); // reserve space for the header
     serde_cbor::to_writer(&mut serialized, &input).expect("failed to encode as CBOR");
 
     let size = serialized.len();
     let varlena = serialized.into_char_ptr();
+    // SAFETY: StringInfo owns this aligned PostgreSQL allocation, reserves an
+    // initialized header prefix, and bounds its total size by MaxAllocSize.
+    // into_char_ptr transfers the buffer to its live memory context without
+    // freeing it, so the header remains writable and its length fits C int.
     unsafe {
-        set_varsize_4b(varlena as *mut pg_sys::varlena, size as i32);
+        pg_sys::SET_VARSIZE_4B!(varlena as *mut pg_sys::varlena, size as i32).get();
     }
 
     varlena as *const pg_sys::varlena
@@ -398,8 +413,11 @@ where
     T: Deserialize<'de>,
 {
     let varlena = pg_sys::pg_detoast_datum_packed(input);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
+    // SAFETY: the caller supplies a valid CBOR varlena; detoasting keeps the
+    // complete packed allocation live for both header and payload accesses.
+    let (len, data) = unsafe {
+        (pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize, pg_sys::VARDATA_ANY!(varlena).get())
+    };
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_cbor::from_slice(slice).expect("failed to decode CBOR")
 }

@@ -160,7 +160,7 @@ impl PgProc {
     /// Data type of the variadic array parameter's elements, or [`None`] if the function does not have a variadic parameter
     pub fn provariadic(&self) -> Option<pg_sys::Oid> {
         let oid = self.get_attr(pg_sys::Anum_pg_proc_provariadic).unwrap();
-        if oid == pg_sys::InvalidOid { None } else { Some(oid) }
+        if oid == pg_sys::Oid::INVALID { None } else { Some(oid) }
     }
 
     /// Planner support function for this function (see Section 38.11), or zero if none

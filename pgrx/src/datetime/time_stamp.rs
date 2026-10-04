@@ -61,8 +61,8 @@ impl From<Timestamp> for pg_sys::Timestamp {
 /// Create a [`Timestamp`] from a [`pg_sys::Timestamp`]
 ///
 /// Note that `pg_sys::Timestamp` is an `i64` as a microsecond offset from the "Postgres epoch".
-/// This impl currently allows producing a `Timestamp` that cannot be constructed by SQL,
-/// such as a timestamp before "Julian day zero".
+/// Finite values must lie within PostgreSQL's supported timestamp range;
+/// its two infinity sentinels are also accepted.
 ///
 /// The details of the encoding may also prove surprising, for instance:
 /// - Postgres uses Julian days to reason about time instead of the Gregorian calendar
@@ -75,14 +75,16 @@ impl TryFrom<pg_sys::Timestamp> for Timestamp {
     type Error = pg_sys::Timestamp;
     #[inline]
     fn try_from(ts: pg_sys::Timestamp) -> Result<Self, Self::Error> {
-        // defined by Postgres, but bindgen doesn't evaluate them for some reason:
-        const MIN_TIMESTAMP: pg_sys::Timestamp = -211_813_488_000_000_000;
-        const END_TIMESTAMP: pg_sys::Timestamp = 9_223_371_331_200_000_000;
-        //  #define IS_VALID_TIMESTAMP(t)  (MIN_TIMESTAMP <= (t) && (t) < END_TIMESTAMP)
-        const MAX_TIMESTAMP: pg_sys::Timestamp = END_TIMESTAMP - 1;
-        match ts {
-            i64::MIN | i64::MAX | MIN_TIMESTAMP..=MAX_TIMESTAMP => Ok(Timestamp(ts)),
-            _ => Err(ts),
+        // timestamp.h defines the finite range as MIN_TIMESTAMP <= ts < END_TIMESTAMP.
+        // The infinity sentinels are outside that range and are accepted separately.
+        let value =
+            pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::Timestamp>::new(ts as _);
+        if pg_sys::TIMESTAMP_NOT_FINITE!(value).get() != 0
+            || pg_sys::IS_VALID_TIMESTAMP!(value).get() != 0
+        {
+            Ok(Timestamp(ts))
+        } else {
+            Err(ts)
         }
     }
 }
@@ -97,7 +99,7 @@ impl TryFrom<pg_sys::Datum> for Timestamp {
 
 impl IntoDatum for Timestamp {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
+        self.0.into_datum()
     }
     fn type_oid() -> pg_sys::Oid {
         pg_sys::TIMESTAMPOID
@@ -122,8 +124,8 @@ impl FromDatum for Timestamp {
 }
 
 impl Timestamp {
-    const NEG_INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MIN;
-    const INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MAX;
+    const NEG_INFINITY: pg_sys::Timestamp = pg_sys::DT_NOBEGIN as _;
+    const INFINITY: pg_sys::Timestamp = pg_sys::DT_NOEND as _;
 
     /// Construct a new [`Timestamp`] from its constituent parts.
     ///
@@ -224,13 +226,21 @@ impl Timestamp {
     /// Does this [`Timestamp`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        self.0 == Self::INFINITY
+        pg_sys::TIMESTAMP_IS_NOEND!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::Timestamp,
+        >::new(self.0 as _))
+        .get()
+            != 0
     }
 
     /// Does this [`Timestamp`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        self.0 == Self::NEG_INFINITY
+        pg_sys::TIMESTAMP_IS_NOBEGIN!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::Timestamp,
+        >::new(self.0 as _))
+        .get()
+            != 0
     }
 
     /// Extract the `month`
@@ -275,7 +285,11 @@ impl Timestamp {
     }
 
     pub fn is_finite(&self) -> bool {
-        !matches!(self.0, pg_sys::Timestamp::MIN | pg_sys::Timestamp::MAX)
+        pg_sys::TIMESTAMP_NOT_FINITE!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::Timestamp,
+        >::new(self.0 as _))
+        .get()
+            == 0
     }
 
     /// Truncate [`Timestamp`] to specified units

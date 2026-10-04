@@ -62,68 +62,7 @@ pub use cshim::*;
 pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
-// Preserve the public Rust port API's precedence over generated binding globs.
-// Generated C expressions resolve bindings through __pgrx_c_bindings instead.
-pub use port::{
-    BootstrapTransactionId, BufferIsLocal, FirstCommandId, FirstNormalTransactionId,
-    FirstOffsetNumber, FrozenTransactionId, GETSTRUCT, GetMemoryChunkContext, InvalidBlockNumber,
-    InvalidCommandId, InvalidOffsetNumber, InvalidOid, InvalidTransactionId, MAXALIGN,
-    MaxOffsetNumber, MaxTransactionId, MemoryContextIsValid, MemoryContextSwitchTo, PageIsValid,
-    PageValidateSpecialPointer, SizeOfPageHeaderData, TYPEALIGN, TransactionIdIsNormal, VARHDRSZ,
-    VARHDRSZ_EXTERNAL, VARHDRSZ_SHORT, get_pg_major_minor_version_string, get_pg_major_version_num,
-    get_pg_major_version_string, heap_tuple_get_struct, type_is_array,
-};
-
-#[cfg(any(not(target_env = "msvc"), feature = "pg17", feature = "pg18", feature = "pg19"))]
-pub use port::get_pg_version_string;
-#[cfg(all(target_env = "msvc", any(feature = "pg15", feature = "pg16")))]
-pub use port::get_pg_version_string;
-
-#[cfg(feature = "pg19")]
-pub use port::{
-    TransactionIdFollows, TransactionIdFollowsOrEquals, TransactionIdPrecedes,
-    TransactionIdPrecedesOrEquals,
-};
-
-#[cfg(any(
-    feature = "pg15",
-    all(
-        not(feature = "cshim"),
-        any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19")
-    )
-))]
-pub use port::{BufferGetBlock, BufferGetPage};
-
-#[cfg(feature = "pg15")]
-pub use port::{
-    expression_tree_walker, planstate_tree_walker, query_or_expression_tree_walker,
-    query_tree_walker, range_table_entry_walker, range_table_walker, raw_expression_tree_walker,
-};
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-pub use port::{
-    expression_tree_walker, planstate_tree_walker, query_or_expression_tree_walker,
-    query_tree_walker, range_table_entry_walker, range_table_walker, raw_expression_tree_walker,
-};
-
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-pub use port::expression_tree_mutator;
-
-#[cfg(feature = "pg15")]
-pub use port::{
-    BufferGetPageSize, BufferIsValid, ItemIdGetOffset, PageGetContents, PageGetItem, PageGetItemId,
-    PageGetMaxOffsetNumber, PageGetPageLayoutVersion, PageGetPageSize, PageGetSpecialSize,
-    PageIsEmpty, PageIsNew, PageSetPageSizeAndVersion, PageSizeIsValid,
-};
-
-#[cfg(any(feature = "pg15", feature = "pg18", feature = "pg19"))]
-pub use port::PageGetSpecialPointer;
-
-// Keep the legacy tuple helper API ahead of newly generated inline bindings.
-pub use submodules::{
-    HeapTupleGetRawCommandId, HeapTupleHeaderFrozen, HeapTupleHeaderGetNatts,
-    HeapTupleHeaderGetRawXmin, HeapTupleHeaderGetXmin, HeapTupleHeaderIsHeapOnly,
-    HeapTupleHeaderIsHotUpdated, HeapTupleHeaderXminInvalid, HeapTupleNoNulls, heap_getattr,
-};
+pub use port::*;
 
 // For postgres 18+, some functions will reexport when enabling `cshim` feature
 #[allow(ambiguous_glob_reexports)]

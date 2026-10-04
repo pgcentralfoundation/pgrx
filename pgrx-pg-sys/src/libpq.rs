@@ -16,11 +16,6 @@ pub mod be {
         pub static mut MyProcPort: *mut Port;
     }
 
-    /// #define SCRAM_MAX_KEY_LEN          PG_SHA256_DIGEST_LENGTH
-    /// #define PG_SHA256_DIGEST_LENGTH    32
-    #[cfg(any(feature = "pg18", feature = "pg19"))]
-    const SCRAM_MAX_KEY_LEN: usize = 32;
-
     /// Port for Postgres 15..=16
     #[cfg(any(feature = "pg15", feature = "pg16"))]
     #[repr(C)]
@@ -177,8 +172,8 @@ pub mod be {
         keepalives_count: core::ffi::c_int,
         tcp_user_timeout: core::ffi::c_int,
 
-        scram_ClientKey: [u8; SCRAM_MAX_KEY_LEN],
-        scram_ServerKey: [u8; SCRAM_MAX_KEY_LEN],
+        scram_ClientKey: [u8; crate::SCRAM_MAX_KEY_LEN as usize],
+        scram_ServerKey: [u8; crate::SCRAM_MAX_KEY_LEN as usize],
         has_scram_keys: bool,
 
         // as if ENABLE_GSS == false && ENABLE_SSPI == false

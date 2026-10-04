@@ -13,7 +13,7 @@ use crate::{
     AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts, pg_sys, varlena, varlena_to_byte_slice,
 };
 use alloc::ffi::CString;
-use core::{ffi::CStr, mem::size_of};
+use core::ffi::CStr;
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
@@ -58,7 +58,7 @@ pub trait FromDatum: Sized {
     /// If, however, you're providing an arbitrary datum value, it needs to be considered unsafe
     /// and that unsafeness should be propagated through your API.
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
-        FromDatum::from_polymorphic_datum(datum, is_null, pg_sys::InvalidOid)
+        FromDatum::from_polymorphic_datum(datum, is_null, pg_sys::Oid::INVALID)
     }
 
     /// Like `from_datum` for instantiating polymorphic types
@@ -186,23 +186,12 @@ impl FromDatum for pg_sys::Oid {
         if is_null {
             None
         } else {
-            // NB:  Postgres' `DatumGetObjectId()` function is defined as a straight cast
-            // rather than assuming the Datum's pointer value is itself a valid unsigned int:
-            //
-            // ```c
-            // /*
-            //  * DatumGetObjectId
-            //  *		Returns object identifier value of a datum.
-            //  */
-            // static inline Oid
-            // DatumGetObjectId(Datum X)
-            // {
-            // 	return (Oid) X;
-            // }
-            // ```
-
-            let oid_as_u32 = datum.value() as u32;
-            Some(pg_sys::Oid::from(oid_as_u32))
+            // DatumGetObjectId casts the Datum's stored value to Oid; it does not
+            // treat those bits as a pointer to an unsigned integer and dereference it.
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetObjectId!(datum).get() };
+            Some(pg_sys::Oid::from(value))
         }
     }
 }
@@ -226,7 +215,14 @@ impl FromDatum for bool {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<bool> {
-        if is_null { None } else { Some(datum.value() != 0) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetBool!(datum).get() };
+            Some(value)
+        }
     }
 }
 
@@ -238,7 +234,14 @@ impl FromDatum for i8 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<i8> {
-        if is_null { None } else { Some(datum.value() as _) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetChar!(datum).get() };
+            Some(value as i8)
+        }
     }
 }
 
@@ -250,7 +253,14 @@ impl FromDatum for i16 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<i16> {
-        if is_null { None } else { Some(datum.value() as _) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetInt16!(datum).get() };
+            Some(value)
+        }
     }
 }
 
@@ -262,7 +272,14 @@ impl FromDatum for i32 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<i32> {
-        if is_null { None } else { Some(datum.value() as _) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetInt32!(datum).get() };
+            Some(value)
+        }
     }
 }
 
@@ -274,7 +291,14 @@ impl FromDatum for u32 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<u32> {
-        if is_null { None } else { Some(datum.value() as _) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetUInt32!(datum).get() };
+            Some(value)
+        }
     }
 }
 
@@ -289,11 +313,9 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            let value = if size_of::<i64>() <= size_of::<pg_sys::Datum>() {
-                datum.value() as _
-            } else {
-                *(datum.cast_mut_ptr() as *const _)
-            };
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            let value = unsafe { pg_sys::DatumGetInt64!(datum).get() };
             Some(value)
         }
     }
@@ -307,7 +329,13 @@ impl FromDatum for f32 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<f32> {
-        if is_null { None } else { Some(f32::from_bits(datum.value() as _)) }
+        if is_null {
+            None
+        } else {
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            let value = unsafe { pg_sys::DatumGetFloat4(datum) };
+            Some(value)
+        }
     }
 }
 
@@ -322,11 +350,8 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            let value = if size_of::<i64>() <= size_of::<pg_sys::Datum>() {
-                f64::from_bits(datum.value() as _)
-            } else {
-                *(datum.cast_mut_ptr() as *const _)
-            };
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            let value = unsafe { pg_sys::DatumGetFloat8(datum) };
             Some(value)
         }
     }
@@ -428,8 +453,8 @@ impl FromDatum for String {
             // If the datum is EXTERNAL or COMPRESSED, then detoasting creates a pfree-able chunk
             // that needs to be freed. We can free it because `to_owned` above creates a Rust copy
             // of the string.
-            if varlena::varatt_is_1b_e(datum.cast_mut_ptr())
-                || varlena::varatt_is_4b_c(datum.cast_mut_ptr())
+            if pg_sys::VARATT_IS_1B_E!(datum.cast_mut_ptr::<pg_sys::varlena>()).get() != 0
+                || pg_sys::VARATT_IS_4B_C!(datum.cast_mut_ptr::<pg_sys::varlena>()).get() != 0
             {
                 pg_sys::pfree(varlena.cast());
             }

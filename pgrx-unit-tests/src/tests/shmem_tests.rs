@@ -44,7 +44,7 @@ mod tests {
         // Hold lock
         let _lock = LWLOCK.exclusive();
         // Call into pg_guarded postgres function which internally reports an error
-        unsafe { pg_sys::format_type_extended(pg_sys::InvalidOid, -1, 0) };
+        unsafe { pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0) };
     }
 
     #[pg_test]

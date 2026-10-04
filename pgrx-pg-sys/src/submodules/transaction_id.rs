@@ -21,11 +21,16 @@ pub type MultiXactId = TransactionId;
 pub struct TransactionId(u32);
 
 impl TransactionId {
-    pub const INVALID: Self = Self(0);
-    pub const BOOTSTRAP: Self = Self(1);
-    pub const FROZEN: Self = Self(2);
-    pub const FIRST_NORMAL: Self = Self(3);
-    pub const MAX: Self = Self(u32::MAX);
+    /// Invalid transaction identity from the selected PostgreSQL headers.
+    pub const INVALID: Self = Self(crate::InvalidTransactionId);
+    /// Bootstrap transaction identity from the selected PostgreSQL headers.
+    pub const BOOTSTRAP: Self = Self(crate::BootstrapTransactionId);
+    /// Frozen transaction identity from the selected PostgreSQL headers.
+    pub const FROZEN: Self = Self(crate::FrozenTransactionId);
+    /// First normal transaction identity from the selected PostgreSQL headers.
+    pub const FIRST_NORMAL: Self = Self(crate::FirstNormalTransactionId);
+    /// Maximum transaction identity from the selected PostgreSQL headers.
+    pub const MAX: Self = Self(crate::MaxTransactionId);
 
     pub const fn from_inner(xid: u32) -> Self {
         Self(xid)

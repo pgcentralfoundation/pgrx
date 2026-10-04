@@ -173,6 +173,9 @@ impl Serialize for Tuple {
             #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
             let tuple = self.data.as_ptr();
 
+            // SAFETY: the reorder buffer keeps tuple and its data alive, desc
+            // comes from the pinned relation, and iteration supplies a valid
+            // attribute number. isnull is an initialized exclusive output.
             let datum = unsafe {
                 pg_sys::heap_getattr(tuple, attribute.attnum.into(), desc.as_ptr(), &mut isnull)
             };

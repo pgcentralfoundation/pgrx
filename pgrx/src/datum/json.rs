@@ -8,8 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
-    FromDatum, IntoDatum, direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any,
-    varsize_any_exhdr, void_mut_ptr,
+    FromDatum, IntoDatum, direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -38,8 +37,15 @@ impl FromDatum for Json {
             None
         } else {
             let varlena = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
-            let len = varsize_any_exhdr(varlena);
-            let data = vardata_any(varlena);
+            // SAFETY: FromDatum's caller supplies a valid JSON datum. The
+            // detoasted allocation has an initialized header and stays live
+            // while its payload is read and copied into the Rust result.
+            let (len, data) = unsafe {
+                (
+                    pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize,
+                    pg_sys::VARDATA_ANY!(varlena).get(),
+                )
+            };
             let slice = std::slice::from_raw_parts(data as *const u8, len);
             let value =
                 serde_json::from_slice(slice).expect("datum must refer to a valid json varlena");
@@ -101,8 +107,15 @@ impl FromDatum for JsonString {
         } else {
             let varlena = datum.cast_mut_ptr();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
-            let len = varsize_any_exhdr(detoasted);
-            let data = vardata_any(detoasted);
+            // SAFETY: FromDatum's caller supplies a valid JSON datum. The
+            // detoasted allocation has an initialized header and stays live
+            // while its payload is read and copied into the Rust result.
+            let (len, data) = unsafe {
+                (
+                    pg_sys::VARSIZE_ANY_EXHDR!(detoasted).get() as usize,
+                    pg_sys::VARDATA_ANY!(detoasted).get(),
+                )
+            };
 
             let result =
                 std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))

@@ -519,7 +519,7 @@ where
 mod casper {
     use super::UnboxDatum;
     use crate::layout::Align;
-    use crate::{Array, pg_sys, varlena};
+    use crate::{Array, pg_sys};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
     /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.
@@ -613,9 +613,10 @@ mod casper {
 
         #[inline]
         unsafe fn hop_size(&self, ptr: *const u8) -> usize {
-            // SAFETY: This uses the varsize_any function to be safe,
+            // SAFETY: The generated size operation accepts the varlena's packed header,
             // and the caller was informed of pointer requirements.
-            let varsize = varlena::varsize_any(ptr.cast());
+            let varsize =
+                unsafe { pg_sys::VARSIZE_ANY!(ptr.cast::<pg_sys::varlena>()).get() as usize };
 
             // Now make sure this is aligned-up
             self.align.pad(varsize)
