@@ -243,6 +243,12 @@ static inline int original_mode(void) {\n\
             linker.arg(input);
             if input == &consumer {
                 linker.arg(&archive);
+            } else {
+                // The original flags can intentionally produce non-PIC
+                // relocations. Disable Linux's default PIE only when linking
+                // that object; archive consumers still use the host defaults.
+                #[cfg(target_os = "linux")]
+                linker.arg("-no-pie");
             }
             let output = linker.arg("-o").arg(executable).output().unwrap();
             assert!(
