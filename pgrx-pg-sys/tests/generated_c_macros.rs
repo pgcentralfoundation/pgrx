@@ -93,8 +93,10 @@ fn generated_field_access_preserves_raw_c_storage() {
     // before reading. The NodeTag bytes deliberately have no Rust enum variant;
     // neither allocation is materialized as a Rust Node or ListCell value.
     unsafe {
-        assert_eq!(pg::NodeSetTag!(node, u32::MAX).get(), u32::MAX);
-        assert_eq!(pg::nodeTag!(node).get(), u32::MAX);
+        // The compatible C enum integer is signed on MSVC and unsigned on other
+        // targets. Convert the expected bits to that exact inferred storage type.
+        assert_eq!(pg::NodeSetTag!(node, u32::MAX).get(), u32::MAX as _);
+        assert_eq!(pg::nodeTag!(node).get(), u32::MAX as _);
         assert_eq!(pg::NodeSetTag!(node, pg::NodeTag::T_Invalid).get(), 0);
         assert_eq!(pg::nodeTag!(node).get(), 0);
         core::ptr::addr_of_mut!((*cell).int_value).write(-17);

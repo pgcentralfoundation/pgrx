@@ -8,8 +8,7 @@
 //! invocation short-circuits before calling them. Its complete expansion still
 //! needs the backend's symbols at link/load time, so these integration checks
 //! belong in the extension test harness rather than a standalone test binary.
-//! The availability classifier follows the selected build's actual emitted API;
-//! Windows profiles currently do not generate C macro definitions.
+//! The availability classifier follows the selected build's actual emitted API.
 
 #![cfg(not(target_os = "windows"))]
 #![deny(unsafe_op_in_unsafe_fn)]

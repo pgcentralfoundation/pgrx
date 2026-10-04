@@ -29,6 +29,8 @@ mod enum_type_tests;
 mod fcinfo_tests;
 mod fn_call_tests;
 mod from_into_datum_tests;
+/// Exercise byte-order macros across builtin and guarded native C definitions.
+mod generated_c_builtin_tests;
 /// Exercise generated macros whose complete expansions reference PostgreSQL backend symbols.
 mod generated_c_macro_tests;
 mod geo_tests;

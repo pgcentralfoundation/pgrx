@@ -526,7 +526,11 @@ fn generated_event_trigger_context_check_uses_the_closed_pasted_node_tag() {
 fn time_value(ticks: i64) -> pg::instr_time {
     #[cfg(feature = "pg15")]
     {
-        pg::instr_time { tv_sec: ticks / 1_000_000_000, tv_nsec: ticks % 1_000_000_000 }
+        // Match the original C recorder's assignments to this target's time_t and long.
+        pg::instr_time {
+            tv_sec: (ticks / 1_000_000_000) as _,
+            tv_nsec: (ticks % 1_000_000_000) as _,
+        }
     }
     #[cfg(not(feature = "pg15"))]
     {
