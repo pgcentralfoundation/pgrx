@@ -435,6 +435,16 @@ pub struct MacroSupportArtifact {
     pub c_source: String,
 }
 
+/// Emit only an all-unavailable classifier when authoritative C inspection cannot run.
+///
+/// Include this source in the defining crate just as normal generated support. Callers can
+/// use `__pgrx_c_classify!(@if_available NAME { ... })` uniformly, but no queried body is
+/// emitted. This requires no compiler profile, binding catalog, runtime helpers or native code.
+pub fn emit_unavailable_macro_support() -> String {
+    arguments::shared(&BTreeSet::new(), false)
+        .expect("an empty export set contains no invalid identifiers and fits the output bound")
+}
+
 /// One preparation supplies both the macros and their shared native capabilities.
 #[derive(Clone, Debug)]
 pub struct MacroGeneration {
@@ -528,16 +538,15 @@ fn render_adapters(
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
         .filter_map(|emission| macro_identifier(&emission.analysis.name))
         .collect::<BTreeSet<_>>();
-    if macros.iter().any(|emission| {
+    let operands = macros.iter().any(|emission| {
         matches!(emission.status, EmissionStatus::Emitted { .. })
             && emission
                 .analysis
                 .parameters
                 .iter()
                 .any(|parameter| parameter.roles.contains(&crate::ParameterRole::Value))
-    }) {
-        rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports)?)?);
-    }
+    });
+    rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports, operands)?)?);
     if !adapters.fields.markers.is_empty() {
         rust.push_str(&crate::format_rust_macros(&field_registry(&adapters.fields.markers)?)?);
     }

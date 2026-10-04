@@ -1232,10 +1232,14 @@ so a missing file does not make every build dirty and its later creation is
 still detected.
 
 Unavailable inspection paths, including the existing Windows/pre-generated
-target-info integration cases, produce an explicit unavailable report and an
-empty compilable macro index. The discovery library's ability to inspect some
-targets does not imply that the current runtime supports their ABI. The runtime
-gate requires signed-char LP64, 64-bit pointers, C unsigned-long `size_t`, the
+target-info integration cases, produce an explicit unavailable report and a
+compilable macro index whose classifier answers every availability query as absent.
+Every normal artifact also includes the classifier, even when every candidate was
+skipped or the successful macros take no value operands. Operand adapters are
+retained only when successful macros need them; availability needs no C ABI facts.
+The discovery library's ability to inspect some targets does not imply that the
+current runtime supports their ABI. The runtime gate requires signed-char LP64,
+64-bit pointers, C unsigned-long `size_t`, the
 verified integer table, little endian, and a recognized Rust architecture/OS
 guard; LLP64 Windows is outside it.
 

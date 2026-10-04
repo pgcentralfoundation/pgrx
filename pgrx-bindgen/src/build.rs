@@ -2489,13 +2489,13 @@ macro_rules! EXAMPLE {
         assert!(macro_watch_directories(&inputs, &out_dir).is_err());
     }
 
-    /// Checks that unavailable target metadata produces an empty macro file and explicit
-    /// report.
+    /// Checks that unavailable target metadata retains availability queries and an explicit
+    /// report without inventing an inspected compiler profile or publishing C definitions.
     #[test]
-    fn unavailable_target_metadata_produces_an_empty_macro_file_and_explicit_report() {
+    fn unavailable_target_metadata_retains_availability_and_explicit_report() {
         let output = MacroOutput::unavailable(18, "no matching macro target metadata").unwrap();
         assert_eq!(output.files.sources.len(), 1);
-        assert!(output.files.sources[Path::new("mod.rs")].is_empty());
+        assert_eq!(output.files.sources, MacroFiles::empty().sources);
         assert!(!output.inspected);
         assert_eq!(output.emitted, 0);
         let report: serde_json::Value = serde_json::from_slice(&output.report).unwrap();

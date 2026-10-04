@@ -35,10 +35,15 @@ pub(super) struct MacroFiles {
 
 /// Build the complete versioned output map used for both host and documentation publication.
 impl MacroFiles {
-    /// Produce a valid empty root index when C macro generation is unavailable, keeping the
-    /// include path compilable.
+    /// Keep availability queries usable when C inspection is unavailable, without publishing
+    /// C definitions, adapters, or any guessed compiler facts.
     pub(super) fn empty() -> Self {
-        Self { sources: BTreeMap::from([(PathBuf::from("mod.rs"), String::new())]) }
+        Self {
+            sources: BTreeMap::from([(
+                PathBuf::from("mod.rs"),
+                pgrx_c_macros::emit_unavailable_macro_support(),
+            )]),
+        }
     }
 
     /// Partition adapter support and group emitted macros by verified header provenance,
@@ -525,6 +530,7 @@ mod tests {
         SignedOverflow, SourceSpan,
     };
     use std::fs;
+    use std::process::Command;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
@@ -599,7 +605,52 @@ mod tests {
         let files = MacroFiles::new(String::new(), &[], Path::new("/does/not/exist")).unwrap();
         assert_eq!(files.sources.len(), 1);
         assert_eq!(files.sources[Path::new("mod.rs")], "");
-        assert_eq!(MacroFiles::empty().sources, files.sources);
+        let unavailable = MacroFiles::empty();
+        assert_eq!(unavailable.sources.len(), 1);
+        syn::parse_file(&unavailable.sources[Path::new("mod.rs")]).unwrap();
+    }
+
+    /// Prove the actual unavailable tree exports queries at the crate root through nested
+    /// inclusion, while a separate consumer never resolves unavailable item bodies.
+    #[test]
+    fn unavailable_tree_exports_availability_to_external_consumers() {
+        let fixture = Fixture::new();
+        let files = MacroFiles::empty();
+        let index = fixture.0.join("mod.rs");
+        fs::write(&index, &files.sources[Path::new("mod.rs")]).unwrap();
+        let library = fixture.0.join("library.rs");
+        fs::write(&library, format!("mod cmacros {{ mod pg18 {{ include!({index:?}); }} }}\n"))
+            .unwrap();
+        let metadata = fixture.0.join("libavailability.rmeta");
+        let output = Command::new("rustc")
+            .args([
+                "--edition=2024",
+                "--crate-type=rlib",
+                "--crate-name=availability",
+                "--emit=metadata",
+                "-Dwarnings",
+            ])
+            .arg(&library)
+            .arg("-o")
+            .arg(&metadata)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+        let consumer = fixture.0.join("consumer.rs");
+        fs::write(
+            &consumer,
+            "extern crate availability as pg;\npg::__pgrx_c_classify!(@if_available CHECK_FOR_INTERRUPTS { compile_error!(\"unavailable items escaped\"); missing::function(); });\npg::__pgrx_c_classify!(@if_available PageSetPrunable { compile_error!(\"unavailable items escaped\"); });\nfn main() {}\n",
+        )
+        .unwrap();
+        let output = Command::new("rustc")
+            .args(["--edition=2024", "--emit=metadata", "-Dwarnings", "--extern"])
+            .arg(format!("availability={}", metadata.display()))
+            .arg(&consumer)
+            .arg("-o")
+            .arg(fixture.0.join("consumer.rmeta"))
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
     }
 
     /// Checks that equal header basenames remain in separate provenance-derived modules.

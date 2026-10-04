@@ -261,14 +261,15 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
     Ok(Some(ArgumentAdapter { normalizer, rust }))
 }
 
-/// One export classifier for the entire generated artifact, rather than one per macro.
-/// Names are the actual Rust exports, including mappings for reserved C identifiers.
-pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
+/// Always describe the actual exports, retaining operand normalization only when an emitted
+/// macro needs it. Empty artifacts still answer availability queries without any C type facts.
+pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<String, String> {
     // Only a complete dereference of a named operand gets the qualifier-aware
     // descriptor. Borrowing that name cannot drop an owner temporary before the
     // outer projection; arbitrary expressions keep their original Rust scope.
-    let mut rust = format!(
-        "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_classify {{\n\
+    let mut rust = if operands {
+        format!(
+            "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_classify {{\n\
          (@argument [$callback:ident] $state:tt [$($original:tt)*]) => {{ $crate::__pgrx_c_classify!(@walk [$callback] $state [$($original)*] [{}]; [$($original)*]) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt [@ $($budget:tt)*]; [($($inner:tt)*)]) => {{ $crate::__pgrx_c_classify!(@walk [$callback] $state $original [$($budget)*]; [$($inner)*]) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [@__pgrx_c_native [$expression:expr]]) => {{ $crate::$callback!(@classified $state (@native [$expression])) }};\n\
@@ -282,23 +283,35 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
          (@walk [$callback:ident] $state:tt [$($original:tt)*] []; [$($raw:tt)*]) => {{ compile_error!(\"C macro argument exceeds the 64-group normalization bound\") }};\n\
          (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [$($raw:tt)*]) => {{ $crate::$callback!(@classified $state (@native [$($original)*])) }};\n\
          (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt [@ $($budget:tt)*]; $head:ident :: $($tail:tt)+) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original $path $group [$($budget)*]; $($tail)+) }};\n",
-        "@ ".repeat(TOKEN_BUDGET)
-    );
+            "@ ".repeat(TOKEN_BUDGET)
+        )
+    } else {
+        "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_classify {\n".into()
+    };
     for name in exports {
         if super::rust_identifier(name.strip_prefix("r#").unwrap_or(name)).as_deref() != Some(name)
         {
             return Err(format!("{name}: invalid generated Rust macro export"));
         }
-        writeln!(rust, "(@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; {name}) => {{ $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group) }};").expect("String output");
+        if operands {
+            writeln!(rust, "(@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; {name}) => {{ $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group) }};").expect("String output");
+        }
         writeln!(rust, "(@if_available {name} {{ $($items:tt)* }}) => {{ $($items)* }};")
             .expect("String output");
         if rust.len() > MAX_EMISSION_BYTES {
             return Err("generated macro export classifier exceeds the output bound".into());
         }
     }
+    rust.push_str("(@if_available $unknown:ident { $($items:tt)* }) => {};\n");
+    if !operands {
+        rust.push_str("}\n");
+        if rust.len() > MAX_EMISSION_BYTES {
+            return Err("generated macro export classifier exceeds the output bound".into());
+        }
+        return Ok(rust);
+    }
     rust.push_str(
-        "(@if_available $unknown:ident { $($items:tt)* }) => {};\n\
-         (@path [$callback:ident] $state:tt [$($original:tt)*] $path:tt $group:tt $budget:tt; $last:ident) => { $crate::$callback!(@classified $state (@native [$($original)*])) };\n\
+        "(@path [$callback:ident] $state:tt [$($original:tt)*] $path:tt $group:tt $budget:tt; $last:ident) => { $crate::$callback!(@classified $state (@native [$($original)*])) };\n\
          (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt []; $($raw:tt)+) => { compile_error!(\"C macro path exceeds the 64-component normalization bound\") };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; ($($inner:tt)*)) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; [$($inner:tt)*]) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
@@ -355,4 +368,21 @@ pub(super) fn render_operand(
     };
     write!(rust, "$crate::__pgrx_c_operand!({mode}; ${})", name(analysis, parameter))
         .expect("String output");
+}
+
+/// Check availability-only support's completed output bound without invoking a compiler.
+///
+/// The small classifier must obey the same publication budget as operand support, including
+/// fallback syntax appended after the last successful-name arm.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Prove fallback arms cannot make an otherwise bounded export list exceed its limit.
+    #[test]
+    fn availability_fallback_is_included_in_the_output_bound() {
+        let fixed_bytes = shared(&BTreeSet::from(["A".into()]), false).unwrap().len() - 1;
+        let exports = BTreeSet::from(["A".repeat(MAX_EMISSION_BYTES - fixed_bytes + 1)]);
+        assert!(shared(&exports, false).unwrap_err().contains("exceeds the output bound"));
+    }
 }

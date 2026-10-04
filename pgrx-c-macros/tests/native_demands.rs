@@ -1734,7 +1734,7 @@ int main(void) {
     assert!(matches!(rejected.macros[0].status, EmissionStatus::Emitted { .. }));
     assert!(matches!(rejected.macros[1].status, EmissionStatus::Skipped { .. }));
     assert!(
-        rejected.support.rust.is_empty(),
+        !rejected.support.rust.contains("__pgrx_c_generated"),
         "a rejected root must not retain native capabilities"
     );
     assert!(rejected.support.c_source.is_empty());
