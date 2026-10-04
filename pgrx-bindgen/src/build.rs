@@ -1051,6 +1051,10 @@ fn build_shim(
     if compiler.is_like_msvc() {
         build.flag("/Gy");
         build.flag("/Gw");
+        // PostgreSQL 19 headers require C11; MSVC defaults to an older C dialect.
+        if major_version >= 19 {
+            build.flag("/std:c11");
+        }
     }
     for pg_target_include in pg_target_includes(major_version, pg_config)?.iter() {
         build.flag(format!("-I{pg_target_include}"));
