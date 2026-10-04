@@ -2,12 +2,24 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check the registration boundary between enum identity and numeric storage.
+//!
+//! Standalone consumer compilation exercises coexistence with legacy wrappers,
+//! exact pointer compatibility, and rejection of wrong ranks or duplicate impls.
+//! Identical integer representations must not merge distinct C identities.
+
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Assemble emitted macro definitions for the consumer, failing the test if an expected
+/// candidate is skipped.
 fn source(body: &str) -> String {
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -18,6 +30,8 @@ fn source(body: &str) -> String {
     )
 }
 
+/// Fixture enum identities and storage declarations used to check nominal registration
+/// boundaries.
 const IDENTITIES: &str = r#"
 use __pgrx_c_macros as c;
 use __pgrx_c_macros::{CUnsignedInt, CUnsignedLong, CUnsignedLongLong, CLong};
@@ -56,6 +70,7 @@ unsafe impl EnumStorage<Legacy, CUnsignedInt> for u32 {
 }
 "#;
 
+/// Checks that numeric registration coexists with checked and legacy storage.
 #[test]
 fn numeric_registration_coexists_with_checked_and_legacy_storage() {
     let output = rust_oracle::run_rust(&source(
@@ -73,6 +88,7 @@ fn numeric_registration_coexists_with_checked_and_legacy_storage() {
     assert!(output.is_empty());
 }
 
+/// Checks that numeric registration rejects other ranks storage and identity pairs.
 #[test]
 fn numeric_registration_rejects_other_ranks_storage_and_identity_pairs() {
     for expression in [
@@ -88,6 +104,8 @@ fn numeric_registration_rejects_other_ranks_storage_and_identity_pairs() {
     }
 }
 
+/// Checks that numeric registration shares exact pointer compatibility without merging
+/// identities.
 #[test]
 fn numeric_registration_shares_exact_pointer_compatibility_without_merging_identities() {
     let output = rust_oracle::run_rust(&source(
@@ -128,6 +146,8 @@ fn numeric_registration_shares_exact_pointer_compatibility_without_merging_ident
     assert!(output.is_empty());
 }
 
+/// Checks that numeric pointer compatibility rejects wrong kind rank and unregistered
+/// identities.
 #[test]
 fn numeric_pointer_compatibility_rejects_wrong_kind_rank_and_unregistered_identities() {
     for (left, right) in [
@@ -147,6 +167,7 @@ fn numeric_pointer_compatibility_rejects_wrong_kind_rank_and_unregistered_identi
     }
 }
 
+/// Checks that registered pointer compatibility rejects duplicate implementations.
 #[test]
 fn registered_pointer_compatibility_rejects_duplicate_implementations() {
     for implementation in [

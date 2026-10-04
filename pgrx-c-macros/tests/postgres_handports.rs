@@ -2,18 +2,35 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Use existing port names to choose C-oracle coverage, not expected behavior.
+//!
+//! The test discovers handwritten pgrx function names and compares every emittable
+//! counterpart across configured PostgreSQL versions with the original C macro.
+//! This catches mistakes in either implementation without blessing an old port.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, PostgresConfig, SignedOverflow,
     generate_with_bindings,
 };
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::BTreeSet;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Representative macro families used alongside discovered handport names for
+/// original-PostgreSQL oracle coverage.
 const TRIGGERS: &[&str] = &[
     "TRIGGER_FIRED_BY_INSERT",
     "TRIGGER_FIRED_BY_DELETE",
@@ -27,6 +44,8 @@ const TRIGGERS: &[&str] = &[
 ];
 
 // Names establish coverage only. No Rust body, type, or result is an oracle.
+/// Discover the old port names as a coverage selection only; their implementations do not
+/// determine expected results.
 fn handwritten_function_names() -> BTreeSet<String> {
     [
         include_str!("../../pgrx-pg-sys/src/port.rs"),
@@ -46,6 +65,7 @@ fn handwritten_function_names() -> BTreeSet<String> {
     .collect()
 }
 
+/// Checks that every emittable handport matches each original PostgreSQL version.
 #[test]
 #[ignore = "requires configured native PostgreSQL 15 through 19 installations"]
 fn every_emittable_handport_matches_each_original_postgres_version() {

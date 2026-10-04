@@ -3,22 +3,41 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Function addresses come from the original C declaration, including statics.
+//!
+//! Taking an address is distinct from calling a binding or its Rust guard wrapper.
+//! This pass emits same-profile C getters for the original function, including
+//! internal declarations with available definitions, and verifies the callback ABI
+//! before exposing a tagged Rust function value.
 
+/// Resolve callback storage using the same compiler/binding reconciliation as callable adapters.
 use super::types::Lowering;
+/// Require compiler linkage and callback identity facts before generating original-function getters.
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionAddressBinding, TargetFacts,
 };
+/// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
 use sha2::{Digest, Sha256};
+/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Original-function address getters and their verified macro-facing bindings.
 pub(super) struct AddressAdapters {
+    /// Rust getters returning tagged callback values without making native calls through them.
     pub rust: String,
+    /// C getters that return the compiler’s original function addresses under the selected profile.
     pub c_source: String,
+    /// Successful getters indexed by the source C function name.
     pub bindings: BTreeMap<String, FunctionAddressBinding>,
+    /// Linkage, identifier, or callback ABI failures retained for diagnostics.
     pub unsupported: BTreeMap<String, String>,
 }
 
+/// Generate requested address getters only after proving linkage, definition availability, and callback ABI.
+///
+/// The profile and signature salt keeps symbols distinct across installations;
+/// parenthesized C identifiers avoid invoking same-named function-like macros.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,

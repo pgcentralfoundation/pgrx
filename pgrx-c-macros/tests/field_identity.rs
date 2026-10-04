@@ -2,32 +2,61 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test field capability identity across generation and crate boundaries.
+//!
+//! The suite resolves identities from actual emitted selectors rather than
+//! reimplementing their allocation. Selection, skips, keyword fields, and foreign
+//! impl rejection ensure a field's spelling cannot impersonate another owner.
+
 #![cfg(all(target_pointer_width = "64", not(target_os = "windows")))]
 
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroGeneration, MacroScanner, generate_with_bindings, inspect,
 };
+/// Inspect token structure and spacing needed to distinguish preserved macro semantics from
+/// formatting changes.
 use proc_macro2::{Delimiter, TokenTree};
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::{BTreeMap, BTreeSet};
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::Command;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "IDENTITY_READ",
     "IDENTITY_WRITE",
@@ -43,6 +72,8 @@ const NAMES: &[&str] = &[
 
 // Read the actual emitted token routes. The test deliberately does not reproduce
 // the private registry's ID allocation or derive IDs from the fixture's names.
+/// Read actual emitted field selector routes so the test never guesses the generator's identity
+/// allocation.
 fn field_routes(source: &str) -> BTreeMap<String, String> {
     let file = syn::parse_file(source).unwrap();
     let registry = file
@@ -86,6 +117,7 @@ fn field_routes(source: &str) -> BTreeMap<String, String> {
     routes
 }
 
+/// Resolve a selector's nominal marker and require it to live in the defining generated module.
 fn local_marker(route: &str) -> String {
     let tokens = route.parse::<proc_macro2::TokenStream>().unwrap().into_iter().collect::<Vec<_>>();
     let [TokenTree::Punct(dollar), TokenTree::Ident(root), ..] = tokens.as_slice() else {
@@ -103,6 +135,8 @@ fn local_marker(route: &str) -> String {
     path.segments.last().unwrap().ident.to_string()
 }
 
+/// Collect the fixture's successful macro definitions while asserting that intentionally
+/// unsupported peers remain explained skips.
 fn definitions(generation: &MacroGeneration) -> String {
     let mut rust = String::new();
     for emission in &generation.macros {
@@ -117,6 +151,7 @@ fn definitions(generation: &MacroGeneration) -> String {
     rust
 }
 
+/// Checks that local field identities survive selection skips and cross crate expansion.
 #[test]
 fn local_field_identities_survive_selection_skips_and_cross_crate_expansion() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -368,6 +403,8 @@ fn main() {{
 // not attempt third-party NativeRecord registration: that private registration
 // remains in the complete defining library tested above. Every generated field,
 // bitfield and offset implementation and eager layout/type witness is retained.
+/// Compile attempted downstream field implementations and require sealing and identity checks
+/// to reject them.
 fn verify_foreign_runtime_field_impls(
     directory: &TemporaryDirectory,
     library: &Path,
@@ -427,6 +464,7 @@ fn main() {{}}
     );
 }
 
+/// Rust observation calls covering field identity through public generated capabilities.
 const RUST_OBSERVATIONS: &str = r#"
 fn main() {
     let mut ordinary = core::mem::MaybeUninit::<IdentityOrdinary>::zeroed();
@@ -450,6 +488,7 @@ fn main() {
 }
 "#;
 
+/// Independent C observation calls covering the same field identity operations.
 const C_OBSERVATIONS: &str = r#"
 #include <stdio.h>
 int main(void) {
@@ -464,8 +503,17 @@ int main(void) {
 }
 "#;
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let path = std::env::temp_dir()
@@ -474,7 +522,10 @@ impl TemporaryDirectory {
         Self(path)
     }
 }
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

@@ -2,25 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Guard semantic behavior while simplifying emitted macro entry points.
+//!
+//! Public forwarding and shared bodies must preserve invocation contexts, explicit
+//! captures, repetitions, and statement side effects. Original C observations and
+//! invalid consumer cases ensure readability changes do not broaden the contract.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, ParameterOrigin, ParameterRole,
     generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "CLEAN_EXPR_ZERO",
     "CLEAN_EXPR_BOUNDARY",
@@ -37,11 +56,14 @@ const NAMES: &[&str] = &[
     "CLEAN_RETURN_ALIAS",
     "CLEAN_RETURN_IF",
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int cleanup_calls;
 void cleanup_tick(void) { cleanup_calls++; }
 unsigned int cleanup_value(void) { cleanup_calls++; return cleanup_calls; }
 "#;
+/// Original C recorder source whose header invocations establish expected semantic
+/// observations.
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 static unsigned char zero_result(void) { CLEAN_RETURN_ZERO(); return 99; }
@@ -71,6 +93,7 @@ int main(void) {
     }
 }
 "#;
+/// Rust consumer source exercising actual generated macros and adapters.
 const CONSUMER: &str = r#"
 fn zero_result() -> u8 { CLEAN_RETURN_ZERO!(); 99 }
 fn alias_result() -> u8 {
@@ -128,6 +151,8 @@ fn main() {
 }
 "#;
 
+/// Require an illegal grouped invocation to fail in both the original C and emitted Rust
+/// consumers.
 fn reject_group(rust: &str, invocations: &[String], message: &str) {
     let diagnostic = rust_oracle::reject_rust(&format!(
         "{rust}\nfn main() {{ {} }}",
@@ -143,6 +168,7 @@ fn reject_group(rust: &str, invocations: &[String], message: &str) {
     );
 }
 
+/// Checks that emission cleanup preserves invocation contexts captures and statement effects.
 #[test]
 fn emission_cleanup_preserves_invocation_contexts_captures_and_statement_effects() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

@@ -2,21 +2,40 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Verify readable integer spelling without changing C literal typing.
+//!
+//! The oracle compares emitted literals with the original C tokens across radices,
+//! suffixes, and C23 binary syntax. Keeping the header's digits must preserve its
+//! compiler-selected rank and signedness rather than relying on Rust inference.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, FrontendOutput, MacroScanner,
     emit, emit_support_artifact_with_bindings, inspect,
 };
+/// Append complete paired source and observation records without ad hoc string replacement.
 use std::fmt::Write;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Integer literal spellings and expected Rust storage used to check readable emission without
+/// losing C typing.
 const INTEGER_CASES: &[(&str, &str)] = &[
     ("INTEGER_HEX_MAX", "0xFFFFFFFFu"),
     ("INTEGER_DECIMAL_SAME_VALUE", "4294967295i"),
@@ -37,16 +56,21 @@ const INTEGER_CASES: &[(&str, &str)] = &[
     ("INTEGER_DECIMAL_NEGATIVE", "2147483648i"),
     ("INTEGER_HEX_NEGATIVE", "0x00aFi"),
 ];
+/// C23 binary literal spellings checked under a profile that actually accepts that syntax.
 const BINARY_CASES: &[(&str, &str)] = &[
     ("INTEGER_BINARY", "0b00110101i"),
     ("INTEGER_BINARY_UPPER_PREFIX", "0b00110101u"),
     ("INTEGER_BINARY_MAX", "0b1111111111111111111111111111111111111111111111111111111111111111u"),
 ];
 
+/// Return the original fixture header whose preprocessing and C definitions supply this test's
+/// semantics.
 fn header() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/integer_literals.h")
 }
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments(standard: &str) -> Vec<String> {
     let arguments = vec![format!("-std={standard}")];
     #[cfg(target_os = "macos")]
@@ -70,6 +94,8 @@ fn arguments(standard: &str) -> Vec<String> {
     }
 }
 
+/// Check preserved literal spelling and compare execution with C under the same selected
+/// language profile.
 fn compare_literals(scanner: &MacroScanner, frontend: &FrontendOutput, cases: &[(&str, &str)]) {
     let names = cases.iter().map(|&(name, _)| name).collect::<Vec<_>>();
     let session = AnalysisSession::prepare(scanner, frontend, &names).unwrap();
@@ -144,6 +170,7 @@ int main(void) {
     assert_eq!(generated, original, "original C and generated Rust literal types and values");
 }
 
+/// Checks that integer literals keep radix digits and C types against original c.
 #[test]
 fn integer_literals_keep_radix_digits_and_c_types_against_original_c() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -152,6 +179,7 @@ fn integer_literals_keep_radix_digits_and_c_types_against_original_c() {
     compare_literals(&scanner, &frontend, INTEGER_CASES);
 }
 
+/// Checks that binary literals keep digits and C types under c23.
 #[test]
 fn binary_literals_keep_digits_and_c_types_under_c23() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

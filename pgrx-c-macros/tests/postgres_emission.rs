@@ -2,14 +2,28 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare emitted PostgreSQL scalar macros with their installed C definitions.
+//!
+//! The configured installation supplies headers, flags, and compiler facts. A
+//! standalone Rust consumer and an original-header C oracle record types, values,
+//! and operand counts; checked-in bindings and handwritten ports supply no truth.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{AnalysisSession, EmissionStatus, MacroScanner, PostgresConfig, emit};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Checks that generated PostgreSQL 18 macros match original C types values and occurrences.
 #[test]
 #[ignore = "requires a configured native PostgreSQL 18 installation"]
 fn generated_postgres_18_macros_match_original_c_types_values_and_occurrences() {

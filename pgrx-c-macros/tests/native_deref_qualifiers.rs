@@ -2,27 +2,50 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check native dereference owner types and nested C qualifiers.
+//!
+//! A temporary header isolates const and volatile pointer shapes. Original C and
+//! Rust observations, plus rejected consumers, ensure alias resolution and cast
+//! precedence do not strip qualification at a deeper pointer level.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, generate_with_bindings, inspect,
 };
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Synthetic C source inspected as an original header, keeping this test's semantic input
+/// explicit.
 const HEADER: &str = r#"
 typedef struct DerefState { int scalar; int values[2]; } DerefState;
 typedef struct DerefConstState { int scalar; const int values[2]; } DerefConstState;
@@ -31,9 +54,18 @@ typedef struct DerefConstState { int scalar; const int values[2]; } DerefConstSt
 #define DEREF_ADD(value) ((value) + 3)
 "#;
 
-struct TemporaryHeader(PathBuf);
+/// Own a synthetic header and its temporary directory so profile-sensitive generation has an
+/// isolated source of C facts.
+struct TemporaryHeader(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Write an owned synthetic header whose source and compiler inputs can be varied
+/// independently.
 impl TemporaryHeader {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let directory =
@@ -45,13 +77,17 @@ impl TemporaryHeader {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryHeader {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_file(&self.0);
         let _ = fs::remove_dir(self.0.parent().expect("created header directory"));
     }
 }
 
+/// Checks that native raw dereferences preserve qualification owners and precedence.
 #[test]
 fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
     let header = TemporaryHeader::new();

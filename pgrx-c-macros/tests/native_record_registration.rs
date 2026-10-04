@@ -2,15 +2,33 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check private native record registration across crate boundaries.
+//!
+//! A producer exposes generated record input behavior to a consumer while sealing
+//! its registration trait. Valid use must compile, but downstream crates must not
+//! forge registrations that bypass the compiler-owned layout contract.
+
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::Command;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Consumer registration declarations used to exercise native record sealing and valid
+/// downstream inputs.
 const REGISTRATIONS: &str = r#"
 use __pgrx_c_macros::expression::{self, CRecord, COpaque, IntoExpression, NativeType, RecordValue};
 
@@ -40,12 +58,14 @@ impl IntoExpression for LegacyRecord {
 }
 "#;
 
+/// Consumer imports required to test registration from a separate crate.
 const IMPORTS: &str = r#"
 extern crate pgrx_record_registration_runtime as renamed;
 use renamed::{CopyRecord, LegacyRecord, NonCopyRecord, Opaque};
 use renamed::__pgrx_c_macros::{self, expression::*};
 "#;
 
+/// Checks that record registration is private but native inputs work across crates.
 #[test]
 fn record_registration_is_private_but_native_inputs_work_across_crates() {
     let directory = TemporaryDirectory::new();
@@ -152,9 +172,18 @@ fn main() {{
     }
 }
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let path = std::env::temp_dir()
@@ -164,7 +193,10 @@ impl TemporaryDirectory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

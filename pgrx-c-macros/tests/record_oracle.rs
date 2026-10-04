@@ -1,27 +1,48 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate compiler-anchored record places and raw storage contexts.
+//!
+//! Record identity, field layout, arrays, and pointer operations are compared with
+//! C while leaving unrelated fields uninitialized. The consumer must never create
+//! a Rust record merely to access one valid C field.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, inspect,
 };
+/// Render parsed fixture syntax for the independent generated consumer without rewriting
+/// semantic declarations.
 use quote::ToTokens;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "RECORD_HEADER",
     "RECORD_BYTE",
@@ -55,6 +76,7 @@ const NAMES: &[&str] = &[
     "RECORD_VOLATILE_ASSIGNMENT_SIZE",
 ];
 
+/// Checks that compiler anchored record places match C without reading uninitialized fields.
 #[test]
 fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields() {
     let scanner = MacroScanner::new().expect("libclang must be available");

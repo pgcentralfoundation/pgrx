@@ -4,23 +4,46 @@
 
 //! Retain source-level null-constant identity without folding generated operations.
 
+//! A C integer constant expression equal to zero has null-pointer semantics that a runtime
+//! integer of value zero does not share. This phase finds maximal pure source subtrees and
+//! asks both Clang paths to prove their constant identity. Proven node IDs travel with the
+//! session into emission; native loads, caller operands, and side effects do not acquire this
+//! source-level identity by numerical coincidence.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{FrontendError, driver_arguments, run_compiler_with_input};
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{AnalysisSession, ExpressionKind, MacroScanner, NodeId, TypeCategory, TypeExpression};
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
+/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
 
+/// Bound declaration or expression candidates before constructing a compiler proof batch.
 const MAX_CANDIDATES: usize = 16_384;
+/// Bound one constructed probe source before invoking Clang or allocating additional instrumentation.
 const MAX_SOURCE_BYTES: usize = 1024 * 1024;
+/// Bound copied maximal-subtree source across the zero-constant batch, not just one compiler
+/// invocation.
 const MAX_TOTAL_SOURCE_BYTES: usize = 8 * 1024 * 1024;
+/// Bound compiler-pass isolation work for candidate-specific failures.
 const MAX_PROBE_RUNS: usize = 64;
 
+/// A maximal pure source subtree and its equivalent node occurrences awaiting zero-constant proof.
 struct Candidate {
+    /// Owning expanded macro whose proven zero-constant nodes are recorded in the session.
     macro_name: String,
+    /// Equivalent arena nodes associated with one copied maximal pure source expression.
     nodes: Vec<NodeId>,
+    /// Copied maximal pure C source subtree checked for integer-constant-expression identity.
     expression: String,
 }
 
+/// Prove pure source subtrees are zero-valued C integer constant expressions and record their node
+/// identities.
 pub(crate) fn probe(
     scanner: &MacroScanner,
     session: &AnalysisSession<'_>,
@@ -213,6 +236,8 @@ pub(crate) fn probe(
     Ok(result)
 }
 
+/// Generate bounded zero-constant witnesses without evaluating macro arguments or stored native
+/// values.
 fn source(
     session: &AnalysisSession<'_>,
     candidates: &[Candidate],
@@ -244,6 +269,8 @@ fn source(
     Ok(source)
 }
 
+/// Require driver and libclang agreement on the null-constant witnesses before admitting their source
+/// nodes.
 fn collect(
     scanner: &MacroScanner,
     session: &AnalysisSession<'_>,

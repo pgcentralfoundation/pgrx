@@ -2,14 +2,23 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test compiler builtin macros through the selected pgrx-pg-sys exports.
+//!
+//! Public invocations cover byte swaps and their C integer results using the
+//! actual build's generated support, ensuring integration agrees with the
+//! standalone oracle coverage.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 // Evaluated through port/pg_bswap.h from the installed PostgreSQL headers under
 // the compiler and flags recorded in this build's OUT_DIR macro report. The
 // standalone C oracle calls no backend; these values do not come from pgrx ports.
+/// Original-header byte-swap boundary vectors for this width, including endian-sensitive high
+/// bits.
 const CASES16: &[(u16, u16)] = &[
     (0x0000, 0x0000),
     (0x0001, 0x0100),
@@ -18,6 +27,8 @@ const CASES16: &[(u16, u16)] = &[
     (0x8000, 0x0080),
     (0x1234, 0x3412),
 ];
+/// Original-header byte-swap boundary vectors for this width, including endian-sensitive high
+/// bits.
 const CASES32: &[(u32, u32)] = &[
     (0x00000000, 0x00000000),
     (0x00000001, 0x01000000),
@@ -26,6 +37,8 @@ const CASES32: &[(u32, u32)] = &[
     (0x80000000, 0x00000080),
     (0x01234567, 0x67452301),
 ];
+/// Original-header byte-swap boundary vectors for this width, including endian-sensitive high
+/// bits.
 const CASES64: &[(u64, u64)] = &[
     (0x0000000000000000, 0x0000000000000000),
     (0x0000000000000001, 0x0100000000000000),
@@ -38,6 +51,7 @@ const CASES64: &[(u64, u64)] = &[
 // Profiles using PostgreSQL's static-inline fallback have no function-style
 // macro to generate. Execute each API only when this build emitted that macro.
 pg::__pgrx_c_classify! { @if_available pg_bswap16 {
+/// Checks that generated swap16 matches original C and evaluates its operand once.
 #[test]
 fn generated_swap16_matches_original_c_and_evaluates_its_operand_once() {
     for &(input, expected) in CASES16 {
@@ -49,6 +63,7 @@ fn generated_swap16_matches_original_c_and_evaluates_its_operand_once() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pg_bswap32 {
+/// Checks that generated swap32 matches original C and evaluates its operand once.
 #[test]
 fn generated_swap32_matches_original_c_and_evaluates_its_operand_once() {
     for &(input, expected) in CASES32 {
@@ -60,6 +75,7 @@ fn generated_swap32_matches_original_c_and_evaluates_its_operand_once() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pg_bswap64 {
+/// Checks that generated swap64 matches original C and retains an explicit C input identity.
 #[test]
 fn generated_swap64_matches_original_c_and_retains_an_explicit_c_input_identity() {
     for &(input, expected) in CASES64 {
@@ -75,6 +91,7 @@ fn generated_swap64_matches_original_c_and_retains_an_explicit_c_input_identity(
 
 pg::__pgrx_c_classify! { @if_available pg_hton16 {
 pg::__pgrx_c_classify! { @if_available pg_ntoh16 {
+/// Checks that generated network16 wrappers match C and invert each other.
 #[test]
 fn generated_network16_wrappers_match_c_and_invert_each_other() {
     for &(input, reversed) in CASES16 {
@@ -88,6 +105,7 @@ fn generated_network16_wrappers_match_c_and_invert_each_other() {
 } }
 pg::__pgrx_c_classify! { @if_available pg_hton32 {
 pg::__pgrx_c_classify! { @if_available pg_ntoh32 {
+/// Checks that generated network32 wrappers match C and invert each other.
 #[test]
 fn generated_network32_wrappers_match_c_and_invert_each_other() {
     for &(input, reversed) in CASES32 {
@@ -101,6 +119,7 @@ fn generated_network32_wrappers_match_c_and_invert_each_other() {
 } }
 pg::__pgrx_c_classify! { @if_available pg_hton64 {
 pg::__pgrx_c_classify! { @if_available pg_ntoh64 {
+/// Checks that generated network64 wrappers match C and invert each other.
 #[test]
 fn generated_network64_wrappers_match_c_and_invert_each_other() {
     for &(input, reversed) in CASES64 {
@@ -129,6 +148,7 @@ unsafe fn generated_datum_endian_conversion_requires_backend(value: pg::Datum) -
     // helper dereferences it, invokes a callback, allocates, or raises ERROR.
     unsafe { pg::DatumBigEndianToNative!(value).get() }
 }
+/// Checks that generated datum endian conversion matches original C scalar vectors.
 #[cfg(all(target_pointer_width="64",not(feature="pg19")))]
 #[test]
 fn generated_datum_endian_conversion_matches_original_c_scalar_vectors() {
@@ -138,6 +158,7 @@ fn generated_datum_endian_conversion_matches_original_c_scalar_vectors() {
         assert_eq!(pg::DatumBigEndianToNative!(pg::Datum::from(input)).get(),expected);
     }
 }
+/// Checks that generated datum endian conversion matches original C scalar vectors.
 #[cfg(all(target_pointer_width="32",not(feature="pg19")))]
 #[test]
 fn generated_datum_endian_conversion_matches_original_c_scalar_vectors() {

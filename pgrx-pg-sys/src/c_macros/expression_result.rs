@@ -2,59 +2,93 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Evaluated public macro results retain their C identity behind one Rust type.
+//! Keep evaluated macro results usable at the public Rust call boundary.
+//!
+//! A common outer `CExpression` wrapper lets unsuffixed integer inputs use Rust's
+//! fallback inference even when C conditional conversion selects a result kind.
+//! The wrapped value keeps its C identity for further macro composition; native
+//! extraction is explicit and never repeats operand evaluation. Return helpers
+//! apply C assignment conversion before extraction, including pointer qualifier
+//! and source-proved null-constant rules.
 
+/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::{CInteger, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native;
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<K: CInteger> NativeResult for CValue<K> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = K::Repr;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<M: CType, Q: Qualifier> NativeResult for Pointer<M, Q> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = Q::Raw<M::Storage>;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<F: FloatType> NativeResult for FloatValue<F> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = F::Storage;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<R: Copy> NativeResult for RecordValue<R> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = R;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<R> NativeResult for RawRecordValue<R> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = core::mem::MaybeUninit<R>;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<S: FunctionSignature> NativeResult for FunctionValue<S> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = S::Pointer;
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl<M: CType<Storage: Copy>, const N: usize> NativeResult for ArrayValue<M, N> {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = [M::Storage; N];
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) -> Self::Native {
         self.get()
     }
 }
+/// Extract this evaluated value family's native storage at the public Rust macro boundary.
 impl NativeResult for () {
+    /// Native extraction type exposed by the public evaluated-result wrapper.
     type Native = ();
+    /// Extract the family's native representation at an explicit public macro result boundary.
     fn native(self) {}
 }
 
@@ -65,30 +99,45 @@ impl NativeResult for () {
 /// This wrapper carries neither a place nor a deferred load, and makes no FFI
 /// ABI promise. `into_value` preserves the exact tagged C identity.
 #[derive(Clone, Copy)]
-pub struct CExpression<V: CExprValue>(V);
+pub struct CExpression<V: CExprValue>(
+    /// Hold the already evaluated C value so public extraction never repeats operand evaluation.
+    V,
+);
+/// Expose evaluated macro results while preserving inference and explicit native extraction.
 impl<V: CExprValue> CExpression<V> {
+    /// Expose the evaluated tagged C value so later operations retain its semantic identity.
     pub fn into_value(self) -> V {
         self.0
     }
 }
+/// Expose evaluated macro results while preserving inference and explicit native extraction.
 impl<V: NativeResult> CExpression<V> {
+    /// Extract the evaluated family's native storage at an explicit boundary without promising a C ABI.
     pub fn get(self) -> V::Native {
         self.0.native()
     }
 }
+/// Keep this runtime family within crate-owned C capability registration.
 impl<V: CExprValue> sealed::Sealed for CExpression<V> {}
+/// Normalize this admitted input at the public expression boundary while retaining its C family.
 impl<V: CExprValue> IntoExpression for CExpression<V> {
+    /// Evaluated C expression representation produced by this type or input conversion.
     type Value = V;
+    /// Normalize the input at an evaluated expression boundary, dropping source-only metadata where required.
     fn into_expression(self) -> V {
         self.0
     }
 }
+/// Admit this scalar input without inferring an ambiguous C rank from Rust width.
 impl<K: CInteger> IntoCValue for CExpression<CValue<K>> {
+    /// C integer identity retained by the admitted native or tagged scalar input.
     type Kind = K;
+    /// Normalize this admitted scalar input while retaining its selected C integer identity.
     fn into_c_value(self) -> CValue<K> {
         self.0
     }
 }
+/// Wrap an evaluated result at the public macro boundary so Rust inference and explicit native extraction share one outer type.
 pub fn finish<T: IntoExpression>(value: T) -> CExpression<T::Value> {
     CExpression(value.into_expression())
 }
@@ -112,11 +161,16 @@ pub fn return_value_as<M: CType, V: ImplicitTo<M>>(value: V) -> M::Storage {
     M::into_storage(implicit::<M, _>(value))
 }
 
+/// Check public result inference and C return conversion at explicit native extraction boundaries.
+/// Pointer tests retain qualification and source-proved null identity through assignment conversion.
 #[cfg(test)]
 mod tests {
+    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::super::{CInt, Either};
+    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::*;
 
+    /// Check the public result wrapper supports unsuffixed integer inference while preserving tagged conditional results.
     #[test]
     fn unsuffixed_conditional_inputs_keep_integer_fallback_and_c_identity() {
         let result = finish(select(if truth(gt(input(7), input(4))) {
@@ -129,6 +183,7 @@ mod tests {
         assert_eq!(finish(()).get(), ());
     }
 
+    /// Verify return conversion narrows integers and tests Boolean truth before native result extraction.
     #[test]
     fn returns_apply_assignment_conversion_before_native_extraction() {
         let narrowed: u8 = return_value(CValue::<CInt>::new(257));
@@ -143,6 +198,7 @@ mod tests {
         assert_eq!(explicit, u64::MAX);
     }
 
+    /// Check return assignment conversion accepts qualifier addition and source-proved null constants.
     #[test]
     fn returns_preserve_pointer_qualification_and_null_constant_identity() {
         let mut value = 7i32;

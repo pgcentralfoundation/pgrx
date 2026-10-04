@@ -2,20 +2,49 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Exercise Cargo invalidation for the integrated C macro binding build.
+//!
+//! An isolated consumer uses synthetic PostgreSQL configuration and headers, so
+//! changes to flags, optional includes, and include-path shadowing can be observed
+//! without touching a developer's installation. The test checks both emitted
+//! behavior and modification times: identical builds must reuse Cargo's result
+//! and preserve unchanged generated files.
+
 #![cfg(unix)]
 
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::BTreeMap;
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::{Command, Output};
+/// Allocate unique fixture paths or record process-local effects across concurrent test
+/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Allocate unique isolated consumer paths without sharing Cargo outputs between tests.
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
-struct Fixture(PathBuf);
+/// Own an isolated consumer or header tree whose generated artifacts can be inspected without
+/// mutating the repository.
+struct Fixture(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Construct and inspect owned fixtures without changing repository snapshots or sharing
+/// consumer build artifacts.
 impl Fixture {
+    /// Create owned fixture storage for synthetic headers and a separate Cargo target tree.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let path = std::env::temp_dir().join(format!(
@@ -27,10 +56,14 @@ impl Fixture {
         Self(path)
     }
 
+    /// Return the isolated consumer checkout, keeping generated inputs separate from the
+    /// repository.
     fn source(&self) -> PathBuf {
         self.0.join("source")
     }
 
+    /// Configure an offline consumer build with isolated headers, PGRX_HOME, target output, and
+    /// exact flag overrides.
     fn command(&self, flags: &str, env_flags: &str) -> Command {
         let mut command = Command::new("cargo");
         for (name, _) in std::env::vars_os() {
@@ -60,10 +93,13 @@ impl Fixture {
         command
     }
 
+    /// Run the isolated binding consumer with one selected pair of recorded and environment
+    /// compiler flags.
     fn build(&self, flags: &str, env_flags: &str) -> Output {
         self.command(flags, env_flags).output().expect("run the isolated binding build")
     }
 
+    /// Locate the actual generated PG18 module index in the isolated consumer's OUT_DIR.
     fn macros(&self) -> PathBuf {
         let root = self.0.join("target/debug/build");
         fs::read_dir(root)
@@ -74,11 +110,14 @@ impl Fixture {
             .expect("macro output must exist")
     }
 
+    /// Resolve the consumer's build output root from its discovered macro index.
     fn out_dir(&self) -> PathBuf {
         self.macros().ancestors().nth(3).unwrap().to_path_buf()
     }
 }
 
+/// Record generated Rust leaf modification times to detect unnecessary rewrites during an
+/// unchanged build.
 fn macro_timestamps(directory: &Path) -> BTreeMap<PathBuf, SystemTime> {
     let mut result = BTreeMap::new();
     let mut directories = vec![directory.to_path_buf()];
@@ -101,12 +140,17 @@ fn macro_timestamps(directory: &Path) -> BTreeMap<PathBuf, SystemTime> {
     result
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for Fixture {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }
 }
 
+/// Require the isolated binding build to succeed before using its stdout as observed macro
+/// behavior.
 fn successful(output: Output) -> String {
     assert!(
         output.status.success(),
@@ -116,6 +160,7 @@ fn successful(output: Output) -> String {
     String::from_utf8(output.stdout).unwrap()
 }
 
+/// Checks that generation tracks flags optional headers shadowing and unchanged builds.
 #[test]
 #[ignore = "compiles an isolated binding build repeatedly; requires native Clang and cached dependencies"]
 fn generation_tracks_flags_optional_headers_shadowing_and_unchanged_builds() {

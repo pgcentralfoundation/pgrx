@@ -1,18 +1,32 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test the explicit invocation boundary for non-atomic C substitutions.
+//!
+//! A Rust expression fragment cannot reproduce every textual C substitution.
+//! The oracle checks that unsupported argument shapes are rejected instead of
+//! inventing parentheses or evaluating a different expression at the call site.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)] // This oracle requires no native support library.
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, InvocationContract, MacroScanner,
     generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Checks that non atomic replacements require an explicit C invocation boundary.
 #[test]
 fn non_atomic_replacements_require_an_explicit_c_invocation_boundary() {
     let scanner = MacroScanner::new().expect("libclang required");

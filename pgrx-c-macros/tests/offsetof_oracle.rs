@@ -2,28 +2,48 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check offset lowering against original C layout and unevaluated operands.
+//!
+//! Compiler-derived record identity and bindgen storage constrain offsets. The
+//! oracle compares values and type identities while ensuring operand expressions
+//! are not evaluated and unsupported offset forms remain rejected.
+
 // offsetof initially requires the compiler-proven LP64 size_t identity.
 #![cfg(all(target_pointer_width = "64", not(target_os = "windows")))]
 
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, generate_with_bindings, inspect,
 };
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::BTreeSet;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Offset or expression cases selected for paired original-C and generated-Rust observations.
 const CASES: &[(&str, &str)] = &[
     ("OFFSET_ZERO", ""),
     ("OFFSET_TAG", ""),
@@ -61,6 +81,7 @@ const CASES: &[(&str, &str)] = &[
     ("OFFSET_GENERIC", "OffsetQualified, changed.value"),
     ("OFFSET_FORWARD", "nested.value"),
 ];
+/// Supporting fixture operations required to exercise the selected macro cases.
 const AUXILIARY: &[&str] = &[
     "OFFSET_UNUSED",
     "OFFSET_SIZE",
@@ -69,6 +90,8 @@ const AUXILIARY: &[&str] = &[
     "OFFSET_NULL_CALL",
     "OFFSET_RUNTIME_NULL",
 ];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[&str] = &[
     "OFFSET_BITFIELD",
     "OFFSET_INCOMPLETE",
@@ -80,12 +103,15 @@ const REJECTED: &[&str] = &[
     "OFFSET_ARROW_PATH",
     "OFFSET_PATH_BUDGET",
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int offset_evaluations;
 int offset_record(int value) { offset_evaluations++; return value; }
 int *offset_take_pointer(int *value) { return value; }
 "#;
 
+/// Checks that record offsets preserve original C layout type identity and unevaluated
+/// operands.
 #[test]
 fn record_offsets_preserve_original_c_layout_type_identity_and_unevaluated_operands() {
     let project = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

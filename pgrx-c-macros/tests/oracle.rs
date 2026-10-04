@@ -2,19 +2,35 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Establish independent C observations before relying on translated Rust.
+//!
+//! Original headers are compiled directly and report C type, result, and operand
+//! counts. These expectations cover synthetic integer macros and configured
+//! PostgreSQL headers; handwritten pgrx ports are never the semantic oracle.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
 
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::BTreeMap;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
 
+/// Represent one independent C result together with its type and evaluation count.
 #[derive(Debug, PartialEq, Eq)]
 struct Observation {
+    /// Original C expression type reported independently by the native oracle.
     c_type: String,
+    /// Recorded numeric result for cross-language comparison.
     value: i128,
+    /// Number of observable operand evaluations in the original C invocation.
     evaluations: u32,
 }
 
+/// Parse the C oracle's type, value, and evaluation columns into named observations.
 fn observations(output: &str) -> BTreeMap<String, Observation> {
     let mut records = BTreeMap::new();
     for line in output.lines() {
@@ -30,6 +46,7 @@ fn observations(output: &str) -> BTreeMap<String, Observation> {
     records
 }
 
+/// Checks that original C integer macros establish types values and evaluation counts.
 #[test]
 fn original_c_integer_macros_establish_types_values_and_evaluation_counts() {
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
@@ -169,9 +186,12 @@ int main(void) {
     assert_eq!(records.len(), 23 + 256 * 16);
 }
 
+/// Checks that configured PostgreSQL 18 original headers establish scalar semantics.
 #[test]
 #[ignore = "requires a configured native PostgreSQL 18 installation"]
 fn configured_postgres_18_original_headers_establish_scalar_semantics() {
+    /// Use the production scanner, analysis, and emission contracts so these checks exercise
+    /// the actual C macro pipeline.
     use pgrx_c_macros::{MacroScanner, PostgresConfig};
 
     let postgres = PostgresConfig::resolve("pg18").expect("a native PG18 must be configured");

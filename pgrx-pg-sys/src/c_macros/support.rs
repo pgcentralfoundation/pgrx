@@ -18,29 +18,46 @@
 //! Signed right shifts use Clang's arithmetic shift implementation choice.
 //! Helpers are runtime operations; their trait calls do not establish const use.
 
+/// Use zero-cost marker or raw-storage primitives without adding ownership to C values.
 use core::marker::PhantomData;
 
+/// Extend scalar C arithmetic with typed values, raw places, and declaration-driven native capabilities.
+/// The generator selects operations; this runtime preserves their type/evaluation and access contracts.
 pub mod expression;
+/// Expose public macro results through one evaluated wrapper for predictable Rust inference.
+/// Native extraction remains explicit so C semantic identity can survive further macro composition.
 pub mod expression_result;
+/// Guard statement-local name capture before Rust hygiene can change textual C substitution semantics.
+/// The bounded token check runs during const evaluation and rejects uncertain invocation shapes.
 pub mod statements;
 
+/// Restrict C capability implementation to this crate and its generated native registrations.
+/// External callers cannot widen the supported type families through trait implementations.
 pub(crate) mod sealed {
+    /// Keep the admitted C value and operation families under crate-owned registration.
     pub trait Sealed {}
 }
 
 /// One fundamental C integer identity in the supported target model.
 pub trait CInteger: sealed::Sealed + Copy + core::fmt::Debug + Eq {
+    /// Native bits/values used to store this C integer kind without erasing its rank.
     type Repr: Copy + core::fmt::Debug + Eq;
+    /// C kind selected by integer promotion before unary, shift, or arithmetic operations.
     type Promoted: PromotedInteger;
     /// Ordinary value identity after compiler-owned expression metadata is lost
     /// at a variable or public evaluated-value boundary.
     type Boundary: CInteger<Repr = Self::Repr>;
+    /// Width of the declared C storage representation before promotion.
     const BITS: u32;
+    /// Whether the C kind interprets its storage bits as a signed value.
     const SIGNED: bool;
+    /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8;
 
+    /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     #[doc(hidden)]
     fn encode(value: Self::Repr) -> u128;
+    /// Recover the declared integer or enum representation from checked conversion bits.
     #[doc(hidden)]
     fn decode(bits: u128) -> Self::Repr;
 }
@@ -48,20 +65,32 @@ pub trait CInteger: sealed::Sealed + Copy + core::fmt::Debug + Eq {
 /// A C integer type after integer promotion.
 pub trait PromotedInteger: CInteger<Promoted = Self> {}
 
+/// Define the finite C integer rank/storage table used by promotion, casts, and common-type selection.
 macro_rules! integer_kinds {
     ($(($kind:ident, $repr:ty, $bits:literal, $signed:literal, $rank:literal, $promoted:ident)),+ $(,)?) => {
         $(
+            /// Nominal marker preserving this C integer kind’s rank independently of its native Rust storage.
             #[derive(Clone, Copy, Debug, PartialEq, Eq)]
             pub struct $kind;
+            /// Keep this admitted scalar or type-marker family under crate-owned capability registration.
             impl sealed::Sealed for $kind {}
+            /// Retain this fundamental C kind’s distinct rank and promotion even when Rust storage widths coincide.
             impl CInteger for $kind {
+                /// Native representation of this C kind, kept separate from its arithmetic rank.
                 type Repr = $repr;
+                /// C kind required by integer promotion before unary or usual arithmetic conversion.
                 type Promoted = $promoted;
+                /// Ordinary integer identity retained after evaluated-value boundaries remove source-only metadata.
                 type Boundary = Self;
+                /// Width of this C kind’s declared storage, before any integer promotion.
                 const BITS: u32 = $bits;
+                /// Whether the C kind interprets its representation as signed.
                 const SIGNED: bool = $signed;
+                /// C integer rank, preserving distinctions between equal-width Rust representations.
                 const RANK: u8 = $rank;
+                /// Encode this native integer in the shared bit carrier used by C conversion and arithmetic checks.
                 fn encode(value: Self::Repr) -> u128 { value as u128 }
+                /// Narrow checked result bits to this C kind’s native storage representation.
                 fn decode(bits: u128) -> Self::Repr { bits as $repr }
             }
         )+
@@ -84,27 +113,41 @@ integer_kinds!(
     (CUnsignedInt128, u128, 128, false, 6, CUnsignedInt128),
 );
 
+/// Keep C `_Bool` separate from integer kinds so conversion tests truth before any narrowing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CBool;
+/// Keep this runtime family within crate-owned C capability registration.
 impl sealed::Sealed for CBool {}
+/// Retain C rank, width, signedness, and promotion rules independently of native Rust storage.
 impl CInteger for CBool {
+    /// Native bits/values used to store this C integer kind without erasing its rank.
     type Repr = bool;
+    /// C kind selected by integer promotion before unary, shift, or arithmetic operations.
     type Promoted = CInt;
+    /// Ordinary C identity after source-only constant or bitfield metadata is lost at a value boundary.
     type Boundary = Self;
+    /// Width of the declared C storage representation before promotion.
     const BITS: u32 = 8;
+    /// Whether the C kind interprets its storage bits as a signed value.
     const SIGNED: bool = false;
+    /// C integer rank used by usual arithmetic conversions independently of storage width.
     const RANK: u8 = 0;
+    /// Convert admitted integer or enum storage to the representation used by C conversion rules.
     fn encode(value: bool) -> u128 {
         u128::from(value)
     }
+    /// Recover the declared integer or enum representation from checked conversion bits.
     fn decode(bits: u128) -> bool {
         // Conversion to _Bool tests the source value, before any narrowing.
         bits != 0
     }
 }
 
+/// Register the kinds that already satisfy C integer promotion without adding duplicate implementations.
 macro_rules! promoted_kinds {
-    ($($kind:ident),+ $(,)?) => { $(impl PromotedInteger for $kind {})+ };
+    ($($kind:ident),+ $(,)?) => { $(
+        /// Register a C kind that is already its own integer-promotion result.
+        impl PromotedInteger for $kind {})+ };
 }
 promoted_kinds!(
     CInt,
@@ -121,10 +164,13 @@ promoted_kinds!(
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CValue<K: CInteger> {
+    /// Store the native integer representation while the marker retains its distinct C rank.
     repr: K::Repr,
+    /// Carry C identity and qualification at the type level without runtime storage or ownership.
     kind: PhantomData<K>,
 }
 
+/// Construct and extract scalar storage while preserving its declared C rank and conversion rules.
 impl<K: CInteger> CValue<K> {
     /// Tag native storage with an explicit C identity.
     pub const fn new(repr: K::Repr) -> Self {
@@ -136,36 +182,49 @@ impl<K: CInteger> CValue<K> {
         self.repr
     }
 
+    /// Encode native storage for width/rank-aware C conversion and arithmetic checks.
     fn bits(self) -> u128 {
         K::encode(self.repr)
     }
 
+    /// Decode a checked integer bit result into the declared C storage representation.
     fn from_bits(bits: u128) -> Self {
         Self::new(K::decode(bits))
     }
 }
 
+/// Keep this runtime family within crate-owned C capability registration.
 impl<K: CInteger> sealed::Sealed for CValue<K> {}
 
 /// An accepted C scalar input. This trait is sealed to the documented finite family.
 pub trait IntoCValue: sealed::Sealed {
+    /// C integer identity retained by the admitted native or tagged scalar input.
     type Kind: CInteger;
+    /// Normalize this admitted scalar input while retaining its selected C integer identity.
     fn into_c_value(self) -> CValue<Self::Kind>;
 }
 
+/// Admit this scalar input without inferring an ambiguous C rank from Rust width.
 impl<K: CInteger> IntoCValue for CValue<K> {
+    /// C integer identity retained by the admitted native or tagged scalar input.
     type Kind = K;
+    /// Normalize this admitted scalar input while retaining its selected C integer identity.
     fn into_c_value(self) -> Self {
         self
     }
 }
 
+/// Admit only native integer widths with an unambiguous modeled C identity.
 macro_rules! raw_inputs {
     ($(($repr:ty, $kind:ident)),+ $(,)?) => {
         $(
+            /// Keep this admitted scalar or type-marker family under crate-owned capability registration.
             impl sealed::Sealed for $repr {}
+            /// Admit this native scalar only because the modeled C identity is unambiguous.
             impl IntoCValue for $repr {
+                /// Unique modeled C integer kind associated with this admitted native input.
                 type Kind = $kind;
+                /// Tag an already evaluated native input with its unambiguous C integer identity.
                 fn into_c_value(self) -> CValue<$kind> { CValue::new(self) }
             }
         )+
@@ -185,21 +244,31 @@ raw_inputs!(
 
 /// The usual arithmetic conversion between two promoted C identities.
 pub trait Common<Rhs: PromotedInteger>: PromotedInteger {
+    /// C result representation selected by this operand family's capability.
     type Output: PromotedInteger;
 }
 
+/// Select the C common integer identity after promotion of both operand kinds.
 impl<K: PromotedInteger> Common<K> for K {
+    /// C result representation selected by this operand family's capability.
     type Output = K;
 }
 
 // Only distinct unordered promoted pairs are listed; the rules are symmetric.
 // In LP64, unsigned long plus signed long long becomes unsigned long long:
 // the latter's higher rank cannot make its equal-width signed range sufficient.
+/// Encode both operand orders of each C usual-arithmetic-conversion pair.
 macro_rules! common_pairs {
     ($(($left:ident, $right:ident, $output:ident)),+ $(,)?) => {
         $(
-            impl Common<$right> for $left { type Output = $output; }
-            impl Common<$left> for $right { type Output = $output; }
+            /// Select the C common promoted type for this operand order using rank and signedness rules.
+            impl Common<$right> for $left {
+                /// C result identity selected by this admitted operand family after required common conversion.
+                type Output = $output; }
+            /// Select the C common promoted type for this operand order using rank and signedness rules.
+            impl Common<$left> for $right {
+                /// C result identity selected by this admitted operand family after required common conversion.
+                type Output = $output; }
         )+
     };
 }
@@ -236,17 +305,22 @@ common_pairs!(
 
 /// Two accepted inputs with a statically determined common arithmetic type.
 pub trait ArithmeticInput<Rhs: IntoCValue>: IntoCValue {
+    /// Promoted C common kind used to convert both arithmetic operands.
     type Common: PromotedInteger;
+    /// Promote and convert both operands to the same C usual-arithmetic-conversion kind.
     #[doc(hidden)]
     fn common_values(self, rhs: Rhs) -> (CValue<Self::Common>, CValue<Self::Common>);
 }
 
+/// Convert admitted operands to their shared promoted C integer representation.
 impl<L: IntoCValue, R: IntoCValue> ArithmeticInput<R> for L
 where
     <L::Kind as CInteger>::Promoted: Common<<R::Kind as CInteger>::Promoted>,
 {
+    /// Promoted C common kind used to convert both arithmetic operands.
     type Common =
         <<L::Kind as CInteger>::Promoted as Common<<R::Kind as CInteger>::Promoted>>::Output;
+    /// Promote and convert both operands to the same C usual-arithmetic-conversion kind.
     fn common_values(self, rhs: R) -> (CValue<Self::Common>, CValue<Self::Common>) {
         (cast(self), cast(rhs))
     }
@@ -269,23 +343,31 @@ pub fn promote<V: IntoCValue>(input: V) -> CValue<<V::Kind as CInteger>::Promote
 
 /// A selected compiler's signed arithmetic behavior.
 pub trait OverflowPolicy: sealed::Sealed {
+    /// Whether signed arithmetic follows the inspected wrapping policy rather than rejecting overflow.
     const WRAPPING: bool;
 }
 
 /// Signed overflow is outside the accepted C domain; checked helpers panic on it.
 pub struct Undefined;
+/// Keep this runtime family within crate-owned C capability registration.
 impl sealed::Sealed for Undefined {}
+/// Select the signed arithmetic policy recorded by compiler inspection.
 impl OverflowPolicy for Undefined {
+    /// Whether signed arithmetic follows the inspected wrapping policy rather than rejecting overflow.
     const WRAPPING: bool = false;
 }
 
 /// Clang's `-fwrapv` signed arithmetic behavior.
 pub struct Wrapping;
+/// Keep this runtime family within crate-owned C capability registration.
 impl sealed::Sealed for Wrapping {}
+/// Select the signed arithmetic policy recorded by compiler inspection.
 impl OverflowPolicy for Wrapping {
+    /// Whether signed arithmetic follows the inspected wrapping policy rather than rejecting overflow.
     const WRAPPING: bool = true;
 }
 
+/// Calculate the signed value domain of the selected C integer kind before overflow validation.
 fn signed_bounds<K: CInteger>() -> (i128, i128) {
     if K::BITS == 128 {
         (i128::MIN, i128::MAX)
@@ -295,6 +377,7 @@ fn signed_bounds<K: CInteger>() -> (i128, i128) {
     }
 }
 
+/// Reject undefined signed overflow before encoding a valid result in the selected C representation.
 fn checked_signed<K: CInteger>(result: Option<i128>) -> CValue<K> {
     let result = result.expect("C signed arithmetic overflow");
     let (min, max) = signed_bounds::<K>();
@@ -302,8 +385,10 @@ fn checked_signed<K: CInteger>(result: Option<i128>) -> CValue<K> {
     CValue::from_bits(result as u128)
 }
 
+/// Share checked/wrapping integer arithmetic dispatch without replacing the inspected overflow policy.
 macro_rules! arithmetic {
     ($name:ident, $wrapping:ident, $checked:ident) => {
+        /// Apply integer promotion and common conversion, checking or wrapping signed results according to the selected C policy.
         pub fn $name<P: OverflowPolicy, L: ArithmeticInput<R>, R: IntoCValue>(
             left: L,
             right: R,
@@ -321,6 +406,7 @@ arithmetic!(add, wrapping_add, checked_add);
 arithmetic!(sub, wrapping_sub, checked_sub);
 arithmetic!(mul, wrapping_mul, checked_mul);
 
+/// Apply promoted unary negation under the inspected signed-overflow policy.
 pub fn neg<P: OverflowPolicy, V: IntoCValue>(input: V) -> CValue<<V::Kind as CInteger>::Promoted> {
     let input = promote(input);
     if <<V::Kind as CInteger>::Promoted as CInteger>::SIGNED && !P::WRAPPING {
@@ -330,8 +416,10 @@ pub fn neg<P: OverflowPolicy, V: IntoCValue>(input: V) -> CValue<<V::Kind as CIn
     }
 }
 
+/// Share quotient/remainder validation so both reject the same undefined signed and zero-divisor cases.
 macro_rules! division {
     ($name:ident, $operator:tt) => {
+        /// Compute the common integer quotient or remainder after rejecting zero divisors and undefined signed overflow.
         pub fn $name<L: ArithmeticInput<R>, R: IntoCValue>(
             left: L,
             right: R,
@@ -352,8 +440,10 @@ macro_rules! division {
 division!(div, /);
 division!(rem, %);
 
+/// Implement bitwise operators after C common-type conversion instead of Rust-width inference.
 macro_rules! bitwise {
     ($name:ident, $operator:tt) => {
+        /// Operate on the common promoted integer bits and preserve the resulting C identity.
         pub fn $name<L: ArithmeticInput<R>, R: IntoCValue>(
             left: L,
             right: R,
@@ -367,12 +457,15 @@ bitwise!(bitand, &);
 bitwise!(bitor, |);
 bitwise!(bitxor, ^);
 
+/// Invert the promoted C integer representation, preserving the promoted result identity.
 pub fn bitnot<V: IntoCValue>(input: V) -> CValue<<V::Kind as CInteger>::Promoted> {
     CValue::from_bits(!promote(input).bits())
 }
 
+/// Share integer comparison lowering while retaining C common conversion and `int` result identity.
 macro_rules! comparisons {
     ($name:ident, $operator:tt) => {
+        /// Compare the common promoted representation with its C signedness and return a C int truth value.
         pub fn $name<L: ArithmeticInput<R>, R: IntoCValue>(
             left: L,
             right: R,
@@ -394,14 +487,17 @@ comparisons!(le, <=);
 comparisons!(gt, >);
 comparisons!(ge, >=);
 
+/// Test the C scalar truth value used by lazy logical expressions and statement conditions.
 pub fn truth<V: IntoCValue>(input: V) -> bool {
     input.into_c_value().bits() != 0
 }
 
+/// Return C logical negation as an `int` value rather than a Rust Boolean.
 pub fn logical_not<V: IntoCValue>(input: V) -> CValue<CInt> {
     CValue::new(i32::from(!truth(input)))
 }
 
+/// Validate the promoted shift count against the promoted left operand width.
 fn shift_count<K: CInteger, V: IntoCValue>(input: V) -> u32 {
     let count = promote(input);
     assert!(
@@ -412,6 +508,7 @@ fn shift_count<K: CInteger, V: IntoCValue>(input: V) -> u32 {
     count.bits() as u32
 }
 
+/// Apply C left-shift promotion and reject counts or signed results outside the inspected policy.
 pub fn shl<P: OverflowPolicy, L: IntoCValue, R: IntoCValue>(
     left: L,
     right: R,
@@ -431,6 +528,7 @@ pub fn shl<P: OverflowPolicy, L: IntoCValue, R: IntoCValue>(
     }
 }
 
+/// Apply C right-shift promotion and the modeled compiler choice for signed right shifts.
 pub fn shr<L: IntoCValue, R: IntoCValue>(
     left: L,
     right: R,
@@ -446,8 +544,16 @@ pub fn shr<L: IntoCValue, R: IntoCValue>(
 
 /// The evaluated arm of a lazy conditional, retaining both arms' types for conversion.
 pub enum Either<L, R> {
-    Left(L),
-    Right(R),
+    /// Retain only the evaluated left conditional arm for subsequent common-type conversion.
+    Left(
+        /// Carry the sole evaluated arm; the other conditional branch has no runtime value here.
+        L,
+    ),
+    /// Retain only the evaluated right conditional arm for subsequent common-type conversion.
+    Right(
+        /// Carry the sole evaluated arm; the other conditional branch has no runtime value here.
+        R,
+    ),
 }
 
 /// Convert only the evaluated arm using the C arithmetic conditional's common type.
@@ -458,10 +564,20 @@ pub fn select<L: ArithmeticInput<R>, R: IntoCValue>(arm: Either<L, R>) -> CValue
     }
 }
 
+/// Check integer promotion, distinct C ranks, cast truth/sign behavior, and usual arithmetic conversion.
+/// Boundary cases cover overflow policies, division and shift domains; effect counters prove
+/// that conditional conversion evaluates only the selected arm.
 #[cfg(test)]
 mod tests {
+    //! Small deterministic cases exercise the finite C integer model before the
+    //! expression layer adds pointers and places. Typed assertions preserve promotion
+    //! and common-result identity; rejection cases cover arithmetic outside the
+    //! supported C domain, and counters retain lazy conditional evaluation.
+
+    /// Exercise promotion, cast, arithmetic-domain, and conditional helpers directly.
     use super::*;
 
+    /// Verify small-integer promotions and keep equal-width `long` and `long long` as distinct C ranks.
     #[test]
     fn identity_promotions_and_distinct_ranks() {
         let _: CValue<CUnsignedChar> = value(255_u8);
@@ -476,6 +592,7 @@ mod tests {
         assert_eq!(wider.get(), i128::from(u64::MAX) + 1);
     }
 
+    /// Check Boolean casts test the original value and signed integer widening preserves negative values.
     #[test]
     fn casts_test_truth_before_narrowing_and_sign_extend() {
         assert!(cast::<CBool, _>(256_i32).get());
@@ -485,6 +602,7 @@ mod tests {
         assert_eq!(cast::<CUnsignedInt128, _>(-1_i32).get(), u128::MAX);
     }
 
+    /// Prove unsigned arithmetic wraps while signed operations follow the selected undefined or wrapping policy.
     #[test]
     fn signed_and_unsigned_arithmetic_have_separate_policies() {
         assert_eq!(add::<Wrapping, _, _>(i32::MAX, 1_i32).get(), i32::MIN);
@@ -494,6 +612,7 @@ mod tests {
         assert!(std::panic::catch_unwind(|| neg::<Undefined, _>(i128::MIN)).is_err());
     }
 
+    /// Reject zero division and the signed minimum/-1 pair for both quotient and remainder.
     #[test]
     fn division_checks_both_quotient_and_remainder_domains() {
         assert_eq!(div(-7_i32, 3_i32).get(), -2);
@@ -503,6 +622,7 @@ mod tests {
         assert!(std::panic::catch_unwind(|| rem(1_u32, 0_u32)).is_err());
     }
 
+    /// Check invalid shift counts and signed left-shift domains after C integer promotion.
     #[test]
     fn shift_domains_and_left_result_promotion() {
         let promoted: CValue<CInt> = shl::<Undefined, _, _>(1_u8, 15_i32);
@@ -515,6 +635,7 @@ mod tests {
         assert!(std::panic::catch_unwind(|| shr(1_i32, u128::MAX)).is_err());
     }
 
+    /// Verify comparisons use C common-type conversion and return an `int` truth value.
     #[test]
     fn comparisons_return_c_int_after_common_conversion() {
         let result: CValue<CInt> = lt(-1_i32, 1_u32);
@@ -523,6 +644,7 @@ mod tests {
         assert_eq!(bitnot(0_u8).get(), -1);
     }
 
+    /// Count branch effects to prove common-type conversion never evaluates the unselected conditional arm.
     #[test]
     fn conditional_only_evaluates_selected_arm() {
         let mut calls = 0;

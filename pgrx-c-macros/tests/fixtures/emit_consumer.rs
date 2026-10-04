@@ -1,18 +1,45 @@
+/// Standalone downstream consumer for generated macro hygiene and C expression capabilities.
+///
+/// The harness links this consumer to a renamed producer containing generated
+/// definitions and production semantic support. Assertions cover integer ranks,
+/// floating inputs, repeated and lazy operands, and caller-local names that must
+/// not capture the generated helpers.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use renamed_generated::__pgrx_c_macros::expression_result::CExpression;
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use renamed_generated::__pgrx_c_macros::{
     CBool, CInt, CLong, CLongLong, CShort, CUnsignedChar, CUnsignedInt, CUnsignedLong,
     CUnsignedLongLong, CUnsignedShort, CValue,
 };
 
 // A caller's identically named module and helpers must not capture generated bindings.
+/// Shadow the support name in caller scope to prove generated paths resolve through their
+/// defining crate.
 mod __pgrx_c_macros {
+    //! Shadow the support name in caller scope to prove generated paths resolve through their
+    //! defining crate.
+    //!
+    //! The enclosing selector or oracle owns this scope; generated paths must retain that
+    //! ownership when expanded from a downstream consumer.
+
+    /// Fail if caller-local support captures a generated path; successful macro expansion must
+    /// never call this decoy.
     pub fn value(_: u8) -> ! {
         panic!("caller-local helper must remain unused")
     }
 }
 
+/// Assert the generated expression contract through a renamed producer, including the
+/// caller-local helper and module names that must never capture hygienic expansion paths.
 fn main() {
-    let floating: CExpression<renamed_generated::__pgrx_c_macros::expression::FloatValue<renamed_generated::__pgrx_c_macros::expression::CDouble>> = renamed_generated::EMIT_ADD!(1_f64, 2_f32);
+    let floating: CExpression<
+        renamed_generated::__pgrx_c_macros::expression::FloatValue<
+            renamed_generated::__pgrx_c_macros::expression::CDouble,
+        >,
+    > = renamed_generated::EMIT_ADD!(1_f64, 2_f32);
     assert_eq!(floating.get(), 3_f64);
     let _: CExpression<CValue<CBool>> = renamed_generated::EMIT_ID!(true);
     let identity: CExpression<CValue<CUnsignedChar>> = renamed_generated::EMIT_ID!(255_u8);
@@ -118,7 +145,8 @@ fn main() {
     );
     assert_eq!(chosen.get(), u32::MAX);
     assert_eq!(chosen_calls, 1);
-    let promoted_arm: CExpression<CValue<CInt>> = renamed_generated::EMIT_CHOOSE!(0_i32, 2_u8, 3_u8);
+    let promoted_arm: CExpression<CValue<CInt>> =
+        renamed_generated::EMIT_CHOOSE!(0_i32, 2_u8, 3_u8);
     assert_eq!(promoted_arm.get(), 3);
 
     // The module remains a meaningful shadowing fixture without warning suppression.

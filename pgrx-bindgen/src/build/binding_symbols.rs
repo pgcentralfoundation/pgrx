@@ -2,12 +2,27 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Extract the Rust half of the C macro type contract from fresh bindgen output.
+//!
+//! The frontend supplies C declarations and target facts; this collector records
+//! what the current binding build actually exposes: paths, storage, signatures,
+//! record fields, and integer values. Emission must reconcile both catalogs before
+//! using a Rust symbol. Ambiguous or unrepresentable declarations are omitted
+//! rather than repaired, so the transpiler can report a skip without changing
+//! bindgen's output. Checked-in documentation bindings are not semantic inputs.
+
+/// Use the emitter catalog and result types that connect C inspection to generated binding
+/// publication.
 use pgrx_c_macros::{
     AliasBinding, BindingCatalog, BitfieldBinding, DeclarationCatalog, EnumBinding, FieldBinding,
     FunctionBinding, IntegerBinding, IntegerBindingRepresentation, IntegerConstant, IntegerKind,
     IntegerValue, RecordBinding, RecordKind, RustBindingType, TargetFacts, VariableBinding,
 };
+/// Keep binding catalogs, header trees, and output maps ordered for deterministic generation
+/// and collision checks.
 use std::collections::{BTreeMap, BTreeSet};
+/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
+/// facts from names.
 use syn::{Expr, Item, Lit, Type, UnOp};
 
 /// Discover bindgen's actual values and paths without changing its bindings.
@@ -72,6 +87,8 @@ pub(super) fn collect_bindings(
     bindings
 }
 
+/// Recover bit offsets and widths from actual bindgen getter bodies and verified storage units;
+/// getter names alone are not layout evidence.
 fn collect_bitfields(
     items: &[Item],
     path: &mut Vec<String>,
@@ -178,9 +195,18 @@ fn collect_bitfields(
     }
 }
 
+/// Collect literal storage-unit reads from a bindgen getter so ambiguous or unrelated methods
+/// cannot establish bitfield layout.
 #[derive(Default)]
-struct BitfieldAccess(Vec<(String, u64, u32)>);
+struct BitfieldAccess(
+    /// Observed storage field, bit offset, and width tuples collected from the getter body.
+    Vec<(String, u64, u32)>,
+);
+/// Recover bitfield layout from actual getter access syntax rather than method naming
+/// conventions.
 impl syn::visit_mut::VisitMut for BitfieldAccess {
+    /// Record literal bindgen storage-unit reads while visiting the rest of the getter body,
+    /// allowing ambiguous access shapes to be rejected.
     fn visit_expr_method_call_mut(&mut self, call: &mut syn::ExprMethodCall) {
         if call.method == "get"
             && call.args.len() == 2
@@ -198,12 +224,16 @@ impl syn::visit_mut::VisitMut for BitfieldAccess {
     }
 }
 
+/// Accept only a literal unsigned value for layout metadata rather than evaluating arbitrary
+/// Rust expressions.
 fn literal_u64(expression: &Expr) -> Option<u64> {
     let Expr::Lit(literal) = expression else { return None };
     let Lit::Int(literal) = &literal.lit else { return None };
     literal.base10_parse().ok()
 }
 
+/// Recognize a bindgen bitfield storage unit with concrete byte-array storage so reported
+/// ranges can be bounded.
 fn bitfield_unit_bytes(ty: &Type) -> Option<u64> {
     let Type::Path(ty) = ty else { return None };
     let segment = ty.path.segments.last()?;
@@ -228,14 +258,23 @@ fn bitfield_unit_bytes(ty: &Type) -> Option<u64> {
 /// collisions between public modules cannot accidentally select one C declaration.
 #[derive(Default)]
 struct StructuredDuplicates {
+    /// Foreign function names that cannot be selected unambiguously.
     functions: BTreeSet<String>,
+    /// Record names duplicated across accessible public modules.
     records: BTreeSet<String>,
+    /// Type alias paths repeated in the collected type namespace.
     types: BTreeSet<String>,
+    /// Enum names whose representation cannot be chosen uniquely.
     enums: BTreeSet<String>,
+    /// Foreign variable names that occur at multiple accessible paths.
     variables: BTreeSet<String>,
 }
 
+/// Remove ambiguous bindings only after scanning the entire namespace, so traversal order
+/// cannot select a winner.
 impl StructuredDuplicates {
+    /// Remove all names observed more than once in a structured namespace so emission cannot
+    /// choose an arbitrary binding.
     fn remove(self, bindings: &mut BindingCatalog) {
         for name in self.functions {
             bindings.functions.remove(&name);
@@ -255,6 +294,8 @@ impl StructuredDuplicates {
     }
 }
 
+/// Insert a binding while remembering duplicate names for deferred removal after the full
+/// catalog scan.
 fn insert_unique<T>(
     map: &mut BTreeMap<String, T>,
     duplicates: &mut BTreeSet<String>,
@@ -266,14 +307,17 @@ fn insert_unique<T>(
     }
 }
 
+/// Restrict the catalog to bindings generated code can name through public paths.
 fn public(vis: &syn::Visibility) -> bool {
     matches!(vis, syn::Visibility::Public(_))
 }
 
+/// Remove raw-identifier syntax for C-name matching while keeping actual Rust paths separately.
 fn rust_name(ident: &syn::Ident) -> String {
     ident.to_string().trim_start_matches("r#").to_owned()
 }
 
+/// Extend the current public module path with the item's actual Rust identifier.
 fn item_path(path: &[String], ident: &syn::Ident) -> Vec<String> {
     let mut result = path.to_vec();
     result.push(ident.to_string());
@@ -349,6 +393,8 @@ fn flexible_array_helpers(items: &[Item], path: &mut Vec<String>) -> BTreeSet<Ve
     verified
 }
 
+/// Walk public bindings and record callable signatures, variables, aliases, record storage, and
+/// enum representation for C/Rust reconciliation.
 fn collect_structures(
     items: &[Item],
     path: &mut Vec<String>,
@@ -498,6 +544,8 @@ fn collect_structures(
     }
 }
 
+/// Capture named public field storage and representation attributes without claiming the
+/// corresponding C layout is already verified.
 fn record_binding(
     ident: &syn::Ident,
     attrs: &[syn::Attribute],
@@ -527,6 +575,7 @@ fn record_binding(
     RecordBinding { path: item_path(path, ident), kind, fields, packed, copy }
 }
 
+/// Parse representation and derive metadata used to establish actual Rust storage properties.
 fn attribute_arguments(attrs: &[syn::Attribute], name: &str) -> Vec<syn::Meta> {
     attrs
         .iter()
@@ -542,6 +591,8 @@ fn attribute_arguments(attrs: &[syn::Attribute], name: &str) -> Vec<syn::Meta> {
         .collect()
 }
 
+/// Record integral Rust enum storage and exact variant values, rejecting payload variants or
+/// unevaluable discriminants.
 fn enum_binding(
     item: &syn::ItemEnum,
     path: &[String],
@@ -573,11 +624,15 @@ fn enum_binding(
     Some(EnumBinding { path: item_path(path, &item.ident), repr, variants })
 }
 
+/// Keep the declared calling convention, including Rust defaults, so the emitter can reject an
+/// incompatible C call.
 fn abi_name(abi: Option<&syn::Abi>) -> String {
     abi.map(|abi| abi.name.as_ref().map_or_else(|| "C".into(), syn::LitStr::value))
         .unwrap_or_else(|| "Rust".into())
 }
 
+/// Recover a foreign symbol's linker spelling so ordinary and cshim-backed calls remain
+/// distinguishable.
 fn link_name(attrs: &[syn::Attribute]) -> Option<String> {
     attrs.iter().find_map(|attribute| {
         let syn::Meta::NameValue(meta) = &attribute.meta else { return None };
@@ -590,6 +645,7 @@ fn link_name(attrs: &[syn::Attribute]) -> Option<String> {
     })
 }
 
+/// Represent omitted Rust returns as unit and recursively catalog explicit return storage.
 fn return_type(
     output: &syn::ReturnType,
     path: &[String],
@@ -603,6 +659,9 @@ fn return_type(
     }
 }
 
+/// Translate supported Rust binding storage into the catalog while preserving pointer
+/// mutability, callback ABI, wrappers, and named paths; reject unknown or excessively deep
+/// forms.
 fn binding_type(
     ty: &Type,
     path: &[String],
@@ -753,6 +812,8 @@ fn binding_type(
     }
 }
 
+/// Resolve relative public binding paths without letting a path escape the owning crate
+/// namespace.
 fn resolve_path(parts: &[String], current: &[String]) -> Option<Vec<String>> {
     let mut resolved = current.to_vec();
     let mut position = 0;
@@ -777,6 +838,8 @@ fn resolve_path(parts: &[String], current: &[String]) -> Option<Vec<String>> {
     Some(resolved)
 }
 
+/// Walk public integer bindings and retain representable values and paths, including associated
+/// enum constants and checked OID storage.
 fn collect(
     items: &[Item],
     path: &mut Vec<String>,
@@ -833,14 +896,23 @@ fn collect(
     }
 }
 
+/// Represent verified integer storage bounds independently of the C semantic kind used by the
+/// emitter.
 #[derive(Clone, Copy)]
 struct Storage {
+    /// Whether this Rust storage can represent negative C constants.
     signed: bool,
+    /// Width verified from primitive spelling or the selected target's standard C aliases.
     bits: u32,
+    /// Whether storage accepts only zero or one rather than the full integer range.
     boolean: bool,
 }
 
+/// Enforce the actual Rust storage range before a binding value can participate in symbolic C
+/// emission.
 impl Storage {
+    /// Check that the bindgen value fits its actual storage before it can be referenced as a C
+    /// constant.
     fn contains(self, value: i128) -> bool {
         if self.boolean {
             return (0..=1).contains(&value);
@@ -854,6 +926,8 @@ impl Storage {
     }
 }
 
+/// Recognize primitive or standard-library C integer storage using target widths; arbitrary
+/// same-spelled aliases provide no proof.
 fn storage(
     ty: &Type,
     aliases: &BTreeMap<String, &Type>,
@@ -925,6 +999,8 @@ fn storage(
     })
 }
 
+/// Promote a recorded integer value to i128 for bounded signed arithmetic during literal
+/// interpretation.
 fn numeric(value: IntegerValue) -> i128 {
     match value {
         IntegerValue::Signed(value) => value.into(),
@@ -932,6 +1008,8 @@ fn numeric(value: IntegerValue) -> i128 {
     }
 }
 
+/// Read literal, boolean, negated, and grouped binding values without substituting a newly
+/// evaluated expression for bindgen's output.
 fn rust_value(expr: &Expr) -> Option<IntegerValue> {
     match expr {
         Expr::Lit(expr) => match &expr.lit {
@@ -948,12 +1026,29 @@ fn rust_value(expr: &Expr) -> Option<IntegerValue> {
     }
 }
 
+/// Check catalog, publication, and invalidation invariants directly against the private
+/// binding-build implementation.
 #[cfg(test)]
 mod tests {
+    //! Check catalog, publication, and invalidation invariants directly against the private
+    //! binding-build implementation.
+    //!
+    //! The tests inspect real parsed output, generated leaf maps, and compiler dependency
+    //! directives. Temporary input trees make success and rejection conditions explicit without
+    //! relying on a configured server.
+
+    /// Exercise the private implementation directly in its unit tests without widening the
+    /// production API.
     use super::*;
+    /// Use the emitter catalog and result types that connect C inspection to generated binding
+    /// publication.
     use pgrx_c_macros::{ByteOrder, IntegerType, TypeCategory, TypeInfo};
+    /// Render parsed fixture syntax for the independent generated consumer without rewriting
+    /// semantic declarations.
     use quote::ToTokens;
 
+    /// Construct explicit target integer facts for collector tests so storage checks do not
+    /// depend on the test host.
     fn target() -> TargetFacts {
         TargetFacts {
             triple: "x86_64-unknown-linux-gnu".into(),
@@ -979,6 +1074,8 @@ mod tests {
         }
     }
 
+    /// Construct a compiler-side integer constant used to test reconciliation with
+    /// independently written binding syntax.
     fn constant(kind: IntegerKind, value: IntegerValue) -> IntegerConstant {
         IntegerConstant {
             ty: TypeInfo {
@@ -995,6 +1092,8 @@ mod tests {
         }
     }
 
+    /// Checks actual bindgen values, primitive storage, and enum/OID paths without replacing
+    /// them with Clang's preferred values.
     #[test]
     fn preserves_bindgen_values_storage_and_enum_oid_paths() {
         let file = syn::parse_file(
@@ -1053,6 +1152,8 @@ pub mod Negative { pub type Type = ::core::ffi::c_int; pub const NEG: Type = -1;
         ));
     }
 
+    /// Checks that associated enum variants retain actual Rust paths and values for later C
+    /// disagreement validation.
     #[test]
     fn collects_rustified_enum_symbols_without_replacing_bindgen_values() {
         let file = syn::parse_file(
@@ -1083,6 +1184,8 @@ pub mod B { #[repr(u32)] pub enum Second { DUP = 1 } }
         assert_eq!(file.to_token_stream().to_string(), original);
     }
 
+    /// Checks that duplicate paths, unproved storage, and nonintegral values are omitted
+    /// instead of guessed.
     #[test]
     fn rejects_ambiguous_paths_unresolved_storage_and_nonintegral_constants() {
         let file = syn::parse_file(
@@ -1112,6 +1215,8 @@ pub const CYCLE: Loop = 7;
         );
     }
 
+    /// Checks that the catalog preserves actual foreign ABI, aliases, record fields, and nested
+    /// callback storage for reconciliation.
     #[test]
     fn catalogs_actual_function_abi_aliases_records_and_callback_types() {
         let file = syn::parse_file(
@@ -1206,6 +1311,8 @@ unsafe extern "C" {
         assert!(!catalog.variables["Frozen"].mutable);
     }
 
+    /// Checks storage-unit widths and offsets from genuine getter accesses while rejecting
+    /// unrelated getter-shaped methods.
     #[test]
     fn recovers_bitfield_layout_from_actual_bindgen_getter_bodies() {
         let file = syn::parse_file(
@@ -1232,6 +1339,8 @@ impl Bits {
         assert_eq!(flag.ty, RustBindingType::Integer { signed: false, bits: 32 });
     }
 
+    /// Checks standard-library C aliases inside function signatures and fields using the
+    /// selected target facts.
     #[test]
     fn collects_actual_std_os_raw_function_and_field_storage() {
         let file = syn::parse_file(
@@ -1258,6 +1367,8 @@ unsafe extern "C" {
         );
     }
 
+    /// Checks that ambiguous or unsupported signatures and record forms cannot enter the usable
+    /// binding catalog.
     #[test]
     fn rejects_ambiguous_and_unrepresentable_structured_bindings() {
         let file = syn::parse_file(
@@ -1288,6 +1399,8 @@ unsafe extern "C" {
             matches!(&catalog.functions["good"].result, RustBindingType::Pointer { pointee, .. } if **pointee == RustBindingType::Named { path: vec!["core".into(), "ffi".into(), "c_void".into()] })
         );
     }
+    /// Checks generic storage helpers from their emitted definitions rather than trusting
+    /// conventional helper names.
     #[test]
     fn verifies_generic_union_and_flexible_array_storage_definitions() {
         let file = syn::parse_file(r#"

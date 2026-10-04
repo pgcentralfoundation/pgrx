@@ -2,28 +2,53 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Inspect selected native capabilities without duplicating emitter identities.
+//!
+//! The suite parses actual adapter impls and selector routes to recover owners,
+//! fields, enum registration, and callback storage. Open caller types must retain
+//! all eligible capabilities, while known owners must not emit unrelated families.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroGeneration, MacroScanner,
     RustBindingType, SkipReasonCode, generate_with_bindings, inspect,
 };
+/// Inspect token structure and spacing needed to distinguish preserved macro semantics from
+/// formatting changes.
 use proc_macro2::{Delimiter, TokenTree};
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::{BTreeMap, BTreeSet};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Recover emitted owner/field pairs from capability impls and the actual field selector
+/// registry.
 fn adapter_fields(source: &str, capability: &str) -> BTreeSet<(String, String)> {
+    /// Walk parsed emitted declarations to collect the selected capability facts rather than
+    /// reproducing the emitter's choices.
     fn collect(
         items: &[syn::Item],
         capability: &str,
@@ -111,11 +136,15 @@ fn adapter_fields(source: &str, capability: &str) -> BTreeSet<(String, String)> 
     owners
 }
 
+/// Project emitted field capabilities to their nominal owners for demand-pruning assertions.
 fn adapter_owners(source: &str, capability: &str) -> BTreeSet<String> {
     adapter_fields(source, capability).into_iter().map(|(owner, _)| owner).collect()
 }
 
+/// Inspect actual adapter impls to list the Rust types receiving a selected capability.
 fn capability_types(source: &str, capability: &str) -> BTreeSet<String> {
+    /// Walk parsed emitted declarations to collect the selected capability facts rather than
+    /// reproducing the emitter's choices.
     fn collect(items: &[syn::Item], capability: &str, output: &mut BTreeSet<String>) {
         for item in items {
             match item {
@@ -144,7 +173,11 @@ fn capability_types(source: &str, capability: &str) -> BTreeSet<String> {
     output
 }
 
+/// Resolve fixture callback aliases to a comparable Rust storage shape without inventing C
+/// identity.
 fn callback_storage(ty: &RustBindingType, bindings: &BindingCatalog) -> String {
+    /// Resolve nested aliases or token structure within this fixture while retaining the
+    /// information needed by its comparison.
     fn normalize(ty: &mut RustBindingType, bindings: &BindingCatalog, depth: usize) {
         assert!(depth < 64, "fixture callback aliases must be finite");
         match ty {
@@ -177,6 +210,8 @@ fn callback_calls(
     bindings: &BindingCatalog,
     frontend: &FrontendOutput,
 ) -> BTreeSet<String> {
+    /// Walk parsed emitted declarations to collect the selected capability facts rather than
+    /// reproducing the emitter's choices.
     fn collect(items: &[syn::Item], calls: &BTreeSet<String>, output: &mut Vec<syn::Item>) {
         for item in items {
             if let syn::Item::Mod(module) = item {
@@ -225,6 +260,8 @@ fn callback_calls(
     callback_storage_types(output, bindings, frontend)
 }
 
+/// List callback storage representations that are eligible according to the actual fixture
+/// catalog.
 fn callback_storage_types(
     items: Vec<syn::Item>,
     bindings: &BindingCatalog,
@@ -244,11 +281,15 @@ fn callback_storage_types(
         .collect()
 }
 
+/// Inspect raw callback input bridges to ensure only unambiguous C identities gain native
+/// conversion.
 fn callback_native_inputs(
     source: &str,
     bindings: &BindingCatalog,
     frontend: &FrontendOutput,
 ) -> BTreeSet<String> {
+    /// Walk parsed emitted declarations to collect the selected capability facts rather than
+    /// reproducing the emitter's choices.
     fn collect(items: &[syn::Item], output: &mut Vec<syn::Item>) {
         for item in items {
             if let syn::Item::Mod(module) = item
@@ -274,6 +315,7 @@ fn callback_native_inputs(
     callback_storage_types(output, bindings, frontend)
 }
 
+/// Assemble a downstream consumer with this selection's emitted macros and support.
 fn program(bindings: &str, generated: &MacroGeneration, body: &str) -> String {
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -293,6 +335,7 @@ fn program(bindings: &str, generated: &MacroGeneration, body: &str) -> String {
     source
 }
 
+/// Checks that native capabilities follow nominal owners and keep unknown caller types.
 #[test]
 fn native_capabilities_follow_nominal_owners_and_keep_unknown_caller_types() {
     let project = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

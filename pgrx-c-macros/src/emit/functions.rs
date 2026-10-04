@@ -3,25 +3,45 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Exact native ABI primitives for callable C declarations.
+//!
+//! Generated C thunks cover callable static inline declarations and by-value objects
+//! that cannot safely use a binding directly. Exact prototype and layout checks
+//! anchor both sides of the ABI; Rust argument conversions stay outside the guarded
+//! native call so PostgreSQL error jumps cannot cross conversion-owned destructors.
 
+/// Share verified storage lowering and path rendering with the other native capability passes.
 use super::types::{Lowering, rust_path};
+/// Validate native linkage and prototypes against binding storage and compiler target facts.
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionBinding, FunctionInfo,
     IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
+/// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
 use sha2::{Digest, Sha256};
+/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Bound the combined Rust/C native thunk source emitted by this capability family.
 const OUTPUT_LIMIT: usize = 16 * 1024 * 1024;
 
+/// Native call replacements and exact binding signatures for requested C declarations.
 pub(super) struct FunctionAdapters {
+    /// Rust ABI declarations and semantic argument/result adapters around native thunks.
     pub rust: String,
+    /// Same-profile C definitions that call the original declaration or transport by-value objects.
     pub c_source: String,
+    /// Macro-facing binding replacements indexed by the original C function name.
     pub bindings: BTreeMap<String, FunctionBinding>,
+    /// Linkage and prototype failures retained for dependent lowering diagnostics.
     pub unsupported: BTreeMap<String, String>,
 }
 
+/// Emit required thunks for static inline declarations and by-value record or enum ABI transport.
+///
+/// A profile salt includes record layouts so otherwise-identical signatures cannot
+/// reuse a native symbol across different PostgreSQL compilation profiles.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -88,6 +108,10 @@ pub(super) fn generate(
     Ok(result)
 }
 
+/// Validate one declaration and produce matched C/Rust ABI code plus its binding replacement.
+///
+/// Availability, convention, object validity, and destructor restrictions are checked
+/// before emitting call code; C owns the original function invocation.
 #[allow(clippy::too_many_arguments)] // One ABI proof owns declaration, storage, profile and demand.
 fn adapter(
     name: &str,
@@ -296,6 +320,7 @@ fn adapter(
     Ok((rust, c_source, binding))
 }
 
+/// Select Clang’s compatible integer only when it preserves the enum’s object layout.
 fn enum_abi_type<'a>(
     ty: &'a TypeInfo,
     declarations: &'a DeclarationCatalog,
@@ -318,6 +343,7 @@ fn enum_abi_type<'a>(
     Ok(underlying)
 }
 
+/// Reject unresolved, void, or function objects at nonvoid by-value prototype positions.
 fn value_shape(ty: &TypeInfo) -> Result<(), String> {
     if matches!(ty.category, TypeCategory::Function | TypeCategory::Other | TypeCategory::Void) {
         return Err("inline value requires a proven scalar or pointer ABI representation".into());
@@ -325,6 +351,10 @@ fn value_shape(ty: &TypeInfo) -> Result<(), String> {
     Ok(())
 }
 
+/// Recover native storage recursively from compiler shapes and verified binding rewrites.
+///
+/// Binding-owned integer newtypes remain intact when their typedef identity is
+/// proved; records and enums use the transport representation required by C.
 fn abi_storage(
     ty: &TypeInfo,
     declarations: &DeclarationCatalog,
@@ -460,6 +490,7 @@ fn abi_storage(
     })
 }
 
+/// Emit a compiler-visible type alias and layout assertions without accepting injected C source.
 fn c_alias(
     output: &mut String,
     alias: &str,
@@ -502,6 +533,7 @@ fn c_alias(
     Ok(())
 }
 
+/// Anchor the Rust thunk storage size and alignment to the compiler prototype facts.
 fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
     if let Some(size) = ty.size {
         writeln!(output, "const _: () = assert!(::core::mem::size_of::<{storage}>() == {size});")
@@ -516,6 +548,7 @@ fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
     }
 }
 
+/// Admit a single ASCII C identifier before using it in a native declaration or call.
 fn c_identifier(name: &str) -> bool {
     let mut characters = name.chars();
     characters.next().is_some_and(|c| c == '_' || c.is_ascii_alphabetic())

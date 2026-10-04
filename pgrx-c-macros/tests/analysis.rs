@@ -2,19 +2,36 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test the supported-expression boundary before Rust emission.
+//!
+//! Analysis uses compiler-owned types and the final preprocessor environment to
+//! classify parameters, operands, dependencies, and explicit skips. These tests
+//! check that uncertain syntax remains uncertain, original provenance survives,
+//! and profile-dependent expressions are accepted only with sufficient evidence.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, ConstCapability, EmissionStatus, ExpressionKind,
     FrontendError, InvocationContract, MacroAnalysis, MacroScanner, ParameterRole, SkipReasonCode,
     TypeCategory, TypeExpression, analyze, emit, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Checks that unconstrained parameters stay open to pointer and floating operands instead of
+/// acquiring an invented integer-only contract.
 #[test]
 fn parameter_metadata_does_not_claim_unproved_integer_only_inputs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -38,10 +55,14 @@ fn parameter_metadata_does_not_claim_unproved_integer_only_inputs() {
     );
 }
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Require the expected structured rejection, including the reason used to explain unsupported
+/// C syntax.
 fn assert_skip(analysis: &MacroAnalysis, expected: SkipReasonCode) {
     let AnalysisStatus::Skipped { reason } = &analysis.status else {
         panic!("{} must be skipped as {expected:?}: {analysis:?}", analysis.name);
@@ -54,6 +75,7 @@ fn assert_skip(analysis: &MacroAnalysis, expected: SkipReasonCode) {
     assert!(analysis.expression.is_none(), "skips must not look like analyzed candidates");
 }
 
+/// Checks that complete integer expressions are candidates with value roles.
 #[test]
 fn complete_integer_expressions_are_candidates_with_value_roles() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -133,6 +155,7 @@ _Static_assert(ANALYSIS_PRECEDENCE(4) == 20, "operator precedence");
     assert!(original.is_empty());
 }
 
+/// Checks that unsupported forms have stable reasons and original source spans.
 #[test]
 fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -170,6 +193,7 @@ fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
     assert_skip(&analyze(&deep, "ANALYSIS_DEEP"), SkipReasonCode::BudgetExceeded);
 }
 
+/// Checks that typed expression candidates preserve parameters and original C expression types.
 #[test]
 fn typed_expression_candidates_preserve_parameters_and_original_c_expression_types() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -238,6 +262,8 @@ void verify_original_types(void) {
     assert!(checked.is_empty());
 }
 
+/// Checks that type argument casts retain deferred types and concrete pointer casts use
+/// compiler facts.
 #[test]
 fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_compiler_facts() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -318,6 +344,7 @@ _Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(analysis_callback,7), int: 1,
     assert!(checked.is_empty());
 }
 
+/// Checks that ungrouped parameter uses require atomic arguments without changing the C body.
 #[test]
 fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -346,6 +373,7 @@ _Static_assert(EXPR_ATOMIC_POW2(16) == EXPR_ATOMIC_POW2((16)), "atomic grouping 
     assert!(checked.is_empty());
 }
 
+/// Checks that dependencies require real preprocessing and use the final active context.
 #[test]
 fn dependencies_require_real_preprocessing_and_use_the_final_active_context() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -377,6 +405,7 @@ fn dependencies_require_real_preprocessing_and_use_the_final_active_context() {
     assert!(original.is_empty());
 }
 
+/// Checks that binary literals require c23 and compile under the original c23 profile.
 #[test]
 fn binary_literals_require_c23_and_compile_under_the_original_c23_profile() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -417,6 +446,7 @@ fn binary_literals_require_c23_and_compile_under_the_original_c23_profile() {
     assert!(checked.is_empty());
 }
 
+/// Checks that original C shadowing demonstrates the fixed binding invocation boundary.
 #[test]
 fn original_c_shadowing_demonstrates_the_fixed_binding_invocation_boundary() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -450,6 +480,7 @@ void check_caller_scope(void) {
     assert!(checked.is_empty());
 }
 
+/// Checks that attributed integer typedefs and their aliases need a separate semantic contract.
 #[test]
 fn attributed_integer_typedefs_and_their_aliases_need_a_separate_semantic_contract() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

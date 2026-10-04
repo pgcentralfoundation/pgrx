@@ -2,19 +2,49 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check publication and documentation consumption of generated macro trees.
+//!
+//! The harness builds isolated consumers and inspects their versioned snapshots,
+//! formatting, reports, and exported adapter modules. It distinguishes ordinary
+//! host generation from docs.rs consumption, where PostgreSQL and Clang may be
+//! absent and installation-specific native adapters must stay disabled.
+
 #![cfg(unix)]
 
+/// Render parsed fixture syntax for the independent generated consumer without rewriting
+/// semantic declarations.
 use quote::ToTokens;
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::{BTreeMap, BTreeSet};
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs::{self, File};
+/// Make fixture compiler or pg_config wrappers executable so process failures can be tested
+/// directly.
 use std::os::unix::fs::PermissionsExt;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::{Command, Stdio};
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-struct Fixture(PathBuf);
+/// Own an isolated consumer or header tree whose generated artifacts can be inspected without
+/// mutating the repository.
+struct Fixture(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Construct and inspect owned fixtures without changing repository snapshots or sharing
+/// consumer build artifacts.
 impl Fixture {
+    /// Create owned storage for publication and docs.rs consumer experiments without touching
+    /// the checkout's snapshots.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let root = std::env::temp_dir()
@@ -25,6 +55,8 @@ impl Fixture {
         Self(root)
     }
 
+    /// Configure an isolated consumer build with controlled release or documentation settings
+    /// and no inherited pgrx installation state.
     fn command(&self) -> Command {
         let mut command = Command::new("cargo");
         for (name, _) in std::env::vars_os() {
@@ -45,10 +77,14 @@ impl Fixture {
         command
     }
 
+    /// Execute the isolated consumer command so tests can inspect success, diagnostics, and
+    /// generated artifacts.
     fn run(&self, command: &mut Command, phase: &str) {
         assert_eq!(self.successful_output(command, phase), "12\n", "{phase} macro invocation");
     }
 
+    /// Run a bounded consumer process and reject partial output or failures before interpreting
+    /// its generated behavior.
     fn successful_output(&self, command: &mut Command, phase: &str) -> String {
         let paths =
             [self.0.join(format!("{phase}.stdout")), self.0.join(format!("{phase}.stderr"))];
@@ -75,6 +111,7 @@ impl Fixture {
         fs::read_to_string(&paths[0]).unwrap()
     }
 
+    /// Require the isolated generated file to agree with rustfmt's final representation.
     fn formatted(&self, file: &syn::File, phase: &str) -> String {
         let path = self.0.join(format!("{phase}.rs"));
         fs::write(&path, file.to_token_stream().to_string()).unwrap();
@@ -87,6 +124,7 @@ impl Fixture {
         fs::read_to_string(path).unwrap()
     }
 
+    /// Find the Cargo build report that records macro generation warnings and skip reasons.
     fn output(&self) -> PathBuf {
         fs::read_dir(self.0.join("target/debug/build"))
             .unwrap()
@@ -95,10 +133,13 @@ impl Fixture {
             .expect("generated macros must exist")
     }
 
+    /// Locate the isolated consumer's current generated binding directory.
     fn out_dir(&self) -> PathBuf {
         self.output().ancestors().nth(3).unwrap().to_path_buf()
     }
 
+    /// Require binding/Clang disagreements and their dependency skips to appear in both report
+    /// data and compiler warnings.
     fn assert_mismatch_skips(&self, phase: &str) {
         let out_dir = self.out_dir();
         let report: serde_json::Value =
@@ -153,6 +194,7 @@ impl Fixture {
     }
 }
 
+/// Read the complete generated Rust leaf map for snapshot and stable-write comparisons.
 fn rust_tree(directory: &Path) -> BTreeMap<PathBuf, String> {
     let mut result = BTreeMap::new();
     let mut directories = vec![directory.to_path_buf()];
@@ -173,12 +215,16 @@ fn rust_tree(directory: &Path) -> BTreeMap<PathBuf, String> {
     result
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for Fixture {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }
 }
 
+/// Checks that docsrs exports generated adapter modules and accepts support free snapshots.
 #[test]
 fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots() {
     let fixture = Fixture::new();
@@ -301,6 +347,7 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
     }
 }
 
+/// Checks that release ships macros and docsrs uses them without PostgreSQL or clang.
 #[test]
 #[ignore = "compiles isolated ordinary, release and docs.rs builds; requires native Clang and cached dependencies"]
 fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {

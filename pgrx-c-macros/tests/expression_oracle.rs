@@ -2,17 +2,31 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check empty, void, and comma-expression macro semantics.
+//!
+//! Original C and emitted Rust report type, value, and evaluation effects. The
+//! consumer deliberately uses contexts that distinguish discarding a value from
+//! an unevaluated operand; unsupported cases remain explicit exclusions.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, SkipReasonCode, emit,
     emit_support_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Fixture macros whose emitted behavior is compared with the original header.
 const SUPPORTED: &[&str] = &[
     "EXPR_EMPTY",
     "EXPR_EMPTY_ZERO",
@@ -28,6 +42,7 @@ const SUPPORTED: &[&str] = &[
     "EXPR_ATOMIC_POW2",
     "EXPR_STATEMENT",
 ];
+/// Fixture forms deliberately excluded from successful generation and asserted separately.
 const EXCLUDED: &[(&str, SkipReasonCode)] = &[
     ("EXPR_BAD_LOOP", SkipReasonCode::Statement),
     ("EXPR_BAD_PASTE", SkipReasonCode::TokenPaste),
@@ -35,6 +50,8 @@ const EXCLUDED: &[(&str, SkipReasonCode)] = &[
     ("EXPR_BAD_VARIADIC", SkipReasonCode::Variadic),
 ];
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(target_os = "macos")]
 fn native_include_arguments() -> Vec<String> {
     let sdk = rust_oracle::run_tool(
@@ -46,11 +63,14 @@ fn native_include_arguments() -> Vec<String> {
     vec!["-isysroot".into(), sdk.into()]
 }
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(not(target_os = "macos"))]
 fn native_include_arguments() -> Vec<String> {
     Vec::new()
 }
 
+/// Checks that empty void and comma macros match original C types values and evaluation.
 #[test]
 fn empty_void_and_comma_macros_match_original_c_types_values_and_evaluation() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

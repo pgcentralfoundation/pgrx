@@ -2,22 +2,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check compiler-derived type, layout, and floating-point evidence.
+//!
+//! Independent static C assertions establish size, alignment, offsets, type edges,
+//! and prototypes. Shadowed helpers must isolate capabilities, and floating modes
+//! that Rust cannot reproduce must be rejected before emission.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     ArrayKind, DeclarationLinkage, FieldInfo, FloatingKind, FrontendError, IntegerKind,
     MacroScanner, RecordInfo, RecordKind, TypeCategory, TypeShapeKind, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Find the compiler-owned field declaration needed by a layout assertion instead of recreating
+/// its offset.
 fn field<'a>(record: &'a RecordInfo, name: &str) -> &'a FieldInfo {
     record.fields.iter().find(|field| field.name.as_deref() == Some(name)).unwrap()
 }
 
+/// Checks that compiler size identity and offset capability match independent C assertions.
 #[test]
 fn compiler_size_identity_and_offset_capability_match_independent_c_assertions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -62,6 +79,8 @@ fn compiler_size_identity_and_offset_capability_match_independent_c_assertions()
     assert_eq!(json["offsetof_supported"], true);
 }
 
+/// Checks that intrinsic macro shadow disables only offsets and cannot spoof required type
+/// proofs.
 #[test]
 fn intrinsic_macro_shadow_disables_only_offsets_and_cannot_spoof_required_type_proofs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -94,6 +113,7 @@ fn intrinsic_macro_shadow_disables_only_offsets_and_cannot_spoof_required_type_p
     );
 }
 
+/// Checks that compiler catalog retains type edges signatures and record layout.
 #[test]
 fn compiler_catalog_retains_type_edges_signatures_and_record_layout() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -238,6 +258,7 @@ fn compiler_catalog_retains_type_edges_signatures_and_record_layout() {
     assert!(json.len() < 200_000, "small cyclic fixture must remain bounded");
 }
 
+/// Checks that verified float profile preserves C representation and evaluation facts.
 #[test]
 fn verified_float_profile_preserves_c_representation_and_evaluation_facts() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -334,6 +355,7 @@ _Static_assert(((1.0 + 9007199254740992.0) - 9007199254740992.0) == 0.0, "binary
     );
 }
 
+/// Checks that floating point modes that Rust operators cannot preserve are rejected.
 #[test]
 fn floating_point_modes_that_rust_operators_cannot_preserve_are_rejected() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

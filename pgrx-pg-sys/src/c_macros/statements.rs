@@ -2,9 +2,18 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Invocation checks for C statement macros with introduced local names.
+//! Reject statement invocations whose textual C capture Rust hygiene would change.
+//!
+//! Generated statement macros introduce the original C local names. Rust macro
+//! hygiene would hide those locals from caller expressions that C substitution
+//! could capture, so the emitter inserts a const-evaluated check on stringified
+//! arguments. This module scans complete identifier words, including forwarded
+//! expression fragments, without allocations. Bounded inputs and conservative
+//! rejection of field, path, and string matches keep the accepted contract clear.
 
+/// Bound token scanning so statement-local capture checks remain suitable for const evaluation.
 const MAX_ARGUMENT_BYTES: usize = 4096;
+/// Bound the per-argument local-name comparisons performed by the statement capture guard.
 const MAX_LOCALS: usize = 64;
 
 /// Check stringified argument tokens for names that C substitution could capture.
@@ -53,14 +62,19 @@ pub const fn local_scope_allowed(source: &str, locals: &[&str]) -> bool {
     true
 }
 
+/// Keep ASCII and non-ASCII identifier bytes together so the capture guard never matches an interior substring.
 const fn identifier_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || byte == b'_' || byte >= 0x80
 }
 
+/// Check bounded local-name matching, conservative rejection, and forwarded-expression visibility.
+/// The fixture macros exercise the same stringification path used by generated statement guards.
 #[cfg(test)]
 mod tests {
+    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::*;
 
+    /// Reject captured local names inside token groups and raw identifiers while accepting longer identifier spellings.
     #[test]
     fn matches_complete_local_names_even_inside_groups_and_raw_identifiers() {
         for source in ["rsi", "(rsi)", "[(rsi)]", "{ rsi }", "r#rsi", "value.rsi", "path::rsi"] {
@@ -73,6 +87,7 @@ mod tests {
         assert!(!local_scope_allowed("αrsi", &["αrsi"]));
     }
 
+    /// Check that the bounded capture guard also rejects matching words inside quoted and raw strings.
     #[test]
     fn string_contents_are_rejected_conservatively() {
         assert!(!local_scope_allowed(r#""rsi""#, &["rsi"]));
@@ -80,13 +95,16 @@ mod tests {
         assert!(local_scope_allowed(r#""rsi_next""#, &["rsi"]));
     }
 
+    /// Prove stringification exposes identifiers hidden inside forwarded Rust expression fragments.
     #[test]
     fn stringification_reveals_forwarded_expression_identifiers() {
+        /// Stringify forwarded tokens so the capture guard can inspect otherwise opaque Rust expression fragments.
         macro_rules! check {
             ($($tokens:tt)*) => {
                 local_scope_allowed(stringify!($($tokens)*), &["rsi"])
             };
         }
+        /// Exercise expression-fragment forwarding before the capture guard performs identifier checks.
         macro_rules! forward {
             ($expression:expr) => {
                 check!($expression)
@@ -98,6 +116,7 @@ mod tests {
         assert!(!rejected);
     }
 
+    /// Check capture-guard bounds and empty inputs so pathological invocations fail before expensive scanning.
     #[test]
     fn oversized_inputs_and_local_sets_are_rejected() {
         assert!(local_scope_allowed(&" ".repeat(MAX_ARGUMENT_BYTES), &["rsi"]));

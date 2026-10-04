@@ -9,25 +9,46 @@
 //! resulting token stream retains every surviving argument occurrence; expression
 //! analysis must prove grouping from that stream rather than from the probe itself.
 
+//! Expansion uses the inspected compiler rather than recreating C preprocessing in Rust.
+//! Fresh formal markers preserve surviving argument occurrences, while bounded dependency
+//! inspection checks provenance and constructs probe sources. Independent passes verify
+//! closed token pasting and atomic constant retention. Temporary overlays preserve the main
+//! file context, and original-environment checks reject observations from changed inputs.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveProvenance, BuildInputs, FrontendError, FrontendOutput, MacroDefinition, MacroKind,
     MacroScanner, SourceSpan, TokenKind,
 };
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::{Path, PathBuf};
 
+/// Retain readable object-macro symbols only after independent atomicity, type, value, and
+/// token-restoration proof.
 mod constants;
+/// Prove closed token pasting and attribute synthesized dependencies with bounded owned
+/// instrumentation.
 mod paste;
+/// Expose independently verified constant retention to the preparation phase.
 pub(crate) use constants::retain_integer_constants;
 
+/// Probe-only diagnostic policy that accepts source markers and makes invalid token pasting an error.
 const PROBE_PRAGMAS: &str = "\n\n#pragma clang diagnostic ignored \"-Wgnu-line-marker\"\n#pragma clang diagnostic error \"-Winvalid-token-paste\"\n";
 
+/// Reserved prefix seed used to choose collision-free expansion marker names.
 const NAMESPACE: &str = "__pgrx_c_expand_";
 
+/// Compiler-expanded results and newly discovered dependencies for one coherent preparation batch.
 #[derive(Clone, Debug, Serialize)]
 pub struct ExpansionBatch {
+    /// Selected macro names paired with complete expansions or explicit preprocessing refusals.
     pub results: BTreeMap<String, ExpansionResult>,
     /// Additional macro and integer-constant references observed during preprocessing.
     /// Empty entries identify candidates checked for closed token pasting.
@@ -36,21 +57,38 @@ pub struct ExpansionBatch {
     pub inputs: BuildInputs,
 }
 
+/// Separate owned successful expansions from per-macro preprocessing refusals.
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum ExpansionResult {
-    Expanded { expansion: ExpandedMacro },
-    Skipped { reason: ExpansionSkip },
+    /// The matched compiler supplied a complete owned symbolic expansion.
+    Expanded {
+        /// The owned authoritative compiler expansion admitted to symbolic analysis.
+        expansion: ExpandedMacro,
+    },
+    /// A required proof or supported construct is missing, with an explicit refusal attached.
+    Skipped {
+        /// The structured proof gap that prevents this candidate from being treated as supported.
+        reason: ExpansionSkip,
+    },
 }
 
+/// An original function signature and provenance paired with authoritative compiler-expanded
+/// replacement tokens.
 #[derive(Clone, Debug, Serialize)]
 pub struct ExpandedMacro {
+    /// Selected original macro identifier used to index results, retained symbols, and
+    /// source-level proofs.
     pub name: String,
     /// Original signature/provenance with the compiler-expanded replacement tokens.
     pub definition: MacroDefinition,
     /// Original C labels, indexed consistently with the fresh symbolic formals.
     pub parameters: Vec<String>,
+    /// Fresh marker identifiers indexed with original formals, preventing accidental identifier
+    /// capture.
     pub symbolic_parameters: Vec<String>,
+    /// Every surviving compiler-expanded formal occurrence needed to preserve argument evaluation
+    /// multiplicity.
     pub occurrences: Vec<ParameterOccurrence>,
     /// Conservative closure, including object-like/external context definitions.
     /// This establishes possible origins, not an exact per-token source map.
@@ -69,58 +107,96 @@ pub struct ConstantFallback {
     pub reason: String,
 }
 
+/// One surviving symbolic argument occurrence, used to preserve C evaluation multiplicity.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ParameterOccurrence {
+    /// Original formal index represented by this surviving symbolic occurrence.
     pub parameter: usize,
     /// Index within the expanded replacement list, excluding the macro signature.
     pub token: usize,
 }
 
+/// A conservative macro origin observed during expansion, including context definitions not emitted
+/// as public macros.
 #[derive(Clone, Debug, Serialize)]
 pub struct ExpansionDependency {
+    /// Final active dependency name admitted by closure inspection or compiler discovery.
     pub name: String,
+    /// Whether the observed dependency is function-like or object-like expansion context.
     pub kind: MacroKind,
+    /// Physical source origins or their resolution status used for ownership filtering and auditing.
     pub provenance: Option<SourceSpan>,
 }
 
+/// Explain why a selected macro could not yield a reliable compiler-expanded symbolic invocation.
 #[derive(Clone, Debug, Serialize)]
 pub struct ExpansionSkip {
+    /// Stable machine-readable skip classification, independent of the explanatory text.
     pub code: ExpansionSkipCode,
+    /// Human-readable detail explaining the compiler observation or unsupported construct.
     pub message: String,
+    /// Immediate referenced macro that prevented expansion, when the refusal has a known owner.
     pub dependency: Option<String>,
+    /// Possible physical source ranges supporting the refusal or dependency explanation.
     pub spans: Vec<SourceSpan>,
 }
 
+/// Stable preprocessing failure families that session analysis translates into public skip
+/// categories.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ExpansionSkipCode {
+    /// The selected name is absent from the final active preprocessing environment.
     NotActive,
+    /// The selected definition has no function-style parameter list and is retained only as expansion
+    /// context.
     NotFunctionLike,
+    /// The original macro signature cannot establish an ordinary bounded formal list.
     MalformedParameters,
+    /// An open macro or callable argument tail falls outside the supported substitution contract.
     Variadic,
+    /// Token pasting lacks the independent closed-expansion and dependency proof required for
+    /// support.
     TokenPaste,
+    /// Stringified preprocessing spelling cannot be preserved by the accepted Rust argument contract.
     Stringification,
+    /// A context-dependent compiler builtin cannot be frozen into a faithful generated definition.
     DynamicBuiltin,
+    /// Multiple physical definitions match the final active body, so unique source ownership is
+    /// unproved.
     ProvenanceAmbiguous,
+    /// No physical discovery definition could be linked reliably to the final active body.
     ProvenanceUnresolved,
+    /// Source, token, dependency, depth, or compiler-pass work exceeded a finite configured limit.
     BudgetExceeded,
+    /// The matched compiler rejected a required typed or preprocessing witness.
     CompilerRejected,
+    /// Compiler output lacks complete, unambiguous probe boundaries or proof diagnostics.
     UnrecognizedOutput,
 }
 
 /// Limits apply to source construction, dependency inspection, and expanded output.
 #[derive(Clone, Copy, Debug)]
 pub struct ExpansionLimits {
+    /// Maximum selected macro candidates admitted to one expansion batch.
     pub macros: usize,
+    /// Maximum instrumented source bytes allocated for a bounded expansion pass.
     pub source_bytes: usize,
+    /// Maximum preprocessor output size accepted for body extraction.
     pub expanded_bytes: usize,
+    /// Maximum replacement tokens admitted for any one macro.
     pub macro_tokens: usize,
+    /// Maximum expanded tokens retained across the selected batch.
     pub total_tokens: usize,
+    /// Maximum tokens inspected across dependency closure discovery.
     pub dependency_tokens: usize,
+    /// Maximum distinct dependencies admitted to one macro closure.
     pub dependencies_per_macro: usize,
 }
 
+/// Provide bounded preparation budgets for ordinary library and CLI callers.
 impl Default for ExpansionLimits {
+    /// Provide finite source, token, macro-count, and dependency budgets for normal preparation.
     fn default() -> Self {
         Self {
             macros: 8192,
@@ -143,6 +219,8 @@ pub fn prepare_expansions(
     prepare_expansions_with_limits(scanner, frontend, names, ExpansionLimits::default())
 }
 
+/// Expand selected final active macros with caller budgets and record independently owned results or
+/// skips.
 pub fn prepare_expansions_with_limits(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -533,6 +611,8 @@ pub(crate) fn prepare_inner(
     Ok(ExpansionBatch { results, discovered_dependencies, inputs })
 }
 
+/// Reject changes to recorded compiler environment values before combining observations across
+/// phases.
 pub(crate) fn verify_environment(frontend: &FrontendOutput) -> Result<(), FrontendError> {
     let directory = std::env::current_dir().map_err(|error| {
         FrontendError::Environment(format!("could not check working directory: {error}"))
@@ -559,6 +639,7 @@ pub(crate) fn verify_environment(frontend: &FrontendOutput) -> Result<(), Fronte
     Ok(())
 }
 
+/// Choose fresh per-probe boundary markers that cannot collide with the inspected source namespace.
 fn probe_tag(directory: &Path, index: usize) -> Result<String, FrontendError> {
     directory
         .join(format!("probe-{index}"))
@@ -568,6 +649,7 @@ fn probe_tag(directory: &Path, index: usize) -> Result<String, FrontendError> {
 }
 
 // Retention and paste validation must use the same finite marker spelling.
+/// Choose a fresh symbolic token for retaining one verified object-macro dependency.
 fn constant_marker(prefix: &str, index: usize) -> String {
     format!("{prefix}c{index}")
 }
@@ -713,6 +795,8 @@ fn preprocess_prepared<'a>(
     Ok(None)
 }
 
+/// Require temporary source/overlay preprocessing to reproduce the original inspected macro
+/// environment and inputs.
 fn verify_original_environment(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -789,6 +873,7 @@ fn verify_original_environment(
     Ok(())
 }
 
+/// Copy only semantic token spellings for exact expansion comparisons, excluding comments.
 fn significant_tokens(definition: &MacroDefinition) -> Vec<&str> {
     definition
         .tokens
@@ -798,6 +883,7 @@ fn significant_tokens(definition: &MacroDefinition) -> Vec<&str> {
         .collect()
 }
 
+/// Attach a structured refusal to one requested macro while preserving dependency source spans.
 fn record_skip(
     results: &mut BTreeMap<String, ExpansionResult>,
     name: &str,
@@ -824,6 +910,8 @@ fn record_skip(
     results.insert(name.into(), ExpansionResult::Skipped { reason });
 }
 
+/// Reject a prepared probe with the dependency and source origins already established during
+/// inspection.
 fn skip_prepared(
     results: &mut BTreeMap<String, ExpansionResult>,
     prepared: &[Prepared<'_>],
@@ -841,6 +929,8 @@ fn skip_prepared(
     }
 }
 
+/// Recover each completed boundary-delimited expansion, rejecting missing, repeated, or malformed
+/// probe output.
 fn extract_bodies(
     output: &str,
     prepared: &[Prepared<'_>],
@@ -899,31 +989,53 @@ fn extract_bodies(
     Ok(bodies)
 }
 
+/// A validated invocation and its fresh boundaries, formals, and dependency proof inputs.
 struct Prepared<'a> {
+    /// Borrowed original active definition whose signature and provenance remain authoritative.
     definition: &'a MacroDefinition,
+    /// Original signature labels aligned with the fresh symbolic formal markers.
     parameters: Vec<String>,
+    /// Original token offset at which replacement content begins after the signature.
     body_start: usize,
+    /// Fresh symbolic formal identifiers supplied to the driver without added parentheses.
     markers: Vec<String>,
+    /// Fresh opening probe boundary that must appear exactly once in accepted output.
     begin: String,
+    /// Fresh closing probe boundary that must follow the matching opening boundary.
     end: String,
+    /// References established for this phase and used to explain or propagate downstream skips.
     dependencies: Vec<ExpansionDependency>,
+    /// Whether the dependency closure contains token pasting and requires independent closure proof.
     pastes: bool,
 }
 
+/// Cached local replacement facts used to build bounded macro dependency closures.
 struct DependencyNode<'a> {
+    /// References established for this phase and used to explain or propagate downstream skips.
     dependencies: Vec<&'a str>,
+    /// Cached local preprocessing construct refusal, reused by each dependent closure.
     rejection: Option<ExpansionSkip>,
+    /// Whether this local body includes ## and therefore requires paste-proof instrumentation.
     pastes: bool,
 }
 
+/// Own the per-batch dependency cache and token accounting while borrowing the inspected environment.
 struct Dependencies<'a> {
+    /// The coherent inspected environment borrowed by this phase; it is never reconstructed from
+    /// snapshots.
     frontend: &'a FrontendOutput,
+    /// Cached local macro facts shared by bounded closure discovery across the batch.
     nodes: HashMap<&'a str, DependencyNode<'a>>,
+    /// Tokens already charged to the bounded dependency-inspection budget.
     tokens: usize,
+    /// Finite source/token/run budgets enforced by this proof or dependency inspection.
     limits: ExpansionLimits,
 }
 
+/// Cache local macro facts and bound closure inspection across the prepared batch.
 impl<'a> Dependencies<'a> {
+    /// Inspect and cache a bounded dependency closure, including nested unsupported preprocessing
+    /// constructs.
     fn closure(
         &mut self,
         root: &'a str,
@@ -982,6 +1094,8 @@ impl<'a> Dependencies<'a> {
     }
 }
 
+/// Read one active replacement body and record named references, token pastes, and explicit rejection
+/// reasons.
 fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> DependencyNode<'a> {
     let active = &frontend.environment().active[name];
     let reject = |code, message: &str| DependencyNode {
@@ -1070,6 +1184,8 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
     DependencyNode { dependencies: dependencies.into_iter().collect(), rejection: None, pastes }
 }
 
+/// Recognize context-sensitive builtins whose changing expansion cannot be represented by a static
+/// translation.
 fn dynamic_builtin(name: &str) -> bool {
     name.starts_with("__has_")
         || name.starts_with("__is_")
@@ -1096,6 +1212,8 @@ fn dynamic_builtin(name: &str) -> bool {
         )
 }
 
+/// Parse a macro signature and locate its replacement body without adding probe-side argument
+/// grouping.
 fn parameters(
     definition: &MacroDefinition,
 ) -> Result<(Vec<String>, usize), (ExpansionSkipCode, String)> {
@@ -1142,6 +1260,7 @@ fn parameters(
     Err((ExpansionSkipCode::MalformedParameters, "unterminated macro parameter list".into()))
 }
 
+/// Construct a preprocessing refusal with its direct dependency and possible physical source origins.
 fn skip(
     code: ExpansionSkipCode,
     message: impl Into<String>,
@@ -1163,6 +1282,8 @@ fn skip(
     }
 }
 
+/// Choose a prefix absent from inspected tokens so generated markers cannot capture original
+/// identifiers.
 fn namespace(frontend: &FrontendOutput) -> String {
     let mut occupied = HashSet::new();
     for spelling in frontend
@@ -1194,9 +1315,15 @@ fn namespace(frontend: &FrontendOutput) -> String {
     format!("{NAMESPACE}{number}_")
 }
 
-struct ProbeDirectory(PathBuf);
+/// Own a unique temporary directory for overlays and staged outputs, removing only its own resources.
+struct ProbeDirectory(
+    /// Unique owned scratch directory removed on drop.
+    PathBuf,
+);
 
+/// Allocate unique owned scratch space for compiler probes and staged native outputs.
 impl ProbeDirectory {
+    /// Create a uniquely owned temporary directory for probe overlays and native staging artifacts.
     fn new() -> Result<Self, FrontendError> {
         for attempt in 0..128 {
             let directory = std::env::temp_dir()
@@ -1213,12 +1340,16 @@ impl ProbeDirectory {
     }
 }
 
+/// Release resources owned by ProbeDirectory even when a compiler or proof phase exits early.
 impl Drop for ProbeDirectory {
+    /// Remove only the temporary probe directory owned by this invocation.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
 
+/// Write a VFS overlay mapping the original header spelling to instrumented contents while preserving
+/// include context.
 fn overlay(directory: &Path, header: &Path, external: &Path) -> Result<PathBuf, FrontendError> {
     let path = directory.join("overlay.json");
     let contents = serde_json::json!({

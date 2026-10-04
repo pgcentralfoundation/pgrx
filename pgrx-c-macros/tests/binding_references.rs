@@ -2,20 +2,38 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare symbolic binding references and explained literal fallbacks with C.
+//!
+//! The tests preserve original integer identities and operator precedence while
+//! checking that binding paths are used only when verified. Domain checks must
+//! survive constant folding, and the unmodified header remains the value oracle.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, IntegerBinding, IntegerBindingRepresentation,
     IntegerValue, MacroScanner, SkipReasonCode, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, emit_with_bindings, inspect, pg_sys_integer_bridges,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "REF_HUGE_VALID",
     "REF_ALIASES",
@@ -30,6 +48,7 @@ const NAMES: &[&str] = &[
     "REF_ENUM_HIDDEN_ADD",
 ];
 
+/// Checks that uncertain constant folding preserves domain checks.
 #[test]
 fn uncertain_constant_folding_preserves_domain_checks() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -66,6 +85,8 @@ fn uncertain_constant_folding_preserves_domain_checks() {
     }
 }
 
+/// Assemble emitted macro definitions for the consumer, failing the test if an expected
+/// candidate is skipped.
 fn source(session: &AnalysisSession<'_>, name: &str, bindings: &BindingCatalog) -> String {
     match emit_with_bindings(session, name, bindings).status {
         EmissionStatus::Emitted { rust, .. } => rust,
@@ -73,6 +94,8 @@ fn source(session: &AnalysisSession<'_>, name: &str, bindings: &BindingCatalog) 
     }
 }
 
+/// Read the production semantic support and append the emitted adapters so the consumer
+/// exercises the real implementation.
 fn shared_support(
     session: &AnalysisSession<'_>,
     names: &[&str],
@@ -83,6 +106,7 @@ fn shared_support(
     artifact.rust
 }
 
+/// Checks that references and fallbacks preserve original C values types and precedence.
 #[test]
 fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

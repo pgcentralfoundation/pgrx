@@ -2,35 +2,64 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check that macro discovery can coexist with bindgen's Clang runtime.
+//!
+//! The scanner and bindgen are constructed in both orders and exercised while
+//! callbacks are active. Inventory checks and generated declarations establish
+//! that neither participant silently replaces or invalidates the other's runtime.
+
+/// Generate the fixture's actual Rust storage and callbacks for reconciliation with
+/// compiler-owned C facts.
 use bindgen::callbacks::{MacroParsingBehavior, ParseCallbacks};
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{MacroInventory, MacroScanner};
+/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::{Cell, RefCell};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Share discovery callback observations with the test without transferring Clang runtime
+/// ownership.
 use std::rc::Rc;
+/// Share discovery callback observations with the test without transferring Clang runtime
+/// ownership.
 use std::sync::Arc;
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/definitions.h")
 }
 
+/// Check that discovery retains the fixture definitions while another Clang-backed consumer is
+/// active.
 fn assert_inventory(inventory: &MacroInventory) {
     for name in ["FUNCTION", "INCLUDED_VALUE"] {
         assert!(inventory.macros.iter().any(|definition| definition.name == name));
     }
 }
 
+/// Check that the scanner still owns a usable Clang runtime after bindgen interacts with it.
 fn assert_runtime(expected: &Arc<clang_sys::SharedLibrary>) {
     let current = clang_sys::get_library().expect("the Clang runtime must remain loaded");
     assert!(Arc::ptr_eq(expected, &current), "the original Clang runtime must be retained");
 }
 
+/// Observe discovery while bindgen is parsing, proving both users coexist with the Clang
+/// runtime.
 #[derive(Debug)]
 struct ScanCallback {
+    /// Shared observation showing the discovery callback actually ran during bindgen.
     called: Rc<Cell<bool>>,
+    /// Earlier scanner whose Clang runtime must remain usable inside bindgen callbacks.
     existing: Option<Rc<RefCell<Option<MacroScanner>>>>,
 }
 
+/// Exercise discovery while bindgen callbacks hold the active Clang runtime.
 impl ParseCallbacks for ScanCallback {
+    /// Invoke discovery during bindgen callbacks and record that the earlier runtime remains
+    /// usable.
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
         if name != "CALLBACK_VALUE" {
             return MacroParsingBehavior::Default;
@@ -54,6 +83,7 @@ impl ParseCallbacks for ScanCallback {
     }
 }
 
+/// Run bindgen with the scanning callback under either scanner construction order.
 fn generate(callback: ScanCallback) -> String {
     bindgen::Builder::default()
         .header_contents(
@@ -74,6 +104,7 @@ fn generate(callback: ScanCallback) -> String {
         .to_string()
 }
 
+/// Require ordinary bindgen output to remain intact after discovery runs during its callbacks.
 fn assert_bindings(bindings: &str) {
     for declaration in
         ["pub const CALLBACK_VALUE", "pub struct BindingValue", "pub fn callback_function"]
@@ -83,6 +114,7 @@ fn assert_bindings(bindings: &str) {
 }
 
 // One test covers both construction orders without concurrent clang wrapper handles.
+/// Checks that discovery preserves bindgens runtime in both construction orders.
 #[test]
 fn discovery_preserves_bindgens_runtime_in_both_construction_orders() {
     assert!(clang_sys::get_library().is_none(), "the test starts before Clang initialization");

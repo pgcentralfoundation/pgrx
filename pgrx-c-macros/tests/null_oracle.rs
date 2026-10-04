@@ -2,26 +2,45 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare C null-constant rules with generated Rust expression boundaries.
+//!
+//! The fixtures distinguish literal zero, folded zero, ordinary integer values,
+//! object pointers, and callbacks. Native observations and rejected consumers
+//! ensure context-specific null conversion does not become a general integer cast.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "NULL_CONST",
     "NULL_CAST_CONST",
@@ -63,6 +82,7 @@ const NAMES: &[&str] = &[
     "NULL_NEGATIVE_VALUE",
 ];
 
+/// Checks that original C null constant contexts and boundaries are preserved.
 #[test]
 fn original_c_null_constant_contexts_and_boundaries_are_preserved() {
     let scanner = MacroScanner::new().expect("libclang must be available");

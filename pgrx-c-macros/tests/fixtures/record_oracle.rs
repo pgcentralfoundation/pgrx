@@ -1,6 +1,15 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Standalone Rust consumer for the record oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     let mut allocation = core::mem::MaybeUninit::<[u64; 8]>::uninit();
     let anonymous = allocation.as_mut_ptr().cast::<AnonymousRecord>();
@@ -80,6 +89,8 @@ fn main() {
             "flexarrayvoid\t{}",
             u8::from(RECORD_FLEX_ARRAY_VOID!(flexible).get() == items.cast())
         );
+        /// Represent an opaque C pointee identity without pretending its record layout is
+        /// available.
         type Incomplete = __pgrx_c_macros::expression::CFlexibleArray<
             __pgrx_c_macros::CUnsignedInt,
             __IncompleteArrayField<u32>,
@@ -112,6 +123,8 @@ fn main() {
         println!("volatile\t{}", RECORD_VOLATILE_READ!(signal).get());
         println!("volatileindirect\t{}", RECORD_VOLATILE_INDIRECT!(signal).get());
         let qualified = RECORD_VOLATILE_ADDRESS!(signal);
+        /// Keep a volatile-qualified operand in the consumer so generated accesses must retain
+        /// their qualification.
         fn keep_volatile(
             _: __pgrx_c_macros::expression_result::CExpression<
                 __pgrx_c_macros::expression::Pointer<

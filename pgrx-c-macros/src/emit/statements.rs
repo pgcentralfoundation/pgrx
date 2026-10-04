@@ -3,11 +3,23 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Ordered C statements share the expression arena and preserve lexical blocks.
+//!
+//! The statement renderer uses the same contextual expression lowering as value
+//! macros, retaining ordered effects, declarations, nested scopes, and returns.
+//! Delegation is limited to proved whole-body wrappers, and a token guard rejects
+//! arguments whose local-name capture would differ under Rust macro hygiene.
 
+/// Combine contextual expression rendering with macro delegation and fallback diagnostics.
 use super::{BindingCatalog, SUPPORT, macro_identifier, typed, write_fallback};
+/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::{AnalysisSession, MacroAnalysis, SkipReason, syntax::Statement};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Lower an entire admitted statement body, preserving ordered effects and return context.
+///
+/// Cross-macro calls remain visible only when delegation proves equivalence of the
+/// whole simple wrapper; other dependencies receive an expansion explanation.
 pub(super) fn render(
     session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
@@ -58,6 +70,7 @@ pub(super) fn render(
     Ok(rust)
 }
 
+/// Emit declarations, expressions, blocks, branches, and returns in original statement order.
 fn render_statements(
     statements: &[Statement],
     renderer: &typed::Renderer<'_>,

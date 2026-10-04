@@ -4,6 +4,13 @@
 
 //! Establish the selected C compilation environment before macro analysis.
 
+//! Discovery reconciles the Clang executable with the loaded libclang, including active
+//! macros, included files, target facts, and declaration identities. Bounded compiler probes
+//! establish facts that a declaration-only AST cannot supply, such as bitfield promotions and
+//! inline definitions. Input fingerprints and recorded searches make later generation reject
+//! a changed environment rather than silently mixing compiler observations.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveMacro, ActiveProvenance, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity,
     DeclarationCatalog, Error, FloatingKind, FloatingPointFacts, FloatingType, FrontendOutput,
@@ -11,24 +18,48 @@ use crate::{
     MacroEnvironment, MacroInventory, MacroKind, MacroScanner, SignedOverflow, TargetFacts,
     TokenKind, TypeCategory, TypeInfo,
 };
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
+/// Fingerprint consumed input bytes so subsequent phases reject changed compiler environments.
 use sha2::{Digest, Sha256};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::{self, Read, Write};
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::{Path, PathBuf};
+/// Run compiler tools with explicit owned process and stream boundaries.
 use std::process::{Child, Command, ExitStatus, Stdio};
+/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
+/// rules.
 use std::sync::mpsc;
+/// Drain compiler streams concurrently so one full pipe cannot block the other.
 use std::thread;
+/// Bound compiler work or distinguish owned probe directories without assuming timing proves
+/// semantics.
 use std::time::{Duration, Instant};
 
+/// Probe implementation-specific field promotions and access units before admitting native bitfield
+/// capabilities.
 mod bitfields;
+/// Prove supported compiler operations by prototype and bounded LLVM effect witnesses.
 mod builtins;
+/// Reparse original inline bodies to prove local definitions match the declaration-only catalog.
 mod definitions;
+/// Copy canonical C shape graphs while translation-unit handles remain live, preserving nominal
+/// identity and layout.
 mod types;
+/// Prove source integer constant expressions are zero so null-pointer identity is never inferred from
+/// runtime values.
 pub(crate) mod zero_constants;
 
+/// Bound each captured compiler pipe so pathological diagnostics or output cannot exhaust memory.
 const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
+/// Bound one tool invocation so failed or stuck compiler phases release their owned child process.
 const COMPILER_TIMEOUT: Duration = Duration::from_secs(60);
+/// Compiler flags that consume a separate value and must be parsed without confusing it with another
+/// input.
 const VALUE_OPTIONS: &[&str] = &[
     "-I",
     "-isystem",
@@ -56,30 +87,83 @@ const VALUE_OPTIONS: &[&str] = &[
 /// Failure to establish an agreed compiler environment or obtain its declarations.
 #[derive(Debug, thiserror::Error)]
 pub enum FrontendError {
+    /// The underlying scanner could not produce a complete reliable inventory.
     #[error(transparent)]
-    Discovery(#[from] Error),
+    Discovery(
+        /// Original scanner failure preserved through the frontend/CLI boundary.
+        #[from]
+        Error,
+    ),
+    /// Compiler arguments could change or bypass the coherent inspected C phase.
     #[error("invalid Clang analysis arguments: {0}")]
-    Arguments(String),
+    Arguments(
+        /// The unsupported option or argument detail that prevented a reproducible compiler phase.
+        String,
+    ),
+    /// The selected compiler could not be executed or its owned streams could not be read.
     #[error("could not run Clang at {}: {source}", compiler.display())]
-    CompilerIo { compiler: PathBuf, source: io::Error },
+    CompilerIo {
+        /// The selected executable whose invocation failed or whose target facts are being recorded.
+        compiler: PathBuf,
+        /// The underlying I/O or parsing failure retained for actionable diagnostics.
+        source: io::Error,
+    },
+    /// Generated native source or staged artifacts could not be accessed reliably.
     #[error("native support I/O at {}: {source}", path.display())]
-    NativeIo { path: PathBuf, source: io::Error },
+    NativeIo {
+        /// Native source or output path at which the filesystem operation failed.
+        path: PathBuf,
+        /// The underlying I/O or parsing failure retained for actionable diagnostics.
+        source: io::Error,
+    },
+    /// A tool phase exited unsuccessfully, with status and diagnostics retained.
     #[error("Clang at {} failed ({status}): {diagnostics}", compiler.display())]
-    CompilerFailed { compiler: PathBuf, status: ExitStatus, diagnostics: String },
+    CompilerFailed {
+        /// The selected executable whose invocation failed or whose target facts are being recorded.
+        compiler: PathBuf,
+        /// Unsuccessful driver or archiver exit status retained alongside diagnostics.
+        status: ExitStatus,
+        /// Owned compiler diagnostics associated with this discovery or tool phase.
+        diagnostics: String,
+    },
+    /// A compiler output pipe exceeded the bounded capture budget.
     #[error("Clang at {} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
-    OutputLimit(PathBuf),
+    OutputLimit(
+        /// The tool executable whose captured output exceeded its byte budget.
+        PathBuf,
+    ),
+    /// The tool invocation exceeded its finite time budget and is reaped.
     #[error("Clang at {} exceeded the 60-second time limit", .0.display())]
-    Timeout(PathBuf),
+    Timeout(
+        /// The tool executable whose invocation exceeded its time budget.
+        PathBuf,
+    ),
+    /// No acceptable executable could be selected for the loaded libclang release.
     #[error("could not find a compatible Clang executable: {0}")]
-    CompilerUnavailable(String),
+    CompilerUnavailable(
+        /// The missing or incompatible compiler selection detail.
+        String,
+    ),
+    /// Compiler paths, inputs, or effective semantics disagreed with the recorded inspection.
     #[error("incompatible compiler environment: {0}")]
-    Environment(String),
+    Environment(
+        /// The disagreement or changed-input detail that invalidates compiler fact coherence.
+        String,
+    ),
+    /// Required compiler output was malformed, incomplete, or outside the bounded proof grammar.
     #[error("invalid Clang output: {0}")]
-    Output(String),
+    Output(
+        /// The malformed or incomplete compiler output detail.
+        String,
+    ),
 }
 
+/// Owned driver output from one bounded invocation; later phases interpret stdout facts and stderr
+/// diagnostics separately.
 pub(crate) struct CompilerOutput {
+    /// Successful driver output consumed as preprocessing, dependency, or LLVM facts.
     pub(crate) stdout: String,
+    /// Diagnostics and verbose driver configuration captured separately from phase fact output.
     pub(crate) stderr: String,
 }
 
@@ -96,6 +180,8 @@ pub fn inspect(
     inspect_with_compiler_hint(scanner, header, arguments, preferred_compiler, None)
 }
 
+/// Resolve driver preference, reconcile driver/libclang observations, and probe facts before exposing
+/// a frontend snapshot.
 pub(crate) fn inspect_with_compiler_hint(
     scanner: &MacroScanner,
     header: &Path,
@@ -209,11 +295,14 @@ pub(crate) fn inspect_with_compiler_hint(
     Ok(frontend)
 }
 
+/// Resolve a filesystem identity for comparison and rebuild tracking without reusing it as include
+/// lookup spelling.
 fn absolute_path(path: &Path) -> Result<PathBuf, FrontendError> {
     path.canonicalize()
         .map_err(|source| FrontendError::CompilerIo { compiler: path.into(), source })
 }
 
+/// Make an input spelling absolute while retaining symlink-sensitive include lookup behavior.
 fn input_path(path: &Path) -> Result<PathBuf, FrontendError> {
     if path.is_absolute() {
         Ok(path.to_owned())
@@ -224,23 +313,36 @@ fn input_path(path: &Path) -> Result<PathBuf, FrontendError> {
     }
 }
 
+/// Reject non-UTF-8 compiler paths before passing them through the string-based driver interface.
 fn path_string(path: &Path) -> Result<&str, FrontendError> {
     path.to_str()
         .ok_or_else(|| FrontendError::Arguments(format!("path {} is not UTF-8", path.display())))
 }
 
+/// Change-sensitive driver lookup history, including absent candidates whose creation could change
+/// tool selection.
 #[derive(Default)]
 struct CompilerSearch {
+    /// Observed or change-sensitive file inputs retained for content fingerprinting and rebuild
+    /// invalidation.
     files: BTreeSet<PathBuf>,
+    /// PATH search roots whose contents can change which executable wins.
     directories: BTreeSet<PathBuf>,
+    /// Direct directory hints whose later replacement can make them valid executables.
     required_directories: BTreeSet<PathBuf>,
 }
 
+/// The chosen compatible executable together with the lookup dependencies that establish its
+/// preference.
 struct CompilerSelection {
+    /// The compatible Clang driver chosen for preprocessing and typed probe checks.
     executable: PathBuf,
+    /// Lookup dependencies needed to invalidate the selected driver when preference changes.
     search: CompilerSearch,
 }
 
+/// Combine explicit overrides, PostgreSQL hints, adjacent tools, and PATH roots into a compatible
+/// driver search.
 fn find_compiler(
     preferred: Option<&Path>,
     configured: Option<&Path>,
@@ -265,6 +367,8 @@ fn find_compiler(
     select_compiler(explicit.as_deref(), configured, adjacent.as_deref(), major, &search_roots)
 }
 
+/// Apply driver preference in order while retaining searches whose later changes could select a
+/// different executable.
 fn select_compiler(
     explicit: Option<&Path>,
     configured: Option<&Path>,
@@ -296,7 +400,10 @@ fn select_compiler(
     )))
 }
 
+/// Record executable spelling, identity, and lookup roots during driver preference resolution.
 impl CompilerSearch {
+    /// Resolve a direct executable or PATH name and record both successful and change-sensitive
+    /// lookup locations.
     fn resolve(
         &mut self,
         path: &Path,
@@ -327,6 +434,8 @@ impl CompilerSearch {
         Ok(None)
     }
 
+    /// Track the requested executable spelling and any current canonical identity for rebuild
+    /// invalidation.
     fn record_file(&mut self, path: &Path) {
         self.files.insert(path.to_owned());
         if let Ok(identity) = path.canonicalize() {
@@ -335,6 +444,8 @@ impl CompilerSearch {
     }
 }
 
+/// Build a C-mode invocation from recorded flags and phase-specific options without changing the
+/// inspected input profile.
 pub(crate) fn driver_arguments(
     arguments: &[String],
     options: &[&str],
@@ -350,6 +461,8 @@ pub(crate) fn driver_arguments(
     all
 }
 
+/// Run a bounded driver preprocessing phase against the selected header using validated path
+/// spelling.
 pub(crate) fn preprocess(
     compiler: &Path,
     header: &Path,
@@ -360,6 +473,8 @@ pub(crate) fn preprocess(
     run_compiler(compiler, &driver_arguments(arguments, options, Some(header)))
 }
 
+/// Recover the effective frontend target from the driver command instead of assuming the generator
+/// host target.
 pub(crate) fn compiler_triple(verbose: &str) -> Result<String, FrontendError> {
     for line in verbose.lines() {
         let Some(arguments) = shlex::split(line) else { continue };
@@ -372,6 +487,8 @@ pub(crate) fn compiler_triple(verbose: &str) -> Result<String, FrontendError> {
     Err(FrontendError::Output("Clang verbose output did not identify its frontend target".into()))
 }
 
+/// Read actual driver inclusions so inspection can compare them with libclang, separately from
+/// availability searches.
 fn parse_include_trace(verbose: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
     let mut included = BTreeSet::new();
     for line in verbose.lines() {
@@ -383,12 +500,16 @@ fn parse_include_trace(verbose: &str) -> Result<BTreeSet<PathBuf>, FrontendError
     Ok(included)
 }
 
+/// Replay the final macro dump through libclang with protected line endings to recover lexical token
+/// categories.
 pub(crate) fn tokenize_snapshot(
     scanner: &MacroScanner,
     contents: &str,
 ) -> Result<Vec<MacroDefinition>, FrontendError> {
     // Clang emits one complete definition per dump line. A literal terminal
     // backslash must not splice that line into the next definition when replayed.
+    /// Seed a comment marker that prevents terminal backslashes from joining adjacent macro-dump
+    /// definitions.
     const PREFIX: &str = "/*__pgrx_c_snapshot_end_";
     let occupied = contents
         .match_indices(PREFIX)
@@ -432,6 +553,8 @@ pub(crate) fn tokenize_snapshot(
         .collect())
 }
 
+/// Build the lexical definition key used to join a final active macro with physical discovery
+/// history.
 fn signature(definition: &MacroDefinition) -> (bool, Vec<&str>) {
     (
         definition.kind == MacroKind::FunctionLike,
@@ -444,6 +567,8 @@ fn signature(definition: &MacroDefinition) -> (bool, Vec<&str>) {
     )
 }
 
+/// Attach physical provenance to the final active definitions, retaining ambiguity when multiple
+/// source definitions match.
 fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroEnvironment {
     let mut history = HashMap::<_, (Vec<_>, HashSet<_>)>::new();
     for definition in &inventory.macros {
@@ -482,6 +607,8 @@ fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroE
     environment
 }
 
+/// Copy top-level declarations and include identities before the translation unit releases its Clang
+/// handles.
 fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTreeSet<PathBuf>) {
     let mut catalog = DeclarationCatalog::default();
     let mut included = BTreeSet::new();
@@ -554,6 +681,8 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
     (catalog, included)
 }
 
+/// Copy representation, qualifiers, and canonical C identity from a live Clang type for downstream
+/// checks.
 pub(crate) fn type_info(ty: Type<'_>) -> TypeInfo {
     let canonical = ty.get_canonical_type();
     let category = if has_type_attributes(ty) {
@@ -584,6 +713,7 @@ pub(crate) fn type_info(ty: Type<'_>) -> TypeInfo {
 
 // Canonicalization can erase arithmetic-affecting attributes on a typedef or an alias.
 // Keep such types outside the integer family until their semantics are modeled.
+/// Reject type spellings with attributes that ordinary canonical type facts cannot fully model.
 fn has_type_attributes(mut ty: Type<'_>) -> bool {
     for _ in 0..64 {
         if ty.get_kind() == TypeKind::Attributed {
@@ -623,6 +753,7 @@ fn has_type_attributes(mut ty: Type<'_>) -> bool {
     true
 }
 
+/// Classify a fundamental Clang integer kind without collapsing equal-width C identities.
 fn integer_kind(kind: TypeKind) -> Option<IntegerKind> {
     Some(match kind {
         TypeKind::Bool => IntegerKind::Bool,
@@ -643,17 +774,29 @@ fn integer_kind(kind: TypeKind) -> Option<IntegerKind> {
     })
 }
 
+/// Target witnesses agreed by driver preprocessing and typed libclang probes before profile
+/// construction.
 struct VerifiedPredefines {
+    /// Final target predefines observed by the driver and replayed through libclang.
     macros: Vec<MacroDefinition>,
+    /// Typed fundamental C integer witnesses agreeing with driver predefines.
     integers: BTreeMap<IntegerKind, IntegerType>,
+    /// Canonical unsigned C identity of sizeof/alignment results verified by both compiler paths.
     size_type: IntegerKind,
+    /// Whether optional intrinsic offset witnesses passed without hiding required fact errors.
     offsetof_supported: bool,
+    /// Whether supported ASCII characters and basic escapes match the bounded literal decoder.
     ascii_execution_charset: bool,
+    /// Typed float representation facts awaiting semantic option reconciliation.
     floating_types: BTreeMap<FloatingKind, (u64, Option<u64>)>,
+    /// The effective C floating evaluation mode, including excess-precision behavior.
     evaluation_method: i32,
+    /// Native function-pointer layout agreed by driver assertions and libclang.
     function_pointer: crate::PointerLayout,
 }
 
+/// Require driver macros and typed libclang witnesses to agree on the target facts used by semantic
+/// helpers.
 fn verify_predefines(
     scanner: &MacroScanner,
     compiler: &Path,
@@ -1066,6 +1209,8 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     })
 }
 
+/// Allow an optional offsetof proof to fail only when diagnostics belong exclusively to that optional
+/// witness.
 fn only_offsetof_errors(diagnostics: &str) -> bool {
     let mut found = false;
     for line in diagnostics.lines().filter(|line| line.contains("error:")) {
@@ -1077,6 +1222,8 @@ fn only_offsetof_errors(diagnostics: &str) -> bool {
     found
 }
 
+/// Construct the character-set witness that makes supported character literal values independent of
+/// host assumptions.
 fn ascii_character_predicate() -> String {
     let mut terms = (32_u8..=126)
         .map(|byte| {
@@ -1096,6 +1243,7 @@ fn ascii_character_predicate() -> String {
     terms.join(" && ")
 }
 
+/// Parse a verified numeric predefined macro for target representation checks.
 fn macro_number(
     macros: &BTreeMap<&str, &MacroDefinition>,
     name: &str,
@@ -1131,6 +1279,8 @@ fn macro_number(
     Err(FrontendError::Output(format!("recursive compiler macro {name}")))
 }
 
+/// Assemble agreed scalar, pointer, character, and layout facts into the profile consumed by
+/// analysis.
 fn target_facts(
     verified: VerifiedPredefines,
     triple: String,
@@ -1245,6 +1395,8 @@ fn target_facts(
     })
 }
 
+/// Reconcile floating representation with effective compiler options so lowering can reject altered
+/// arithmetic semantics.
 fn floating_point_facts(
     macros: &BTreeMap<&str, &MacroDefinition>,
     layouts: BTreeMap<FloatingKind, (u64, Option<u64>)>,
@@ -1338,6 +1490,7 @@ fn floating_point_facts(
     })
 }
 
+/// Read a signed predefined numeric fact without losing the negative exponent or evaluation value.
 fn macro_signed_number(
     macros: &BTreeMap<&str, &MacroDefinition>,
     name: &str,
@@ -1371,6 +1524,7 @@ fn macro_signed_number(
     Ok(if negative { -value } else { value })
 }
 
+/// Extract the effective cc1 command from verbose output for semantic option auditing.
 fn frontend_arguments(verbose: &str) -> Result<Vec<String>, FrontendError> {
     verbose
         .lines()
@@ -1379,6 +1533,8 @@ fn frontend_arguments(verbose: &str) -> Result<Vec<String>, FrontendError> {
         .ok_or_else(|| FrontendError::Output("missing effective Clang frontend arguments".into()))
 }
 
+/// Determine signed-overflow policy and unsupported semantic modes from recorded and effective
+/// compiler options.
 fn semantic_options(
     arguments: &[String],
     verbose: &str,
@@ -1451,6 +1607,8 @@ fn semantic_options(
     Ok((overflow, unsupported))
 }
 
+/// Identify flags that can alter floating arithmetic and therefore require explicit profile
+/// reasoning.
 fn is_floating_point_option(argument: &str) -> bool {
     argument.starts_with("-ffp-")
         || argument.starts_with("-fdenormal-fp-math")
@@ -1484,6 +1642,7 @@ fn is_floating_point_option(argument: &str) -> bool {
         )
 }
 
+/// Decode Clang makefile dependencies, preserving escaped paths for later input tracking.
 pub(crate) fn parse_dependencies(output: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
     let (_, paths) = output
         .split_once(':')
@@ -1520,6 +1679,8 @@ pub(crate) fn parse_dependencies(output: &str) -> Result<BTreeSet<PathBuf>, Fron
     Ok(files)
 }
 
+/// Record files, fingerprints, search roots, and environment values that can change compiler
+/// observations.
 fn build_inputs(
     arguments: &[String],
     verbose: &str,
@@ -1665,6 +1826,8 @@ pub(crate) fn fingerprint_files<'a>(
             }
             digest.update(&buffer[..length]);
         }
+        /// Format owned report text or bounded probe source without changing the original semantic
+        /// tokens.
         use std::fmt::Write as _;
         let mut fingerprint = String::with_capacity(64);
         for byte in digest.finalize() {
@@ -1675,6 +1838,7 @@ pub(crate) fn fingerprint_files<'a>(
     Ok(fingerprints)
 }
 
+/// Reject file-content changes after inspection before later phases combine stale and fresh facts.
 pub(crate) fn verify_input_files(inputs: &BuildInputs) -> Result<(), FrontendError> {
     let actual = fingerprint_files(inputs.fingerprints.keys())?;
     if let Some((path, _)) =
@@ -1690,6 +1854,8 @@ pub(crate) fn verify_input_files(inputs: &BuildInputs) -> Result<(), FrontendErr
 
 // Read stdout and stderr concurrently so either pipe can fill without blocking Clang.
 // The channel also lets an output limit stop the child without waiting for a timeout.
+/// Run a driver phase with bounded concurrent output capture so either pipe cannot deadlock the
+/// other.
 pub(crate) fn run_compiler(
     compiler: &Path,
     arguments: &[String],
@@ -1768,6 +1934,7 @@ pub fn compile_native_support(
     Ok(())
 }
 
+/// Resolve output identities, including absent filenames, to reject source/object/archive aliasing.
 fn native_output_identity(path: &Path) -> Result<PathBuf, FrontendError> {
     let name = path.file_name().ok_or_else(|| {
         FrontendError::Arguments(format!("native output has no filename: {}", path.display()))
@@ -1784,6 +1951,8 @@ fn native_output_identity(path: &Path) -> Result<PathBuf, FrontendError> {
         .map_err(|source| FrontendError::NativeIo { path: path.into(), source })
 }
 
+/// Require a fresh nonempty regular output before native generation accepts a tool invocation as
+/// successful.
 fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError> {
     let metadata = std::fs::symlink_metadata(path).map_err(|error| {
         FrontendError::Output(format!("native tool did not produce its {kind}: {error}"))
@@ -1796,6 +1965,8 @@ fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError>
     Ok(())
 }
 
+/// Feed an optional owned probe to the driver while enforcing output/time limits and reaping failed
+/// children.
 fn run_compiler_with_input(
     compiler: &Path,
     arguments: &[String],
@@ -1880,9 +2051,16 @@ fn run_compiler_with_input(
     }
 }
 
-struct RunningCompiler(Child);
+/// Own a child process so early returns, diagnostic failures, and time limits still kill and reap it.
+struct RunningCompiler(
+    /// The child process owned until completion or explicit kill/reap on failure.
+    Child,
+);
 
+/// Release resources owned by RunningCompiler even when a compiler or proof phase exits early.
 impl Drop for RunningCompiler {
+    /// Kill and reap a still-running compiler so errors and time limits do not leave owned child
+    /// processes behind.
     fn drop(&mut self) {
         if self.0.try_wait().ok().flatten().is_none() {
             let _ = self.0.kill();
@@ -1891,6 +2069,8 @@ impl Drop for RunningCompiler {
     }
 }
 
+/// Drain one compiler pipe on an owned thread with a byte budget and report its result to the
+/// coordinator.
 fn start_reader(
     stream: impl Read + Send + 'static,
     is_stdout: bool,
@@ -1905,11 +2085,14 @@ fn start_reader(
         .map(|_| ())
 }
 
+/// Extract the Clang release major used to require a driver compatible with the loaded library.
 pub(crate) fn version_major(version: &str) -> Option<u32> {
     let (_, version) = version.split_once("clang version ")?;
     version.split('.').next()?.parse().ok()
 }
 
+/// Reject automatically loaded driver configuration whose unrecorded flags would defeat reproducible
+/// analysis.
 pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), FrontendError> {
     if let Some(configuration) =
         verbose.lines().find(|line| line.trim_start().starts_with("Configuration file:"))
@@ -1922,6 +2105,8 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
     Ok(())
 }
 
+/// Reject extra inputs, driver actions, and hidden configuration that could change or bypass the
+/// inspected C phase.
 fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
@@ -2005,6 +2190,7 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
     Ok(())
 }
 
+/// Prevent -D/-U options from forging protected target macros that serve as semantic witnesses.
 fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
     let name = value
         .split(|character: char| !character.is_ascii_alphanumeric() && character != '_')
@@ -2046,10 +2232,16 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
     Ok(())
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
 
+    /// Checks optional offsetof failures cannot hide required fact errors.
     #[test]
     fn optional_offsetof_failures_cannot_hide_required_fact_errors() {
         assert!(only_offsetof_errors(
@@ -2065,6 +2257,7 @@ mod tests {
         assert!(!only_offsetof_errors(""));
     }
 
+    /// Checks protection codegen options require exact reviewed spellings.
     #[test]
     fn protection_codegen_options_require_exact_reviewed_spellings() {
         let verbose = "clang -cc1 -fwrapv\n";
@@ -2095,15 +2288,25 @@ mod tests {
         }
     }
 
+    /// Exercise driver preference and change-sensitive filesystem searches with isolated synthetic
+    /// executables.
     #[cfg(unix)]
     mod compiler_selection {
+        /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+        /// validation and input contract.
         use super::*;
+        /// Create and inspect only fixture/probe files owned by the enclosing phase.
         use std::fs;
+        /// Set synthetic executable permissions needed to exercise real driver lookup behavior.
         use std::os::unix::fs::PermissionsExt;
+        /// Share owned runtime/process observations while retaining the enclosing thread or fixture
+        /// ownership rules.
         use std::sync::atomic::{AtomicU64, Ordering};
 
+        /// Give compiler-selection tests unique owned temporary directory names.
         static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
+        /// Checks creating an adjacent compiler invalidates the previous path selection.
         #[test]
         fn creating_an_adjacent_compiler_invalidates_the_previous_path_selection() {
             let fixture = Fixture::new();
@@ -2142,6 +2345,7 @@ mod tests {
             assert!(!selection.search.files.contains(&path_compiler));
         }
 
+        /// Checks replacing a rejected configured compiler changes preference and keeps aliases.
         #[test]
         fn replacing_a_rejected_configured_compiler_changes_preference_and_keeps_aliases() {
             let fixture = Fixture::new();
@@ -2172,6 +2376,7 @@ mod tests {
             assert_ne!(inputs.fingerprints[&configured], rejected_identity);
         }
 
+        /// Checks bare configured names keep path precedence and explicit failures stay strict.
         #[test]
         fn bare_configured_names_keep_path_precedence_and_explicit_failures_stay_strict() {
             let fixture = Fixture::new();
@@ -2203,6 +2408,7 @@ mod tests {
             ));
         }
 
+        /// Checks replacing a direct directory hint keeps it distinct from path lookups.
         #[test]
         fn replacing_a_direct_directory_hint_keeps_it_distinct_from_path_lookups() {
             let fixture = Fixture::new();
@@ -2235,6 +2441,8 @@ mod tests {
             assert!(selection.search.files.contains(&actual.canonicalize().unwrap()));
         }
 
+        /// Create a synthetic executable whose version response exercises driver preference and
+        /// invalidation without invoking Clang.
         fn compiler(path: &Path, major: u32) {
             fs::write(path, format!("#!/bin/sh\nprintf '%s\\n' 'clang version {major}.0.0'\n"))
                 .unwrap();
@@ -2243,9 +2451,17 @@ mod tests {
             fs::set_permissions(path, permissions).unwrap();
         }
 
-        struct Fixture(PathBuf);
+        /// Own an isolated synthetic compiler directory for preference and rebuild-invalidation
+        /// tests.
+        struct Fixture(
+            /// The isolated synthetic compiler directory owned by this test fixture.
+            PathBuf,
+        );
 
+        /// Create uniquely owned synthetic tool trees for driver-selection regression tests.
         impl Fixture {
+            /// Create a uniquely owned compiler-selection fixture directory so tests do not alter
+            /// configured installations.
             fn new() -> Self {
                 let number = NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed);
                 for attempt in 0..64 {
@@ -2263,13 +2479,16 @@ mod tests {
             }
         }
 
+        /// Release resources owned by Fixture even when a compiler or proof phase exits early.
         impl Drop for Fixture {
+            /// Remove only the synthetic compiler directory owned by this fixture.
             fn drop(&mut self) {
                 let _ = fs::remove_dir_all(&self.0);
             }
         }
     }
 
+    /// Checks compiler target facts cannot be forged by macro options.
     #[test]
     fn compiler_target_facts_cannot_be_forged_by_macro_options() {
         for arguments in [
@@ -2302,6 +2521,7 @@ mod tests {
         .unwrap();
     }
 
+    /// Checks automatically loaded driver configuration is rejected.
     #[test]
     fn automatically_loaded_driver_configuration_is_rejected() {
         assert!(matches!(

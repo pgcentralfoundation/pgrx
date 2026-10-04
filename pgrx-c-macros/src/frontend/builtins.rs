@@ -4,44 +4,81 @@
 
 //! Verify direct compiler operations without treating them as native functions.
 
+//! Compiler builtins do not have ordinary PostgreSQL binding symbols. This phase proves a
+//! bounded operation set using typed prototypes and LLVM witnesses from the matched driver.
+//! Only accepted signatures with the expected operand identity and effects become capabilities;
+//! unsupported witnesses produce reasons. Temporary overlays preserve the original source
+//! context while isolating instrumentation.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{FrontendError, driver_arguments, run_compiler, tokenize_snapshot, type_info};
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     BuiltinInfo, BuiltinKind, FrontendOutput, FunctionSignature, IntegerKind, MacroScanner,
     TypeCategory,
 };
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{Entity, EntityKind, EntityVisitResult, Index, TypeKind};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeMap;
+/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
+/// Create and inspect only fixture/probe files owned by the enclosing phase.
 use std::fs;
+/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::PathBuf;
+/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
+/// rules.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Bound compiler work or distinguish owned probe directories without assuming timing proves
+/// semantics.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// The reviewed builtin names and operation identities eligible for signature and effect proof.
 const OPERATIONS: &[(&str, BuiltinKind)] = &[
     ("__builtin_bswap16", BuiltinKind::ByteSwap { bits: 16 }),
     ("__builtin_bswap32", BuiltinKind::ByteSwap { bits: 32 }),
     ("__builtin_bswap64", BuiltinKind::ByteSwap { bits: 64 }),
     ("__builtin_expect", BuiltinKind::Expect),
 ];
+/// Bound one constructed probe source before invoking Clang or allocating additional instrumentation.
 const MAX_SOURCE_BYTES: usize = 4 * 1024 * 1024;
+/// Bound LLVM witness parsing so unsupported compiler bodies remain an explicit refusal.
 const MAX_BODY_LINES: usize = 128;
+/// Distinguish temporary builtin probe directories within one process without reusing another
+/// invocation’s files.
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
+/// Separate builtin capabilities with established signature/effect proofs from per-name unavailable
+/// reasons.
 #[derive(Default)]
 pub(super) struct Proof {
+    /// Capabilities whose operation signatures and effects were established by both compiler paths.
     pub(super) supported: BTreeMap<String, BuiltinInfo>,
+    /// Per-name explanations for compiler operations that could not establish the required proof.
     pub(super) unavailable: BTreeMap<String, String>,
 }
 
+/// The intended builtin operation and fresh typed/LLVM witness name to be checked by both compiler
+/// paths.
 struct Candidate {
+    /// Reviewed builtin spelling selected for prototype and effect proof.
     name: &'static str,
+    /// Intended compiler operation whose semantics the witnesses must establish.
     kind: BuiltinKind,
+    /// Target-derived operand/result width expected by the builtin proof.
     bits: u16,
+    /// Fresh probe symbol used to associate typed and LLVM observations with one builtin candidate.
     witness: String,
 }
 
+/// Derive only the reviewed operation metadata used to construct builtin witnesses.
 impl Candidate {
+    /// Return the operation-specific operand count used by typed builtin probes.
     fn arity(&self) -> usize {
         match self.kind {
             BuiltinKind::ByteSwap { .. } => 1,
@@ -50,8 +87,11 @@ impl Candidate {
     }
 }
 
+/// The source lines owned by one builtin candidate for attributing compiler diagnostics.
 struct ProbeRange {
+    /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     name: &'static str,
+    /// Physical probe-source lines used to attribute diagnostics to one candidate.
     lines: std::ops::Range<u32>,
 }
 
@@ -133,6 +173,8 @@ pub(super) fn prove(
     Ok(proof)
 }
 
+/// Reconcile typed prototypes and driver LLVM witnesses for the bounded candidate set, recording
+/// per-name refusals.
 fn prove_inner(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -274,6 +316,7 @@ fn prove_inner(
     Ok(())
 }
 
+/// Validate the builtin call result and parameter identity against the intended operation and target.
 fn prototype(
     function: Entity<'_>,
     candidate: &Candidate,
@@ -361,10 +404,12 @@ fn prototype(
     })
 }
 
+/// Produce the common reason when a candidate signature cannot prove the expected builtin contract.
 fn prototype_message(candidate: &Candidate) -> String {
     format!("PGRX builtin prototype {}", candidate.name)
 }
 
+/// Build bounded typed and dynamic witnesses in the original preprocessing context.
 fn source(
     original: &str,
     prefix: &str,
@@ -417,14 +462,23 @@ fn source(
     Ok((source, ranges))
 }
 
+/// Own builtin instrumentation and an overlay while retaining original bytes for environment
+/// verification.
 struct ProbeFiles {
+    /// The unique owned scratch directory containing this phase’s temporary overlays and probes.
     directory: PathBuf,
+    /// Owned instrumentation source file mapped onto the original header by the overlay.
     source: PathBuf,
+    /// Owned VFS mapping that preserves the original main-file identity during driver probes.
     overlay: PathBuf,
+    /// Original main-file bytes retained to prove instrumentation preserves its preprocessing
+    /// context.
     original: String,
 }
 
+/// Manage owned instrumentation/overlays while keeping the original main-file preprocessing context.
 impl ProbeFiles {
+    /// Create owned builtin probe files and retain original header bytes for overlay verification.
     fn new(frontend: &FrontendOutput) -> Result<Self, FrontendError> {
         let header = &frontend.profile().header;
         let io_error = |source| FrontendError::CompilerIo { compiler: header.clone(), source };
@@ -466,11 +520,13 @@ impl ProbeFiles {
         Ok(files)
     }
 
+    /// Replace the owned probe source contents between bounded witness phases.
     fn write(&self, source: &str) -> Result<(), FrontendError> {
         fs::write(&self.source, source)
             .map_err(|source| FrontendError::CompilerIo { compiler: self.source.clone(), source })
     }
 
+    /// Construct the driver arguments that apply the owned overlay to the original header context.
     fn arguments(
         &self,
         frontend: &FrontendOutput,
@@ -483,12 +539,16 @@ impl ProbeFiles {
     }
 }
 
+/// Release resources owned by ProbeFiles even when a compiler or proof phase exits early.
 impl Drop for ProbeFiles {
+    /// Clean up the temporary builtin probe files owned by this proof.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.directory);
     }
 }
 
+/// Require instrumented preprocessing to retain the inspected macro environment before accepting
+/// builtin evidence.
 fn verify_snapshot(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -525,17 +585,28 @@ fn verify_snapshot(
     Ok(())
 }
 
+/// The operand identity tracked through a builtin LLVM witness, including a byte-swapped result.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Origin {
-    Parameter(usize),
+    /// The original dynamic operand identity tracked through permitted LLVM copies.
+    Parameter(
+        /// The original dynamic operand identity tracked through permitted LLVM copies.
+        usize,
+    ),
+    /// A witness value derived from the original operand by exactly the admitted byte swap.
     Swapped,
 }
 
+/// A supported LLVM local copy with tracked value identity and required alignment.
 struct Slot {
+    /// Operand identity stored in a supported local LLVM copy.
     value: Option<Origin>,
+    /// Recorded local access alignment checked when accepting stack-copy witnesses.
     alignment: Option<u64>,
 }
 
+/// Recognize a bounded LLVM body whose result identity and allowed effects prove the intended
+/// operation.
 fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result<(), String> {
     let marker = format!("@{witness}(");
     let mut functions = ir.lines().filter(|line| line.starts_with("define "));
@@ -751,6 +822,7 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result
     }
 }
 
+/// Parse load/store pointer and alignment details needed to track supported O0 value copies.
 fn access_suffix(parts: &[&str]) -> Result<Option<u64>, String> {
     let mut alignment = None;
     for part in parts {
@@ -772,6 +844,7 @@ fn access_suffix(parts: &[&str]) -> Result<Option<u64>, String> {
     Ok(alignment)
 }
 
+/// Recognize the bounded local pointer spelling used by LLVM stack-copy witnesses.
 fn local_pointer<'a>(part: Option<&'a str>, ty: &str) -> Result<&'a str, String> {
     let mut words = part.ok_or("LLVM scalar access has no pointer")?.split_whitespace();
     let storage = words.next().ok_or("LLVM scalar access has no pointer type")?;
@@ -782,18 +855,26 @@ fn local_pointer<'a>(part: Option<&'a str>, ty: &str) -> Result<&'a str, String>
     Ok(pointer)
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
 
+    /// Build a byte-swap LLVM test body for the production witness recognizer.
     fn witness(body: &str) -> String {
         format!("define dso_local i32 @probe(i32 noundef %0) {{\n{body}\n}}\n")
     }
 
+    /// Build a branch-hint LLVM test body for checking first-operand identity and allowed effects.
     fn expect_witness(body: &str) -> String {
         format!("define dso_local i64 @probe(i64 noundef %0, i64 noundef %1) {{\n{body}\n}}\n")
     }
 
+    /// Checks dynamic swap accepts optimized and initialized O0 copies with debug records.
     #[test]
     fn dynamic_swap_accepts_optimized_and_initialized_o0_copies_with_debug_records() {
         for body in [
@@ -805,6 +886,7 @@ mod tests {
         }
     }
 
+    /// Checks byte swap proof rejects extra effects wrong width and lost value identity.
     #[test]
     fn byte_swap_proof_rejects_extra_effects_wrong_width_and_lost_value_identity() {
         for body in [
@@ -845,6 +927,7 @@ mod tests {
         assert!(llvm_witness("define i32 @probe(i32 returned %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1\n}", "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).is_err());
     }
 
+    /// Checks malformed or incomplete LLVM witnesses are errors.
     #[test]
     fn malformed_or_incomplete_llvm_witnesses_are_errors() {
         for ir in [
@@ -861,6 +944,7 @@ mod tests {
         }
     }
 
+    /// Checks expect proves first operand identity with stack copies or a pure hint.
     #[test]
     fn expect_proves_first_operand_identity_with_stack_copies_or_a_pure_hint() {
         for body in [
@@ -880,6 +964,7 @@ mod tests {
         .unwrap();
     }
 
+    /// Checks expect rejects reversed identity arithmetic and non hint effects.
     #[test]
     fn expect_rejects_reversed_identity_arithmetic_and_non_hint_effects() {
         for body in [

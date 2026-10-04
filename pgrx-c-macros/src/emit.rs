@@ -10,34 +10,60 @@
 //! declarations with actual binding types and preserve raw aggregate and enum validity.
 //! Place and native-call operations retain explicit caller safety obligations. Emission
 //! does not establish differential validation, and the generic helpers are runtime calls.
+//!
+//! Lowering is admitted only after analysis establishes the selected C profile and
+//! its declaration facts. Batch generation first plans the required capabilities,
+//! reconciles them with the fresh Rust bindings, and propagates rejected dependencies
+//! so exported macros never call a missing generated definition.
 
+/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{
     AnalysisStatus, AnalyzedExpression, ConstCapability, MacroAnalysis, ResolvedConstant,
     SkipReason, SkipReasonCode, TypeExpression,
 };
+/// Preserve target integer width, rank, literal value, and overflow semantics in emitted helpers.
 use crate::model::{IntegerKind, IntegerType, IntegerValue, SignedOverflow};
+/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, IntegerLiteral, NodeId, TokenRange, UnaryOperator,
 };
+/// Combine immutable session provenance with target ABI assertions before producing reviewable source.
 use crate::{AnalysisSession, MacroDefinition, support_generation::support_abi_assertions};
+/// Serialize emission outcomes and binding facts for CLI reports and generation consumers.
 use serde::Serialize;
+/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Hygienic path to the defining crate’s C semantic runtime used by exported expansions.
 const SUPPORT: &str = "$crate::__pgrx_c_macros";
+/// Bound one macro’s emitted source, including diagnostics and original-definition docs.
 const MAX_EMISSION_BYTES: usize = 1024 * 1024;
 
+/// Original-function address adapters that bypass callable thunks and Rust guard wrappers.
 mod addresses;
+/// Token normalization that preserves contextual C substitution at Rust macro call sites.
 mod arguments;
+/// Compiler-owned storage access for fields Rust cannot project directly.
 mod bitfields;
+/// Prototype identity and native callback ABI reconciliation.
 mod callbacks;
+/// Batch capability selection derived from C expression constraints.
 mod demands;
+/// Nominal enum identities and checked bridges to actual binding storage.
 mod enumerations;
+/// Optimization-hint planning that preserves C values and operand effects.
 mod expectation;
+/// Typed field projections, record registrations, and independent offset capabilities.
 mod fields;
+/// Native C thunks and guarded Rust adapters for callable declarations.
 mod functions;
+/// Lexically ordered statement lowering over the shared expression arena.
 mod statements;
+/// Contextual expression rendering for values, places, size operands, and effects.
 mod typed;
+/// Shared reconciliation of compiler C identity with fresh Rust binding storage.
 mod types;
 
 /// Names and values in the defining Rust crate, supplied by its binding generator.
@@ -46,15 +72,23 @@ mod types;
 /// Paths are relative to `$crate`; `macros` contains macros actually emitted there.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BindingCatalog {
+    /// Binding values and paths used to preserve symbols after checking agreement with Clang.
     pub integer_constants: BTreeMap<String, IntegerBinding>,
+    /// Definitions available for preserved cross-macro calls in this defining crate.
     pub macros: BTreeSet<String>,
+    /// Actual function binding prototypes and any generated native replacements.
     pub functions: BTreeMap<String, crate::FunctionBinding>,
+    /// Binding-owned record constructors and field storage, independent of C layout facts.
     pub records: BTreeMap<String, crate::RecordBinding>,
+    /// Rust typedef aliases available for storage reconciliation and readable casts.
     pub types: BTreeMap<String, crate::AliasBinding>,
+    /// Rust enum constructors whose discriminants require checked C storage conversion.
     pub enums: BTreeMap<String, crate::EnumBinding>,
+    /// Global binding paths and storage for C object reads, addresses, and mutations.
     pub variables: BTreeMap<String, crate::VariableBinding>,
     /// Binding-owned integer newtypes whose storage adapters have been verified.
     pub integer_storage: BTreeMap<String, IntegerKind>,
+    /// Bindgen storage-unit descriptions used to anchor original-C bitfield adapters.
     pub bitfields: BTreeMap<String, crate::BitfieldBinding>,
     /// Generated field capabilities, populated by batch lowering from both catalogs.
     #[serde(skip)]
@@ -62,27 +96,40 @@ pub struct BindingCatalog {
     /// Offset-only field metadata, independent of load or projection support.
     #[serde(skip)]
     pub offset_capabilities: BTreeMap<String, Option<String>>,
+    /// Rejected offset paths whose reasons must remain visible to dependent macros.
     #[serde(skip)]
     pub offset_unavailable: BTreeMap<String, String>,
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
+    /// Native-call rejections retained instead of silently using an unverified binding.
     #[serde(skip)]
     pub function_unavailable: BTreeMap<String, String>,
+    /// Verified nominal callback markers and exact native signature storage.
     #[serde(skip)]
     pub callback_capabilities: BTreeMap<String, crate::CallbackBinding>,
+    /// Callback identity or ABI failures that prevent unsafe inference during rendering.
     #[serde(skip)]
     pub callback_unavailable: BTreeMap<String, String>,
+    /// Enum layout or representation failures retained for contextual lowering.
     #[serde(skip)]
     pub enum_unavailable: BTreeMap<String, String>,
+    /// Getters for the original C function addresses, distinct from Rust call wrappers.
     #[serde(skip)]
     pub function_addresses: BTreeMap<String, crate::FunctionAddressBinding>,
 }
 
+/// A symbol reference and its independently comparable binding value.
+///
+/// The representation records binding rewrites so preserving a name does not lose
+/// the conversion required by a nonprimitive Rust storage type.
 #[derive(Clone, Debug, Serialize)]
 pub struct IntegerBinding {
+    /// Crate-relative binding path, validated before insertion into hygienic macro source.
     pub path: Vec<String>,
+    /// Bindgen’s value, checked against Clang without rewriting the binding.
     pub value: IntegerValue,
+    /// Storage bridge needed to wrap this binding value with its C integer identity.
     pub representation: IntegerBindingRepresentation,
 }
 
@@ -90,27 +137,36 @@ pub struct IntegerBinding {
 #[derive(Clone, Copy, Debug, Default, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum IntegerBindingRepresentation {
+    /// Ordinary Rust integer storage whose bits can enter the C value wrapper directly.
     #[default]
     Primitive,
+    /// pgrx’s OID newtype, requiring its storage conversion rather than a primitive assumption.
     Oid,
 }
 
 /// The original analysis and the outcome of lowering it under the same trusted profile.
 #[derive(Clone, Debug, Serialize)]
 pub struct MacroEmission {
+    /// Trusted source analysis retained alongside output for provenance and skip reporting.
     pub analysis: MacroAnalysis,
+    /// Lowering result under the binding catalog and C profile used for this generation.
     pub status: EmissionStatus,
 }
 
+/// Either reviewable Rust source or a structured explanation of why lowering was rejected.
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum EmissionStatus {
     /// Rust source was produced; downstream compilation and C comparison are separate checks.
     Emitted {
+        /// Formatted macro definition retaining source docs and profile checks.
         rust: String,
+        /// Advertised evaluation capability; emission currently produces runtime expressions.
         const_capability: ConstCapability,
     },
+    /// No definition is available; callers must propagate the reason to dependent macros.
     Skipped {
+        /// Structured root rejection with token location and provenance for reporting.
         reason: SkipReason,
     },
 }
@@ -133,6 +189,10 @@ pub fn emit_with_bindings(
     emit_with_lowering(session, name, bindings, &mut None)
 }
 
+/// Apply admission gates before rendering, sharing storage reconciliation across a batch.
+///
+/// The optional lowering is populated only after a macro survives analysis and ABI
+/// checks, so skipped batches do not build indexes they cannot use.
 fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
@@ -194,6 +254,7 @@ pub fn emit_batch_with_bindings(
     Ok(emit_prepared_batch(session, names, &capabilities))
 }
 
+/// Install verified capabilities and their rejection reasons into one rendering catalog.
 fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdapters) {
     capabilities.callback_capabilities.extend(adapters.callbacks.markers.clone());
     capabilities.callback_unavailable.extend(adapters.callbacks.unsupported.clone());
@@ -206,6 +267,10 @@ fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdap
     capabilities.function_unavailable.extend(adapters.functions.unsupported.clone());
 }
 
+/// Render candidates, close mismatch failures through the dependency graph, and rerender calls.
+///
+/// A second propagation step handles late rendering failures so no surviving macro
+/// references an exported definition that failed its output bound.
 fn emit_prepared_batch(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
@@ -371,14 +436,18 @@ pub fn emit_support_with_bindings(
 /// and call original C functions; they do not replace complete macro expressions.
 #[derive(Clone, Debug, Default)]
 pub struct MacroSupportArtifact {
+    /// Support items included once alongside the generated macro set.
     pub rust: String,
+    /// Same-profile C primitives that the caller must compile when nonempty.
     pub c_source: String,
 }
 
 /// One preparation supplies both the macros and their shared native capabilities.
 #[derive(Clone, Debug)]
 pub struct MacroGeneration {
+    /// Per-root output and skips produced with the finalized capability catalog.
     pub macros: Vec<MacroEmission>,
+    /// Only the shared Rust and native C support retained by successful roots.
     pub support: MacroSupportArtifact,
 }
 
@@ -432,6 +501,7 @@ pub fn generate_with_bindings(
     Ok(MacroGeneration { macros, support })
 }
 
+/// Generate the complete batch and return its mutually consistent support artifacts.
 pub fn emit_support_artifact_with_bindings(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
@@ -440,6 +510,7 @@ pub fn emit_support_artifact_with_bindings(
     Ok(generate_with_bindings(session, names, bindings)?.support)
 }
 
+/// Assemble native items and shared token classifiers needed by the successful macro set.
 fn render_adapters(
     adapters: GeneratedAdapters,
     macros: &[MacroEmission],
@@ -488,20 +559,31 @@ fn render_adapters(
     })
 }
 
+/// Reconciled capability families before registration, pruning, and final artifact assembly.
 struct GeneratedAdapters {
+    /// Member-access and offset capabilities, including same-profile bitfield primitives.
     fields: fields::FieldAdapters,
+    /// Callable declaration adapters and any replacement binding signatures.
     functions: functions::FunctionAdapters,
+    /// Nominal function-pointer identities and admitted call operations.
     callbacks: callbacks::CallbackAdapters,
+    /// Original C address getters for referenced functions.
     addresses: addresses::AddressAdapters,
+    /// Enum identities and checked storage bridges for requested types.
     enumerations: enumerations::EnumAdapters,
 }
 
+/// Build capability families in dependency order from the planned batch requirements.
+///
+/// Callback witnesses establish signatures before function thunks are generated;
+/// those thunks then contribute storage facts to the final callback and field passes.
 fn generated_adapters(
     session: &AnalysisSession<'_>,
     requests: &demands::Requests,
     bindings: &BindingCatalog,
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
+    /// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
     use sha2::{Digest, Sha256};
     let profile = serde_json::to_vec(frontend.profile())
         .map_err(|error| format!("cannot fingerprint the C function profile: {error}"))?;
@@ -576,6 +658,7 @@ fn generated_adapters(
     })
 }
 
+/// Render a bounded identifier-to-capability lookup for fields and offsetof paths.
 fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> {
     let mut rust =
         String::from("#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_field_marker {\n");
@@ -605,6 +688,9 @@ fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> 
 
 // Field tokens select a verified capability rather than declare a Rust item.
 // C members may therefore use Rust keywords such as `self` or `crate`.
+/// Accept C member tokens without applying Rust item-name keyword restrictions.
+///
+/// These tokens select verified capabilities rather than declare Rust identifiers.
 pub(super) fn field_identifier(name: &str) -> Option<&str> {
     let mut bytes = name.bytes();
     (bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
@@ -612,6 +698,7 @@ pub(super) fn field_identifier(name: &str) -> Option<&str> {
     .then_some(name)
 }
 
+/// Retain the failing dependency and root cause in a dependent macro’s skip diagnostic.
 fn dependency_skip(
     analysis: &MacroAnalysis,
     dependency: &str,
@@ -629,6 +716,7 @@ fn dependency_skip(
     )
 }
 
+/// Compare signed and unsigned binding facts in a lossless common representation.
 fn integer_numeric(value: IntegerValue) -> i128 {
     match value {
         IntegerValue::Signed(value) => i128::from(value),
@@ -636,6 +724,7 @@ fn integer_numeric(value: IntegerValue) -> i128 {
     }
 }
 
+/// Explain a bindgen/Clang value disagreement without correcting either source of facts.
 fn mismatch_reason(
     analysis: &MacroAnalysis,
     name: &str,
@@ -655,6 +744,7 @@ fn mismatch_reason(
     )
 }
 
+/// Reject differing binding values even when object-macro expansion already folded the name.
 fn binding_mismatch(
     session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
@@ -682,6 +772,7 @@ fn binding_mismatch(
     })
 }
 
+/// Attach token and provenance information to a rendering rejection for audit output.
 fn skip(
     analysis: &MacroAnalysis,
     code: SkipReasonCode,
@@ -696,6 +787,7 @@ fn skip(
     }
 }
 
+/// Assemble the public macro, contextual entry arms, profile guard, and original C docs.
 fn render(
     session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
@@ -1032,6 +1124,7 @@ fn render_body(
     Ok(rust)
 }
 
+/// Lower the integer expression arena with explicit work tasks and retained binding names.
 fn render_expression(
     analysis: &MacroAnalysis,
     root: NodeId,
@@ -1281,6 +1374,7 @@ fn render_expression(
     Ok(())
 }
 
+/// Validate a crate-relative constant path and retain its binding representation bridge.
 fn binding_path(
     bindings: &BindingCatalog,
     name: &str,
@@ -1302,6 +1396,7 @@ fn binding_path(
         .map(|parts| (parts.join("::"), binding.representation))
 }
 
+/// Record why a C name remains expanded, sanitizing header text as inert Rust commentary.
 fn write_fallback(rust: &mut String, name: &str, reason: &str) {
     // Diagnostic text can contain header tokens; prevent it from ending or nesting
     // the comment, or putting source directives on a new physical line.
@@ -1316,6 +1411,10 @@ fn write_fallback(rust: &mut String, name: &str, reason: &str) {
     .expect("writing to a String cannot fail");
 }
 
+/// Prefix every physical source line and reserve the full comment budget before writing.
+///
+/// Header text can contain comments or line endings, so it must never escape into
+/// active Rust items or leave a partially emitted documentation block.
 fn write_doc_comments(rust: &mut String, comment: &str) -> Option<()> {
     // Prefix every physical line, including those inside retained C block
     // comments or filenames. Header text must never become Rust source.
@@ -1337,6 +1436,7 @@ fn write_doc_comments(rust: &mut String, comment: &str) -> Option<()> {
     Some(())
 }
 
+/// Reconstruct the original C definition with a fenced block and stable source provenance.
 fn definition_comment(definition: &MacroDefinition) -> Option<String> {
     // Bound normalization before allocating: one retained comment can be much
     // larger than the token count suggests. Display adds at most one separator
@@ -1362,11 +1462,21 @@ fn definition_comment(definition: &MacroDefinition) -> Option<String> {
     Some(format!("\n\n{fence}text\n{definition}\n{fence}\n"))
 }
 
+/// Pending work for iterative integer-expression rendering without recursive source copies.
 enum RenderTask {
-    Node(NodeId),
-    Text(&'static str),
+    /// Render one expression-arena node after scheduling its surrounding delimiters.
+    Node(
+        /// Arena index identifying the next integer-expression subtree.
+        NodeId,
+    ),
+    /// Write a fixed delimiter or helper fragment between scheduled child nodes.
+    Text(
+        /// Fixed source fragment placed between child-expression tasks.
+        &'static str,
+    ),
 }
 
+/// Map the compiler integer category to target width, signedness, and C rank facts.
 fn concrete_type(
     expression: &AnalyzedExpression,
     index: NodeId,
@@ -1383,6 +1493,7 @@ fn concrete_type(
     }
 }
 
+/// Wrap a literal spelling with explicit Rust storage and the original C integer marker.
 fn write_value(rust: &mut String, ty: IntegerType, magnitude: &str) {
     let value = if ty.kind == IntegerKind::Bool {
         if magnitude == "0" { "false" } else { "true" }
@@ -1398,6 +1509,7 @@ fn write_value(rust: &mut String, ty: IntegerType, magnitude: &str) {
     rust.push(')');
 }
 
+/// Preserve the header’s numeric radix while replacing C suffixes with Rust storage suffixes.
 fn write_literal(rust: &mut String, ty: IntegerType, literal: &IntegerLiteral) {
     if literal.spelling.starts_with('\'') {
         write!(rust, "{SUPPORT}::CValue::<{SUPPORT}::{}>::new(", marker(ty.kind))
@@ -1433,6 +1545,7 @@ fn write_literal(rust: &mut String, ty: IntegerType, literal: &IntegerLiteral) {
     write_value(rust, ty, &magnitude);
 }
 
+/// Name the semantic C integer marker, keeping rank distinct from equal-width Rust storage.
 pub(crate) fn marker(kind: IntegerKind) -> &'static str {
     match kind {
         IntegerKind::Bool => "CBool",
@@ -1452,6 +1565,7 @@ pub(crate) fn marker(kind: IntegerKind) -> &'static str {
     }
 }
 
+/// Select the runtime operation implementing the analyzed C binary operator.
 fn binary_helper(operator: BinaryOperator) -> &'static str {
     match operator {
         BinaryOperator::Multiply => "mul",
@@ -1476,6 +1590,7 @@ fn binary_helper(operator: BinaryOperator) -> &'static str {
     }
 }
 
+/// Render a usable Rust item name, rejecting special keywords that raw identifiers cannot fix.
 fn rust_identifier(name: &str) -> Option<String> {
     let mut bytes = name.bytes();
     if !bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
@@ -1537,6 +1652,7 @@ fn rust_identifier(name: &str) -> Option<String> {
     Some(if keyword { format!("r#{name}") } else { name.into() })
 }
 
+/// Preserve C macro identity while accommodating Rust keywords where macro names allow it.
 fn macro_identifier(name: &str) -> Option<String> {
     rust_identifier(name).or_else(|| {
         matches!(name, "_" | "self" | "Self" | "super" | "crate").then(|| {
@@ -1549,14 +1665,19 @@ fn macro_identifier(name: &str) -> Option<String> {
     })
 }
 
+/// Regression tests for output bounds, inert source documentation, hygienic names, and batch errors.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private rendering and budget helpers directly in regression tests.
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
 
+    /// Check that batch generation propagates profile serialization errors instead of emitting partial support.
     #[cfg(unix)]
     #[test]
     fn batch_emission_reports_shared_profile_fingerprint_errors() {
+        /// Construct a non-UTF-8 tracked-input path to exercise profile fingerprint error propagation.
         use std::os::unix::ffi::OsStringExt;
         let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         let scanner = crate::MacroScanner::new().expect("libclang required");
@@ -1577,6 +1698,7 @@ mod tests {
         assert!(error.contains("cannot fingerprint the C function profile"), "{error}");
     }
 
+    /// Check that large retained C definitions account for both source text and documentation fences.
     #[test]
     fn source_comment_budget_includes_comment_bytes_and_markdown_fences() {
         for comment in [
@@ -1607,6 +1729,7 @@ mod tests {
         }
     }
 
+    /// Prove embedded line endings and C comment text remain doc-comment content rather than Rust items.
     #[test]
     fn doc_comments_cover_every_physical_line_and_cannot_inject_rust_items() {
         let mut rust = String::new();
@@ -1643,6 +1766,7 @@ mod tests {
         assert!(documentation.contains("pub fn also_injected() {}"));
     }
 
+    /// Check that per-line prefixes count toward the budget and rejection leaves the output unchanged.
     #[test]
     fn source_comment_budget_includes_per_line_prefixes_without_writing_partial_output() {
         let mut rust = String::from("existing Rust source\n");
@@ -1651,6 +1775,7 @@ mod tests {
         assert_eq!(rust, before);
     }
 
+    /// Check raw keyword handling while keeping macro names separate from operand metavariable rules.
     #[test]
     fn macro_names_preserve_identity_without_using_c_parameters_as_rust_identifiers() {
         assert_eq!(rust_identifier("TYPEALIGN").as_deref(), Some("TYPEALIGN"));

@@ -2,14 +2,36 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Run original C headers as independent, resource-bounded semantic oracles.
+///
+/// Each invocation owns a temporary directory and compiles the supplied program
+/// with the original header forcibly included. Syntax-only witnesses avoid the
+/// linker; executable witnesses report observations for comparison with Rust.
+/// Process deadlines and output limits keep malformed probes from exhausting a
+/// normal cargo test run, and owned files are removed after each invocation.
+///
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs::{self, File};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::{Command, Stdio};
+/// Allocate unique fixture paths or record process-local effects across concurrent test
+/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
+/// Maximum compiler or consumer runtime before the oracle kills a stalled process.
 const TIMEOUT: Duration = Duration::from_secs(30);
+/// Maximum captured output size, keeping failed or malformed compiler probes from exhausting
+/// test resources.
 const OUTPUT_LIMIT: u64 = 8 * 1024 * 1024;
+/// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
 /// Each runner includes the original header; it never reconstructs its macro definitions.
@@ -46,6 +68,8 @@ pub fn run_c(
     }
 }
 
+/// Run a compiler or consumer with output and time limits, rejecting failures instead of
+/// comparing partial observations.
 fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
     let stdout_path = directory.join(format!("{phase}.stdout"));
     let stderr_path = directory.join(format!("{phase}.stderr"));
@@ -82,9 +106,18 @@ fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
     stdout
 }
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let number = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
@@ -95,7 +128,10 @@ impl TemporaryDirectory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

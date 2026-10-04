@@ -3,53 +3,100 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Lower C values, places and prototype conversions through one expression arena.
+//!
+//! Rendering distinguishes an evaluated C value from a writable or readable place,
+//! an unevaluated object-size operand, and an expression used only for its effects.
+//! The shared storage reconciliation supplies nominal markers and binding paths;
+//! explicit work tasks keep expression traversal bounded without recursively
+//! copying large rendered subtrees.
 
+/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::arguments::{self, ArgumentContext};
+/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::types::{EXPRESSION, Lowering, rust_path};
+/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
+/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
+/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
 };
+/// Preserve compiler profile, qualifiers, and structural C type facts during contextual rendering.
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
+/// Index compiler-owned local facts by source name for reuse during contextual rendering.
 use std::collections::BTreeMap;
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// The C use-site contract requested for one occurrence of an expression-arena node.
 #[derive(Clone, Copy)]
 pub(super) enum Context {
+    /// Evaluate the operand after C value conversion and applicable array/function decay.
     Value,
+    /// Retain writable or addressable storage for mutation, address-taking, or member projection.
     Place,
+    /// Retain a readable object location, avoiding a premature whole-object load.
     ReadPlace,
+    /// Obtain complete-object metadata without evaluating the operand.
     Size,
+    /// Evaluate required effects without demanding a usable result or whole-record initialization.
     Discard,
 }
 
+/// Pending contextual rendering work, avoiding recursive traversal of deep expression trees.
 enum Task {
-    Node(NodeId, Context),
-    Text(String),
+    /// Render a node under its consumer’s value, place, size, or discard requirements.
+    Node(
+        /// Arena node whose source fragment remains to be rendered.
+        NodeId,
+        /// Consumer contract applied to this occurrence without changing other occurrences.
+        Context,
+    ),
+    /// Write a surrounding helper or delimiter after pending child expressions.
+    Text(
+        /// Owned delimiter or helper fragment queued around child tasks.
+        String,
+    ),
 }
 
+/// Compiler-established statement local with a hygienic Rust index and reconciled storage.
 struct Local {
+    /// Unique generated local name index, separate from the source C identifier.
     index: usize,
+    /// Declared C object type used to preserve initialization and access conversions.
     ty: TypeInfo,
+    /// Cached marker/storage result, retaining unsupported local representations as errors.
     lowered: Result<super::types::LoweredType, String>,
 }
 
 /// Per-macro expression facts borrowing the pass's immutable storage reconciliation.
 pub(super) struct Renderer<'a> {
+    /// Trusted declarations and compiler profile used throughout contextual lowering.
     frontend: &'a FrontendOutput,
+    /// Macro parameters, type expressions, and arena facts established during analysis.
     analysis: &'a MacroAnalysis,
+    /// Fresh binding symbols and generated capabilities used for hygienic references.
     bindings: &'a BindingCatalog,
+    /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
+    /// Shared C identity/native-storage reconciliation for the immutable capability catalog.
     lowering: &'a Lowering<'a>,
+    /// Whether the selected profile permits the floating expression combinations in this macro.
     floats: bool,
+    /// Arena-indexed addressability facts propagated once through groups and member chains.
     places: Vec<bool>,
+    /// Compiler-proved object types; unresolved caller families intentionally remain None.
     objects: Vec<Option<TypeInfo>>,
+    /// C local names mapped to hygienic storage and declaration-conversion facts.
     locals: BTreeMap<String, Local>,
+    /// Per-node branch advice decisions kept separate from actual operand evaluation.
     expectations: Vec<super::expectation::Decision>,
 }
 
+/// Lower each expression occurrence under its own C context with shared trusted object facts.
 impl<'a> Renderer<'a> {
+    /// Precompute local, place, declared-object, floating-profile, and expectation facts for one macro.
     pub(super) fn new(
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
@@ -145,6 +192,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
+    /// Allocate hygienic local storage and apply the declared C conversion when an initializer is present.
     pub(super) fn declare_local(
         &self,
         name: &str,
@@ -205,6 +253,7 @@ impl<'a> Renderer<'a> {
     /// Argument substitution can make a callee's dynamic expectation fixed.
     /// Keep that compiler-owned information when recovering a Rust macro call.
     pub(super) fn preserves_expectations(&self, callee: impl FnOnce() -> MacroAnalysis) -> bool {
+        /// Distinguish retained and overridden compiler advice when recovering a cross-macro call.
         use super::expectation::Decision;
         if self.expectations.is_empty() {
             return true;
@@ -222,6 +271,10 @@ impl<'a> Renderer<'a> {
                 == callee.iter().filter(|decision| matches!(decision, Decision::Static)).count()
     }
 
+    /// Lower one arena root with explicit tasks and contextual runtime capabilities.
+    ///
+    /// Each parameter occurrence is rendered separately, lazy consumers retain control
+    /// over evaluation, and output limits reject oversized expansion source.
     pub(super) fn render(
         &self,
         root: NodeId,
@@ -998,6 +1051,7 @@ impl<'a> Renderer<'a> {
     }
 }
 
+/// Identify aggregate volatile access requiring conservative rejection rather than a Rust record load.
 fn volatile_record(ty: &TypeInfo) -> bool {
     ty.category == TypeCategory::Record && ty.is_volatile
 }
@@ -1109,6 +1163,7 @@ pub(super) fn declared_objects(
     objects
 }
 
+/// Prove a shared conditional object type, combining compatible record-pointee qualifiers.
 fn declared_common_object(
     lowering: &Lowering<'_>,
     left: &TypeInfo,
@@ -1156,6 +1211,7 @@ fn declared_common_object(
     Some(result)
 }
 
+/// Resolve a direct or uniquely promoted compiler field while inheriting anonymous-owner qualifiers.
 pub(super) fn declared_field(
     declarations: &crate::DeclarationCatalog,
     canonical: &str,
@@ -1227,6 +1283,7 @@ fn proved_integer_zero(
     }
 }
 
+/// Recognize the unqualified void-pointer target relevant to C pointer conversion rules.
 fn is_unqualified_void_pointer(frontend: &FrontendOutput, ty: &crate::TypeInfo) -> bool {
     if ty.category != TypeCategory::Pointer {
         return false;

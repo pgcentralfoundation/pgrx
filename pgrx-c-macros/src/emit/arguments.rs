@@ -6,27 +6,48 @@
 //!
 //! Normalization changes tokens only. Each use of an operand requests its own C
 //! context, so repeated operands and lazy branches retain C substitution semantics.
+//!
+//! A shared classifier records operand syntax before an expr fragment hides it from
+//! subsequent macro matching. Per-macro stages then preserve type and identifier
+//! parameters, unused operands, and C argument spelling. Value, place, sizeof, and
+//! discard uses consume the descriptor differently without eagerly evaluating it.
 
+/// Reuse emission budgets and identifier checks while building contextual argument normalization.
 use super::{MAX_EMISSION_BYTES, macro_identifier, skip};
+/// Use analyzed formal roles and expansion provenance to normalize each C operand correctly.
 use crate::{MacroAnalysis, ParameterOrigin, ParameterRole, SkipReason, SkipReasonCode};
+/// Borrow formal operand names and allocate only when hygienic expansion captures require a new spelling.
 use std::borrow::Cow;
+/// Deduplicate emitted macro names used by the shared operand classifier.
 use std::collections::BTreeSet;
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Cap per-macro normalization stages so pathological parameter lists fail predictably.
 const MAX_ARGUMENTS: usize = 64;
+/// Bound scanning of an unused operand that has no expr fragment to delimit it.
 const TOKEN_BUDGET: usize = 64;
 
+/// Per-macro token normalizer emitted before contextual expression fragments become opaque.
 pub(super) struct ArgumentAdapter {
+    /// Exported hidden helper name used by public and delegated entry arms.
     pub normalizer: String,
+    /// Linear normalization stages for this macro’s parameter roles.
     pub rust: String,
 }
 
+/// C use-site context selected independently for each normalized operand occurrence.
 #[derive(Clone, Copy)]
 pub(super) enum ArgumentContext {
+    /// Evaluate an operand using C value conversion and decay rules.
     Value,
+    /// Retain an addressable operand for projection or mutation.
     Place,
+    /// Retain a readable place without immediately loading the entire object.
     ReadPlace,
+    /// Request unevaluated object metadata rather than executing the operand.
     Size,
+    /// Preserve operand effects without demanding a usable result value.
     Discard,
 }
 
@@ -322,6 +343,7 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
     Ok(rust)
 }
 
+/// Consume one normalized descriptor in the requested context at this C parameter occurrence.
 pub(super) fn render_operand(
     analysis: &MacroAnalysis,
     parameter: usize,

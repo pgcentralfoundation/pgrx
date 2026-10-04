@@ -1,17 +1,34 @@
+//! Test physical macro discovery independently of transpilation support.
+//!
+//! Headers with splicing, comments, redefinitions, diagnostics, and unusual file
+//! boundaries establish exact tokens and line spans. The scanner must retain
+//! preprocessor syntax and report invalid inputs rather than output partial facts.
+
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     DiagnosticSeverity, Error, MacroDefinition, MacroKind, MacroScanner, TokenKind,
 };
 
 // The clang wrapper permits one live Clang instance in a process.
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Require physical file identity, exact source spans, and complete definition text for a
+/// discovered macro.
 fn assert_provenance(definition: &MacroDefinition, file: &Path, start_line: u32, end_line: u32) {
     let span = definition.provenance.as_ref().expect("file-defined macro has physical provenance");
     assert!(span.file.is_absolute(), "{}", definition.name);
@@ -25,6 +42,7 @@ fn assert_provenance(definition: &MacroDefinition, file: &Path, start_line: u32,
     assert_eq!((span.start_line, span.end_line), (start_line, end_line), "{}", definition.name);
 }
 
+/// Checks that the scanner discovers source macros without losing preprocessor syntax.
 #[test]
 fn discovers_source_macros_without_losing_preprocessor_syntax() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -171,6 +189,7 @@ fn discovers_source_macros_without_losing_preprocessor_syntax() {
     }));
 }
 
+/// Checks that the scanner applies Clang defines and undefines before recording active macros.
 #[test]
 fn applies_clang_defines_and_undefines_before_recording_active_macros() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -222,6 +241,7 @@ fn applies_clang_defines_and_undefines_before_recording_active_macros() {
     assert!(!undefined.macros.iter().any(|definition| definition.name == "ENABLED_VALUE"));
 }
 
+/// Checks that the pipeline rejects error diagnostics but preserves warning diagnostics.
 #[test]
 fn rejects_error_diagnostics_but_preserves_warning_diagnostics() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -255,6 +275,8 @@ fn rejects_error_diagnostics_but_preserves_warning_diagnostics() {
     assert!(warned.macros.iter().any(|definition| definition.name == "AFTER_DIAGNOSTIC"));
 }
 
+/// Checks that the pipeline preserves spliced macro syntax and physical locations and rejects
+/// invalid inputs.
 #[test]
 fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inputs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -323,12 +345,15 @@ fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inp
     assert!(matches!(scanner.scan(Path::new("header\0.h"), &[]), Err(Error::InvalidInput(_))));
     #[cfg(unix)]
     {
+        /// Construct non-UTF-8 fixture paths to test scanner diagnostics at the filesystem
+        /// boundary.
         use std::os::unix::ffi::OsStringExt;
         let non_utf8 = PathBuf::from(std::ffi::OsString::from_vec(b"header\xff.h".to_vec()));
         assert!(matches!(scanner.scan(&non_utf8, &[]), Err(Error::InvalidInput(_))));
     }
 }
 
+/// Checks that records token extents with trailing trivia crlf and end of file.
 #[test]
 fn records_token_extents_with_trailing_trivia_crlf_and_end_of_file() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -351,8 +376,17 @@ fn records_token_extents_with_trailing_trivia_crlf_and_end_of_file() {
         assert_provenance(definition, &header, start, end);
     }
 
-    struct TemporaryHeader(PathBuf);
+    /// Own a synthetic header and its temporary directory so profile-sensitive generation has
+    /// an isolated source of C facts.
+    struct TemporaryHeader(
+        /// Owned fixture path used for isolated inputs and cleanup.
+        PathBuf,
+    );
+    /// Write an owned synthetic header whose source and compiler inputs can be varied
+    /// independently.
     impl TemporaryHeader {
+        /// Create owned, uniquely named fixture storage so this test's headers and compiler
+        /// outputs cannot collide with another invocation.
         fn new(name: &str, bytes: &[u8]) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -366,7 +400,11 @@ fn records_token_extents_with_trailing_trivia_crlf_and_end_of_file() {
             header
         }
     }
+    /// Release only temporary artifacts owned by this fixture, including on failed compiler or
+    /// assertion paths.
     impl Drop for TemporaryHeader {
+        /// Remove only this fixture's owned temporary storage after the test or oracle
+        /// completes.
         fn drop(&mut self) {
             let _ = std::fs::remove_file(&self.0);
         }

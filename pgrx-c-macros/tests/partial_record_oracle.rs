@@ -2,25 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check native aggregate calls over partially initialized C storage.
+//!
+//! The oracle transports raw record bytes without constructing a Rust value for
+//! uninitialized fields. Selected field observations and native calls ensure
+//! adapters preserve C behavior without reading or validating untouched storage.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)] // Fixtures use different subsets of shared bounded oracle helpers.
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "PARTIAL_RECORD",
     "PARTIAL_IDENTITY",
@@ -37,6 +56,7 @@ const NAMES: &[&str] = &[
     "PARTIAL_DISCARD_VALUE",
 ];
 
+/// Checks that aggregate native calls copy uninitialized fields without materializing them.
 #[test]
 fn aggregate_native_calls_copy_uninitialized_fields_without_materializing_them() {
     let scanner = MacroScanner::new().expect("libclang must be available");

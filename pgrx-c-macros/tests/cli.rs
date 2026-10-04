@@ -1,23 +1,51 @@
+//! Exercise the public CLI against an isolated PostgreSQL configuration.
+//!
+//! Synthetic pg_config programs and headers make version resolution, argument
+//! ordering, ownership filters, output formats, and failure diagnostics observable.
+//! The tests invoke the real binary and assert its output rather than duplicating
+//! the command implementation.
+
 #![cfg(all(feature = "cli", unix))]
 
+/// Make fixture compiler or pg_config wrappers executable so process failures can be tested
+/// directly.
 use std::os::unix::fs::PermissionsExt;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::{Command, Output};
+/// Allocate unique fixture paths or record process-local effects across concurrent test
+/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Allocate unique fake-configuration paths for concurrent CLI invocations.
 static NEXT_CONFIG: AtomicU64 = AtomicU64::new(0);
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Own synthetic PostgreSQL configuration and header roots, keeping CLI and ownership tests
+/// independent of the developer's setup.
 struct TestConfig {
+    /// Owned PGRX_HOME containing only the fixture's configuration.
     home: PathBuf,
+    /// Owned server-header root used for version and physical ownership resolution.
     include_dir: PathBuf,
 }
 
+/// Build isolated installation metadata and commands for configuration and ownership
+/// assertions.
 impl TestConfig {
+    /// Create an isolated fake PostgreSQL configuration and server include tree for invoking
+    /// the real CLI.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let number = NEXT_CONFIG.fetch_add(1, Ordering::Relaxed);
@@ -54,6 +82,8 @@ impl TestConfig {
         config
     }
 
+    /// Invoke the real CLI binary with this fixture's PGRX_HOME and controlled environment,
+    /// avoiding the developer's installations.
     fn command(&self) -> Command {
         let mut command = Command::new(env!("CARGO_BIN_EXE_pgrx-c-macros"));
         command
@@ -69,12 +99,17 @@ impl TestConfig {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TestConfig {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.home);
     }
 }
 
+/// Invoke the real list command with the requested output format against this test's isolated
+/// configuration.
 fn list(header: &str, arguments: &[&str]) -> Output {
     let config = TestConfig::new();
     config
@@ -87,11 +122,15 @@ fn list(header: &str, arguments: &[&str]) -> Output {
         .expect("macro discovery CLI must run")
 }
 
+/// Require the CLI invocation to succeed and decode the complete output for behavioral
+/// assertions.
 fn successful_stdout(output: Output) -> String {
     assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
     String::from_utf8(output.stdout).expect("CLI output must be UTF-8")
 }
 
+/// Check that CLI JSON carries physical header paths, line spans, and original definition
+/// information.
 fn assert_json_provenance(definition: &serde_json::Value, file: &Path, start: u32, end: u32) {
     let provenance = &definition["provenance"];
     let filename = provenance["file"].as_str().expect("JSON provenance has a physical filename");
@@ -102,6 +141,8 @@ fn assert_json_provenance(definition: &serde_json::Value, file: &Path, start: u3
     assert_eq!(provenance["end_line"], end);
 }
 
+/// Checks that the CLI requires a configured version and lists functions from the complete
+/// default wrapper.
 #[test]
 fn requires_a_configured_version_and_lists_functions_from_the_complete_default_wrapper() {
     let config = TestConfig::new();
@@ -149,6 +190,7 @@ fn requires_a_configured_version_and_lists_functions_from_the_complete_default_w
     assert!(unconfigured.stdout.is_empty());
 }
 
+/// Checks that the CLI analyzes final PostgreSQL functions with profile and explicit skips.
 #[test]
 fn analyzes_final_postgres_functions_with_profile_and_explicit_skips() {
     let config = TestConfig::new();
@@ -193,6 +235,7 @@ fn analyzes_final_postgres_functions_with_profile_and_explicit_skips() {
     assert!(String::from_utf8_lossy(&missing.stderr).contains("<PG_VERSION>"));
 }
 
+/// Checks that analysis uses recorded cflags and explicit overrides.
 #[test]
 fn analysis_uses_recorded_cflags_and_explicit_overrides() {
     let config = TestConfig::new();
@@ -234,6 +277,8 @@ fn analysis_uses_recorded_cflags_and_explicit_overrides() {
     assert!(String::from_utf8_lossy(&invalid.stderr).contains("arguments"));
 }
 
+/// Checks that analysis filters final external definitions and reports ambiguous PostgreSQL
+/// sources.
 #[test]
 fn analysis_filters_final_external_definitions_and_reports_ambiguous_postgres_sources() {
     let config = TestConfig::new();
@@ -268,6 +313,7 @@ fn analysis_filters_final_external_definitions_and_reports_ambiguous_postgres_so
     assert_eq!(macros[1]["status"]["status"], "candidate");
 }
 
+/// Checks that analysis reports C type errors and preserves successful warnings.
 #[test]
 fn analysis_reports_c_type_errors_and_preserves_successful_warnings() {
     let config = TestConfig::new();
@@ -294,6 +340,8 @@ fn analysis_reports_c_type_errors_and_preserves_successful_warnings() {
     assert_eq!(report["macros"][0]["name"], "WARN_FUNC");
 }
 
+/// Checks that configuration resolves pg config path override and rejects version mismatch and
+/// malformed cppflags.
 #[test]
 fn resolves_pg_config_path_override_and_rejects_version_mismatch_and_malformed_cppflags() {
     let config = TestConfig::new();
@@ -327,6 +375,8 @@ fn resolves_pg_config_path_override_and_rejects_version_mismatch_and_malformed_c
     assert!(String::from_utf8_lossy(&malformed.stderr).contains("CPPFLAGS"));
 }
 
+/// Checks that the CLI lists only functions from custom headers with exact name and source
+/// filters.
 #[test]
 fn lists_only_functions_from_custom_headers_with_exact_name_and_source_filters() {
     let definitions = successful_stdout(list("definitions.h", &[]));
@@ -375,6 +425,8 @@ fn lists_only_functions_from_custom_headers_with_exact_name_and_source_filters()
     assert!(unknown.is_empty());
 }
 
+/// Checks that the CLI emits json with function tokens physical provenance and definition
+/// history.
 #[test]
 fn emits_json_with_function_tokens_physical_provenance_and_definition_history() {
     let config = TestConfig::new();
@@ -452,6 +504,8 @@ fn emits_json_with_function_tokens_physical_provenance_and_definition_history() 
     assert!(builtin_object["macros"].as_array().unwrap().is_empty());
 }
 
+/// Checks that the CLI excludes external macros from every format despite custom headers and
+/// include options.
 #[test]
 fn excludes_external_macros_from_every_format_despite_custom_headers_and_include_options() {
     let config = TestConfig::new();
@@ -532,6 +586,7 @@ fn excludes_external_macros_from_every_format_despite_custom_headers_and_include
     }
 }
 
+/// Checks that the CLI passes Clang arguments and reports diagnostics without partial output.
 #[test]
 fn passes_clang_arguments_and_reports_diagnostics_without_partial_output() {
     let enabled = successful_stdout(list(
@@ -587,6 +642,8 @@ fn passes_clang_arguments_and_reports_diagnostics_without_partial_output() {
     }));
 }
 
+/// Checks that the CLI emits supported PostgreSQL macros with positional version and structured
+/// skips.
 #[test]
 fn emits_supported_postgres_macros_with_positional_version_and_structured_skips() {
     let config = TestConfig::new();
@@ -625,6 +682,7 @@ fn emits_supported_postgres_macros_with_positional_version_and_structured_skips(
     assert!(String::from_utf8_lossy(&missing.stderr).contains("<PG_VERSION>"));
 }
 
+/// Checks that compiler override wins and incompatible or empty recorded hints fall back.
 #[test]
 fn compiler_override_wins_and_incompatible_or_empty_recorded_hints_fall_back() {
     let config = TestConfig::new();
@@ -674,6 +732,7 @@ fn compiler_override_wins_and_incompatible_or_empty_recorded_hints_fall_back() {
     );
 }
 
+/// Checks that cflags precede cppflags and final explicit overrides.
 #[test]
 fn cflags_precede_cppflags_and_final_explicit_overrides() {
     let config = TestConfig::new();

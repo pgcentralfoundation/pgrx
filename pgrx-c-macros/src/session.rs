@@ -2,11 +2,20 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! A prepared session connects one inspected environment to one bounded expansion batch.
+//!
+//! Compiler passes establish active dependencies, retained integer symbols, and source-level
+//! zero constants before analysis is exposed to emission. File and environment checks surround
+//! these passes so a session never intentionally combines facts from different header states.
+//! The borrowed frontend owns the profile; the session owns observations specific to its batch.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, ExpansionBatch, ExpansionLimits,
     ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, IntegerConstant,
     MacroAnalysis, MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
 };
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
 
 /// An inspected C environment and compiler-expanded symbolic invocations resolved together.
@@ -15,14 +24,24 @@ use std::collections::{BTreeMap, BTreeSet};
 /// environment must remain stable through preparation; changes require a new inspection.
 /// Emission accepts this session rather than independently assembled syntax or type facts.
 pub struct AnalysisSession<'a> {
+    /// The coherent inspected environment borrowed by this phase; it is never reconstructed from
+    /// snapshots.
     frontend: &'a FrontendOutput,
+    /// Owned compiler-expanded observations prepared specifically for this selected macro batch.
     expansions: ExpansionBatch,
+    /// Optional batch-augmented graph; the original frontend graph remains the fallback.
     dependencies: Option<crate::MacroDependencyGraph>,
+    /// C type/value facts established independently of Rust binding values for referenced object
+    /// macros.
     integer_constants: BTreeMap<String, IntegerConstant>,
+    /// Per-macro source node IDs proved to be zero-valued C integer constant expressions.
     integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
 }
 
+/// Prepare and analyze a batch only within the borrowed coherent frontend environment.
 impl<'a> AnalysisSession<'a> {
+    /// Prepare the selected macros with default budgets while preserving one inspected compiler
+    /// environment.
     pub fn prepare(
         scanner: &MacroScanner,
         frontend: &'a FrontendOutput,
@@ -31,6 +50,8 @@ impl<'a> AnalysisSession<'a> {
         Self::prepare_with_limits(scanner, frontend, names, ExpansionLimits::default())
     }
 
+    /// Expand the batch, establish retained constants and zero identities, and reject changed inputs
+    /// at phase boundaries.
     pub fn prepare_with_limits(
         scanner: &MacroScanner,
         frontend: &'a FrontendOutput,
@@ -67,10 +88,14 @@ impl<'a> AnalysisSession<'a> {
         Ok(session)
     }
 
+    /// Borrow the inspection that supplies authoritative target and declaration facts for this
+    /// session.
     pub fn frontend(&self) -> &FrontendOutput {
         self.frontend
     }
 
+    /// Expose compiler-expanded invocations and explicit preprocessing skips without rerunning the
+    /// driver.
     pub fn expansions(&self) -> &ExpansionBatch {
         &self.expansions
     }
@@ -87,6 +112,7 @@ impl<'a> AnalysisSession<'a> {
         &self.integer_constants
     }
 
+    /// Expose the recorded build inputs consumed by preparation for later rebuild tracking.
     pub fn inputs(&self) -> &BuildInputs {
         &self.expansions.inputs
     }
@@ -98,6 +124,8 @@ impl<'a> AnalysisSession<'a> {
         crate::frontend::verify_input_files(self.inputs())
     }
 
+    /// Analyze a prepared invocation, restore original formal names, and translate preprocessing
+    /// failures into structured analysis skips.
     pub fn analyze(&self, name: &str) -> MacroAnalysis {
         match self.expansions.results.get(name) {
             Some(ExpansionResult::Expanded { expansion }) => {

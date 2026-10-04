@@ -473,6 +473,8 @@ impl PgConfig {
     }
 
     /// Compiler flags recorded by the selected PostgreSQL installation.
+    /// Macro inspection and native adapter compilation reuse these arithmetic and ABI options
+    /// so generated Rust follows the same C invocation profile as the installed server.
     pub fn cflags(&self) -> eyre::Result<OsString> {
         Ok(self.run("--cflags")?.into())
     }
@@ -483,6 +485,8 @@ impl PgConfig {
         Ok(path)
     }
 
+    /// Read a pg_config property from recorded metadata or a successful subprocess; reject
+    /// partial stdout on failure so macro profiles cannot use incomplete flags.
     fn run(&self, arg: &str) -> eyre::Result<String> {
         if let Some(known_props) = &self.known_props {
             // we have some known properties, so use them.  We'll return an `ErrorKind::InvalidData`
@@ -669,8 +673,10 @@ impl Pgrx {
     /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
-    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions in `$PGRX_HOME/config.toml`,
-    /// [`PgConfigSelector::Specific`] being that specific version from `$PGRX_HOME/config.toml`, and
+    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions
+    /// in `$PGRX_HOME/config.toml`,
+    /// [`PgConfigSelector::Specific`] being that specific version from
+    /// `$PGRX_HOME/config.toml`, and
     /// [`PgConfigSelector::Environment`] being the one described in the environment.
     pub fn iter(
         &self,
@@ -746,7 +752,8 @@ impl Pgrx {
     /// Get the postmaster stub directory
     ///
     /// We isolate postmaster stubs to an independent directory instead of alongside the postmaster
-    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one managed
+    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one
+    /// managed
     /// by pgrx.
     pub fn postmaster_stub_dir() -> Result<PathBuf, std::io::Error> {
         let mut stub_dir = Self::home()?;
@@ -1012,6 +1019,8 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgreSQL .53").expect_err("Parsed invalid version string");
 }
 
+/// Checks that recorded flags retain quoting and spaces and that missing metadata produces an
+/// error.
 #[test]
 fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
     let flags = "-O2 -fwrapv -isysroot '/sdk with spaces'";
@@ -1025,10 +1034,15 @@ fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
     );
 }
 
+/// Checks that a failing pg_config reports its status and stderr without accepting partial
+/// stdout as compiler flags.
 #[cfg(unix)]
 #[test]
 fn failed_pg_config_queries_do_not_accept_partial_stdout() {
+    /// Make fixture compiler or pg_config wrappers executable so process failures can be tested
+    /// directly.
     use std::os::unix::fs::PermissionsExt;
+    /// Give the temporary pg_config fixture a unique name without reusing files from a prior run.
     use std::time::{SystemTime, UNIX_EPOCH};
 
     let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();

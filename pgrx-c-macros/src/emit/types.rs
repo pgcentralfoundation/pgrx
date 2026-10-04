@@ -3,23 +3,38 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Reconcile compiler C identities with the storage that bindgen actually emitted.
+//!
+//! C markers retain arithmetic rank, qualifiers, and nominal identity independently
+//! from native Rust storage. This reconciliation indexes aliases, record edges, and
+//! enum constructors once per catalog, rejects ambiguous storage correspondences,
+//! and renders distinct paths for exported macro expansions and native support
+//! items in the defining crate.
 
+/// Retain the defining crate’s binding catalog and semantic integer marker names.
 use super::{BindingCatalog, SUPPORT, marker};
+/// Reconcile C structural and nominal facts with actual binding constructors and storage shapes.
 use crate::{
     ArrayKind, DeclarationCatalog, EnumBinding, FieldBinding, RecordBinding, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
+/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
+/// Hygienic exported-macro path to contextual C expression capabilities.
 pub(super) const EXPRESSION: &str = "$crate::__pgrx_c_macros::expression";
 
+/// Choose runtime helper paths according to whether source is an exported macro or native item.
 #[derive(Clone, Copy)]
 enum RuntimePath {
+    /// Use hygienic $crate paths that survive dependency renaming at macro invocation.
     ExportedMacro,
+    /// Use the defining module’s private runtime import for ordinary generated Rust items.
     Native,
 }
 
+/// Select helper namespaces without altering binding or semantic identity paths.
 impl RuntimePath {
+    /// Select the integer semantic runtime namespace for this emission context.
     fn support(self) -> &'static str {
         match self {
             Self::ExportedMacro => SUPPORT,
@@ -27,6 +42,7 @@ impl RuntimePath {
         }
     }
 
+    /// Select contextual value/place capability paths without rewriting binding storage paths.
     fn expression(self) -> &'static str {
         match self {
             Self::ExportedMacro => EXPRESSION,
@@ -35,32 +51,56 @@ impl RuntimePath {
     }
 }
 
+/// Paired C semantic marker and actual Rust storage after identity/representation reconciliation.
 pub(super) struct LoweredType {
+    /// Capability type retaining C rank, qualifiers, or nominal object identity.
     pub marker: String,
+    /// Native Rust representation used by verified binding storage and ABI operations.
     pub storage: String,
 }
 
+/// Exact named cast spelling paired with its actual binding type and pointee mutability fact.
 struct CastStorage {
+    /// Readable source typedef path preserved rather than substituted with a primitive name.
     spelling: String,
+    /// Binding type checked against the independently resolved C cast target.
     ty: RustBindingType,
+    /// Qualification used while reconstructing nested pointer storage.
     is_const: bool,
 }
 
+/// Immutable catalog reconciliation reused across expression rendering and native adapter passes.
+///
+/// Indexes connect nominal C identities to actual binding constructors and member
+/// edges; ambiguous mappings stay errors instead of being resolved by equal layout.
 pub(super) struct Lowering<'a> {
+    /// Compiler-owned C shapes, qualifiers, identities, and layout facts.
     declarations: &'a DeclarationCatalog,
+    /// Actual Rust alias, constructor, member, and capability storage facts.
     bindings: &'a BindingCatalog,
+    /// Selected platform widths, ranks, and pointer ABI used for scalar marker reconciliation.
     target: &'a TargetFacts,
+    /// Helper-path mode appropriate for exported expansions or ordinary native support items.
     runtime: RuntimePath,
+    /// Actual record constructors indexed by normalized crate-relative binding path.
     records_by_path: BTreeMap<String, &'a RecordBinding>,
+    /// All witnessed Rust storage paths for a compiler record, retaining ambiguity.
     record_paths: BTreeMap<String, BTreeSet<String>>,
+    /// Compiler record/field-index edges paired with bindgen’s anonymous storage member names.
     anonymous_edges: BTreeMap<(String, usize), String>,
+    /// Compiler named-member edges paired with unambiguous bindgen-renamed fields.
     named_edges: BTreeMap<(String, String), String>,
+    /// Actual Rust enum constructors indexed separately from typedef aliases.
     enums_by_path: BTreeMap<String, &'a EnumBinding>,
+    /// Witnessed storage constructors for each unqualified compiler enum identity.
     enum_paths: BTreeMap<String, BTreeSet<String>>,
+    /// Storage paths shared by multiple C declarations, preventing nominal enum inference.
     ambiguous_enum_paths: BTreeSet<String>,
 }
 
+/// Reconcile nominal compiler types with actual binding edges before rendering capabilities.
 impl<'a> Lowering<'a> {
+    /// Build immutable reconciliation indexes with hygienic paths for exported macro rendering.
     pub fn new(
         declarations: &'a DeclarationCatalog,
         bindings: &'a BindingCatalog,
@@ -79,6 +119,7 @@ impl<'a> Lowering<'a> {
         Self::with_runtime(declarations, bindings, target, RuntimePath::Native)
     }
 
+    /// Create path-independent storage indexes and select the helper namespace used during rendering.
     fn with_runtime(
         declarations: &'a DeclarationCatalog,
         bindings: &'a BindingCatalog,
@@ -107,6 +148,7 @@ impl<'a> Lowering<'a> {
         lowering
     }
 
+    /// Map compiler enum identities to actual binding constructors and retain shared-path ambiguity.
     fn index_enums(&mut self) {
         let mut owners = BTreeMap::<String, BTreeSet<String>>::new();
         for (name, ty) in &self.declarations.types {
@@ -133,6 +175,7 @@ impl<'a> Lowering<'a> {
             .collect();
     }
 
+    /// Follow bounded alias chains to an actual Rust enum constructor, never guessing from integer storage.
     fn storage_enum_path(&self, storage: &RustBindingType, depth: usize) -> Option<String> {
         if depth > 64 {
             return None;
@@ -151,6 +194,7 @@ impl<'a> Lowering<'a> {
         }
     }
 
+    /// Require Clang’s compatible integer type before admitting enum arithmetic or ABI transport.
     pub fn enum_underlying(&self, ty: &TypeInfo) -> Result<&'a TypeInfo, String> {
         let shape = self
             .declarations
@@ -170,6 +214,7 @@ impl<'a> Lowering<'a> {
         Ok(underlying)
     }
 
+    /// Return only a unique nominal enum storage match, rejecting identity or path ambiguity.
     pub fn enum_binding(&self, ty: &TypeInfo) -> Result<Option<&'a EnumBinding>, String> {
         let Some(paths) = self.enum_paths.get(&enum_key(ty)) else {
             return Ok(None);
@@ -184,6 +229,7 @@ impl<'a> Lowering<'a> {
         Ok(self.enums_by_path.get(path).copied())
     }
 
+    /// Reconcile numeric aliases or checked Rust enum objects with the compiler enum’s layout and identity.
     fn resolve_enum(
         &self,
         ty: &TypeInfo,
@@ -329,6 +375,10 @@ impl<'a> Lowering<'a> {
         }
     }
 
+    /// Prove anonymous record shape matching through uniquely corresponding binding edges.
+    ///
+    /// A recursive by-value cycle or multiple possible child constructors cannot
+    /// establish an anchored storage match.
     fn anonymous_candidate(
         &self,
         record: &crate::RecordInfo,
@@ -387,6 +437,7 @@ impl<'a> Lowering<'a> {
         matched
     }
 
+    /// Follow matched aliases, pointers, arrays, and record objects to discover nominal storage witnesses.
     fn match_record_edges(
         &self,
         ty: &TypeInfo,
@@ -429,6 +480,7 @@ impl<'a> Lowering<'a> {
         }
     }
 
+    /// Follow actual alias or ManuallyDrop storage to a known record constructor within the depth bound.
     fn storage_record_path(&self, storage: &RustBindingType, depth: usize) -> Option<String> {
         if depth > 64 {
             return None;
@@ -447,6 +499,7 @@ impl<'a> Lowering<'a> {
         }
     }
 
+    /// Require exactly one compiler-anchored Rust constructor for a record identity.
     pub fn record_binding(&self, ty: &TypeInfo) -> Result<&'a RecordBinding, String> {
         let paths = self
             .record_paths
@@ -461,6 +514,7 @@ impl<'a> Lowering<'a> {
             .ok_or("record path is absent from actual bindings".into())
     }
 
+    /// Recover a uniquely anchored bindgen storage member for an anonymous C record edge.
     pub fn anonymous_field_binding(
         &self,
         canonical: &str,
@@ -474,6 +528,7 @@ impl<'a> Lowering<'a> {
         self.records_by_path.get(paths.first()?)?.fields.get(name)
     }
 
+    /// Recover the unambiguous actual Rust field corresponding to a compiler-owned member name.
     pub fn named_field_binding(&self, canonical: &str, name: &str) -> Option<&'a FieldBinding> {
         let actual = self.named_edges.get(&(canonical.to_owned(), name.to_owned()))?;
         let paths = self.record_paths.get(canonical)?;
@@ -483,6 +538,7 @@ impl<'a> Lowering<'a> {
         self.records_by_path.get(paths.first()?)?.fields.get(actual)
     }
 
+    /// Lower compiler type facts into a marker/storage pair without caller-supplied representation guesses.
     pub fn resolve(&self, ty: &TypeInfo) -> Result<LoweredType, String> {
         self.resolve_at(ty, 0)
     }
@@ -503,6 +559,10 @@ impl<'a> Lowering<'a> {
 
     // Follow the same flat pointer/qualifier grammar admitted by resolve_type_info.
     // Every named leaf must exist in the compiler catalog and the actual bindings.
+    /// Retain exact source typedef paths while following the admitted pointer/qualifier grammar.
+    ///
+    /// Every named leaf must exist in both compiler declarations and the current
+    /// bindings; unavailable aliases remain absent or produce a reconciliation error.
     fn alias_storage(&self, name: &str, depth: usize) -> Option<Result<CastStorage, String>> {
         if depth > 64 {
             return Some(Err("named cast storage exceeds the bounded lowering depth".into()));
@@ -595,6 +655,7 @@ impl<'a> Lowering<'a> {
             .ok_or("C pointer pointee is not established".into())
     }
 
+    /// Apply effective volatile qualification around the bounded unqualified type lowering.
     fn resolve_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
         let expression = self.runtime.expression();
         if depth > 64 {
@@ -607,6 +668,7 @@ impl<'a> Lowering<'a> {
         Ok(lowered)
     }
 
+    /// Choose semantic markers and native storage for compiler-proved scalar and structural types.
     fn resolve_unqualified_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
         let expression = self.runtime.expression();
         let support = self.runtime.support();
@@ -725,6 +787,7 @@ impl<'a> Lowering<'a> {
         }
     }
 
+    /// Reconcile a compiler type against the actual binding representation at a specific storage edge.
     pub fn resolve_with_storage(
         &self,
         ty: &TypeInfo,
@@ -733,6 +796,10 @@ impl<'a> Lowering<'a> {
         self.resolve_with_storage_at(ty, storage, 0)
     }
 
+    /// Validate nested C/Rust representation agreement without erasing nominal identity or qualifiers.
+    ///
+    /// Raw records, checked enums, callbacks, and flexible arrays each retain their
+    /// representation-specific capabilities rather than relying on equal object size.
     fn resolve_with_storage_at(
         &self,
         ty: &TypeInfo,
@@ -920,6 +987,7 @@ impl<'a> Lowering<'a> {
         Ok(lowered)
     }
 
+    /// Render actual Rust binding storage through bounded aliases and verified native ABI constructors.
     pub fn storage_type(&self, storage: &RustBindingType, depth: usize) -> Result<String, String> {
         if depth > 64 {
             return Err("Rust alias chain exceeds the bounded lowering depth".into());
@@ -1018,10 +1086,12 @@ fn matched_named_fields<'a>(
     matched
 }
 
+/// Normalize raw identifier prefixes for catalog lookup while retaining the complete binding path.
 fn path_key(path: &[String]) -> String {
     path.iter().map(|part| part.strip_prefix("r#").unwrap_or(part)).collect::<Vec<_>>().join("::")
 }
 
+/// Remove only top-level qualifier prefixes when identifying the nominal C enum declaration.
 pub(super) fn enum_key(ty: &TypeInfo) -> String {
     let mut spelling = ty.canonical_spelling.as_str();
     while let Some(rest) = ["const ", "volatile ", "restrict "]
@@ -1033,10 +1103,12 @@ pub(super) fn enum_key(ty: &TypeInfo) -> String {
     spelling.to_owned()
 }
 
+/// Ignore formatting whitespace when comparing already-rendered native storage spellings.
 fn normalize(storage: &str) -> String {
     storage.chars().filter(|c| !c.is_whitespace()).collect()
 }
 
+/// Validate a binding path and choose absolute standard-library or hygienic defining-crate resolution.
 pub(super) fn rust_path(path: &[String]) -> Result<String, String> {
     if path.is_empty()
         || path
@@ -1050,10 +1122,13 @@ pub(super) fn rust_path(path: &[String]) -> Result<String, String> {
     Ok(format!("{prefix}{}", path.join("::")))
 }
 
+/// Regressions for runtime path hygiene and unambiguous C-to-bindgen member-name reconciliation.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private storage reconciliation helpers directly in regression tests.
     use super::*;
 
+    /// Check native helper imports remain local while exported macros and binding storage retain correct crate paths.
     #[test]
     fn native_runtime_paths_do_not_escape_into_macro_or_storage_paths() {
         let kind = crate::IntegerKind::UnsignedInt;
@@ -1139,6 +1214,7 @@ mod tests {
         assert_eq!(bindings.callback_capabilities["callback"].marker, signature);
     }
 
+    /// Check bindgen underscore renames are accepted only when no distinct C member could own that spelling.
     #[test]
     fn keyword_and_primitive_field_renames_require_unambiguous_compiler_names() {
         let ty = TypeInfo {

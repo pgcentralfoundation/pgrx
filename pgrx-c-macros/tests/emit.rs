@@ -2,26 +2,55 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test emitted public definitions, documentation, and downstream hygiene.
+//!
+//! The suite checks provenance and parameter occurrences, inspects complete C
+//! source documentation, and compiles generated macros in a renamed consumer.
+//! Negative cases enforce the atomic-argument boundary imposed by C substitution.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, EmissionStatus,
     InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
     emit_support_with_bindings, inspect,
 };
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs::{self, File};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::{Command, ExitStatus, Stdio};
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
+/// Allocate unique fixture paths or record process-local effects across concurrent test
+/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+/// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
+/// Bound downstream compiler and consumer runtime so invalid fixtures cannot hang a normal test
+/// run.
 const PROCESS_TIMEOUT: Duration = Duration::from_secs(30);
+/// Maximum captured output size, keeping failed or malformed compiler probes from exhausting
+/// test resources.
 const OUTPUT_LIMIT: u64 = 1024 * 1024;
 
+/// Expected emitted candidates used to distinguish valid translations from structured
+/// unsupported cases.
 const EMITTED: &[&str] = &[
     "EMIT_ID",
     "EMIT_ADD",
@@ -48,10 +77,14 @@ const EMITTED: &[&str] = &[
     "match",
 ];
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Assemble emitted macro definitions for the consumer, failing the test if an expected
+/// candidate is skipped.
 fn source(emission: &MacroEmission) -> &str {
     let EmissionStatus::Emitted { rust, const_capability } = &emission.status else {
         panic!("{} must emit: {emission:?}", emission.analysis.name);
@@ -62,6 +95,8 @@ fn source(emission: &MacroEmission) -> &str {
     rust
 }
 
+/// Extract the generated value-context arm so assertions inspect the translated expression
+/// rather than public forwarding syntax.
 fn value_body(source: &str) -> &str {
     let body = source.split_once("(@__pgrx_emit_value;").unwrap().1.split_once("=> {").unwrap().1;
     let end = body
@@ -74,6 +109,8 @@ fn value_body(source: &str) -> &str {
     &body[..end]
 }
 
+/// Recover a generated macro's documentation for assertions about its original full C
+/// definition.
 fn documentation(item: &syn::ItemMacro) -> String {
     let lines = item
         .attrs
@@ -95,6 +132,7 @@ fn documentation(item: &syn::ItemMacro) -> String {
     documentation
 }
 
+/// Checks that emitted macros keep provenance occurrences names and structured skips.
 #[test]
 fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -140,6 +178,7 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     assert!(source(&pointer).contains("::pointee("));
 }
 
+/// Checks that doc commented definition keeps unexpanded calls parameters and fenced comments.
 #[test]
 fn doc_commented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -197,6 +236,7 @@ fn doc_commented_definition_keeps_unexpanded_calls_parameters_and_fenced_comment
     assert!(stdout.contains("running 0 tests"), "C documentation must not create Rust doctests");
 }
 
+/// Checks that actual support and emitted macros compile in a renamed downstream crate.
 #[test]
 fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -306,6 +346,7 @@ _Static_assert(EMIT_ADD(1.0, 2.0f) == 3.0, "noncontracting float addition");
     );
 }
 
+/// Checks that atomic argument rules reject unparenthesized multi token substitutions.
 #[test]
 fn atomic_argument_rules_reject_unparenthesized_multi_token_substitutions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -384,6 +425,8 @@ fn main() {
     }
 }
 
+/// Configure an isolated downstream Cargo consumer without inheriting unrelated pgrx build
+/// settings.
 fn downstream_command(source: &Path, library: &Path, executable: &Path) -> Command {
     let mut command = Command::new("rustc");
     command
@@ -396,11 +439,14 @@ fn downstream_command(source: &Path, library: &Path, executable: &Path) -> Comma
     command
 }
 
+/// Require a bounded downstream tool invocation to succeed and return its recorded stdout.
 fn run_success(command: &mut Command, directory: &Path, phase: &str) {
     let (status, stdout, stderr) = run_bounded(command, directory, phase);
     assert!(status.success(), "{phase} failed ({status}):\n{stderr}\n{stdout}");
 }
 
+/// Run a compiler or consumer with output and time limits, rejecting failures instead of
+/// comparing partial observations.
 fn run_bounded(
     command: &mut Command,
     directory: &Path,
@@ -438,9 +484,18 @@ fn run_bounded(
     (status, fs::read_to_string(stdout_path).unwrap(), fs::read_to_string(stderr_path).unwrap())
 }
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let number = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
@@ -451,7 +506,10 @@ impl TemporaryDirectory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

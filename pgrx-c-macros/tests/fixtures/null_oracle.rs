@@ -1,30 +1,54 @@
+/// Standalone Rust consumer for the null oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::{CUnsignedLong, IntoCValue, cast};
 
+/// Print the observation format consumed by the paired oracle, retaining C kind and value
+/// information rather than only the result.
 fn record<T: IntoCValue>(name: &str, value: T) {
     let value = cast::<CUnsignedLong, _>(value.into_c_value());
     // SAFETY: The fixture counter belongs to this process and requires no backend.
     println!("{name}:{}:{}", value.get(), unsafe { null_count() });
 }
 
+/// Label pointer categories for oracle output while leaving the generated conversion contract
+/// unchanged.
 trait OraclePointerType {
+    /// Observation tag distinguishing this C pointer category from equal-sized Rust storage.
     const KIND: &'static str;
 }
+/// Tag this pointer representation for original-C type observations without dereferencing it.
 impl OraclePointerType for *mut core::ffi::c_void {
+    /// Observation tag distinguishing this C pointer category from equal-sized Rust storage.
     const KIND: &'static str = "void_pointer";
 }
+/// Tag this pointer representation for original-C type observations without dereferencing it.
 impl OraclePointerType for *mut i32 {
+    /// Observation tag distinguishing this C pointer category from equal-sized Rust storage.
     const KIND: &'static str = "int_pointer";
 }
+/// Tag this pointer representation for original-C type observations without dereferencing it.
 impl OraclePointerType for NullCallback {
+    /// Observation tag distinguishing this C pointer category from equal-sized Rust storage.
     const KIND: &'static str = "callback";
 }
 
+/// Record the expression's C type identity and side effects so value equality alone cannot
+/// bless an incorrect conversion.
 fn record_type<T: OraclePointerType>(name: &str, value: T) {
     let _ = value;
     // SAFETY: The fixture counter belongs to this process and requires no backend.
     println!("{name}:{}:{}:{}", T::KIND, core::mem::size_of::<T>() * 8, unsafe { null_count() });
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     let mut value = 7_i32;
     let pointer = &raw mut value;

@@ -2,28 +2,51 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check that capability pruning preserves the operations selected by macros.
+//!
+//! A synthetic header contains several callback and enum families. Emission may
+//! omit unused adapters, but open operands and multiple call sites must retain
+//! all compatible identities. Executed C and Rust observations check the result.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, inspect,
 };
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Synthetic C source inspected as an original header, keeping this test's semantic input
+/// explicit.
 const HEADER: &str = r#"
 typedef enum DemandEnum { DemandZero = 0, DemandOne = 1 } DemandEnum;
 typedef enum DemandOther { DemandOtherZero = 0, DemandOtherTwo = 2 } DemandOther;
@@ -72,6 +95,7 @@ void demand_void_named(void);
 #define DEMAND_ALIAS_PROTO(value) (demand_alias_prototype(value))
 "#;
 
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 static int demand_answer(void) { return 7; }
 static int demand_add(int value) { return value + 3; }
@@ -88,9 +112,18 @@ void demand_void_callback(void) { demand_void_count += 1; }
 void demand_void_named(void) { demand_void_count += 10; }
 "#;
 
-struct TemporaryHeader(PathBuf);
+/// Own a synthetic header and its temporary directory so profile-sensitive generation has an
+/// isolated source of C facts.
+struct TemporaryHeader(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Write an owned synthetic header whose source and compiler inputs can be varied
+/// independently.
 impl TemporaryHeader {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let directory = std::env::temp_dir()
@@ -116,12 +149,16 @@ impl TemporaryHeader {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryHeader {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(self.0.parent().expect("created header directory"));
     }
 }
 
+/// Checks that selected callback operations and open enum operands match original c.
 #[test]
 fn selected_callback_operations_and_open_enum_operands_match_original_c() {
     let header = TemporaryHeader::new();

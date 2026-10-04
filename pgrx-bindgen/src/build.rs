@@ -11,6 +11,8 @@ use crate::{detect_pg_config, env_tracked, is_for_release};
 use bindgen::NonCopyUnionStyle;
 use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use eyre::{WrapErr, eyre};
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
     IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, SkipReasonCode,
@@ -18,6 +20,7 @@ use pgrx_c_macros::{
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
+/// Serialize compiler facts and per-macro results for the build audit report.
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -25,15 +28,24 @@ use std::fs;
 use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
 use std::rc::Rc;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
+/// Allocate unique fixture paths or record process-local effects across concurrent test
+/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
+/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
+/// facts from names.
 use syn::{Item, ItemConst, spanned::Spanned};
 
 const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
 
 // clang's safe wrapper permits one live Clang handle per process. Bindgen's
 // Binding generation shares that inspection's runtime and verified arguments.
+/// Serialize macro inspection and bindgen generation so both share one usable process-wide
+/// Clang runtime.
 static MACRO_SCANNER: Mutex<()> = Mutex::new(());
+/// Allocate unique owned staging paths while formatting different PostgreSQL versions
+/// concurrently.
 static NEXT_MACRO_FORMATTING_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
 // These postgres versions were effectively "yanked" by the community, even tho they still exist
@@ -47,10 +59,17 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
     PgVersion::new(15, PgMinorVersion::Release(9), None),
 ];
 
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 mod binding_symbols;
+/// Render provenance-derived header modules and same-scope support fragments for publication.
 mod macro_files;
+/// Compile generated native access helpers under the already verified C invocation profile.
 mod macro_support;
+/// Use the complete versioned source map produced from header provenance and adapter
+/// partitioning.
 use macro_files::MacroFiles;
+/// Compile generated native access helpers with the frontend's verified invocation profile.
 use macro_support::compile_macro_support;
 pub(super) mod clang;
 
@@ -161,6 +180,8 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     }
 }
 
+/// Drive binding generation for configured PostgreSQL versions and register the generated-macro
+/// configuration with Cargo before compiling consumers.
 pub fn main() -> eyre::Result<()> {
     println!("cargo:rustc-check-cfg=cfg(docsrs)");
     println!("cargo:rustc-check-cfg=cfg(pgrx_c_macros)");
@@ -267,6 +288,8 @@ fn cshim_static_wrapper_name(major_version: u16) -> String {
     format!("pgrx-cshim-static-pg{major_version}")
 }
 
+/// Register binding inputs without tracking an absent configuration file perpetually;
+/// macro-specific tracking additionally follows inspected compiler and header inputs.
 fn emit_rerun_if_changed() {
     // `pgrx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_PATH");
@@ -301,6 +324,8 @@ fn emit_rerun_if_changed() {
     }
 }
 
+/// Write the selected version's bindings, OIDs, macro module tree, and skip report, publishing
+/// documentation snapshots only during release generation.
 fn generate_bindings(
     major_version: u16,
     pg_config: &PgConfig,
@@ -426,6 +451,8 @@ impl BuildPaths {
     }
 }
 
+/// Add documentation-only guards to installation-specific target checks and native adapters
+/// while preserving original source comments and macro templates.
 fn macro_snapshot(source: &str) -> eyre::Result<String> {
     let file = syn::parse_file(source).wrap_err("could not parse generated C macros")?;
     let mut guards = BTreeMap::new();
@@ -469,6 +496,8 @@ fn macro_snapshot(source: &str) -> eyre::Result<String> {
     Ok(snapshot)
 }
 
+/// Stage and format the complete macro tree before stable writes, then remove only stale Rust
+/// leaves owned by this version.
 fn write_macro_files(
     files: &MacroFiles,
     directory: &Path,
@@ -524,9 +553,16 @@ fn write_macro_files(
 
 /// A sibling keeps the final directory's rustfmt configuration search while
 /// keeping temporary files outside that version's stale-file pruning.
-struct MacroFormattingDirectory(PathBuf);
+struct MacroFormattingDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Own formatting staging beside the final tree so rustfmt sees its configuration
+/// while stale-file pruning remains confined to generated version output.
 impl MacroFormattingDirectory {
+    /// Create a sibling formatting directory so rustfmt finds the destination configuration
+    /// without stale-file pruning observing the temporary files.
     fn new(directory: &Path) -> eyre::Result<Self> {
         let parent = directory.parent().filter(|parent| !parent.as_os_str().is_empty());
         let parent = parent.unwrap_or_else(|| Path::new("."));
@@ -545,12 +581,18 @@ impl MacroFormattingDirectory {
     }
 }
 
+/// Remove only the staging files allocated by this generation attempt on either
+/// successful publication or an earlier formatting error.
 impl Drop for MacroFormattingDirectory {
+    /// Remove only the staging directory owned by this formatter instance after success or
+    /// failure.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }
 }
 
+/// Format generated leaves together while preventing child traversal; tolerate an absent
+/// rustfmt executable but propagate formatter failures.
 fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
     if paths.is_empty() {
         return Ok(());
@@ -576,6 +618,8 @@ fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
     }
 }
 
+/// Remove the obsolete monolithic macro file after publishing the modular tree, tolerating an
+/// already-absent predecessor.
 fn remove_legacy_macro_file(directory: &Path, major_version: u16) -> eyre::Result<()> {
     let path = directory.join(format!("pg{major_version}_macros.rs"));
     match fs::remove_file(&path) {
@@ -585,6 +629,8 @@ fn remove_legacy_macro_file(directory: &Path, major_version: u16) -> eyre::Resul
     }
 }
 
+/// Write formatted binding source and release documentation snapshots using the
+/// repository edition; modular C macro publication uses its separate stable tree writer.
 fn write_rs_file(
     code: proc_macro2::TokenStream,
     file_path: &Path,
@@ -1024,6 +1070,8 @@ struct TypeDescriptor<'a> {
     children: Vec<usize>,
 }
 
+/// Choose normal generation or an unavailable macro result when externally supplied bindings
+/// lack the current C inspection facts.
 fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
@@ -1144,15 +1192,26 @@ fn run_bindgen(
     }
 }
 
+/// Carry the generated macro tree and audit report from inspection through binding publication.
 struct MacroOutput {
+    /// Versioned macro tree and adapters ready for formatted publication.
     files: MacroFiles,
+    /// Serialized compiler facts and macro skip diagnostics written alongside the bindings.
     report: Vec<u8>,
+    /// Successful public definitions counted for the Cargo summary.
     emitted: usize,
+    /// Rejected candidates counted without treating unsupported syntax as build failure.
     skipped: usize,
+    /// Whether authoritative C inspection succeeded, distinguishing unavailability from an
+    /// empty selection.
     inspected: bool,
 }
 
+/// Represent unavailable authoritative C inspection without publishing guessed
+/// macro definitions or treating shipped documentation bindings as compiler evidence.
 impl MacroOutput {
+    /// Create an empty macro tree and explicit report when authoritative C inspection is
+    /// unavailable, rather than deriving facts from shipped bindings.
     fn unavailable(major_version: u16, reason: &str) -> eyre::Result<Self> {
         let report = serde_json::to_vec_pretty(&serde_json::json!({
             "postgres_major_version": major_version,
@@ -1163,19 +1222,32 @@ impl MacroOutput {
     }
 }
 
+/// Serialize the verified C invocation, fresh binding facts, and per-macro results for build
+/// diagnostics and auditing.
 #[derive(Serialize)]
 struct MacroReport<'a> {
+    /// Installation version associated with these compiler and binding facts.
     postgres_major_version: u16,
+    /// Report status distinguishing generated output from unavailable inspection.
     status: &'static str,
+    /// Verified compiler invocation, target, and semantic flags used for this generation.
     profile: &'a CompilationProfile,
+    /// Header, compiler, search-root, and environment dependencies needed to invalidate output.
     inputs: &'a BuildInputs,
+    /// Original frontend warnings retained for audit without repairing the source.
     diagnostics: &'a [Diagnostic],
+    /// Every selected candidate, including provenance and structured emission or skip result.
     macros: &'a [MacroEmission],
+    /// Compiler-owned constant facts used to verify symbolic binding references.
     integer_constants: &'a BTreeMap<String, IntegerConstant>,
+    /// Fresh Rust binding paths, storage, and values reconciled with the C catalog.
     integer_bindings: &'a BindingCatalog,
+    /// Explanation when checked pg_sys integer bridges could not be proved.
     integer_bridge_unavailable: Option<String>,
 }
 
+/// Inspect the selected installation, reconcile fresh bindings, emit supported macros and
+/// native adapters, verify unchanged C inputs, and serialize structured skips.
 fn generate_macros(
     pg_config: &PgConfig,
     header: &Path,
@@ -1296,6 +1368,8 @@ fn generate_macros(
     Ok((bindings, MacroOutput { files, report, emitted, skipped, inspected: true }))
 }
 
+/// Place inspected resource options before bindgen's environment tail and require inspection to
+/// retain the original supplied prefix.
 fn normalize_bindgen_arguments(
     base: &[String],
     environment: &[String],
@@ -1327,6 +1401,8 @@ fn bindgen_environment_arguments(mut lookup: impl FnMut(&str) -> Option<String>)
     value.map_or_else(Vec::new, |value| shlex::split(&value).unwrap_or_else(|| vec![value]))
 }
 
+/// Recognize user target flags so Cargo's default target does not override an explicitly
+/// selected Clang ABI.
 fn has_explicit_clang_target<'a>(arguments: impl Iterator<Item = &'a String>) -> bool {
     let mut arguments = arguments;
     while let Some(argument) = arguments.next() {
@@ -1341,6 +1417,8 @@ fn has_explicit_clang_target<'a>(arguments: impl Iterator<Item = &'a String>) ->
 
 // Bindgen applies these target spelling conversions before giving Cargo's target
 // to Clang. Pin the same spelling explicitly so macro inspection sees that target.
+/// Apply bindgen's target spelling conversions before inspection so Clang and binding
+/// generation select the same ABI.
 fn clang_target(target: &str) -> String {
     let mut parts = target.split_terminator('-').collect::<Vec<_>>();
     parts.resize(4, "");
@@ -1363,6 +1441,8 @@ fn clang_target(target: &str) -> String {
     parts.into_iter().filter(|part| !part.is_empty()).collect::<Vec<_>>().join("-")
 }
 
+/// Publish the verified file, directory, and environment dependencies that must invalidate
+/// generated C macros.
 fn emit_macro_rerun_inputs(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<()> {
     for path in macro_rerun_paths(inputs, out_dir)? {
         cargo_input_path(&path)?;
@@ -1377,6 +1457,8 @@ fn emit_macro_rerun_inputs(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result
     Ok(())
 }
 
+/// Combine present inspected files with safe directory watches for optional inputs and compiler
+/// search roots.
 fn macro_rerun_paths(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<BTreeSet<PathBuf>> {
     let mut paths = macro_watch_directories(inputs, out_dir)?;
     paths.extend(
@@ -1389,6 +1471,8 @@ fn macro_rerun_paths(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<BTree
     Ok(paths)
 }
 
+/// Watch optional input creation and search-path changes without recursively watching this
+/// build's own outputs.
 fn macro_watch_directories(
     inputs: &BuildInputs,
     out_dir: &Path,
@@ -1422,6 +1506,8 @@ fn macro_watch_directories(
     Ok(watched)
 }
 
+/// Track both supplied and canonical directory identities and reject overlap with OUT_DIR to
+/// prevent self-invalidating builds.
 fn watch_input_directory(
     watched: &mut BTreeSet<PathBuf>,
     requested: &Path,
@@ -1443,12 +1529,15 @@ fn watch_input_directory(
     Ok(())
 }
 
+/// Find an existing parent to watch when an optional include or compiler-search directory has
+/// not yet been created.
 fn existing_directory_ancestor(directory: &Path) -> eyre::Result<PathBuf> {
     directory.ancestors().find(|ancestor| ancestor.is_dir()).map(Path::to_owned).ok_or_else(|| {
         eyre!("no existing ancestor for C macro input directory {}", directory.display())
     })
 }
 
+/// Require a UTF-8 single-line path before emitting a Cargo dependency directive.
 fn cargo_input_path(path: &Path) -> eyre::Result<()> {
     let value = path.to_str().ok_or_else(|| eyre!("Cargo input path is not UTF-8: {path:?}"))?;
     if value.contains(['\n', '\r']) {
@@ -1457,6 +1546,8 @@ fn cargo_input_path(path: &Path) -> eyre::Result<()> {
     Ok(())
 }
 
+/// Preserve a generated artifact's modification time when its final bytes match, avoiding
+/// unnecessary downstream rebuilds.
 fn write_content_stable(path: &Path, content: &[u8]) -> eyre::Result<()> {
     match fs::read(path) {
         Ok(existing) if existing == content => return Ok(()),
@@ -1598,6 +1689,8 @@ fn pg_target_includes(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Vec
     Ok(result)
 }
 
+/// Compile PostgreSQL shims against the selected installation and its recorded C
+/// flags, preserving the same arithmetic and ABI profile used by macro inspection.
 fn build_shim(
     shim_src: &path::Path,
     shim_dst: &path::Path,
@@ -1639,6 +1732,8 @@ fn build_shim(
     Ok(())
 }
 
+/// Decode the installation's recorded compiler flags without losing shell quoting;
+/// reject malformed or non-UTF-8 profiles before bindgen and native macros can diverge.
 fn postgres_cflags(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let flags = pg_config.cflags()?;
     let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CFLAGS are not UTF-8"))?;
@@ -1795,12 +1890,20 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
     Ok(out)
 }
 
+/// Normalize callback and foreign ABI declarations to the same C-unwind storage used by guarded
+/// pgrx bindings.
 fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     use proc_macro2::Span;
     use syn::LitStr;
     use syn::visit_mut::VisitMut;
+    /// Normalize nested ABI syntax before catalog collection and final pg_guard rewriting share
+    /// callback storage facts.
     pub struct Visitor {}
+    /// Traverse the parsed syntax so nested declarations participate in the same ABI or storage
+    /// checks.
     impl VisitMut for Visitor {
+        /// Rewrite explicit C ABIs throughout the parsed bindings while leaving other calling
+        /// conventions intact.
         fn visit_abi_mut(&mut self, abi: &mut syn::Abi) {
             if let Some(name) = &mut abi.name
                 && name.value() == "C"
@@ -1812,6 +1915,8 @@ fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     Visitor {}.visit_file_mut(file);
 }
 
+/// Format generated binding source under the requested edition and report formatter
+/// diagnostics through Cargo; macro leaves use their stricter staged writer instead.
 fn rust_fmt(path: &Path, edition: &str) -> eyre::Result<()> {
     // We shouldn't hit this path in a case where we care about it, but... just
     // in case we probably should respect RUSTFMT.
@@ -1850,14 +1955,29 @@ fn rust_fmt(path: &Path, edition: &str) -> eyre::Result<()> {
     }
 }
 
+/// Check catalog, publication, and invalidation invariants directly against the private
+/// binding-build implementation.
 #[cfg(test)]
 mod macro_build_tests {
+    //! Check catalog, publication, and invalidation invariants directly against the private
+    //! binding-build implementation.
+    //!
+    //! The tests inspect real parsed output, generated leaf maps, and compiler dependency
+    //! directives. Temporary input trees make success and rejection conditions explicit without
+    //! relying on a configured server.
+
+    /// Exercise private generation and dependency helpers without broadening their public API.
     use super::*;
+    /// Allocate unique fixture paths or record process-local effects across concurrent test
+    /// invocations.
     use std::sync::atomic::{AtomicU64, Ordering};
+    /// Measure stable artifact timestamps and choose isolated fixture directory names.
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+    /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
     static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
+    /// Checks that documentation snapshots guard native support and preserve macro templates.
     #[test]
     fn documentation_snapshots_guard_native_support_and_preserve_macro_templates() {
         let source = r#"#[cfg(not(target_pointer_width = "64"))]
@@ -1903,6 +2023,7 @@ macro_rules! EXAMPLE {
         assert_eq!(syn::parse_file(&snapshot).unwrap(), expected);
     }
 
+    /// Checks that documentation snapshots require guarded items on their own lines.
     #[test]
     fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
         for (source, description) in [
@@ -1917,6 +2038,7 @@ macro_rules! EXAMPLE {
         }
     }
 
+    /// Checks that environment arguments match bindgen priority and shell quoting.
     #[test]
     fn environment_arguments_match_bindgen_priority_and_shell_quoting() {
         let mut values = BTreeMap::from([
@@ -1946,6 +2068,7 @@ macro_rules! EXAMPLE {
         );
     }
 
+    /// Checks that explicit targets and cargo target spellings are preserved.
     #[test]
     fn explicit_targets_and_cargo_target_spellings_are_preserved() {
         assert_eq!(clang_target("aarch64-apple-darwin"), "arm64-apple-darwin");
@@ -1962,6 +2085,7 @@ macro_rules! EXAMPLE {
         assert!(!has_explicit_clang_target(missing.iter()));
     }
 
+    /// Checks that inspected resource options and environment tail are used exactly once.
     #[test]
     fn inspected_resource_options_and_environment_tail_are_used_exactly_once() {
         let base = ["-fwrapv", "-I/server", "--target=arm64-apple-darwin"].map(String::from);
@@ -1997,6 +2121,7 @@ macro_rules! EXAMPLE {
         assert!(normalize_bindgen_arguments(&base, &environment, &base).is_err());
     }
 
+    /// Checks that unchanged generated artifacts keep their modification time.
     #[test]
     fn unchanged_generated_artifacts_keep_their_modification_time() {
         let directory = TemporaryDirectory::new();
@@ -2012,6 +2137,7 @@ macro_rules! EXAMPLE {
         assert_ne!(fs::metadata(&path).unwrap().modified().unwrap(), before);
     }
 
+    /// Checks that macro tree updates preserve unchanged leaves and remove stale Rust only.
     #[test]
     fn macro_tree_updates_preserve_unchanged_leaves_and_remove_stale_rust_only() {
         let directory = TemporaryDirectory::new();
@@ -2042,6 +2168,7 @@ macro_rules! EXAMPLE {
         assert!(version.join("mod.rs").exists(), "an empty module still loads");
     }
 
+    /// Checks that macro trees are formatted before stable normal and snapshot writes.
     #[test]
     fn macro_trees_are_formatted_before_stable_normal_and_snapshot_writes() {
         let directory = TemporaryDirectory::new();
@@ -2078,6 +2205,7 @@ macro_rules! EXAMPLE {
         }
     }
 
+    /// Checks that unavailable macro formatter preserves original sources.
     #[test]
     fn unavailable_macro_formatter_preserves_original_sources() {
         let directory = TemporaryDirectory::new();
@@ -2089,6 +2217,7 @@ macro_rules! EXAMPLE {
         assert_eq!(fs::read_to_string(path).unwrap(), original);
     }
 
+    /// Checks that macro formatting directories are removed after use.
     #[test]
     fn macro_formatting_directories_are_removed_after_use() {
         let directory = TemporaryDirectory::new();
@@ -2102,6 +2231,7 @@ macro_rules! EXAMPLE {
         assert!(directory.0.exists(), "cleanup only removes its own directory");
     }
 
+    /// Checks that macro snapshots guard each leaf and do not duplicate native guards.
     #[test]
     fn macro_snapshots_guard_each_leaf_and_do_not_duplicate_native_guards() {
         let directory = TemporaryDirectory::new();
@@ -2124,6 +2254,8 @@ macro_rules! EXAMPLE {
         assert_eq!(snapshot.matches("#[cfg(not(docsrs))]").count(), 1);
     }
 
+    /// Checks that absent files watch existing parents without perpetually dirty file
+    /// directives.
     #[test]
     fn absent_files_watch_existing_parents_without_perpetually_dirty_file_directives() {
         let directory = TemporaryDirectory::new();
@@ -2161,6 +2293,7 @@ macro_rules! EXAMPLE {
         assert!(macro_rerun_paths(&unsafe_inputs, &out_dir).is_err());
     }
 
+    /// Checks that missing search directories watch creation without tracking cargo outputs.
     #[test]
     fn missing_search_directories_watch_creation_without_tracking_cargo_outputs() {
         let directory = TemporaryDirectory::new();
@@ -2200,6 +2333,7 @@ macro_rules! EXAMPLE {
         assert!(error.contains("set CLANG_PATH to an absolute compiler path"));
     }
 
+    /// Checks that directory aliases remain watched and cannot hide output overlap.
     #[cfg(unix)]
     #[test]
     fn directory_aliases_remain_watched_and_cannot_hide_output_overlap() {
@@ -2219,6 +2353,8 @@ macro_rules! EXAMPLE {
         assert!(macro_watch_directories(&inputs, &out_dir).is_err());
     }
 
+    /// Checks that unavailable target metadata produces an empty macro file and explicit
+    /// report.
     #[test]
     fn unavailable_target_metadata_produces_an_empty_macro_file_and_explicit_report() {
         let output = MacroOutput::unavailable(18, "no matching macro target metadata").unwrap();
@@ -2233,9 +2369,17 @@ macro_rules! EXAMPLE {
         assert!(report.get("profile").is_none(), "host semantics must not be invented");
     }
 
-    struct TemporaryDirectory(PathBuf);
+    /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+    /// leave a growing target tree.
+    struct TemporaryDirectory(
+        /// Owned fixture path used for isolated inputs and cleanup.
+        PathBuf,
+    );
 
+    /// Allocate isolated compiler artifacts with process-local uniqueness and deterministic
+    /// cleanup ownership.
     impl TemporaryDirectory {
+        /// Create an isolated header and output directory owned by this build-publication test.
         fn new() -> Self {
             let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
             let number = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
@@ -2246,7 +2390,10 @@ macro_rules! EXAMPLE {
         }
     }
 
+    /// Release only temporary artifacts owned by this fixture, including on failed compiler or
+    /// assertion paths.
     impl Drop for TemporaryDirectory {
+        /// Remove only the temporary files owned by this test fixture after its assertions.
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }

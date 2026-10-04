@@ -17,7 +17,7 @@
 //! [`AnalysisSession`] expands a batch with the matched compiler while preserving the main
 //! file's preprocessing context. [`generate_with_bindings`] reconciles those C declarations
 //! with actual Rust binding storage, producing Rust macros and shared Rust/C adapters.
-//! [`emit`] is available without a binding catalog for expressions that need no such adapters.
+//! [`emit()`] is available without a binding catalog for expressions that need no such adapters.
 //! Generated macros use the semantic support in `pgrx-pg-sys`, retaining C type identity,
 //! argument occurrences, lazy branches, places and unevaluated operands. Native operations
 //! require the caller's unsafe obligations and the binding generator's FFI guard; partly
@@ -25,67 +25,117 @@
 //! declarations and constructs are explicit skips. Emission is runtime-only and does not
 //! itself establish differential validation against C for every possible invocation.
 
+//! The crate owns the discovery-to-emission boundary used by pgrx-bindgen and the CLI.
+//! Clang supplies active preprocessing state and C declarations; owned inventories let later
+//! phases inspect those facts without keeping a translation unit alive. Sessions tie expansion
+//! and analysis to that same input snapshot, and emission checks actual Rust binding storage
+//! before producing macros and the adapters they need.
+
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::{Deserialize, Serialize};
+/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt;
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::{Path, PathBuf};
+/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
+/// rules.
 use std::sync::Arc;
 
+/// Resolve pgrx-managed installations and separate PostgreSQL-owned macros from retained expansion
+/// context.
 mod postgres;
+/// Expose installation resolution and PostgreSQL ownership filtering to bindgen and CLI clients.
 pub use postgres::{
     PostgresConfig, PostgresError, PostgresInventory, postgres_function_macro_names,
 };
+/// Own compiler profiles, preprocessing state, and declaration identities independently of Clang
+/// handles.
 mod model;
+/// Expose the owned C profile and declaration vocabulary shared by pipeline clients.
 pub use model::*;
+/// Build deterministic macro/constant reference graphs for ordering and refusal propagation.
 mod dependencies;
+/// Expose deterministic dependency lookup and affected-caller explanations for generation failures.
 pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
+/// Establish one agreed compiler environment and copied C catalog before expansion or analysis.
 mod frontend;
+/// Expose coherent inspection and native support compilation at the library boundary.
 pub use frontend::{FrontendError, compile_native_support, inspect};
+/// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
+/// Expose structural syntax facts for analysis reports and binding-aware emission.
 pub use syntax::{
     BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
     NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, TokenRange, UnaryOperator,
 };
+/// Describe symbolic C types and invocation contracts before Rust lowering claims support.
 mod analysis;
+/// Expose symbolic candidate contracts and structured refusals independently of Rust lowering.
 pub use analysis::*;
 
+/// Serialize tests using libclang because its wrapper allows only one live runtime handle per
+/// process.
 #[cfg(test)]
 pub(crate) static SCANNER_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+/// Use the matched compiler to preserve preprocessing semantics and surviving formal occurrences.
 mod expansion;
+/// Expose bounded compiler expansion and its owned result/dependency vocabulary.
 pub use expansion::{
     ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
     ExpansionResult, ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
     prepare_expansions_with_limits,
 };
+/// Tie expansion, constant proofs, and analysis to one verified inspection snapshot.
 mod session;
+/// Expose the preparation boundary that keeps expansion and analysis tied to one inspection.
 pub use session::AnalysisSession;
+/// Gate runtime helper compatibility and produce target guards and opaque pg-sys integer bridges.
 mod support_generation;
+/// Expose target support gates and pg-sys bridge generation to the binding generator.
 pub use support_generation::*;
+/// Lower analyzed candidates using verified binding storage and shared C-semantic runtime
+/// capabilities.
 mod emit;
+/// Expose binding-aware lowering and the generated artifact/result vocabulary.
 pub use emit::*;
+/// Record actual target bindgen storage independently of authoritative C type identities.
 mod bindings;
+/// Expose actual Rust binding storage facts for compiler-to-binding reconciliation.
 pub use bindings::*;
+/// Retain direct macro calls only after comparing independently expanded structures and C type facts.
 mod delegation;
+/// Lay out generated macro token trees while preserving source spellings and semantic structure.
 mod formatting;
+/// Expose source-preserving macro layout to generated file writers.
 pub use formatting::format_rust_macros;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MacroInventory {
+    /// Owned macro definitions/results retained in discovery or selected pipeline order.
     pub macros: Vec<MacroDefinition>,
+    /// Owned compiler diagnostics associated with this discovery or tool phase.
     pub diagnostics: Vec<Diagnostic>,
 }
 
 /// A C macro definition, with its name and replacement tokens left unexpanded.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MacroDefinition {
+    /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     pub name: String,
+    /// The semantic or structural category kept separate from representation and source spelling.
     pub kind: MacroKind,
+    /// Owned physical diagnostic coordinates or an unresolved location when Clang supplied none.
     pub location: Option<SourceLocation>,
     /// Physical definition span; absent for definitions without a source file.
     pub provenance: Option<SourceSpan>,
     /// Tokens include the macro name and, for function-like macros, the parameter list.
     pub tokens: Vec<Token>,
+    /// Whether libclang identifies the definition as compiler-provided rather than ordinary header
+    /// source.
     pub builtin: bool,
     /// Whether this definition originates in the scanned file rather than an included file.
     pub main_file: bool,
@@ -95,15 +145,21 @@ pub struct MacroDefinition {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum MacroKind {
+    /// An unparameterized definition retained for listing/expansion context rather than
+    /// function-macro emission.
     ObjectLike,
+    /// A definition with a C formal list, eligible for public macro inventory and analysis.
     FunctionLike,
 }
 
 /// A physical source location, unaffected by `#line` directives.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceLocation {
+    /// Absolute physical source filename used for diagnostics and source ownership.
     pub file: PathBuf,
+    /// One-based physical source line, unaffected by #line remapping.
     pub line: u32,
+    /// One-based source column or current layout column, according to the enclosing representation.
     pub column: u32,
     /// Byte offset from the start of the file.
     pub offset: u32,
@@ -116,12 +172,18 @@ pub struct SourceLocation {
 /// `#line` directives do not change these coordinates.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceSpan {
+    /// Absolute physical source filename used for diagnostics and source ownership.
     pub file: PathBuf,
+    /// First physical line occupied by the macro definition’s source tokens.
     pub start_line: u32,
+    /// Last physical line occupied by the macro definition’s source tokens.
     pub end_line: u32,
 }
 
+/// Copy physical Clang ranges into owned inclusive source spans.
 impl SourceSpan {
+    /// Convert Clang exclusive endpoints into an inclusive physical line span for auditing and module
+    /// grouping.
     fn from_range(
         range: clang::source::SourceRange<'_>,
         directory: &Path,
@@ -155,7 +217,9 @@ impl SourceSpan {
 /// A token's spelling and lexical category, including comments.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Token {
+    /// The semantic or structural category kept separate from representation and source spelling.
     pub kind: TokenKind,
+    /// Original token/type spelling retained for readable source and diagnostic reconstruction.
     pub spelling: String,
 }
 
@@ -163,18 +227,26 @@ pub struct Token {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TokenKind {
+    /// Source commentary retained in original token coordinates but excluded from semantic parsing.
     Comment,
+    /// An identifier/designator substitution that must retain C structural spelling.
     Identifier,
+    /// A Clang keyword token; macro formals can still use its spelling as a substitution hole.
     Keyword,
+    /// A source literal awaiting bounded syntax and target-dependent type selection.
     Literal,
+    /// An operator or delimiter token used to preserve C grammar and grouping.
     Punctuation,
 }
 
 /// A compiler diagnostic copied out of the translation unit.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Diagnostic {
+    /// Clang diagnostic severity used to distinguish reports from discovery failures.
     pub severity: DiagnosticSeverity,
+    /// Human-readable detail explaining the compiler observation or unsupported construct.
     pub message: String,
+    /// Owned physical diagnostic coordinates or an unresolved location when Clang supplied none.
     pub location: Option<SourceLocation>,
 }
 
@@ -182,26 +254,53 @@ pub struct Diagnostic {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DiagnosticSeverity {
+    /// A diagnostic ignored by Clang’s configured warning policy.
     Ignored,
+    /// Supplementary compiler information retained with other discovery diagnostics.
     Note,
+    /// A nonfatal compiler diagnostic that remains visible to the caller.
     Warning,
+    /// A compiler failure that prevents accepting a complete discovery/proof result.
     Error,
+    /// A compiler failure that invalidates the remainder of the parsing or proof pass.
     Fatal,
 }
 
 /// An error loading Clang, processing the input, or obtaining a complete inventory.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// The libclang runtime could not be initialized for discovery.
     #[error("could not initialize libclang: {0}")]
-    Clang(String),
+    Clang(
+        /// Library-loading detail returned by the libclang wrapper.
+        String,
+    ),
+    /// Scanner arguments or paths failed validation before parsing.
     #[error("invalid scanner input: {0}")]
-    InvalidInput(String),
+    InvalidInput(
+        /// The invalid scanner path or argument explanation.
+        String,
+    ),
+    /// The selected C input could not be parsed into a translation unit.
     #[error("could not parse {}: {source}", header.display())]
-    Parse { header: PathBuf, source: clang::SourceError },
+    Parse {
+        /// The original main-file spelling that controls preprocessing and quoted include lookup.
+        header: PathBuf,
+        /// The underlying I/O or parsing failure retained for actionable diagnostics.
+        source: clang::SourceError,
+    },
+    /// Clang reported errors, with owned diagnostics retained for the caller.
     #[error("Clang reported errors while processing the input")]
-    Diagnostics(Vec<Diagnostic>),
+    Diagnostics(
+        /// Owned Clang diagnostics retained instead of exposing a partial inventory.
+        Vec<Diagnostic>,
+    ),
+    /// A discovered preprocessing entity lacked a complete owned definition.
     #[error("incomplete Clang macro definition: {0}")]
-    InvalidDefinition(String),
+    InvalidDefinition(
+        /// The missing source/token fact that prevented a complete macro record.
+        String,
+    ),
 }
 
 /// A reusable scanner that owns Clang's runtime handle.
@@ -215,20 +314,32 @@ pub enum Error {
 /// by bindgen during the scanner's lifetime also keep access to their library.
 #[derive(Debug)]
 pub struct MacroScanner {
+    /// The live thread-bound runtime handle required while indexes and translation units are in use.
     clang: Clang,
     // Fields drop in declaration order: restore the runtime after Clang unloads it.
+    /// Retained shared library restored after clang drops, preserving other users’ thread-local
+    /// runtime.
     _restore_runtime: RestoreRuntime,
 }
 
+/// Retain the shared libclang runtime so scanner teardown restores the library used by existing
+/// bindgen handles.
 #[derive(Debug)]
-struct RestoreRuntime(Arc<clang_sys::SharedLibrary>);
+struct RestoreRuntime(
+    /// The shared runtime retained until scanner teardown restores libclang’s thread-local entry.
+    Arc<clang_sys::SharedLibrary>,
+);
 
+/// Release resources owned by RestoreRuntime even when a compiler or proof phase exits early.
 impl Drop for RestoreRuntime {
+    /// Restore the shared thread-local runtime after the scanner handle releases its own Clang
+    /// ownership.
     fn drop(&mut self) {
         clang_sys::set_library(Some(Arc::clone(&self.0)));
     }
 }
 
+/// Own the libclang parsing boundary so no translation-unit borrow escapes discovery/probe visitors.
 impl MacroScanner {
     /// Load libclang using `LIBCLANG_PATH` and normal paths, retaining any existing runtime.
     pub fn new() -> Result<Self, Error> {
@@ -255,6 +366,7 @@ impl MacroScanner {
         self.with_translation_unit(header, clang_args, None, |_, inventory| Ok(inventory))
     }
 
+    /// Scan in-memory probe contents through the same inventory path as physical headers.
     pub(crate) fn scan_unsaved(
         &self,
         header: &Path,
@@ -264,6 +376,8 @@ impl MacroScanner {
         self.with_translation_unit(header, clang_args, Some(contents), |_, inventory| Ok(inventory))
     }
 
+    /// Parse a C input and finish owned inventory extraction before invoking a phase-specific
+    /// translation-unit visitor.
     pub(crate) fn with_translation_unit<R>(
         &self,
         header: &Path,
@@ -301,6 +415,8 @@ impl MacroScanner {
         )
     }
 
+    /// Provide the bounded parsing boundary used by discovery and probes while all borrowed Clang
+    /// handles remain live.
     fn with_parsed_translation_unit<R>(
         &self,
         header: &Path,
@@ -369,6 +485,8 @@ impl MacroScanner {
     }
 }
 
+/// Copy macro definitions and diagnostics from preprocessing entities into data independent of the
+/// translation unit.
 fn collect_macro_inventory(
     translation_unit: &clang::TranslationUnit<'_>,
     directory: &Path,
@@ -449,6 +567,7 @@ fn collect_macro_inventory(
     Ok(MacroInventory { macros, diagnostics })
 }
 
+/// Copy the physical spelling location used for diagnostics and provenance ownership checks.
 fn source_location(location: clang::source::SourceLocation<'_>) -> Option<SourceLocation> {
     let location = location.get_spelling_location();
     Some(SourceLocation {
@@ -464,6 +583,7 @@ fn source_location(location: clang::source::SourceLocation<'_>) -> Option<Source
 /// Block comments remain intact. Line comments are omitted so they cannot hide later tokens
 /// after a multiline definition is rendered. The inventory retains both kinds of comments.
 impl fmt::Display for MacroDefinition {
+    /// Render a normalized C #define for inspection reports and generated source documentation.
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(formatter, "#define {}", self.name)?;
         for (index, token) in self.tokens.iter().skip(1).enumerate() {

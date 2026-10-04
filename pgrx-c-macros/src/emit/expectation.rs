@@ -3,15 +3,27 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Plan compiler expectations without changing expression evaluation or C values.
+//!
+//! The builtin returns its first operand, even when its second operand cannot
+//! provide a static optimization hint. Planning separates fixed expected values from
+//! effect-free evaluation, carries advice through supported casts, and lets an
+//! enclosing expectation override inner advice without removing either operand.
 
+/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{MacroAnalysis, resolve_type_info};
+/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{ExpressionKind, NodeId, OffsetRecord};
+/// Recognize verified compiler builtins and object categories while planning optimization advice.
 use crate::{BuiltinKind, FrontendOutput, TypeCategory};
 
+/// Advice classification for one expression node, separate from the evaluation it still requires.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum Decision {
+    /// Expected value is fixed at compilation or instantiation and can carry branch advice.
     Static,
+    /// No fixed expectation is proved; preserve both operand evaluations without static advice.
     Dynamic,
+    /// An enclosing expectation owns the advice for this projected value.
     Overridden,
 }
 
@@ -128,9 +140,12 @@ pub(super) fn plan(frontend: &FrontendOutput, analysis: &MacroAnalysis) -> Vec<D
     decisions
 }
 
+/// Arena-planning regressions for fixed expectations, nested advice, casts, and unevaluated capabilities.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private expectation planning helpers directly in regression tests.
     use super::*;
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{
         ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, BuiltinInfo, ByteOrder,
         CompilationProfile, CompilerIdentity, DeclarationCatalog, FunctionInfo, FunctionSignature,
@@ -139,6 +154,7 @@ mod tests {
         SignedOverflow, TargetFacts, Token, TokenKind, TypeInfo, analyze,
     };
 
+    /// Build a trusted synthetic macro frontend with verified builtin and target type facts.
     fn frontend(body: &[&str]) -> FrontendOutput {
         let integers = [
             (IntegerKind::Bool, 8, false, 0),
@@ -296,6 +312,7 @@ mod tests {
         }
     }
 
+    /// Analyze the fixture and extract decisions at each verified expectation call.
     fn decisions(body: &[&str]) -> Vec<Decision> {
         let frontend = frontend(body);
         let analysis = analyze(&frontend, "F");
@@ -314,6 +331,7 @@ mod tests {
             .collect()
     }
 
+    /// Check fixed expected values can include comma effects or compound constants without requiring purity.
     #[test]
     fn fixed_expected_values_include_effectful_comma_and_compound_constants() {
         for expected in [
@@ -354,6 +372,7 @@ mod tests {
         );
     }
 
+    /// Check generic casts and sizeof, alignment, and offset capabilities yield fixed instantiation-time expectations.
     #[test]
     fn generic_casts_and_unevaluated_capabilities_are_fixed_at_instantiation() {
         for expected in [
@@ -408,6 +427,7 @@ mod tests {
         );
     }
 
+    /// Check unknown caller values cannot become static optimization advice.
     #[test]
     fn unknown_expected_values_remain_dynamic() {
         for expected in [
@@ -426,6 +446,7 @@ mod tests {
         }
     }
 
+    /// Check outer expectations supersede inner advice through groups and supported cast projections.
     #[test]
     fn outer_hint_overrides_nested_calls_through_groups_and_bit_preserving_casts() {
         for cast in [
@@ -485,6 +506,7 @@ mod tests {
         );
     }
 
+    /// Check cast-induced value changes do not prevent an outer expectation from owning advice.
     #[test]
     fn outer_hint_overrides_inner_advice_even_when_casts_change_values() {
         for cast in [vec!["int"], vec!["unsigned", "int"], vec!["_Bool"], vec!["double"], vec!["y"]]
@@ -534,6 +556,7 @@ mod tests {
         );
     }
 
+    /// Check an outer runtime expectation suppresses conflicting static advice from its projected operand.
     #[test]
     fn dynamic_outer_expectation_cancels_a_projected_static_inner_hint() {
         assert_eq!(
@@ -561,6 +584,7 @@ mod tests {
         );
     }
 
+    /// Check fixed first-operand results remain fixed even when the expected operand is dynamic or effectful.
     #[test]
     fn fixed_builtin_result_does_not_require_a_fixed_or_pure_hint() {
         assert_eq!(
@@ -585,6 +609,7 @@ mod tests {
         );
     }
 
+    /// Check macros without a verified expect builtin return an empty plan rather than allocating arena state.
     #[test]
     fn macros_without_verified_expectation_skip_planning_allocations() {
         let ordinary = frontend(&["(", "(", "x", ")", "+", "1", ")"]);

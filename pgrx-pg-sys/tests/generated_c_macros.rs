@@ -2,16 +2,27 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Exercise generated C macros as a downstream pgrx-pg-sys consumer.
+//!
+//! Renamed imports, checked integer wrappers, repeated operands, symbolic binding
+//! references, and raw fields verify the public export path. All version-specific
+//! facts come from this build rather than documentation snapshots.
+
 #![cfg(any(pgrx_c_macros, docsrs))]
 
 // Exercise the public exports from a downstream crate, including a renamed import.
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CUnsignedLong, CValue};
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
+/// Extract the C int storage used by assertions on public generated predicates.
 fn c_int(value: CValue<CInt>) -> i32 {
     value.get()
 }
 
+/// Checks C wrapping alignment and integer predicates through downstream public macro exports.
 #[test]
 fn generated_handports_preserve_c_results_through_the_public_bindings() {
     let size = CValue::<CUnsignedLong>::new(u64::MAX);
@@ -28,6 +39,8 @@ fn generated_handports_preserve_c_results_through_the_public_bindings() {
     }
 }
 
+/// Checks Oid and TransactionId inputs retain their verified unsigned C rank in min/max
+/// expressions.
 #[test]
 fn checked_newtype_inputs_keep_their_c_integer_identity() {
     let oid = pg::Oid::from_u32(u32::MAX);
@@ -38,6 +51,8 @@ fn checked_newtype_inputs_keep_their_c_integer_identity() {
     assert_eq!(value.get(), 3_u32);
 }
 
+/// Checks that public macro expansion repeats the selected Max operand exactly as the C
+/// definition does.
 #[test]
 fn expansion_hygiene_preserves_repeated_and_lazy_arguments() {
     let mut calls = 0;
@@ -52,6 +67,8 @@ fn expansion_hygiene_preserves_repeated_and_lazy_arguments() {
     assert_eq!(calls, 2);
 }
 
+/// Checks symbolic ALIGNOF_BUFFER and nested TYPEALIGN calls against the current generated
+/// bindings, including unsigned wraparound.
 #[cfg(not(docsrs))]
 #[test]
 fn binding_references_and_macro_calls_use_the_selected_build() {
@@ -62,6 +79,8 @@ fn binding_references_and_macro_calls_use_the_selected_build() {
     assert_eq!(pg::BUFFERALIGN!(CValue::<CUnsignedLong>::new(u64::MAX)).get(), 0);
 }
 
+/// Checks raw enum bytes and union fields without materializing invalid Rust record or enum
+/// values.
 #[cfg(not(docsrs))]
 #[test]
 fn generated_field_access_preserves_raw_c_storage() {

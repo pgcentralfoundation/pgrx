@@ -12,50 +12,84 @@
 //! environment match the inspection. Unresolved caller-scope identifiers become explicit
 //! operands; this does not permit rebinding declarations established by the compiler.
 
+//! Analysis describes the family of supported invocations before Rust emission chooses
+//! capabilities. Expression nodes retain source spans and symbolic C types, while parameter
+//! roles, grouping contracts, and evaluation requirements tell the emitter which substitutions
+//! are valid. A parsed candidate is not a claim of successful lowering or differential proof;
+//! unsupported constructs carry structured reasons instead.
+
+/// Use owned C profile and declaration facts instead of reconstructing compiler identities from Rust
+/// storage.
 use crate::model::{
     ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
     IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
+/// Use the shared source arena and token ranges so this phase preserves the parser’s structural
+/// evidence.
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, OffsetComponent,
     OffsetRecord, Statement, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
     parse_expression, parse_replacement,
 };
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 /// Analysis of one final active definition under the inspected compilation profile.
 #[derive(Clone, Debug, Serialize)]
 pub struct MacroAnalysis {
+    /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     pub name: String,
+    /// Physical source origins or their resolution status used for ownership filtering and auditing.
     pub provenance: Option<SourceSpan>,
+    /// Whether symbolic analysis produced a candidate or an explicit auditable refusal.
     pub status: AnalysisStatus,
+    /// Analyzed formals followed by explicit caller captures, preserving original source labels.
     pub parameters: Vec<ParameterAnalysis>,
+    /// Complete analyzed source arena when syntax and type facts establish a candidate.
     pub expression: Option<AnalyzedExpression>,
+    /// The proven grouping/context contract required of generated macro callers.
     pub invocation: InvocationContract,
+    /// The established const-context status; symbolic syntax alone does not promise const fn support.
     pub const_capability: ConstCapability,
+    /// Occurrence, laziness, undefined-operation, and overflow obligations carried into lowering.
     pub evaluation: EvaluationContract,
+    /// References established for this phase and used to explain or propagate downstream skips.
     pub dependencies: Vec<MacroDependency>,
+    /// C conversion and operator helper families discovered during analysis.
     pub required_helpers: Vec<HelperRequirement>,
+    /// The inspected C signed-overflow policy, retained for helper selection and refusal decisions.
     pub signed_overflow: SignedOverflow,
 }
 
+/// Distinguish analyzable symbolic candidates from explicit refusals without claiming Rust lowering
+/// succeeded.
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum AnalysisStatus {
     /// Parsed and analyzed; Rust lowering and differential validation are separate steps.
     Candidate,
+    /// A required proof or supported construct is missing, with an explicit refusal attached.
     Skipped {
+        /// The structured proof gap that prevents this candidate from being treated as supported.
         reason: SkipReason,
     },
 }
 
+/// Carry a stable skip category and auditable source detail through reports and downstream dependency
+/// propagation.
 #[derive(Clone, Debug, Serialize)]
 pub struct SkipReason {
+    /// Stable machine-readable skip classification, independent of the explanatory text.
     pub code: SkipReasonCode,
+    /// Human-readable detail explaining the compiler observation or unsupported construct.
     pub message: String,
+    /// Original replacement-token range of the refused syntax when available.
     pub tokens: Option<TokenRange>,
+    /// Possible physical source ranges supporting the refusal or dependency explanation.
     pub spans: Vec<SourceSpan>,
 }
 
@@ -63,44 +97,86 @@ pub struct SkipReason {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SkipReasonCode {
+    /// The selected name is absent from the final active preprocessing environment.
     NotActive,
+    /// The selected definition has no function-style parameter list and is retained only as expansion
+    /// context.
     NotFunctionLike,
+    /// Multiple physical definitions match the final active body, so unique source ownership is
+    /// unproved.
     ProvenanceAmbiguous,
+    /// No physical discovery definition could be linked reliably to the final active body.
     ProvenanceUnresolved,
+    /// Recorded compiler semantics exceed the modeled runtime/helper family.
     UnsupportedProfile,
+    /// Required target representation or C language facts could not be established.
     InvalidTarget,
+    /// The original macro signature cannot establish an ordinary bounded formal list.
     MalformedParameters,
+    /// An open macro or callable argument tail falls outside the supported substitution contract.
     Variadic,
+    /// Token pasting lacks the independent closed-expansion and dependency proof required for
+    /// support.
     TokenPaste,
+    /// Stringified preprocessing spelling cannot be preserved by the accepted Rust argument contract.
     Stringification,
+    /// The replacement needs a prepared compiler-owned expansion before symbolic analysis.
     ExpansionRequired,
+    /// The replacement has no supported expression/statement value under this analysis path.
     EmptyReplacement,
+    /// The complete replacement cannot be parsed with the bounded supported grammar.
     InvalidExpression,
+    /// The literal lies outside the verified ordinary integer/basic-character subset.
     UnsupportedLiteral,
+    /// No supported target C literal type represents the parsed magnitude.
     LiteralOutOfRange,
+    /// Pointer syntax or operand compatibility lacks the required semantic proof.
     PointerOperation,
+    /// Assignment or update lacks a supported place/evaluation contract.
     Mutation,
+    /// Statement syntax lies outside the bounded scope-preserving grammar.
     Statement,
+    /// A callable signature or supported call construct could not be established.
     Call,
+    /// A sizeof/alignment operand lacks the required structural type/value proof.
     UnevaluatedExpression,
+    /// A formal type role is ambiguous or exceeds the supported declarator grammar.
     TypeParameter,
+    /// Comma sequencing cannot be admitted under the selected invocation contract.
     CommaExpression,
+    /// Source, token, dependency, depth, or compiler-pass work exceeded a finite configured limit.
     BudgetExceeded,
+    /// A referenced C type or Rust representation cannot establish the needed semantic capabilities.
     UnsupportedType,
+    /// An identifier cannot be resolved to an admitted declaration, constant, or explicit caller
+    /// capture.
     UnknownIdentifier,
+    /// Native variable access lacks verified C identity or compatible actual binding storage.
     VariableAccess,
+    /// The C textual invocation requires a grouping boundary not established for ordinary Rust
+    /// substitutions.
     InvocationGrouping,
+    /// A context-dependent compiler builtin cannot be frozen into a faithful generated definition.
     DynamicBuiltin,
+    /// The matched compiler rejected a required typed or preprocessing witness.
     CompilerRejected,
+    /// Compiler output could not establish the required complete symbolic expansion.
     UnrecognizedExpansion,
+    /// The actual bindgen constant disagrees with the compiler-established C value.
     BindingValueMismatch,
+    /// An immediate dependency was refused, so its callers cannot be emitted reliably.
     DependencySkipped,
 }
 
+/// Describe one formal or explicit caller capture and the syntactic capabilities required by all its
+/// occurrences.
 #[derive(Clone, Debug, Serialize)]
 pub struct ParameterAnalysis {
+    /// Original formal or caller-capture label retained in generated macro argument names.
     pub name: String,
+    /// Whether the operand is an original formal or an explicit caller-scope capture.
     pub origin: ParameterOrigin,
+    /// All syntactic uses that must agree before the emitter can choose a Rust fragment grammar.
     pub roles: Vec<ParameterRole>,
     /// Every lexical replacement-list occurrence; unused arguments remain unevaluated.
     pub uses: Vec<ParameterUse>,
@@ -111,28 +187,41 @@ pub struct ParameterAnalysis {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ParameterOrigin {
+    /// An original C macro formal, retaining source name and replacement occurrences.
     Formal,
+    /// An unresolved caller-scope identifier supplied explicitly to preserve Rust macro hygiene.
     FreeIdentifier,
 }
 
+/// The substitution grammar needed by a parameter, independently of any one concrete caller type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ParameterRole {
+    /// An evaluated expression operand whose C conversion/evaluation rules remain symbolic.
     Value,
+    /// A non-evaluated type operand requiring a Rust type fragment rather than an expression.
     Type,
+    /// An identifier/designator substitution that must retain C structural spelling.
     Identifier,
+    /// A member-name hole used structurally for field projection or offsetof.
     FieldDesignator,
+    /// No surviving occurrence requires evaluating or resolving the supplied argument.
     Unused,
+    /// No single supported substitution grammar has been established for this operand.
     Unknown,
 }
 
+/// One source occurrence whose grouping contributes to the valid macro invocation family.
 #[derive(Clone, Debug, Serialize)]
 pub struct ParameterUse {
+    /// Original replacement-list token coordinates used to explain syntax and reconstruct source.
     pub tokens: TokenRange,
     /// Established from a complete parsed expression, never neighboring-token heuristics.
     pub grouped: bool,
 }
 
+/// The grouping and caller-context conditions under which generated Rust preserves the supported C
+/// invocation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum InvocationContract {
@@ -161,60 +250,95 @@ pub enum InvocationContract {
     /// An unbraced C statement replacement can capture a caller's `else`.
     /// Callers explicitly request the semantics of a braced C invocation.
     ExplicitStatementBoundary,
+    /// No proof has established this capability or invocation contract.
     NotEstablished,
 }
 
+/// Track whether analysis has established any const-context contract; runtime support is a separate
+/// capability.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ConstCapability {
+    /// The generated helper path requires runtime execution; this is not a const-context promise.
     RuntimeOnly,
     /// Integer syntax alone cannot establish const-compatible Rust helper calls.
     NotEstablished,
 }
 
+/// Collect obligations emission must preserve about occurrence count, lazy branches, and defined C
+/// operations.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct EvaluationContract {
+    /// Distinct semantic obligations needed to preserve the supported C invocation family.
     pub requirements: Vec<EvaluationRequirement>,
 }
 
+/// A semantic obligation that prevents convenient Rust lowering from changing observable C behavior.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum EvaluationRequirement {
+    /// Each surviving C argument occurrence must retain its evaluation behavior.
     PreserveParameterOccurrences,
+    /// Conditional and short-circuit paths must evaluate only the selected C branch.
     PreserveLazyBranches,
+    /// The invocation family retains C’s allowed operand ordering rather than inventing a sequencing
+    /// guarantee.
     UnspecifiedOperandOrder,
+    /// Generated operations are valid only within the defined C operation domain.
     ExcludeUndefinedCOperations,
+    /// Signed arithmetic must follow the inspected compiler overflow policy.
     RespectSignedOverflowProfile,
 }
 
+/// A referenced macro and its possible physical origins for generation ordering and skip
+/// explanations.
 #[derive(Clone, Debug, Serialize)]
 pub struct MacroDependency {
+    /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     pub name: String,
+    /// The semantic or structural category kept separate from representation and source spelling.
     pub kind: MacroKind,
+    /// Physical source origins or their resolution status used for ownership filtering and auditing.
     pub provenance: Option<SourceSpan>,
+    /// Exact lexical reference ranges where established; compiler closures can provide only possible
+    /// origins.
     pub uses: Vec<TokenRange>,
 }
 
+/// The C semantic helper families identified during symbolic integer analysis.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum HelperRequirement {
+    /// Promote narrow integer operands using C rank and range rather than Rust’s operand type rules.
     IntegerPromotions,
+    /// Select common C arithmetic types while retaining rank and signedness identities.
     UsualArithmeticConversions,
+    /// Convert integer representations with the original C cast semantics.
     IntegerCasts,
+    /// Perform admitted arithmetic under the inspected C operation domain and overflow policy.
     IntegerArithmetic,
+    /// Apply C integer promotions and result identities to bit operations.
     BitwiseOperations,
+    /// Compare converted operands and produce the original C truth result.
     Comparisons,
+    /// Interpret C truth values for conditionals and short-circuit operators.
     CTruth,
+    /// Apply C division/remainder rules within their defined operand domain.
     DivisionRemainder,
+    /// Apply C shift promotions and operand-domain constraints.
     Shifts,
+    /// Select helpers according to the recorded undefined, wrapping, or trapping policy.
     SignedOverflowPolicy,
 }
 
+/// Combine the source arena with symbolic C types and compiler-resolved constants for Rust lowering.
 #[derive(Clone, Debug, Serialize)]
 pub struct AnalyzedExpression {
+    /// Original arena and statement metadata shared by type analysis and Rust emission.
     pub syntax: Expression,
     /// Parallel to `syntax.nodes`; references are expression node indices.
     pub types: Vec<TypeExpression>,
+    /// Resolved integer identifiers tied to source nodes without replacing their readable names.
     pub constants: Vec<ResolvedConstant>,
     /// Pure integer subexpressions whose zero ICE value both Clang frontends proved.
     /// Native operands and stored values never acquire this source-level identity.
@@ -226,37 +350,56 @@ pub struct AnalyzedExpression {
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TypeExpression {
+    /// No C value is produced; this identity supports statement and discard contexts.
     Void,
     /// A compiler intrinsic admitted only as the callee of a direct call.
     /// It has no address or first-class function value in generated Rust.
     Builtin,
     /// A concrete non-integer C type obtained from a declaration or type operand.
     External {
+        /// Concrete inspected C type facts used by this symbolic result.
         ty: TypeInfo,
     },
     /// A generic expression whose C type is constrained by generated capabilities.
     Deferred,
+    /// A target-resolved fundamental C integer result identity.
     Concrete {
+        /// Concrete inspected C type facts used by this symbolic result.
         ty: IntegerType,
     },
+    /// A formal hole whose role is supplied by the caller rather than one sampled type.
     Parameter {
+        /// Analyzed parameter position whose caller-supplied C type remains symbolic.
         index: usize,
     },
+    /// An operand-dependent integer promotion retained symbolically for generic lowering.
     Promotion {
+        /// Node whose result type determines the C integer promotion.
         operand: NodeId,
     },
+    /// The C usual-arithmetic-conversion result of two independently typed operands.
     Common {
+        /// First operand type participating in C usual arithmetic conversions.
         left: NodeId,
+        /// Second operand type participating in C usual arithmetic conversions.
         right: NodeId,
     },
 }
 
+/// Attach a verified C integer identity/value to its original syntax node while retaining readable
+/// literal metadata.
 #[derive(Clone, Debug, Serialize)]
 pub struct ResolvedConstant {
+    /// Expression node that originally referenced this named integer constant.
     pub node: NodeId,
+    /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     pub name: String,
+    /// Concrete C integer identity of the referenced constant, before Rust binding reconciliation.
     pub ty: IntegerType,
+    /// The exact constant magnitude, operand node, or wrapped storage retained by this
+    /// representation.
     pub value: IntegerValue,
+    /// Original C literal metadata when the resolved identifier has a literal-backed spelling.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub literal: Option<crate::IntegerLiteral>,
 }
@@ -268,6 +411,7 @@ pub fn analyze(frontend: &FrontendOutput, name: &str) -> MacroAnalysis {
     analyze_active(frontend, name, frontend.environment().active.get(name))
 }
 
+/// Analyze the selected final active definition with the frontend declaration constants.
 pub(crate) fn analyze_active(
     frontend: &FrontendOutput,
     name: &str,
@@ -276,6 +420,8 @@ pub(crate) fn analyze_active(
     analyze_active_with_constants(frontend, name, active, &BTreeMap::new(), false)
 }
 
+/// Build symbolic syntax, operand roles, type expressions, and invocation contracts from one resolved
+/// active definition.
 pub(crate) fn analyze_active_with_constants(
     frontend: &FrontendOutput,
     name: &str,
@@ -675,7 +821,10 @@ pub(crate) fn analyze_active_with_constants(
     }
 }
 
+/// Turn parser/analysis refusals into stable reports while retaining source provenance.
 impl MacroAnalysis {
+    /// Replace candidate state with a structured refusal while retaining the macro identity and
+    /// provenance.
     fn skip(
         mut self,
         code: SkipReasonCode,
@@ -693,6 +842,7 @@ impl MacroAnalysis {
         self
     }
 
+    /// Translate a parser failure into stable analysis categories and original-token ranges.
     fn syntax_error(self, error: SyntaxError) -> Self {
         let code = match error.kind {
             SyntaxErrorKind::InvalidExpression => SkipReasonCode::InvalidExpression,
@@ -710,6 +860,8 @@ impl MacroAnalysis {
     }
 }
 
+/// Read the unexpanded function signature and reject malformed or variadic formal lists before
+/// parsing the body.
 fn formal_parameters(
     tokens: &[Token],
     name: &str,
@@ -754,7 +906,9 @@ fn formal_parameters(
     Err((SkipReasonCode::MalformedParameters, "unterminated parameter list".into()))
 }
 
+/// The stable skip category and explanation produced when a symbolic C type cannot be established.
 type TypeFailure = (SkipReasonCode, String, TokenRange);
+/// Parallel symbolic result types and resolved constants returned by the type-analysis pass.
 type TypeAnalysis = (Vec<TypeExpression>, Vec<ResolvedConstant>, BTreeSet<HelperRequirement>);
 
 /// Constant probes accept only expressions already covered by the integer model.
@@ -846,6 +1000,8 @@ pub(crate) fn validate_constant_expression(
     Ok(())
 }
 
+/// Propagate symbolic C types through the expression arena and validate catalog references without
+/// choosing sample argument types.
 fn analyze_types(
     expression: &Expression,
     catalog: &DeclarationCatalog,
@@ -1232,6 +1388,8 @@ fn validate_local_initialization(
     let Some(body) = expression.statement_body.as_ref().filter(|_| !locals.is_empty()) else {
         return Ok(());
     };
+    /// Reject full-expression combinations whose evaluation or mutation constraints cannot be safely
+    /// established.
     fn check_full_expression<'a>(
         expression: &Expression,
         root: NodeId,
@@ -1259,6 +1417,7 @@ fn validate_local_initialization(
     }
     // A terminating path contributes no state to a later join: C never reaches it.
     // Each surviving branch must establish every local read after the conditional.
+    /// Validate statement scopes and declared locals alongside the expression arena before emission.
     fn check_statements<'a>(
         expression: &Expression,
         statements: &'a [Statement],
@@ -1322,6 +1481,8 @@ fn validate_local_initialization(
     check_statements(expression, &body.statements, locals, &mut HashSet::new()).map(|_| ())
 }
 
+/// Require supported straight-line initialization before a local read can become a generated Rust
+/// expression.
 fn check_local_reads(
     expression: &Expression,
     root: NodeId,
@@ -1374,6 +1535,7 @@ fn check_local_reads(
     Ok(())
 }
 
+/// Reject target facts that cannot support the analysis rules used for integer and literal semantics.
 fn validate_target(target: &TargetFacts) -> Result<(), String> {
     if target
         .integers
@@ -1465,10 +1627,14 @@ fn validate_target(target: &TargetFacts) -> Result<(), String> {
     Ok(())
 }
 
+/// Ask whether a spelling resolves through the compiler catalog or supported fundamental type
+/// grammar.
 fn recognized_type(name: &str, catalog: &DeclarationCatalog, target: &TargetFacts) -> bool {
     resolve_type_info(name, catalog, target).is_some()
 }
 
+/// Find an original named declaration, including qualifiers, rather than inferring identity from Rust
+/// storage.
 fn declared_type(info: &TypeInfo, target: &TargetFacts) -> TypeExpression {
     match info.category {
         TypeCategory::Integer(kind) => TypeExpression::Concrete { ty: target.integers[&kind] },
@@ -1477,6 +1643,7 @@ fn declared_type(info: &TypeInfo, target: &TargetFacts) -> TypeExpression {
     }
 }
 
+/// Resolve C specifiers and pointer qualifier layers against the inspected catalog and target facts.
 pub(crate) fn resolve_type_info(
     name: &str,
     catalog: &DeclarationCatalog,
@@ -1545,6 +1712,7 @@ pub(crate) fn resolve_type_info(
     None
 }
 
+/// Resolve a supported C integer spelling while retaining the fundamental identity and target rank.
 pub(crate) fn integer_type(
     name: &str,
     catalog: &DeclarationCatalog,
@@ -1574,6 +1742,7 @@ pub(crate) fn integer_type(
 
 // C declaration specifiers can appear in different orders (`long unsigned int`).
 // Count the permitted specifiers rather than accepting only one printed spelling.
+/// Interpret the supported combinations and orderings of fundamental C integer specifiers.
 fn fundamental_kind(words: &[&str]) -> Option<IntegerKind> {
     let (mut signed, mut unsigned, mut short, mut long, mut int, mut char, mut bool_, mut int128) =
         (0, 0, 0, 0, 0, 0, 0, 0);
@@ -1638,7 +1807,10 @@ fn fundamental_kind(words: &[&str]) -> Option<IntegerKind> {
     })
 }
 
+/// Select a literal C type using radix, suffix, value, and the target-specific standard candidate
+/// order.
 fn literal_type(literal: &IntegerLiteral, target: &TargetFacts) -> Option<IntegerType> {
+    /// Name the standard C literal candidates in their mandated radix/suffix selection order.
     use IntegerKind::{Int, Long, LongLong, UnsignedInt, UnsignedLong, UnsignedLongLong};
     let decimal = literal.radix == 10;
     let candidates: &[IntegerKind] = match (literal.suffix.unsigned, literal.suffix.long, decimal) {
@@ -1660,6 +1832,7 @@ fn literal_type(literal: &IntegerLiteral, target: &TargetFacts) -> Option<Intege
         .copied()
 }
 
+/// Compute the maximum positive literal magnitude representable by a C integer type.
 fn maximum(ty: IntegerType) -> u128 {
     if ty.kind == IntegerKind::Bool {
         return 1;
@@ -1668,6 +1841,7 @@ fn maximum(ty: IntegerType) -> u128 {
     if value_bits == 128 { u128::MAX } else { (1_u128 << value_bits) - 1 }
 }
 
+/// Describe an integer promotion symbolically so generic operands retain their C conversion rules.
 fn promotion(ty: IntegerType, target: &TargetFacts) -> IntegerType {
     let int = target.integers[&IntegerKind::Int];
     if ty.rank > int.rank || matches!(ty.kind, IntegerKind::Int | IntegerKind::UnsignedInt) {
@@ -1676,6 +1850,7 @@ fn promotion(ty: IntegerType, target: &TargetFacts) -> IntegerType {
     if maximum(ty) <= maximum(int) { int } else { target.integers[&IntegerKind::UnsignedInt] }
 }
 
+/// Apply integer promotion to a concrete C kind using target range and rank facts.
 fn promoted_type(
     types: &[TypeExpression],
     operand: NodeId,
@@ -1687,6 +1862,7 @@ fn promoted_type(
     }
 }
 
+/// Apply C usual arithmetic conversions without replacing distinct C identities by equal Rust widths.
 fn common_type(
     types: &[TypeExpression],
     left: NodeId,
@@ -1716,6 +1892,7 @@ fn common_type(
     }
 }
 
+/// Select the corresponding unsigned C identity needed by usual arithmetic conversions.
 fn unsigned_kind(kind: IntegerKind) -> IntegerKind {
     match kind {
         IntegerKind::SignedChar | IntegerKind::Char => IntegerKind::UnsignedChar,
@@ -1730,14 +1907,24 @@ fn unsigned_kind(kind: IntegerKind) -> IntegerKind {
     }
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
+    /// Use owned C profile and declaration facts instead of reconstructing compiler identities from
+    /// Rust storage.
     use crate::model::{
         ActiveMacro, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity, MacroEnvironment,
     };
+    /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
     use crate::{MacroDefinition, MacroInventory};
 
+    /// Construct explicit LP64 integer facts for pure analysis tests rather than borrowing the host
+    /// ABI.
     fn target(long_bits: u32) -> TargetFacts {
         let integers = [
             (IntegerKind::Bool, 8, false, 0),
@@ -1772,6 +1959,7 @@ mod tests {
         }
     }
 
+    /// Parse one test literal with production token rules before checking its C type selection.
     fn literal(spelling: &str, value: u128, radix: u8, unsigned: bool, long: u8) -> IntegerLiteral {
         IntegerLiteral {
             spelling: spelling.into(),
@@ -1781,6 +1969,7 @@ mod tests {
         }
     }
 
+    /// Checks literal types follow radix suffix and target.
     #[test]
     fn literal_types_follow_radix_suffix_and_target() {
         let lp64 = target(64);
@@ -1796,6 +1985,7 @@ mod tests {
         assert_eq!(literal_type(&largest, &lp64).unwrap().kind, IntegerKind::UnsignedLongLong);
     }
 
+    /// Checks promotions and common types preserve c identity.
     #[test]
     fn promotions_and_common_types_preserve_c_identity() {
         let lp64 = target(64);
@@ -1843,6 +2033,7 @@ mod tests {
         assert_eq!(ty.kind, IntegerKind::UnsignedLongLong);
     }
 
+    /// Checks character constants require the verified execution charset.
     #[test]
     fn character_constants_require_the_verified_execution_charset() {
         let mut frontend = frontend(&["(", "'x'", ")"]);
@@ -1856,6 +2047,7 @@ mod tests {
         ));
     }
 
+    /// Construct a small owned declaration environment for symbolic-analysis regression tests.
     fn frontend(body: &[&str]) -> FrontendOutput {
         let tokens = ["F", "(", "x", ",", "unused", ")"]
             .into_iter()
@@ -1911,6 +2103,7 @@ mod tests {
         }
     }
 
+    /// Checks constraints occurrences and skips are explicit.
     #[test]
     fn constraints_occurrences_and_skips_are_explicit() {
         let input = frontend(&["(", "(", "x", ")", "+", "(", "x", ")", ")"]);
@@ -1933,6 +2126,7 @@ mod tests {
         }
     }
 
+    /// Checks replacement grouping is checked separately from parameter grouping.
     #[test]
     fn replacement_grouping_is_checked_separately_from_parameter_grouping() {
         for body in [
@@ -1954,6 +2148,7 @@ mod tests {
         }
     }
 
+    /// Checks binary literal candidates require the inspected C23 profile.
     #[test]
     fn binary_literal_candidates_require_the_inspected_c23_profile() {
         let mut input = frontend(&["(", "(", "x", ")", "+", "0b10", ")"]);
@@ -1968,6 +2163,7 @@ mod tests {
         assert!(matches!(analyze(&input, "F").status, AnalysisStatus::Candidate));
     }
 
+    /// Checks concrete specifier order and missing pairs.
     #[test]
     fn concrete_specifier_order_and_missing_pairs() {
         let target = target(64);
@@ -1986,6 +2182,7 @@ mod tests {
         assert!(validate_target(&target).is_err());
     }
 
+    /// Checks qualified integer typedefs retain intrinsic qualifiers and identity.
     #[test]
     fn qualified_integer_typedefs_retain_intrinsic_qualifiers_and_identity() {
         let target = target(64);
@@ -2026,6 +2223,7 @@ mod tests {
         }
     }
 
+    /// Checks pointer qualifiers apply to their own declarator layer.
     #[test]
     fn pointer_qualifiers_apply_to_their_own_declarator_layer() {
         let target = target(64);
@@ -2072,6 +2270,7 @@ mod tests {
         assert!(!outer.is_const && !outer.is_volatile);
     }
 
+    /// Checks terminal return locals use declared types and are never caller captures.
     #[test]
     fn terminal_return_locals_use_declared_types_and_are_never_caller_captures() {
         let input = frontend(&[
@@ -2100,6 +2299,7 @@ mod tests {
         }
     }
 
+    /// Checks return declarations cannot rebind compiler owned names.
     #[test]
     fn return_declarations_cannot_rebind_compiler_owned_names() {
         let mut input =
@@ -2114,6 +2314,7 @@ mod tests {
         assert!(reason.message.contains("compiler-owned declaration"));
     }
 
+    /// Checks returning local reads require proved straight line initialization.
     #[test]
     fn returning_local_reads_require_proved_straight_line_initialization() {
         for body in [
@@ -2146,6 +2347,7 @@ mod tests {
         }
     }
 
+    /// Checks nested terminal return preserves caller captures.
     #[test]
     fn nested_terminal_return_preserves_caller_captures() {
         let input = frontend(&[

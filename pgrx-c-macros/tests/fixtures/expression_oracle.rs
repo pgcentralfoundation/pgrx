@@ -2,19 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Standalone Rust consumer for the expression oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::{CInteger, CLong, CUnsignedLongLong, CValue};
+/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::Cell;
 
+/// Print the observation format consumed by the paired oracle, retaining C kind and value
+/// information rather than only the result.
 fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T, trace: u32, calls: u32) {
     let value = value.into_c_value();
     let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
-    println!("{name}\t{kind}\t{}\t{:032x}\t{trace}\t{calls}", T::Kind::BITS, T::Kind::encode(value.get()));
+    println!(
+        "{name}\t{kind}\t{}\t{:032x}\t{trace}\t{calls}",
+        T::Kind::BITS,
+        T::Kind::encode(value.get())
+    );
 }
-fn record_void<T: __pgrx_c_macros::expression::IntoExpression<Value = ()>>(name: &str, value: T, trace: u32, calls: u32) {
+/// Record a void-result observation and its effects without treating unit as an integer C
+/// value.
+fn record_void<T: __pgrx_c_macros::expression::IntoExpression<Value = ()>>(
+    name: &str,
+    value: T,
+    trace: u32,
+    calls: u32,
+) {
     let () = value.into_expression();
     println!("{name}\tCVoid\t0\t00000000000000000000000000000000\t{trace}\t{calls}");
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     let trace = Cell::new(0_u32);
     let calls = Cell::new(0_u32);

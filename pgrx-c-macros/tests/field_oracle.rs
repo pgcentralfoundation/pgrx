@@ -2,21 +2,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate ordinary and bitfield access with original C record operations.
+//!
+//! Fresh fixture storage and compiler-owned layout feed generation. C/Rust
+//! executions compare values and effects, including partially initialized
+//! bitfield units, so adapters cannot read unrelated uninitialized neighbors.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BitfieldBinding, EmissionStatus, FieldBinding, MacroScanner,
     RecordBinding, RecordKind, RustBindingType, emit_batch_with_bindings,
     emit_support_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "READ_COUNT",
     "SET_COUNT",
@@ -35,6 +53,8 @@ const NAMES: &[&str] = &[
     "ADDRESS_COUNT",
 ];
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments() -> Vec<String> {
     let mut arguments = vec!["-std=c11".into(), "-fwrapv".into(), "-ffp-contract=off".into()];
     #[cfg(target_os = "macos")]
@@ -50,6 +70,8 @@ fn arguments() -> Vec<String> {
 
 // Collect this fixture's actual bindgen fields. Production uses pgrx-bindgen's
 // full collector; this independent fixture rejects unrecognized Rust storage.
+/// Interpret fixture Rust field storage against target facts before validating it with the C
+/// declaration catalog.
 fn storage(ty: &syn::Type) -> Option<RustBindingType> {
     match ty {
         syn::Type::Path(ty) if ty.qself.is_none() => {
@@ -110,6 +132,8 @@ fn storage(ty: &syn::Type) -> Option<RustBindingType> {
     }
 }
 
+/// Build the fixture's Rust binding catalog so field generation is tested against real storage
+/// definitions.
 fn catalog(rust_bindings: &str) -> BindingCatalog {
     let mut catalog = BindingCatalog::default();
     let file = syn::parse_file(rust_bindings).unwrap();
@@ -186,9 +210,18 @@ fn catalog(rust_bindings: &str) -> BindingCatalog {
     catalog
 }
 
+/// Collect actual fixture bitfield access offsets and widths for comparison with compiler-owned
+/// C field layout.
 #[derive(Default)]
-struct BitAccess(Vec<(String, u64, u32)>);
+struct BitAccess(
+    /// Recorded payload retained for exact semantic comparison.
+    Vec<(String, u64, u32)>,
+);
+/// Traverse the parsed syntax so nested declarations participate in the same ABI or storage
+/// checks.
 impl syn::visit_mut::VisitMut for BitAccess {
+    /// Inspect actual bindgen storage-unit reads while retaining recursive traversal of the
+    /// getter expression.
     fn visit_expr_method_call_mut(&mut self, call: &mut syn::ExprMethodCall) {
         if call.method == "get"
             && call.args.len() == 2
@@ -211,6 +244,7 @@ impl syn::visit_mut::VisitMut for BitAccess {
     }
 }
 
+/// Checks that public macro generation matches original C field values and evaluation.
 #[test]
 fn public_macro_generation_matches_original_c_field_values_and_evaluation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -320,6 +354,7 @@ int main(void) {
     );
 }
 
+/// Checks that generated bitfield accessors match original C with uninitialized neighbor bits.
 #[test]
 fn generated_bitfield_accessors_match_original_c_with_uninitialized_neighbor_bits() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

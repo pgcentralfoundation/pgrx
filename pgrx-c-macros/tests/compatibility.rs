@@ -2,24 +2,48 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare integer conversions and operator behavior across C type families.
+//!
+//! A matrix of ranks, signedness, extrema, shifts, casts, and side effects is
+//! recorded by both original C and emitted Rust. The shared observation format
+//! checks type identity and evaluation counts as well as the numeric result.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{AnalysisSession, EmissionStatus, MacroScanner, emit, inspect};
+/// Append complete paired source and observation records without ad hoc string replacement.
 use std::fmt::Write;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Describe one C integer family with explicit oracle spelling and Rust semantic marker for the
+/// compatibility matrix.
 struct Kind {
+    /// C type spelling used in the independent oracle.
     c: &'static str,
+    /// Semantic support marker retaining C rank and signedness.
     marker: &'static str,
+    /// Rust primitive storage spelling for explicitly typed samples.
     repr: &'static str,
+    /// Fixture cast selected for this C integer family.
     cast_macro: &'static str,
+    /// Width used to generate valid extrema rather than host-dependent guesses.
     bits: u32,
+    /// Whether negative and signed-minimum samples belong to this family.
     signed: bool,
 }
 
+/// C integer families participating in the explicit type, cast, and operator compatibility
+/// matrix.
 const KINDS: &[Kind] = &[
     Kind { c: "_Bool", marker: "CBool", repr: "bool", cast_macro: "BOOL", bits: 1, signed: false },
     Kind { c: "char", marker: "CChar", repr: "i8", cast_macro: "CHAR", bits: 8, signed: true },
@@ -100,25 +124,37 @@ const KINDS: &[Kind] = &[
     },
 ];
 
+/// Binary operators exercised across compatible C operand families.
 const BINARY: &[&str] = &[
     "ADD", "SUB", "MUL", "DIV", "REM", "AND_BITS", "OR_BITS", "XOR_BITS", "EQ", "NE", "LT", "LE",
     "GT", "GE",
 ];
 
+/// Unary and related integer operations covered alongside the binary matrix.
 const OTHER: &[&str] = &[
     "ID", "NOT_BITS", "NEG", "PLUS", "NOT", "SHL", "SHR", "AND", "OR", "CHOOSE", "REPEAT", "UNUSED",
 ];
 
+/// Select value boundaries that expose C promotion, signedness, and cast behavior without
+/// entering undefined cases.
 #[derive(Clone, Copy)]
 enum Sample {
+    /// Exercise zero conversions and false integer conditions.
     Zero,
+    /// Exercise the smallest positive nonzero value in every integer family.
     One,
+    /// Expose signed conversion and promotion differences where the family permits negatives.
     NegativeOne,
+    /// Exercise the minimum representable value for this C family.
     Minimum,
+    /// Exercise the maximum representable value and width-sensitive conversions.
     Maximum,
 }
 
+/// Select defined C boundary values and render matching explicitly typed C and Rust operands.
 impl Kind {
+    /// Select zero, extrema, and sign-sensitive examples that are valid for this C integer
+    /// family.
     fn samples(&self) -> &'static [Sample] {
         if self.repr == "bool" {
             &[Sample::Zero, Sample::One]
@@ -129,6 +165,7 @@ impl Kind {
         }
     }
 
+    /// Spell a sample as a C expression with the intended rank and signedness.
     fn c_value(&self, sample: Sample) -> String {
         let value = match sample {
             Sample::Zero => "0".to_owned(),
@@ -147,6 +184,8 @@ impl Kind {
         format!("({})({value})", self.c)
     }
 
+    /// Spell the matching Rust sample with an explicit semantic marker, avoiding
+    /// inference-dependent type selection.
     fn rust_value(&self, sample: Sample) -> String {
         let value = if self.repr == "bool" {
             match sample {
@@ -166,18 +205,28 @@ impl Kind {
         format!("CValue::<{}>::new({value})", self.marker)
     }
 
+    /// Choose a defined left operand for the operator matrix so the oracle does not bless C
+    /// undefined behavior.
     fn left_sample(&self) -> Sample {
         if self.signed { Sample::NegativeOne } else { Sample::Maximum }
     }
 }
 
+/// Build paired original-C and generated-Rust recorder programs with matching observation rows.
 struct Sources {
+    /// Original-header C recorder program under construction.
     c: String,
+    /// Generated Rust recorder using the production semantic support.
     rust: String,
+    /// Number of paired observations expected after both programs execute.
     rows: usize,
 }
 
+/// Append paired observations to original-C and generated-Rust programs, tracking completeness
+/// of their output.
 impl Sources {
+    /// Start paired C and Rust recording programs that will use the same named observation
+    /// format.
     fn new(generated: String) -> Self {
         let mut c = String::from("#define KIND(value) _Generic((value), ");
         let mut rust = generated;
@@ -208,12 +257,14 @@ impl Sources {
         Self { c, rust, rows: 0 }
     }
 
+    /// Append one paired observation and count its expected output row for completeness checks.
     fn record(&mut self, label: &str, c: &str, rust: &str) {
         writeln!(self.c, "OUT({label:?}, {c});").unwrap();
         writeln!(self.rust, "record({label:?}, {rust});").unwrap();
         self.rows += 1;
     }
 
+    /// Close both programs and return their complete sources and expected observation count.
     fn finish(mut self) -> Self {
         self.c.push_str("return 0;\n}\n");
         self.rust.push_str("}\n");
@@ -221,6 +272,8 @@ impl Sources {
     }
 }
 
+/// Add paired C/Rust observations across integer ranks and casts so equal numeric results
+/// cannot hide a type mismatch.
 fn append_type_and_cast_matrix(sources: &mut Sources) {
     for (from, kind) in KINDS.iter().enumerate() {
         for (sample, value) in kind.samples().iter().copied().enumerate() {
@@ -270,6 +323,7 @@ fn append_type_and_cast_matrix(sources: &mut Sources) {
     }
 }
 
+/// Exercise unsigned-byte promotion boundaries alongside wider integer operations.
 fn append_unsigned_byte_samples(sources: &mut Sources) {
     sources.c.push_str(
         "for (unsigned int i = 0; i < 64; i++) { for (unsigned int j = 0; j < 64; j++) {\n\
@@ -294,6 +348,8 @@ fn append_unsigned_byte_samples(sources: &mut Sources) {
     sources.rows += 4096;
 }
 
+/// Add side-effecting arguments to detect lost, repeated, or prematurely evaluated C operand
+/// occurrences.
 fn append_evaluation_cases(sources: &mut Sources) {
     for (label, c, rust) in [
         ("repeat", "COMP_REPEAT(bump())", "COMP_REPEAT!(bump(&mut calls))"),
@@ -331,6 +387,7 @@ fn append_evaluation_cases(sources: &mut Sources) {
     );
 }
 
+/// Add defined C shift and wrapping boundary cases under the inspected arithmetic profile.
 fn append_shift_and_wrap_cases(sources: &mut Sources, wrapping: bool) {
     for (index, kind) in KINDS.iter().enumerate() {
         let left = kind.c_value(Sample::One);
@@ -394,6 +451,8 @@ fn append_shift_and_wrap_cases(sources: &mut Sources, wrapping: bool) {
     sources.record("negative-rem", "COMP_REM(-7, 3)", "COMP_REM!(-7_i32, 3_i32)");
 }
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(target_os = "macos")]
 fn native_include_arguments() -> Vec<String> {
     let sdk = rust_oracle::run_tool(
@@ -408,11 +467,14 @@ fn native_include_arguments() -> Vec<String> {
     vec!["-isysroot".to_owned(), sdk.to_owned()]
 }
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(not(target_os = "macos"))]
 fn native_include_arguments() -> Vec<String> {
     Vec::new()
 }
 
+/// Checks that original C and emitted Rust match integer types values and evaluation.
 #[test]
 fn original_c_and_emitted_rust_match_integer_types_values_and_evaluation() {
     let scanner = MacroScanner::new().expect("libclang must be available");

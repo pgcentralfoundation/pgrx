@@ -120,6 +120,8 @@ pub mod pg_sys;
 
 // and re-export these
 pub use pg_sys::PgBuiltInOids;
+/// Expose the selected build's generated C macros at the pgrx crate root while their hygienic
+/// paths retain pg_sys ownership.
 #[allow(unused_imports)]
 pub use pg_sys::cmacros::*;
 pub use pg_sys::elog::PgLogLevel;
@@ -271,7 +273,10 @@ const _: () = {
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()`, `pg_module_magic!(name, version)` or `pg_module_magic!(name = c"custom_name", version = c"1.0.0")`
+/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level
+/// (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()`,
+/// `pg_module_magic!(name, version)` or `pg_module_magic!(name = c"custom_name", version =
+/// c"1.0.0")`
 ///
 /// </pre></div>
 ///

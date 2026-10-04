@@ -1,23 +1,48 @@
+//! Check selected-installation ownership and wrapper resolution.
+//!
+//! Synthetic pg_config roots, include trees, and symlinks distinguish PostgreSQL
+//! macros from external context definitions. Raw history remains available for
+//! expansion, while public selection follows physical server-header ownership.
+
 #![cfg(unix)]
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     DiagnosticSeverity, MacroDefinition, MacroScanner, PostgresConfig, PostgresError,
 };
+/// Resolve configured PostgreSQL installations through the same metadata used by ordinary pgrx
+/// builds.
 use pgrx_pg_config::PgConfig;
+/// Create isolated filesystem aliases used to verify physical provenance and input identity.
 use std::os::unix::fs::{PermissionsExt, symlink};
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // The clang wrapper permits one live Clang instance in a process.
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Own synthetic PostgreSQL configuration and header roots, keeping CLI and ownership tests
+/// independent of the developer's setup.
 struct TestConfig {
+    /// Owned PGRX_HOME containing only the fixture's configuration.
     home: PathBuf,
+    /// Owned server-header root used for version and physical ownership resolution.
     include_dir: PathBuf,
 }
 
+/// Build isolated installation metadata and commands for configuration and ownership
+/// assertions.
 impl TestConfig {
+    /// Create an isolated configuration root and header trees for physical ownership tests.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let home = std::env::temp_dir()
@@ -28,6 +53,7 @@ impl TestConfig {
         config
     }
 
+    /// Create one fixture header under an owned path and ensure its parent directories exist.
     fn write(&self, relative: &str, source: &str) -> PathBuf {
         let path = self.home.join(relative);
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
@@ -35,10 +61,14 @@ impl TestConfig {
         path
     }
 
+    /// Build the selected PostgreSQL configuration against the fixture's normal server include
+    /// root.
     fn postgres(&self) -> PostgresConfig {
         self.postgres_with_include_dir(&self.include_dir)
     }
 
+    /// Build fixture PostgreSQL metadata with an explicitly selected server root to test
+    /// aliases and ownership boundaries.
     fn postgres_with_include_dir(&self, include_dir: &Path) -> PostgresConfig {
         let quoted_include = format!("'{}'", include_dir.to_str().unwrap().replace('\'', "'\\''"));
         let executable = self.write(
@@ -59,12 +89,17 @@ impl TestConfig {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TestConfig {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.home);
     }
 }
 
+/// Project raw ownership classifications to names so scans can be compared without discarding
+/// definition history.
 fn ownership_names(definitions: &[MacroDefinition]) -> Vec<&str> {
     definitions
         .iter()
@@ -73,6 +108,8 @@ fn ownership_names(definitions: &[MacroDefinition]) -> Vec<&str> {
         .collect()
 }
 
+/// Checks that the inventory retains every raw definition in order in either primary inventory
+/// or context.
 #[test]
 fn retains_every_raw_definition_in_order_in_either_primary_inventory_or_context() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -149,6 +186,7 @@ fn retains_every_raw_definition_in_order_in_either_primary_inventory_or_context(
     assert_eq!(partitioned.inventory.diagnostics, raw.diagnostics);
 }
 
+/// Checks that custom wrappers and extra includes do not expand the selected server tree.
 #[test]
 fn custom_wrappers_and_extra_includes_do_not_expand_the_selected_server_tree() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -182,6 +220,7 @@ fn custom_wrappers_and_extra_includes_do_not_expand_the_selected_server_tree() {
     );
 }
 
+/// Checks that line directives cannot disguise physical header ownership.
 #[test]
 fn line_directives_cannot_disguise_physical_header_ownership() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -219,6 +258,8 @@ fn line_directives_cannot_disguise_physical_header_ownership() {
     assert_eq!((provenance.start_line, provenance.end_line), (2, 2));
 }
 
+/// Checks that configuration resolves file symlinks in both directions and refreshes ownership
+/// between scans.
 #[test]
 fn resolves_file_symlinks_in_both_directions_and_refreshes_ownership_between_scans() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -249,6 +290,7 @@ fn resolves_file_symlinks_in_both_directions_and_refreshes_ownership_between_sca
     );
 }
 
+/// Checks that configuration accepts a configured server root symlink.
 #[test]
 fn accepts_a_configured_server_root_symlink() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -264,6 +306,7 @@ fn accepts_a_configured_server_root_symlink() {
     assert_eq!(ownership_names(&partitioned.context), ["OWNERSHIP_COMMAND_LINE"]);
 }
 
+/// Checks that configuration reports a server root removed after configuration.
 #[test]
 fn reports_a_server_root_removed_after_configuration() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

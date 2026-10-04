@@ -3,19 +3,36 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Generate original-C access primitives where Rust cannot model initialized bits.
+//!
+//! Rust cannot directly project a C bitfield as an addressable field. These adapters
+//! leave width conversion and neighboring-bit preservation to the original C
+//! compiler, while Rust capability markers track mutability, volatility, and access
+//! alignment. Bindgen and Clang layout witnesses must agree before emission.
 
+/// Resolve actual record storage and hygienic paths before admitting original-C bitfield access.
 use super::types::{Lowering, rust_path};
+/// Match compiler field facts with actual binding storage and record constructors.
 use crate::{BindingCatalog, DeclarationCatalog, FieldInfo, RecordBinding, TypeCategory};
+/// Fingerprint compiler field and record facts for stable native bitfield primitive symbols.
 use sha2::{Digest, Sha256};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Private runtime namespace used by same-crate bitfield support items.
 const EXPRESSION: &str = "c::expression";
 
+/// Rust place capabilities paired with original-C primitives for one verified bitfield.
 pub(super) struct BitfieldAdapter {
+    /// Typed place descriptors and explicit read/write capability implementations.
     pub rust: String,
+    /// Compiler-owned getters and setters preserving bit width and adjacent storage.
     pub c_source: String,
 }
 
+/// Verify the compiler and bindgen storage witness before producing one bitfield capability.
+///
+/// The declared arithmetic type and promotion remain separate, while generated C
+/// performs width narrowing and volatile or unaligned accesses.
 pub(super) fn generate(
     canonical: &str,
     field: &FieldInfo,
@@ -144,6 +161,7 @@ pub(super) fn generate(
     Ok(BitfieldAdapter { rust, c_source })
 }
 
+/// Choose the exact native primitive for the inherited volatile and alignment access flags.
 fn select(function: &str, arguments: &str, access: &str) -> String {
     format!(
         "if {access}.unaligned {{ if {access}.volatile {{ {function}_unaligned_volatile({arguments}) }} else {{ {function}_unaligned({arguments}) }} }} else if {access}.volatile {{ {function}_volatile({arguments}) }} else {{ {function}({arguments}) }}"

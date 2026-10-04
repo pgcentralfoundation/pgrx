@@ -2,22 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Structured statement parsing extends the expression parser without a second expression
+//! arena. Scopes track source order, the first return, and whether every path returns. The
+//! accepted grammar includes blocks, conditionals, local declarations, expressions, and returns;
+//! unsupported scope-changing constructs fail rather than becoming textual Rust substitutions.
+//! Root boundary metadata preserves the C dangling-else contract during emission.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::*;
 
+/// Parsed source-order statements with first-return and all-paths-return metadata for one lexical
+/// scope.
 struct ParsedScope {
+    /// Source-order statements retained with explicit lexical scopes.
     statements: Vec<Statement>,
+    /// Original replacement-list token coordinates used to explain syntax and reconstruct source.
     tokens: TokenRange,
+    /// The first return encountered in source order, independently of whether all paths return.
     first_return: Option<(NodeId, TokenRange)>,
+    /// Whether every path through this supported statement or scope returns from its caller.
     always_returns: bool,
 }
 
+/// One structured statement and its return metadata before it is integrated into an enclosing scope.
 struct ParsedStatement {
+    /// The parsed structured statement whose return metadata is propagated to its parent scope.
     statement: Statement,
+    /// The first return encountered in source order, independently of whether all paths return.
     first_return: Option<(NodeId, TokenRange)>,
+    /// Whether every path through this supported statement or scope returns from its caller.
     always_returns: bool,
 }
 
+/// Parse bounded replacement grammar while preserving original indices and independently proved type
+/// holes.
 impl<F: Fn(&str) -> bool> Parser<'_, F> {
+    /// Select expression or structured-statement grammar while preserving complete replacement
+    /// boundaries.
     pub(super) fn replacement(
         &mut self,
         allow_statements: bool,
@@ -93,6 +115,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Ok((root, Some(body)))
     }
 
+    /// Parse an ordered block and derive first-return and all-paths-return metadata without
+    /// flattening lexical scope.
     fn statement_scope(
         &mut self,
         depth: usize,
@@ -194,6 +218,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         })
     }
 
+    /// Parse one supported structured statement and keep its control-flow effects separate from
+    /// expression nodes.
     fn statement(
         &mut self,
         depth: usize,
@@ -284,6 +310,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         }
     }
 
+    /// Parse a return value through the shared expression arena and reject missing or trailing
+    /// syntax.
     fn return_operand(
         &mut self,
         needs_semicolon: bool,
@@ -298,6 +326,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Ok((Statement::Return { expression, tokens }, (expression, tokens)))
     }
 
+    /// Parse a declaration or expression statement with the required C semicolon boundary.
     fn ordinary_statement(
         &mut self,
         allow_declaration: bool,
@@ -338,6 +367,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
 
     // One flat declarator, with a compiler-recognized type. Arrays, function
     // declarators, storage classes and declaration lists remain deferred.
+    /// Recognize supported local type/name syntax without confusing declarations with caller
+    /// captures.
     fn local_declaration(&self) -> Option<(usize, String)> {
         let mut words = Vec::new();
         for (position, lexeme) in self.tokens.iter().enumerate().skip(self.position) {

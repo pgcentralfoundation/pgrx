@@ -2,25 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate compiler profiles and the final active preprocessing environment.
+//!
+//! Independent C probes establish target and declaration facts. Inventory history,
+//! restoration, ambiguity, and argument rejection checks ensure later phases use
+//! the selected invocation rather than a guessed or partially replayed profile.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, IntegerKind,
     IntegerValue, MacroKind, MacroScanner, SignedOverflow, TypeCategory, emit,
     emit_support_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Checks that protection codegen profiles preserve macro values and original arguments.
 #[test]
 fn protection_codegen_profiles_preserve_macro_values_and_original_arguments() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -125,6 +144,7 @@ fn main() {
     assert!(reason.message.contains("-fpack-struct=1"));
 }
 
+/// Checks that final environment tracks undefinition redefinition restoration and ambiguity.
 #[test]
 fn final_environment_tracks_undefinition_redefinition_restoration_and_ambiguity() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -202,6 +222,7 @@ fn final_environment_tracks_undefinition_redefinition_restoration_and_ambiguity(
     assert!(output.environment().active.contains_key("FRONT_RESTORED"));
 }
 
+/// Checks that inspection rejects arguments that change its language or write outputs.
 #[test]
 fn inspection_rejects_arguments_that_change_its_language_or_write_outputs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -224,6 +245,7 @@ fn inspection_rejects_arguments_that_change_its_language_or_write_outputs() {
     }
 }
 
+/// Checks that compiler profile and declarations match an independent native C probe.
 #[test]
 fn compiler_profile_and_declarations_match_an_independent_native_c_probe() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

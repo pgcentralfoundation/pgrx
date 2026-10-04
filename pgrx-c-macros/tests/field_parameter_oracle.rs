@@ -1,25 +1,43 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check deferred field tokens against compiler-verified record capabilities.
+//!
+//! A field parameter is resolved through the generated registry at the invocation
+//! site. The tests compare valid operations with C and reject wrong owner or
+//! storage combinations rather than selecting by spelling alone.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)] // This oracle requires no native support library.
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, ParameterRole, generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Checks that field tokens select only compiler verified record capabilities.
 #[test]
 fn field_tokens_select_only_compiler_verified_record_capabilities() {
     let scanner = MacroScanner::new().expect("libclang required");

@@ -10,6 +10,13 @@
 //! the recovered argument subtrees produces the same C expression. No unexpanded
 //! token is translated or treated as an independently typed expression.
 
+//! Direct macro wrappers can retain calls to generated callee macros instead of duplicating
+//! their fully expanded bodies. This module compares independently expanded expression trees
+//! and C type facts, recovering arguments only when every occurrence agrees. Cycles, unused
+//! arguments that cannot be recovered, and statement bodies outside the proof are rejected,
+//! leaving ordinary emission to preserve the compiler-expanded definition.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     AnalysisSession, AnalysisStatus, AnalyzedExpression, ExpressionKind, MacroAnalysis,
     MacroDefinition, MacroKind, NodeId, TokenKind, TypeExpression,
@@ -17,7 +24,9 @@ use crate::{
 
 /// Argument roots refer to the caller's trusted analyzed expression arena.
 pub(crate) struct Delegation {
+    /// The generated macro or callable identity whose arguments are retained in original order.
     pub callee: String,
+    /// Caller arena nodes recovered consistently for every occurrence of each callee formal.
     pub arguments: Vec<NodeId>,
 }
 
@@ -114,6 +123,7 @@ pub(crate) fn direct_delegation(
     Ok(Some(Delegation { callee: callee_name.to_owned(), arguments }))
 }
 
+/// Remove explicit group nodes only for structural comparison of independently expanded expressions.
 fn ungroup(expression: &AnalyzedExpression, mut node: NodeId) -> NodeId {
     while let ExpressionKind::Group { operand } = expression.syntax.nodes[node].kind {
         node = operand;
@@ -121,6 +131,7 @@ fn ungroup(expression: &AnalyzedExpression, mut node: NodeId) -> NodeId {
     node
 }
 
+/// Check whether repeated recovered arguments have the same supported structure and C facts.
 fn equivalent_subtree(expression: &AnalyzedExpression, left: NodeId, right: NodeId) -> bool {
     let mut pending = vec![(left, right)];
     while let Some((left, right)) = pending.pop() {
@@ -131,6 +142,7 @@ fn equivalent_subtree(expression: &AnalyzedExpression, left: NodeId, right: Node
     true
 }
 
+/// Compare one pair of expression nodes and enqueue children without recursively walking deep trees.
 fn match_node(
     pattern: &AnalyzedExpression,
     left: NodeId,
@@ -218,6 +230,8 @@ fn match_node(
     }
 }
 
+/// Require matching C integer identities when structural equivalence depends on a concrete constant
+/// or cast.
 fn same_concrete_type(
     pattern: &AnalyzedExpression,
     left: NodeId,
@@ -228,6 +242,8 @@ fn same_concrete_type(
         (TypeExpression::Concrete { ty: left }, TypeExpression::Concrete { ty: right }) if left == right)
 }
 
+/// Recognize a replacement consisting entirely of one function-macro invocation and count its
+/// top-level arguments.
 fn direct_call(definition: &MacroDefinition) -> Result<Option<(&str, usize)>, String> {
     let tokens = definition
         .tokens

@@ -10,16 +10,31 @@
 //! A separate braced-operand pass rejects a live paste involving an operand,
 //! including a pasted name that argument prescan subsequently erases.
 
+//! Token pasting is admitted only for closed expansions whose resulting names can be traced
+//! to the inspected environment. Poison instrumentation discovers synthesized dependencies,
+//! and boundary guards verify complete, owned probe output. Diagnostic ownership prevents
+//! one failed invocation from validating another. Run/source budgets and bounded summaries
+//! keep this proof finite and make rejected constructs explicit.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{ExpansionLimits, ExpansionSkipCode, PROBE_PRAGMAS, Prepared, overlay, probe_tag};
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{FrontendError, FrontendOutput, MacroKind};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::Path;
 
+/// Bound the total preprocessing passes spent proving closed token pasting.
 pub(super) const MAX_CPP_RUNS: usize = 8;
 
 // RegisterBuiltinMacros in upstream Clang 6--21. Unknown compiler majors do not
 // enter this proof: a newly registered preprocessor builtin could erase its own
 // evidence or alter the expansion environment before the ordinary probe.
+/// Context-dependent compiler names that paste instrumentation must guard rather than admitting as
+/// ordinary dependencies.
 const BUILTINS: &[&str] = &[
     "_Pragma",
     "__BASE_FILE__",
@@ -57,13 +72,20 @@ const BUILTINS: &[&str] = &[
     "__pragma",
 ];
 
+/// Per-probe synthesized dependencies and refusals collected within the bounded paste proof run
+/// budget.
 #[derive(Default)]
 pub(super) struct Proof {
+    /// References established for this phase and used to explain or propagate downstream skips.
     pub(super) dependencies: BTreeMap<usize, BTreeSet<String>>,
+    /// Candidates lacking a required proof, with stable categories and bounded reasons.
     pub(super) rejected: BTreeMap<usize, (ExpansionSkipCode, String)>,
+    /// Preprocessing passes already consumed by the bounded paste proof.
     pub(super) runs: usize,
 }
 
+/// Establish bounded token-paste closure and synthesized dependencies using owned poison and boundary
+/// probes.
 pub(super) fn prove(
     frontend: &FrontendOutput,
     directory: &Path,
@@ -314,6 +336,7 @@ pub(super) fn prove(
     Ok(proof)
 }
 
+/// Record a proof failure for all remaining probes when ownership or budgets cannot be established.
 fn reject_all(
     proof: &mut Proof,
     selected: &BTreeSet<usize>,
@@ -345,6 +368,8 @@ pub(super) fn normalized_arguments(arguments: &[String]) -> Vec<String> {
     arguments
 }
 
+/// Construct bounded paste instrumentation while preserving original object/function invocation
+/// shapes.
 #[allow(clippy::too_many_arguments)]
 fn source(
     original: &[u8],
@@ -428,11 +453,14 @@ fn source(
     Ok(source)
 }
 
+/// Encode every inspected name into bounded poison pragmas that reveal synthesized references.
 fn append_poison_pragmas(
     poisoned: &BTreeSet<String>,
     mut append: impl FnMut(&[u8]) -> Result<(), String>,
 ) -> Result<(), String> {
+    /// Begin poison instrumentation without interpreting inspected macro names as source directives.
     const PREFIX: &str = "#pragma GCC poison ";
+    /// Bound poison pragma line length while retaining every inspected identifier.
     const LINE_BYTES: usize = 8192;
     let mut line = String::from(PREFIX);
     for name in poisoned {
@@ -455,6 +483,7 @@ fn append_poison_pragmas(
     Ok(())
 }
 
+/// Require complete boundary evidence for every probe before accepting a paste pass.
 fn guard_boundaries(
     output: &str,
     prepared: &[Prepared<'_>],
@@ -494,12 +523,17 @@ fn guard_boundaries(
     Ok(())
 }
 
+/// One parsed primary diagnostic whose location and fatality control paste-proof ownership.
 struct Primary<'a> {
+    /// Diagnostic filename, line, and column used for exact probe ownership checks.
     location: &'a str,
+    /// Primary compiler diagnostic text interpreted only by exact proof recognizers.
     message: &'a str,
+    /// Whether a diagnostic invalidates bounded proof ownership for the pass.
     fatal: bool,
 }
 
+/// Parse one primary diagnostic into location, message, and fatality for ownership checks.
 fn primary(line: &str) -> Result<Option<Primary<'_>>, String> {
     let (prefix, message, fatal) =
         if let Some((prefix, message)) = line.split_once(": fatal error: ") {
@@ -513,6 +547,7 @@ fn primary(line: &str) -> Result<Option<Primary<'_>>, String> {
     Ok(Some(Primary { location, message, fatal }))
 }
 
+/// Decode the diagnostic source coordinates used to attribute failures to a prepared probe.
 fn location(prefix: &str) -> Result<&str, String> {
     let mut parts = prefix.rsplitn(3, ':');
     let column = parts.next().and_then(|value| value.parse::<usize>().ok());
@@ -527,6 +562,7 @@ fn location(prefix: &str) -> Result<&str, String> {
 // Classification only: the ownership/proof parsers still validate every error.
 // Clang's arity error omits the macro name, so require its exact definition note
 // in the same primary-error block before assigning the dynamic-builtin reason.
+/// Recognize exact owned preprocessing traps and their required definition notes.
 fn trapped_probes(
     diagnostics: &str,
     locations: &BTreeMap<String, usize>,
@@ -560,6 +596,7 @@ fn trapped_probes(
     trapped
 }
 
+/// Attribute ordinary errors to their probes and reject global, fatal, or unowned failures.
 pub(super) fn failed_probes(
     diagnostics: &str,
     locations: &BTreeMap<String, usize>,
@@ -593,6 +630,7 @@ pub(super) fn failed_probe_summaries(
     Ok(summaries)
 }
 
+/// Check a diagnostic location lies within exactly one prepared probe range.
 fn owned_error<'a>(
     line: &'a str,
     locations: &BTreeMap<String, usize>,
@@ -607,6 +645,8 @@ fn owned_error<'a>(
     Ok(Some((*index, error.message)))
 }
 
+/// Retain one Unicode-safe bounded reason per failed probe instead of copying arbitrary compiler
+/// output.
 fn bounded_summary(message: &str) -> String {
     let mut summary = message.chars().take(1024).collect::<String>();
     if summary.len() < message.len() {
@@ -616,12 +656,17 @@ fn bounded_summary(message: &str) -> String {
     summary
 }
 
+/// Synthesized references and owned failures recovered from one complete paste instrumentation pass.
 #[derive(Default)]
 struct Pass {
+    /// Synthesized names discovered by poison instrumentation, indexed by their owning probe.
     pasted: BTreeMap<usize, BTreeSet<String>>,
+    /// Owned probe failures retained without allowing another candidate’s diagnostics to establish
+    /// success.
     failed: BTreeMap<usize, String>,
 }
 
+/// Extract poison references and owned failures only from a complete, unambiguous diagnostic proof.
 fn parse_proof(
     diagnostics: &str,
     locations: &BTreeMap<String, usize>,
@@ -672,6 +717,7 @@ fn parse_proof(
     Ok(pass)
 }
 
+/// Recover the inspected identifier named by an accepted poison diagnostic.
 fn poisoned_name<'a>(lines: &[&'a str]) -> Result<&'a str, String> {
     let mut found = None;
     for (index, line) in lines.iter().enumerate() {
@@ -698,16 +744,23 @@ fn poisoned_name<'a>(lines: &[&'a str]) -> Result<&'a str, String> {
     found.ok_or_else(|| "Clang poison diagnostic lacks its pasted spelling origin".into())
 }
 
+/// Check a pasted name belongs to the ordinary C identifier grammar admitted by this proof.
 fn identifier(spelling: &str) -> bool {
     let mut bytes = spelling.bytes();
     bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
         && bytes.all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
 
+    /// Construct minimal original macro definitions for paste instrumentation tests.
     fn definition(kind: MacroKind) -> crate::MacroDefinition {
         crate::MacroDefinition {
             name: "ROOT".into(),
@@ -720,6 +773,7 @@ mod tests {
         }
     }
 
+    /// Build a prepared probe fixture with explicit boundaries and invocation metadata.
     fn item(definition: &crate::MacroDefinition, index: usize) -> Prepared<'_> {
         Prepared {
             definition,
@@ -733,18 +787,23 @@ mod tests {
         }
     }
 
+    /// Construct deterministic boundary-location facts for diagnostic ownership tests.
     fn locations() -> BTreeMap<String, usize> {
         BTreeMap::from([("/tmp/probe-0".into(), 0), ("/tmp/probe-1".into(), 1)])
     }
 
+    /// Render poison diagnostics used to test synthesized-name discovery.
     fn poison(index: usize, name: &str) -> String {
         format!(
             "/tmp/probe-{index}:1:1: error: attempt to use a poisoned identifier\n    1 | entry\n      | ^\n/header.h:5:2: note: expanded from macro 'CAT'\n    5 | a##b\n      |  ^\n<scratch space>:3:1: note: expanded from here\n    3 | {name}\n      | ^\n"
         )
     }
 
+    /// Completion marker expected by paste-proof fixtures so partial diagnostics cannot establish
+    /// success.
     const COMPLETE: &str = "/tmp/complete:1:2: error: DONE\n    1 | #error DONE\n      |  ^\n";
 
+    /// Run paste-proof parsing against fixture names and prepared probes.
     fn parse(text: &str) -> Result<Pass, String> {
         parse_proof(
             text,
@@ -755,6 +814,7 @@ mod tests {
         )
     }
 
+    /// Checks poison dependencies preserve probe ownership and completion.
     #[test]
     fn poison_dependencies_preserve_probe_ownership_and_completion() {
         let text = format!(
@@ -769,6 +829,7 @@ mod tests {
         assert_eq!(pass.pasted[&1], BTreeSet::from(["HELPER".into()]));
     }
 
+    /// Checks proof requires complete and unambiguous diagnostics.
     #[test]
     fn proof_requires_complete_and_unambiguous_diagnostics() {
         let valid = format!("{}{COMPLETE}", poison(0, "HELPER"));
@@ -794,6 +855,7 @@ mod tests {
         assert!(parse(COMPLETE).unwrap().pasted.is_empty());
     }
 
+    /// Checks recoverable operand error rejects only its owned probe.
     #[test]
     fn recoverable_operand_error_rejects_only_its_owned_probe() {
         let text = format!(
@@ -806,6 +868,7 @@ mod tests {
         assert_eq!(pass.pasted[&0], BTreeSet::from(["HELPER".into()]));
     }
 
+    /// Checks ordinary failure ownership rejects global fatal or missing errors.
     #[test]
     fn ordinary_failure_ownership_rejects_global_fatal_or_missing_errors() {
         let owned = "/tmp/probe-0:4:2: error: wrong arity\n/header.h:1:1: note: macro defined here\n/tmp/probe-1:1:9: error: wrong operand\n";
@@ -822,6 +885,7 @@ mod tests {
         }
     }
 
+    /// Checks failure summaries keep only one bounded unicode reason per probe.
     #[test]
     fn failure_summaries_keep_only_one_bounded_unicode_reason_per_probe() {
         let locations = (0..64).map(|index| (format!("/tmp/probe-{index}"), index)).collect();
@@ -862,6 +926,7 @@ mod tests {
         }
     }
 
+    /// Checks compact poison pragmas keep all names with bounded lines and source.
     #[test]
     fn compact_poison_pragmas_keep_all_names_with_bounded_lines_and_source() {
         let names = (0..1024)
@@ -897,6 +962,7 @@ mod tests {
         assert!(append_poison_pragmas(&BTreeSet::from(["x".repeat(8192)]), |_| Ok(())).is_err());
     }
 
+    /// Checks preprocessing trap requires exact owned arity error and definition note.
     #[test]
     fn preprocessing_trap_requires_exact_owned_arity_error_and_definition_note() {
         let diagnostic = "/tmp/probe-0:1:1: error: too many arguments provided to function-like macro invocation\n/header.h:8:1: note: macro 'fresh_paste_forbidden' defined here\n";
@@ -918,6 +984,7 @@ mod tests {
         assert!(trapped_probes(&separated, &locations(), "fresh_").is_empty());
     }
 
+    /// Checks clean guard requires every boundary once in numeric probe order.
     #[test]
     fn clean_guard_requires_every_boundary_once_in_numeric_probe_order() {
         let definition = definition(MacroKind::FunctionLike);
@@ -942,6 +1009,7 @@ mod tests {
         );
     }
 
+    /// Checks proof source preserves object invocation and isolates instrumentation.
     #[test]
     fn proof_source_preserves_object_invocation_and_isolates_instrumentation() {
         let object = definition(MacroKind::ObjectLike);

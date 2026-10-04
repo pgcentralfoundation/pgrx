@@ -2,59 +2,115 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Exercise supported token-pasting macros through actual PostgreSQL exports.
+//!
+//! The public integration tests check symbolic results and caller evaluation while
+//! using this build's bindings. The independent C oracle supplies the broader
+//! semantic coverage for closed paste translation.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "../../pgrx-c-macros/tests/support/oracle.rs"]
 mod oracle;
 
+/// Record callback or operand observations without changing the generated C expression types.
 use core::cell::Cell;
+/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
+/// accesses.
 use core::mem::MaybeUninit;
+/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::addr_of_mut;
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Cache the independent native oracle once while sharing its immutable observations across
+/// integration tests.
 use std::sync::OnceLock;
 
+/// Read the selected build's macro audit report to configure an independent original-header C
+/// oracle.
 #[derive(serde::Deserialize)]
 struct BuildReport {
+    /// PostgreSQL version whose fresh macro report selects the original-header oracle.
     postgres_major_version: u16,
+    /// Compiler invocation used by the actual binding build.
     profile: OriginalProfile,
 }
 
+/// Retain only the recorded invocation facts needed to recompile the original C definitions.
 #[derive(serde::Deserialize)]
 struct OriginalProfile {
+    /// Original build wrapper whose macros must supply the native expectations.
     header: PathBuf,
+    /// Compiler executable recorded during verified frontend inspection.
     compiler: OriginalCompiler,
+    /// Exact flags recorded by this binding build for oracle compilation.
     arguments: Vec<String>,
 }
 
+/// Identify the exact compiler selected by frontend verification.
 #[derive(serde::Deserialize)]
 struct OriginalCompiler {
+    /// Recorded Clang executable used to generate and validate this version's macros.
     executable: PathBuf,
 }
 
+/// Pair original-C input, result, and evaluation counts for comparison with public generated
+/// macros.
 struct Observation<I, R> {
+    /// Input supplied to the original C macro and matching generated Rust invocation.
     input: I,
+    /// Expected result observed independently from the unchanged installed header.
     result: R,
+    /// Number of recorded operand evaluations in that original C invocation.
     evaluations: u32,
 }
 
+/// Cache independent original-C observations for the integration macro families so tests share
+/// one native compilation.
 #[derive(Default)]
 struct OriginalResults {
+    /// Original C observations for two-lane rotation, including operand evaluation counts.
     rotation: Vec<Observation<u64, u64>>,
+    /// Original C observations for segment-count arithmetic, including operand evaluation
+    /// counts.
     segments: Vec<Observation<u32, u64>>,
+    /// Original C observations for timestamp range checks, including operand evaluation counts.
     timestamp: Vec<Observation<i64, bool>>,
+    /// Original C observations for trigger context tags, including operand evaluation counts.
     trigger: Vec<Observation<i64, bool>>,
+    /// Original C observations for event-trigger context tags, including operand evaluation
+    /// counts.
     event_trigger: Vec<Observation<i64, bool>>,
+    /// Original C observations for time-to-seconds conversion, including operand evaluation
+    /// counts.
     time_double: Vec<Observation<i64, u64>>,
+    /// Original C observations for time-to-milliseconds conversion, including operand
+    /// evaluation counts.
     time_millisec: Vec<Observation<i64, u64>>,
+    /// Original C observations for time-to-microseconds conversion, including operand
+    /// evaluation counts.
     time_microsec: Vec<Observation<i64, u64>>,
+    /// Original C observations for CTE target-list selection, including operand evaluation
+    /// counts.
     cte: Vec<Observation<u32, i32>>,
+    /// Original C observations for dummy-append short circuiting, including operand evaluation
+    /// counts.
     dummy_append: Vec<Observation<u32, bool>>,
+    /// Original C observations for memory-context tag predicates, including operand evaluation
+    /// counts.
     memory_context: Vec<Observation<i64, bool>>,
+    /// Original C observations for soft-error branch selection, including operand evaluation
+    /// counts.
     soft_error: Vec<Observation<u32, bool>>,
 }
 
+/// Original C recorder source whose header invocations establish expected semantic
+/// observations.
 const ORIGINAL: &str = r#"
 #include <limits.h>
 #include <stdio.h>
@@ -206,7 +262,11 @@ int main(void) {
 }
 "#;
 
+/// Compile the installed original C headers under this build's reported profile once and retain
+/// the independent observations for public-macro comparisons.
 fn original_results() -> &'static OriginalResults {
+    /// Cache independently compiled C observations for this process so integration tests share
+    /// the same verified profile.
     static RESULTS: OnceLock<OriginalResults> = OnceLock::new();
     RESULTS.get_or_init(|| {
         let major = if cfg!(feature = "pg15") {
@@ -338,10 +398,14 @@ fn original_results() -> &'static OriginalResults {
     })
 }
 
+/// Parse a numeric oracle column with its expected storage type, rejecting malformed
+/// observations.
 fn number<T: std::str::FromStr>(value: &str) -> T {
     value.parse().unwrap_or_else(|_| panic!("invalid original C oracle integer: {value}"))
 }
 
+/// Decode the original C predicate result without confusing integer truth with Rust-only bool
+/// storage.
 fn c_truth(value: &str) -> bool {
     match value {
         "0" => false,
@@ -351,6 +415,7 @@ fn c_truth(value: &str) -> bool {
 }
 
 pg::__pgrx_c_classify! { @if_available ROTATE_HIGH_AND_LOW_32BITS {
+/// Checks that generated lane rotation matches the original C two lane operation.
 #[test]
 fn generated_lane_rotation_matches_the_original_c_two_lane_operation() {
     for case in &original_results().rotation {
@@ -366,6 +431,7 @@ fn generated_lane_rotation_matches_the_original_c_two_lane_operation() {
 } }
 
 pg::__pgrx_c_classify! { @if_available XLogSegmentsPerXLogId {
+/// Checks that generated segment count uses the pasted 64 bit boundary without truncation.
 #[test]
 fn generated_segment_count_uses_the_pasted_64_bit_boundary_without_truncation() {
     for case in &original_results().segments {
@@ -379,6 +445,7 @@ fn generated_segment_count_uses_the_pasted_64_bit_boundary_without_truncation() 
 } }
 
 pg::__pgrx_c_classify! { @if_available IS_VALID_TIMESTAMP {
+/// Checks that generated timestamp range check preserves both boundaries and lazy evaluation.
 #[test]
 fn generated_timestamp_range_check_preserves_both_boundaries_and_lazy_evaluation() {
     for case in &original_results().timestamp {
@@ -392,6 +459,8 @@ fn generated_timestamp_range_check_preserves_both_boundaries_and_lazy_evaluation
 }
 } }
 
+/// Build only the call-frame and node fields accessed on each selected branch, then compare
+/// predicate results and evaluation counts with C.
 fn exercise_context(
     mut classify: impl FnMut(pg::FunctionCallInfo, &Cell<u32>) -> bool,
     expected: &[Observation<i64, bool>],
@@ -432,6 +501,7 @@ fn exercise_context(
 }
 
 pg::__pgrx_c_classify! { @if_available CALLED_AS_TRIGGER {
+/// Checks that generated trigger context check uses the closed pasted node tag.
 #[test]
 fn generated_trigger_context_check_uses_the_closed_pasted_node_tag() {
     exercise_context(|info,calls| {
@@ -446,6 +516,7 @@ fn generated_trigger_context_check_uses_the_closed_pasted_node_tag() {
 } }
 
 pg::__pgrx_c_classify! { @if_available CALLED_AS_EVENT_TRIGGER {
+/// Checks that generated event trigger context check uses the closed pasted node tag.
 #[test]
 fn generated_event_trigger_context_check_uses_the_closed_pasted_node_tag() {
     exercise_context(|info,calls| {
@@ -459,6 +530,7 @@ fn generated_event_trigger_context_check_uses_the_closed_pasted_node_tag() {
 }
 } }
 
+/// Build the selected PostgreSQL version's instr_time storage for a signed tick observation.
 #[cfg(all(not(feature = "pg19"), not(target_os = "windows")))]
 fn time_value(ticks: i64) -> pg::instr_time {
     #[cfg(feature = "pg15")]
@@ -472,6 +544,7 @@ fn time_value(ticks: i64) -> pg::instr_time {
 }
 
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_DOUBLE {
+/// Checks that generated time seconds matches original C floating bits.
 #[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_seconds_matches_original_c_floating_bits() {
@@ -502,6 +575,7 @@ unsafe fn time_seconds_in_backend(time:pg::instr_time)->f64 {
 } }
 
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MILLISEC {
+/// Checks that generated time milliseconds matches original C floating bits.
 #[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_milliseconds_matches_original_c_floating_bits() {
@@ -530,6 +604,7 @@ unsafe fn time_milliseconds_in_backend(time:pg::instr_time)->f64 {
 } }
 
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MICROSEC {
+/// Checks that generated time microseconds matches original C integer conversion.
 #[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_microseconds_matches_original_c_integer_conversion() {
@@ -561,6 +636,7 @@ unsafe fn time_microseconds_in_backend(time:pg::instr_time)->i64 {
 } }
 
 pg::__pgrx_c_classify! { @if_available GetCTETargetList {
+/// Checks that generated cte target list selects owned pointer fields.
 #[test]
 fn generated_cte_target_list_selects_owned_pointer_fields() {
     let mut cte_storage=MaybeUninit::<pg::CommonTableExpr>::uninit();
@@ -601,6 +677,7 @@ fn generated_cte_target_list_selects_owned_pointer_fields() {
 } }
 
 pg::__pgrx_c_classify! { @if_available IS_DUMMY_APPEND {
+/// Checks that generated dummy append short circuits before uninitialized subpaths.
 #[test]
 fn generated_dummy_append_short_circuits_before_uninitialized_subpaths() {
     let mut storage=MaybeUninit::<pg::AppendPath>::uninit();
@@ -628,6 +705,7 @@ fn generated_dummy_append_short_circuits_before_uninitialized_subpaths() {
 } }
 
 pg::__pgrx_c_classify! { @if_available MemoryContextIsValid {
+/// Checks that generated memory context tags match original C lazy disjunction.
 #[test]
 fn generated_memory_context_tags_match_original_c_lazy_disjunction() {
     let mut storage=MaybeUninit::<pg::MemoryContextData>::uninit();
@@ -656,6 +734,7 @@ fn generated_memory_context_tags_match_original_c_lazy_disjunction() {
 } }
 
 pg::__pgrx_c_classify! { @if_available SOFT_ERROR_OCCURRED {
+/// Checks that generated soft error checks only initialized fields on the selected path.
 #[cfg(not(feature="pg15"))]
 #[test]
 fn generated_soft_error_checks_only_initialized_fields_on_the_selected_path() {

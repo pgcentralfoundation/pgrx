@@ -2,9 +2,22 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Standalone Rust consumer for the call oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::expression::{Pointer, Qualifier, RawRecordValue};
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::{CInt, CInteger, CLong, CLongLong, CUnsignedLong, CUnsignedLongLong, CValue};
 
+/// Print the observation format consumed by the paired oracle, retaining C kind and value
+/// information rather than only the result.
 fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T) {
     let value = value.into_c_value();
     let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
@@ -16,12 +29,16 @@ fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T) {
         T::Kind::encode(value.get())
     );
 }
+/// Record a void-result observation and its effects without treating unit as an integer C
+/// value.
 fn record_void<T: __pgrx_c_macros::expression::IntoExpression<Value = ()>>(name: &str, value: T) {
     let () = value.into_expression();
     // SAFETY: These fixture getters only read native counters on this thread.
     let (trace, calls) = unsafe { (call_trace(), call_count()) };
     println!("{name}\tCVoid\t0\t00000000000000000000000000000000\t{trace}\t{calls}");
 }
+/// Record pointer observations and effects without relying on process-specific absolute
+/// addresses.
 fn record_pointer<
     Q: Qualifier,
     T: __pgrx_c_macros::expression::IntoExpression<Value = Pointer<CInt, Q>>,
@@ -39,6 +56,9 @@ fn record_pointer<
         std::mem::size_of::<*const i32>() * 8
     );
 }
+/// Observe selected native record data without requiring unrelated bytes to become a valid Rust
+/// record.
+///
 /// # Safety
 /// The original fixture must have initialized every field of this CallRecord.
 unsafe fn record_struct<
@@ -59,6 +79,8 @@ unsafe fn record_struct<
     );
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     // SAFETY: The C fixtures operate on local scalars and initialized Copy records.
     // Pointers refer to the live, aligned local `value`; each mutation is complete

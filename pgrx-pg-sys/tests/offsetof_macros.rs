@@ -2,12 +2,19 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check generated offsets against the selected PostgreSQL binding layouts.
+//!
+//! Public invocations use actual record types and fields, making layout and
+//! unevaluated-operand behavior observable at the downstream macro boundary.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 pg::__pgrx_c_classify! { @if_available SizeForFunctionCallInfo {
+/// Checks that generated call frame size uses the current bound flexible member offset.
 #[test]
 fn generated_call_frame_size_uses_the_current_bound_flexible_member_offset() {
     // fmgr.h uses offsetof(FunctionCallInfoBaseData,args) and sizeof(NullableDatum).
@@ -25,6 +32,7 @@ fn generated_call_frame_size_uses_the_current_bound_flexible_member_offset() {
 } }
 
 pg::__pgrx_c_classify! { @if_available CALCDATASIZE {
+/// Checks that generated text search size keeps word entry layout and operand evaluation.
 #[test]
 fn generated_text_search_size_keeps_word_entry_layout_and_operand_evaluation() {
     // ts_type.h adds the flexible entries offset, WordEntry storage and string
@@ -46,9 +54,14 @@ fn generated_text_search_size_keeps_word_entry_layout_and_operand_evaluation() {
 } }
 
 pg::__pgrx_c_classify! { @if_available SizeOfGinPostingList {
+/// Checks that generated gin posting list size reads only its initialized length.
 #[test]
 fn generated_gin_posting_list_size_reads_only_its_initialized_length() {
+    /// Provide owned raw record storage so tests can initialize only fields that a C macro
+    /// actually accesses.
     use core::mem::MaybeUninit;
+    /// Address selected C fields without creating references to an incompletely initialized
+    /// record.
     use core::ptr::addr_of_mut;
 
     let mut storage=MaybeUninit::<pg::GinPostingList>::uninit();
@@ -73,9 +86,14 @@ fn generated_gin_posting_list_size_reads_only_its_initialized_length() {
 } }
 
 pg::__pgrx_c_classify! { @if_available GinNextPostingListSegment {
+/// Checks that generated gin segment advance stays within owned uninitialized storage.
 #[test]
 fn generated_gin_segment_advance_stays_within_owned_uninitialized_storage() {
+    /// Provide owned raw record storage so tests can initialize only fields that a C macro
+    /// actually accesses.
     use core::mem::MaybeUninit;
+    /// Address selected C fields without creating references to an incompletely initialized
+    /// record.
     use core::ptr::addr_of_mut;
 
     let mut storage=MaybeUninit::<[pg::GinPostingList;16]>::uninit();

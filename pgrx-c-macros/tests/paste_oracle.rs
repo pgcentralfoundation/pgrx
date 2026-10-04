@@ -2,25 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate the supported closed token-pasting cases against original C.
+//!
+//! Emission must preserve literal spelling, nominal identity, and symbol paths
+//! without evaluating erased operands. Inspection and native executions check
+//! supported pastes; open or ambiguous token construction remains a skip.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, ExpansionResult, IntegerValue, MacroScanner, SkipReasonCode,
     generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "PASTE_UL",
     "PASTE_ULL",
@@ -52,6 +71,8 @@ const NAMES: &[&str] = &[
     "PASTE_VALUE_ADD",
     "PASTE_VALUE_TOP",
 ];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[&str] = &[
     "PASTE_FORMAL_PREFIX",
     "PASTE_FORMAL_SUFFIX",
@@ -60,6 +81,7 @@ const REJECTED: &[&str] = &[
     "PASTE_ERASED",
     "PASTE_SYNTH_STRING",
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int paste_int_calls;
 unsigned int paste_long_calls;
@@ -67,6 +89,8 @@ int paste_int(int value) { paste_int_calls++; return value; }
 long paste_record(long value) { paste_long_calls++; return value+9; }
 int *paste_take_pointer(int *pointer) { return pointer; }
 "#;
+/// Original C recorder source whose header invocations establish expected semantic
+/// observations.
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 #define C_RANK(value) _Generic((value), unsigned long:4, unsigned long long:5, long:4, long long:5, default:0)
@@ -112,6 +136,7 @@ int main(void) {
     printf("%u %u %u\n",(unsigned int)PASTE_VALUE_BAD(3),(unsigned int)PASTE_VALUE_ADD(3),(unsigned int)PASTE_VALUE_TOP(3));
 }
 "#;
+/// Rust consumer source exercising actual generated macros and adapters.
 const CONSUMER: &str = r#"
 fn rank<K:__pgrx_c_macros::CInteger>(_:__pgrx_c_macros::CValue<K>) -> u8 { K::RANK }
 fn main() {
@@ -175,6 +200,8 @@ fn main() {
 }
 "#;
 
+/// Extract the generated value-context arm so assertions inspect the translated expression
+/// rather than public forwarding syntax.
 fn value_body(source: &str, name: &str) -> String {
     let tokens = syn::parse_file(source)
         .unwrap()
@@ -197,6 +224,7 @@ fn value_body(source: &str, name: &str) -> String {
         .replace(' ', "")
 }
 
+/// Checks that closed pastes preserve literal spelling C identity symbols and evaluation.
 #[test]
 fn closed_pastes_preserve_literal_spelling_c_identity_symbols_and_evaluation() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

@@ -1,14 +1,31 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc.
 //LICENSE Use of this source code is governed by the MIT license.
+
+/// Standalone Rust consumer for the partial record oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Expose the fixture guard observer under the path emitted native adapters expect.
 mod ffi {
+    //! Expose the fixture guard observer under the path emitted native adapters expect.
+    //!
+    //! The enclosing selector or oracle owns this scope; generated paths must retain that
+    //! ownership when expanded from a downstream consumer.
+
+    /// Record calls crossing the fixture guard boundary while executing the supplied operation.
     pub unsafe fn boundary<R, F: FnOnce() -> R>(call: F) -> R {
         call()
     }
 }
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
-    let raw = __pgrx_c_macros::expression::record::RawRecordValue::new(
-        core::mem::MaybeUninit::<PartialDiscardRecord>::uninit(),
-    );
+    let raw = __pgrx_c_macros::expression::record::RawRecordValue::new(core::mem::MaybeUninit::<
+        PartialDiscardRecord,
+    >::uninit());
     let _ = __pgrx_c_macros::expression::cast::<__pgrx_c_macros::expression::CVoid, _>(raw);
     // SAFETY: PartialRecord functions initialize first and inner.value; the
     // discard function initializes only first. Other fields remain inside

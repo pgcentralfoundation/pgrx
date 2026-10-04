@@ -4,12 +4,23 @@
 
 //! Conservative references among final active macros and compiler-resolved constants.
 
+//! The graph supports deterministic skip propagation and dependency explanations. Lexical
+//! references cover final active macro bodies, and prepared expansion adds compiler-discovered
+//! references such as pasted names. Macro nodes and terminal integer-constant users stay
+//! separate, allowing a binding disagreement to seed affected callers without inventing a
+//! macro definition for a declaration constant.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ExpansionBatch, IntegerConstant, MacroDefinition, MacroEnvironment, MacroKind, TokenKind,
 };
+/// Represent immutable caller-to-dependency edges and traverse them in deterministic order.
 use petgraph::Direction::{Incoming, Outgoing};
+/// Represent immutable caller-to-dependency edges and traverse them in deterministic order.
 use petgraph::graph::{DiGraph, NodeIndex};
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 
 /// Conservative macro references, including object macros and external context.
@@ -23,7 +34,10 @@ pub struct MacroDependencyGraph {
     // Nodes remain in lexical name order; no node can be inserted or removed
     // after construction. This permits borrowed name lookup without duplicating
     // the name strings in another map.
+    /// Immutable sorted macro nodes and directed caller-to-dependency edges.
     graph: DiGraph<String, ()>,
+    /// Terminal declaration-constant references kept separate from macro nodes for binding-mismatch
+    /// propagation.
     constant_users: BTreeMap<String, Vec<NodeIndex>>,
 }
 
@@ -38,6 +52,8 @@ pub struct MacroDependencyImpact {
     pub root: String,
 }
 
+/// Construct deterministic references and trace affected callers without repeated visits through
+/// cycles.
 impl MacroDependencyGraph {
     /// Keep the inspected lexical graph immutable, adding the compiler's
     /// synthesized references for this prepared batch. Rebuild sorted edges so
@@ -82,11 +98,14 @@ impl MacroDependencyGraph {
         }
     }
 
+    /// Build a lexical macro graph for tests without terminal declaration constants.
     #[cfg(test)]
     pub(crate) fn from_environment(environment: &MacroEnvironment) -> Self {
         Self::from_environment_with_constants(environment, &BTreeMap::new())
     }
 
+    /// Build sorted active-macro edges and deduplicated integer-constant users while excluding formal
+    /// substitutions.
     pub(crate) fn from_environment_with_constants(
         environment: &MacroEnvironment,
         constants: &BTreeMap<String, IntegerConstant>,
@@ -210,6 +229,8 @@ impl MacroDependencyGraph {
         impacts
     }
 
+    /// Find a macro by binary search over immutable lexical node order without a duplicate name
+    /// index.
     fn node(&self, name: &str) -> Option<NodeIndex> {
         self.graph
             .raw_nodes()
@@ -219,6 +240,8 @@ impl MacroDependencyGraph {
     }
 }
 
+/// Identify signature formals and the replacement-body start so formal names do not create dependency
+/// edges.
 fn signature(definition: &MacroDefinition) -> (HashSet<&str>, usize) {
     if definition.kind == MacroKind::ObjectLike {
         return (HashSet::new(), definition.tokens.len().min(1));
@@ -241,15 +264,23 @@ fn signature(definition: &MacroDefinition) -> (HashSet<&str>, usize) {
     (parameters, definition.tokens.len())
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
+    /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
     use crate::{ActiveMacro, ActiveProvenance, Token};
 
+    /// Create identifier tokens for dependency fixtures with explicit lexical categories.
     fn token(kind: TokenKind, spelling: &str) -> Token {
         Token { kind, spelling: spelling.into() }
     }
 
+    /// Construct a source-independent object macro fixture for graph traversal tests.
     fn object(name: &str, references: &[&str]) -> ActiveMacro {
         let mut tokens = vec![token(TokenKind::Identifier, name)];
         tokens.extend(references.iter().map(|name| token(TokenKind::Identifier, name)));
@@ -267,6 +298,7 @@ mod tests {
         }
     }
 
+    /// Construct a function-macro fixture whose formals can exercise dependency shadowing.
     fn function(name: &str, parameters: &[&str], body: Vec<Token>) -> ActiveMacro {
         let mut active = object(name, &[]);
         active.definition.kind = MacroKind::FunctionLike;
@@ -284,6 +316,7 @@ mod tests {
         active
     }
 
+    /// Assemble deterministic active definitions for graph tests without running Clang.
     fn environment(macros: Vec<ActiveMacro>) -> MacroEnvironment {
         MacroEnvironment {
             active: macros
@@ -293,6 +326,7 @@ mod tests {
         }
     }
 
+    /// Construct the expected caller/dependency/root explanation used to check propagation paths.
     fn impact(name: &str, dependency: &str, root: &str) -> MacroDependencyImpact {
         MacroDependencyImpact {
             name: name.into(),
@@ -301,6 +335,7 @@ mod tests {
         }
     }
 
+    /// Checks chain records each immediate parent toward the failed root.
     #[test]
     fn chain_records_each_immediate_parent_toward_the_failed_root() {
         let graph = MacroDependencyGraph::from_environment(&environment(vec![
@@ -318,6 +353,7 @@ mod tests {
         assert_eq!(graph.dependents("ROOT").collect::<Vec<_>>(), ["MIDDLE"]);
     }
 
+    /// Checks diamond has one deterministic shortest path per caller.
     #[test]
     fn diamond_has_one_deterministic_shortest_path_per_caller() {
         let graph = MacroDependencyGraph::from_environment(&environment(vec![
@@ -339,6 +375,7 @@ mod tests {
         );
     }
 
+    /// Checks cycles and self edges visit nodes once and exclude all roots.
     #[test]
     fn cycles_and_self_edges_visit_nodes_once_and_exclude_all_roots() {
         let graph = MacroDependencyGraph::from_environment(&environment(vec![
@@ -351,6 +388,7 @@ mod tests {
         assert_eq!(graph.impacts(&["B", "A", "A"]), [impact("C", "B", "B")]);
     }
 
+    /// Checks multiple roots and unknown names are deterministic.
     #[test]
     fn multiple_roots_and_unknown_names_are_deterministic() {
         let graph = MacroDependencyGraph::from_environment(&environment(vec![
@@ -367,6 +405,7 @@ mod tests {
         assert_eq!(graph.dependents("missing").count(), 0);
     }
 
+    /// Checks formal parameters comments and literals do not create edges.
     #[test]
     fn formal_parameters_comments_and_literals_do_not_create_edges() {
         let graph = MacroDependencyGraph::from_environment(&environment(vec![
@@ -391,6 +430,7 @@ mod tests {
         assert!(graph.dependents("__VA_ARGS__").next().is_none());
     }
 
+    /// Checks object function external and compiler macros share the same graph.
     #[test]
     fn object_function_external_and_compiler_macros_share_the_same_graph() {
         let mut external = object("EXTERNAL", &["__COMPILER"]);
@@ -415,6 +455,7 @@ mod tests {
         );
     }
 
+    /// Checks only final active bodies create edges.
     #[test]
     fn only_final_active_bodies_create_edges() {
         let mut active =
@@ -426,6 +467,7 @@ mod tests {
         assert_eq!(graph.impacts(&["NEW"]), [impact("CALLER", "NEW", "NEW")]);
     }
 
+    /// Checks keyword macro names are edges unless shadowed by a formal.
     #[test]
     fn keyword_macro_names_are_edges_unless_shadowed_by_a_formal() {
         let mut caller = function(
@@ -443,8 +485,10 @@ mod tests {
         assert!(graph.dependents("enum").next().is_none());
     }
 
+    /// Checks constant users are sorted unique and respect formal and macro shadowing.
     #[test]
     fn constant_users_are_sorted_unique_and_respect_formal_and_macro_shadowing() {
+        /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
         use crate::{IntegerKind, IntegerValue, TypeCategory, TypeInfo};
         let constant = IntegerConstant {
             ty: TypeInfo {

@@ -1,7 +1,18 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Standalone Rust consumer for the enum oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
+    /// Use the production semantic markers and expression wrappers to retain exact C type
+    /// identity in the consumer.
     use __pgrx_c_macros::{CUnsignedInt, CUnsignedLong, CValue};
     let mut record = core::mem::MaybeUninit::<EnumRecord>::uninit();
     let pointer = record.as_mut_ptr();
@@ -67,11 +78,20 @@ fn main() {
         println!("orderforward\t{}", ENUM_ORDER!(first, end).get());
         println!("orderreverse\t{}", ENUM_ORDER!(end, first).get());
         println!("orderequal\t{}", ENUM_ORDER!(first, first.cast::<EnumSmallStorage>()).get());
-        println!("orderqualified\t{}", ENUM_ORDER!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get());
+        println!(
+            "orderqualified\t{}",
+            ENUM_ORDER!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get()
+        );
         println!("differenceforward\t{}", ENUM_DIFFERENCE!(end, first).get());
         println!("differencereverse\t{}", ENUM_DIFFERENCE!(first, end).get());
-        println!("differencezero\t{}", ENUM_DIFFERENCE!(first, first.cast::<EnumSmallStorage>()).get());
-        println!("differencequalified\t{}", ENUM_DIFFERENCE!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get());
+        println!(
+            "differencezero\t{}",
+            ENUM_DIFFERENCE!(first, first.cast::<EnumSmallStorage>()).get()
+        );
+        println!(
+            "differencequalified\t{}",
+            ENUM_DIFFERENCE!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get()
+        );
         let mut integer_values = [CValue::<CUnsignedInt>::new(0); 4];
         let stored_first = integer_values.as_mut_ptr();
         let primitive_end = stored_first.add(4).cast::<u32>();
@@ -81,7 +101,10 @@ fn main() {
             println!("boundary{i}\t{}", ENUM_SET!(pointer, i).get() as u64);
         }
     }
+    /// Use the production semantic markers and expression wrappers to retain exact C type
+    /// identity in the consumer.
     use __pgrx_c_macros::expression::{CType, NativeType, cast, input};
+    /// Keep the explicit C enum identity used by the consumer's cast and native-storage checks.
     type Marker = <EnumSmall as NativeType>::Marker;
     let zero = Marker::into_storage(cast::<Marker, _>(input(0)));
     assert!(matches!(zero, EnumSmall::SmallZero));

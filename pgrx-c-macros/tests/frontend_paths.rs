@@ -2,19 +2,40 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check physical header identity and fresh native build artifacts.
+//!
+//! Temporary files and symlinks exercise include lookup, dependency freshness,
+//! source/output alias rejection, and failed tools. Existing objects or archives
+//! must never substitute for missing fresh output, and ownership follows real
+//! files rather than spoofed logical locations.
+
 #![cfg(unix)]
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, FrontendError, MacroScanner, compile_native_support, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
-struct Directory(PathBuf);
+/// Own the temporary header tree for this test and remove only its fixture files afterward.
+struct Directory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Construct owned header trees for freshness and include-identity tests.
 impl Directory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         for attempt in 0..64 {
             let path = std::env::temp_dir()
@@ -29,12 +50,16 @@ impl Directory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for Directory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
 
+/// Checks that syntax only profile cannot rearchive a stale native object.
 #[test]
 fn syntax_only_profile_cannot_rearchive_a_stale_native_object() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -61,8 +86,12 @@ fn syntax_only_profile_cannot_rearchive_a_stale_native_object() {
     assert_eq!(std::fs::read(&archive).unwrap(), old_archive);
 }
 
+/// Checks that native support requires fresh outputs and preserves existing artifacts on tool
+/// failure.
 #[test]
 fn native_support_requires_fresh_outputs_and_preserves_existing_artifacts_on_tool_failure() {
+    /// Make fixture compiler or pg_config wrappers executable so process failures can be tested
+    /// directly.
     use std::os::unix::fs::PermissionsExt;
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
@@ -115,6 +144,7 @@ fn native_support_requires_fresh_outputs_and_preserves_existing_artifacts_on_too
     }));
 }
 
+/// Checks that native support rejects source and output aliases before publication.
 #[test]
 fn native_support_rejects_source_and_output_aliases_before_publication() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -156,6 +186,7 @@ fn native_support_rejects_source_and_output_aliases_before_publication() {
     assert!(std::fs::metadata(&archive).unwrap().len() > 0);
 }
 
+/// Checks that symlink wrapper keeps quoted include lookup at the supplied path.
 #[test]
 fn symlink_wrapper_keeps_quoted_include_lookup_at_the_supplied_path() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -184,6 +215,7 @@ fn symlink_wrapper_keeps_quoted_include_lookup_at_the_supplied_path() {
     assert!(!inspection.profile().inputs.files.contains(&source.join("choice.h")));
 }
 
+/// Checks that repeated inclusion of one definition is not ambiguous.
 #[test]
 fn repeated_inclusion_of_one_definition_is_not_ambiguous() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -209,6 +241,7 @@ fn repeated_inclusion_of_one_definition_is_not_ambiguous() {
     ));
 }
 
+/// Checks that header availability tracks symlink identity and rejects changed inputs.
 #[test]
 fn header_availability_tracks_symlink_identity_and_rejects_changed_inputs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

@@ -1,21 +1,49 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc.
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+/// Standalone Rust consumer for the callback oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Expose the fixture guard observer under the path emitted native adapters expect.
 mod ffi {
+    //! Expose the fixture guard observer under the path emitted native adapters expect.
+    //!
+    //! The enclosing selector or oracle owns this scope; generated paths must retain that
+    //! ownership when expanded from a downstream consumer.
+
+    /// Allocate unique fixture paths or record process-local effects across concurrent test
+    /// invocations.
     use std::sync::atomic::{AtomicUsize, Ordering};
+    /// Count fixture guard entries to compare callback boundary behavior with native
+    /// observations.
     pub static GUARDS: AtomicUsize = AtomicUsize::new(0);
+    /// Record calls crossing the fixture guard boundary while executing the supplied operation.
     pub unsafe fn boundary<R, F: FnOnce() -> R>(call: F) -> R {
         GUARDS.fetch_add(1, Ordering::Relaxed);
         call()
     }
 }
+/// Construct the fixture's registered enum identity for callback conversion observations.
 fn nominal_enum<I: __pgrx_c_macros::expression::EnumIdentity, K: __pgrx_c_macros::CInteger>(
     value: __pgrx_c_macros::CValue<__pgrx_c_macros::expression::CEnum<I, K>>,
 ) -> K::Repr {
     value.get()
 }
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
+    /// Use the production semantic markers and expression wrappers to retain exact C type
+    /// identity in the consumer.
     use __pgrx_c_macros::expression::*;
+    /// Use the production semantic markers and expression wrappers to retain exact C type
+    /// identity in the consumer.
     use __pgrx_c_macros::{CLong, CLongLong, CValue};
+    /// Allocate unique fixture paths or record process-local effects across concurrent test
+    /// invocations.
     use std::sync::atomic::Ordering;
     // SAFETY: Every callback comes from the original live C table; pointers refer
     // to initialized local storage, and this fixture has no PostgreSQL backend.

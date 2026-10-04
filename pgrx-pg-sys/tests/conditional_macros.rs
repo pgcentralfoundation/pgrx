@@ -2,11 +2,19 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test generated conditional macros through real PostgreSQL binding types.
+//!
+//! The suite exercises branch selection and effects using the selected build's
+//! exports. These checks cover the public integration layer above the isolated
+//! C/Rust control-flow oracles.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
+/// Checks that generated transaction advance matches original C wraparound cases.
 #[test]
 fn generated_transaction_advance_matches_original_c_wraparound_cases() {
     // C results from TransactionIdAdvance in access/transam.h, including every
@@ -30,6 +38,7 @@ fn generated_transaction_advance_matches_original_c_wraparound_cases() {
     }
 }
 
+/// Checks that generated jsonb offset selects absolute or relative and evaluates entry once.
 #[test]
 fn generated_jsonb_offset_selects_absolute_or_relative_and_evaluates_entry_once() {
     // C results from JBE_ADVANCE_OFFSET in utils/jsonb.h. Both branches mask
@@ -65,10 +74,16 @@ fn generated_jsonb_offset_selects_absolute_or_relative_and_evaluates_entry_once(
 // Test its generated API only when that API exists in the inspected profile.
 pg::__pgrx_c_classify! { @if_available PageSetPrunable {
 mod prunable {
+/// Bring the actual consumer capability into scope for this fixture's generated-macro
+/// integration checks.
 use super::pg;
+/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
+/// accesses.
 use core::mem::MaybeUninit;
+/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::{addr_of, addr_of_mut};
 
+/// Checks that generated prunable page short circuits before the backend comparison.
 #[test]
 fn generated_prunable_page_short_circuits_before_the_backend_comparison() {
     for input in [3_u32, u32::MAX] {

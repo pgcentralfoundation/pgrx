@@ -4,11 +4,22 @@
 
 //! Establish inline definitions that declaration-only parsing intentionally hides.
 
+//! Declaration-only parsing omits function bodies to keep inspection affordable. Static inline
+//! adapters still need proof that an original definition exists, so this module performs one
+//! bounded reparse with bodies enabled. Only definitions whose linkage, storage class, and
+//! complete signature match the first catalog are admitted to native support generation.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{FrontendError, type_info};
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{DeclarationLinkage, FrontendOutput, MacroScanner};
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult, Index, Linkage, StorageClass, TypeKind};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeSet;
 
+/// Bound declaration or expression candidates before constructing a compiler proof batch.
 const MAX_CANDIDATES: usize = 16_384;
 
 /// Reparse the same input once with function bodies enabled. Definition identity

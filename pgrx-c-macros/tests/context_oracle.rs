@@ -2,24 +2,49 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Verify value, place, discard, and unevaluated nested-macro contexts.
+//!
+//! The same inner C macro can require different treatment under assignment,
+//! address-taking, sizeof, or ordinary value use. C/Rust comparisons track both
+//! results and effects, while rejected consumers enforce lvalue and unsafe rules.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner,
     emit_batch_with_bindings, emit_support_artifact_with_bindings, inspect,
 };
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::Command;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+/// Fixture macros whose emitted behavior is compared with the original header.
 const SUPPORTED: &[&str] = &[
     "CTX_FIELD",
     "CTX_ARRAY",
@@ -42,16 +67,22 @@ const SUPPORTED: &[&str] = &[
 ];
 
 // Required by the actual production binding collector, whose own tests also run here.
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Return the original fixture header whose preprocessing and C definitions supply this test's
+/// semantics.
 fn header() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/context_oracle.h")
 }
 
+/// Supply native compiler arguments for the oracle, including the platform SDK needed by the
+/// original header.
 fn native_arguments() -> Vec<String> {
     let mut arguments = vec![
         "-std=c17".into(),
@@ -67,6 +98,8 @@ fn native_arguments() -> Vec<String> {
     arguments
 }
 
+/// Generate and collect fresh fixture bindings, preserving the actual Rust ABI and paths that
+/// the emitter must reconcile with C.
 fn original_bindings(
     frontend: &FrontendOutput,
     session: &AnalysisSession<'_>,
@@ -95,6 +128,8 @@ fn original_bindings(
     (source, catalog)
 }
 
+/// Assemble emitted public macros with their real native support for the independently compiled
+/// Rust consumer.
 fn emitted_source(
     session: &AnalysisSession<'_>,
     bindings: &str,
@@ -121,6 +156,7 @@ fn emitted_source(
     (rust, format!("{}\n{}", artifact.c_source, include_str!("fixtures/context_oracle.c")))
 }
 
+/// Checks that nested macro contexts match original C values types and evaluation.
 #[test]
 fn nested_macro_contexts_match_original_c_values_types_and_evaluation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -185,6 +221,7 @@ fn nested_macro_contexts_match_original_c_values_types_and_evaluation() {
     assert!(!original_size.contains("load ") && !original_size.contains("call "));
 }
 
+/// Checks that invalid C lvalue contexts and unsafe obligations are rejected.
 #[test]
 fn invalid_c_lvalue_contexts_and_unsafe_obligations_are_rejected() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -252,6 +289,7 @@ fn invalid_c_lvalue_contexts_and_unsafe_obligations_are_rejected() {
     );
 }
 
+/// Extract a named LLVM function's body for control-flow and branch-weight inspection.
 fn function_body<'a>(llvm: &'a str, name: &str) -> &'a str {
     let definition = llvm
         .lines()
@@ -262,8 +300,17 @@ fn function_body<'a>(llvm: &'a str, name: &str) -> &'a str {
     &tail[..tail.find("\n}").expect("LLVM function must terminate") + 2]
 }
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let path = std::env::temp_dir()
@@ -272,7 +319,10 @@ impl TemporaryDirectory {
         Self(path)
     }
 }
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

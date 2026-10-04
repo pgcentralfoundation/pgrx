@@ -2,20 +2,33 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Exercise generated prediction-hint macros through pgrx-pg-sys exports.
+//!
+//! Runtime checks ensure C result identity and operand effects survive the public
+//! entry point. The standalone compiler witnesses separately establish branch
+//! weights; these integration tests check usable exported behavior.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Record callback or operand observations without changing the generated C expression types.
 use core::cell::Cell;
+/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
+/// accesses.
 use core::mem::MaybeUninit;
+/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::{addr_of_mut, read, write};
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
+/// Expose the semantic C rank for assertions that branch-hint truth results remain C long.
 fn rank<K: pg::__pgrx_c_macros::CInteger>(_: pg::__pgrx_c_macros::CValue<K>) -> u8 {
     K::RANK
 }
 
 pg::__pgrx_c_classify! { @if_available likely {
 pg::__pgrx_c_classify! { @if_available unlikely {
+/// Checks that generated expectation wrappers preserve C long truth and single evaluation.
 #[test]
 fn generated_expectation_wrappers_preserve_c_long_truth_and_single_evaluation() {
     // The installed c.h passes (x != 0) to __builtin_expect, whose compiler
@@ -49,6 +62,9 @@ fn generated_expectation_wrappers_preserve_c_long_truth_and_single_evaluation() 
 } }
 } }
 
+/// Obtain raw addresses for the version-specific statistics counters without reading or
+/// borrowing the containing record.
+///
 /// # Safety
 /// `status` must point into a live, aligned `PgStat_TableStatus` allocation.
 /// Fields need not be initialized: this helper only obtains their raw addresses.
@@ -78,6 +94,8 @@ unsafe fn counter_fields(status: *mut pg::PgStat_TableStatus) -> [*mut pg::PgSta
     }
 }
 
+/// Observe the enabled and disabled statistics paths using owned storage initialized only for
+/// the selected fields, keeping backend association calls unreachable.
 fn exercise_counter(mut update: impl FnMut(pg::Relation), expected: [pg::PgStat_Counter; 5]) {
     let mut status = MaybeUninit::<pg::PgStat_TableStatus>::uninit();
     let mut relation = MaybeUninit::<pg::RelationData>::uninit();
@@ -111,6 +129,7 @@ fn exercise_counter(mut update: impl FnMut(pg::Relation), expected: [pg::PgStat_
 // increment one field or add n. The macros and layouts used here are generated
 // for this build's profile; no checked-in bindings or pgrx hand ports are used.
 pg::__pgrx_c_classify! { @if_available pgstat_count_heap_scan {
+/// Checks that generated heap scan counts only the initialized scan field.
 #[test]
 fn generated_heap_scan_counts_only_the_initialized_scan_field() {
     exercise_counter(|relation| {
@@ -121,6 +140,7 @@ fn generated_heap_scan_counts_only_the_initialized_scan_field() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_heap_getnext {
+/// Checks that generated heap getnext counts only the initialized returned field.
 #[test]
 fn generated_heap_getnext_counts_only_the_initialized_returned_field() {
     exercise_counter(|relation| {
@@ -130,6 +150,7 @@ fn generated_heap_getnext_counts_only_the_initialized_returned_field() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_heap_fetch {
+/// Checks that generated heap fetch counts only the initialized fetched field.
 #[test]
 fn generated_heap_fetch_counts_only_the_initialized_fetched_field() {
     exercise_counter(|relation| {
@@ -139,6 +160,7 @@ fn generated_heap_fetch_counts_only_the_initialized_fetched_field() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_index_scan {
+/// Checks that generated index scan counts only the initialized scan field.
 #[test]
 fn generated_index_scan_counts_only_the_initialized_scan_field() {
     exercise_counter(|relation| {
@@ -148,6 +170,7 @@ fn generated_index_scan_counts_only_the_initialized_scan_field() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_index_tuples {
+/// Checks that generated index tuples evaluates the increment only in the enabled branch.
 #[test]
 fn generated_index_tuples_evaluates_the_increment_only_in_the_enabled_branch() {
     let calls=Cell::new(0_u32);
@@ -159,6 +182,7 @@ fn generated_index_tuples_evaluates_the_increment_only_in_the_enabled_branch() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_buffer_read {
+/// Checks that generated buffer read counts only the initialized read field.
 #[test]
 fn generated_buffer_read_counts_only_the_initialized_read_field() {
     exercise_counter(|relation| {
@@ -168,6 +192,7 @@ fn generated_buffer_read_counts_only_the_initialized_read_field() {
 }
 } }
 pg::__pgrx_c_classify! { @if_available pgstat_count_buffer_hit {
+/// Checks that generated buffer hit counts only the initialized hit field.
 #[test]
 fn generated_buffer_hit_counts_only_the_initialized_hit_field() {
     exercise_counter(|relation| {

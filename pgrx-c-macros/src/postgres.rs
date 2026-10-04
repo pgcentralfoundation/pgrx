@@ -2,12 +2,25 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! PostgreSQL resolution follows pgrx-pg-config and the version-specific pgrx wrapper header.
+//!
+//! The configuration carries server include ownership and recorded compiler flags into the
+//! scanner/frontend. PostgreSQL function macros form the public inventory; object macros and
+//! external-header definitions remain context for expansion. Canonical path identities enforce
+//! ownership without changing include lookup spelling.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveProvenance, Error, FrontendOutput, MacroDefinition, MacroInventory, MacroKind,
     MacroScanner,
 };
+/// Resolve installations and recorded compiler flags through the same pgrx configuration system as
+/// cargo-pgrx.
 use pgrx_pg_config::{PgConfig, Pgrx};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{HashMap, HashSet};
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::{Path, PathBuf};
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.
@@ -25,12 +38,19 @@ pub struct PostgresInventory {
 /// PostgreSQL headers and preprocessing options resolved through pgrx's configuration.
 #[derive(Debug)]
 pub struct PostgresConfig {
+    /// Resolved installation descriptor supplying version, directories, and recorded build flags.
     pg_config: PgConfig,
+    /// The original main-file spelling that controls preprocessing and quoted include lookup.
     header: PathBuf,
+    /// Server header ownership root used to select public PostgreSQL function macros.
     server_include_dir: PathBuf,
+    /// Installation compiler flags and include arguments forwarded consistently into discovery and
+    /// analysis.
     clang_args: Vec<String>,
 }
 
+/// Resolve the installation once and reuse its wrapper header, flags, and ownership root across
+/// pipeline phases.
 impl PostgresConfig {
     /// Select a configured major version, such as `18` or `pg18`.
     ///
@@ -273,6 +293,8 @@ pub fn postgres_function_macro_names(
     Ok(names)
 }
 
+/// Check canonical physical source ownership while caching repeated header resolutions across the
+/// macro inventory.
 fn owns_source(
     file: &Path,
     root: &Path,
@@ -286,6 +308,8 @@ fn owns_source(
     Ok(owned)
 }
 
+/// Resolve a discovered header identity and retain the originating path when reporting filesystem
+/// errors.
 fn canonicalize_header_path(path: &Path) -> Result<PathBuf, PostgresError> {
     path.canonicalize().map_err(|source| PostgresError::HeaderPath { path: path.into(), source })
 }
@@ -293,18 +317,45 @@ fn canonicalize_header_path(path: &Path) -> Result<PathBuf, PostgresError> {
 /// Failure to resolve a PostgreSQL installation or inventory its macros.
 #[derive(Debug, thiserror::Error)]
 pub enum PostgresError {
+    /// pgrx could not resolve or query the selected PostgreSQL installation.
     #[error("PostgreSQL configuration: {0:#}")]
-    Configuration(#[from] eyre::Report),
+    Configuration(
+        /// Original pgrx installation configuration failure.
+        #[from]
+        eyre::Report,
+    ),
+    /// A requested wrapper/header path could not be resolved for inspection.
     #[error("could not resolve header path {}: {source}", path.display())]
-    HeaderPath { path: PathBuf, source: std::io::Error },
+    HeaderPath {
+        /// The actual Rust binding path or filesystem path consumed by this phase.
+        path: PathBuf,
+        /// The underlying I/O or parsing failure retained for actionable diagnostics.
+        source: std::io::Error,
+    },
+    /// The selected installation lacks a usable PostgreSQL server header ownership root.
     #[error("Clang requires a UTF-8 include directory: {}", .0.display())]
-    InvalidIncludeDirectory(PathBuf),
+    InvalidIncludeDirectory(
+        /// The unusable configured server include root.
+        PathBuf,
+    ),
+    /// Recorded PostgreSQL preprocessing flags could not be decoded safely.
     #[error("PostgreSQL CPPFLAGS must be UTF-8 with balanced shell quoting")]
     InvalidCppFlags,
+    /// Recorded PostgreSQL compiler flags could not be decoded safely.
     #[error("PostgreSQL CFLAGS must be UTF-8 with balanced shell quoting")]
     InvalidCFlags,
+    /// Compiler inspection or a required probe failed.
     #[error(transparent)]
-    Frontend(#[from] crate::FrontendError),
+    Frontend(
+        /// Original coherent-inspection or probe error.
+        #[from]
+        crate::FrontendError,
+    ),
+    /// The underlying scanner could not produce a complete reliable inventory.
     #[error(transparent)]
-    Discovery(#[from] Error),
+    Discovery(
+        /// Original scanner failure preserved through the frontend/CLI boundary.
+        #[from]
+        Error,
+    ),
 }

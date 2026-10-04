@@ -1,6 +1,18 @@
+/// Standalone Rust consumer for the emit postgres C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::{CInteger, CUnsignedLong, CValue};
+/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::Cell;
 
+/// Print the observation format consumed by the paired oracle, retaining C kind and value
+/// information rather than only the result.
 fn record<T: __pgrx_c_macros::IntoCValue>(
     name: &str,
     alignment: u32,
@@ -22,6 +34,8 @@ fn record<T: __pgrx_c_macros::IntoCValue>(
     );
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     for alignment in [1_i32, 2, 4, 8, 16, 32, 64] {
         for length in 0_u32..4096 {

@@ -4,22 +4,45 @@
 
 //! Establish bitfield expression types without guessing promotion from its width.
 
+//! C bitfield types and promotions cannot be recovered from width alone. This phase builds
+//! bounded typed probes for readable and writable expressions, checking both compiler paths.
+//! LLVM access witnesses compare original, unaligned alias, and enclosing-record operations
+//! before admitting volatile capabilities. Failed candidates are isolated rather than assigning
+//! unchecked facts to unrelated fields.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{FrontendError, driver_arguments, run_compiler_with_input, type_info};
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{BitfieldFacts, FrontendOutput, MacroScanner, TypeInfo};
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeMap;
+/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
 
+/// Bound bitfield candidate collection before allocating the compiler probe batch.
 const MAX_FIELDS: usize = 16_384;
+/// Bound one constructed probe source before invoking Clang or allocating additional instrumentation.
 const MAX_SOURCE_BYTES: usize = 4 * 1024 * 1024;
+/// Bound compiler-pass isolation work for candidate-specific failures.
 const MAX_PROBE_RUNS: usize = 128;
 
+/// A named bitfield and enclosing contexts whose type and volatile access behavior require compiler
+/// probes.
 struct Candidate {
+    /// Canonical record/member key under which established bitfield facts are stored.
     key: String,
+    /// A usable original C record spelling for compiler witnesses and native capabilities.
     record_type: String,
+    /// Original named C bitfield whose expression types and access units need proof.
     field: String,
+    /// Whether the original field permits assignment/update probes instead of read-only promotion.
     writable: bool,
+    /// Unqualified original field type spelling used by write witnesses.
     declared_type: String,
+    /// Named enclosing record/member paths checked for compatible volatile access behavior.
     parents: Vec<(String, String)>,
 }
 
@@ -133,6 +156,8 @@ pub(super) fn probe(
     Ok(result)
 }
 
+/// Find a usable C record spelling or typedef for probes without inventing names for anonymous
+/// declarations.
 fn record_type(frontend: &FrontendOutput, canonical: &str) -> Option<String> {
     let record = frontend.declarations().records.get(canonical)?;
     if record.name.is_some() && !canonical.contains('(') {
@@ -144,12 +169,15 @@ fn record_type(frontend: &FrontendOutput, canonical: &str) -> Option<String> {
     }
 }
 
+/// Restrict probe designators to ordinary C identifiers before embedding them into generated source.
 fn identifier(value: &str) -> bool {
     let mut bytes = value.bytes();
     bytes.next().is_some_and(|byte| byte == b'_' || byte.is_ascii_alphabetic())
         && bytes.all(|byte| byte == b'_' || byte.is_ascii_alphanumeric())
 }
 
+/// Generate bounded type and access witnesses for original, unaligned, and enclosing-record bitfield
+/// expressions.
 fn source(frontend: &FrontendOutput, candidates: &[Candidate]) -> Result<String, FrontendError> {
     let header = frontend
         .profile()
@@ -201,6 +229,8 @@ fn source(frontend: &FrontendOutput, candidates: &[Candidate]) -> Result<String,
     Ok(source)
 }
 
+/// Extract LLVM volatile access units so generated bitfield capabilities can preserve the compiler
+/// operation.
 fn volatile_units(
     frontend: &FrontendOutput,
     source: &str,
@@ -245,6 +275,7 @@ fn volatile_units(
     Ok(functions)
 }
 
+/// Require the tested access units to agree across the relevant bitfield representations.
 fn access_compatible(
     units: &BTreeMap<String, Vec<(String, String)>>,
     index: usize,
@@ -265,6 +296,8 @@ fn access_compatible(
     })
 }
 
+/// Require both Clang paths to accept a typed bitfield probe before copying its expression type
+/// facts.
 fn collect(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,

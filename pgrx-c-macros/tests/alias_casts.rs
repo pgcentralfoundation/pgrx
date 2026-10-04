@@ -2,25 +2,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Verify that symbolic Rust casts preserve their original C typedef identities.
+//!
+//! Fresh fixture bindings are reconciled with Clang's types before emission. The
+//! tests inspect public macro bodies, compare executed C and Rust observations,
+//! and reject invalid qualifiers or layout substitutions. Alias readability must
+//! not erase the rank, pointer identity, or null-constant rules used by support.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroEmission, MacroScanner, RustBindingType,
     generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Alias-cast cases requiring symbolic Rust spelling without losing the compiler's C identity.
 const CASTS: &[(&str, &str)] = &[
     ("ALIAS_MODE", "$crate::AclMode"),
     ("ALIAS_CHAIN", "$crate::AliasModeChain"),
@@ -44,6 +63,7 @@ const CASTS: &[(&str, &str)] = &[
     ("ALIAS_CALLBACK_ZERO", "$crate::AliasCallback"),
     ("ALIAS_ZERO", "$crate::AliasVoidPointer"),
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int alias_evaluations;
 int alias_record(int value) { alias_evaluations++; return value; }
@@ -53,6 +73,8 @@ unsigned long *alias_take_ulong(unsigned long *value) { return value; }
 AliasCallback alias_take_callback(AliasCallback value) { return value; }
 "#;
 
+/// Require the selected macro to have an emitted body and surface its structured skip if
+/// generation rejects it.
 fn emitted(emission: &MacroEmission) -> &str {
     let EmissionStatus::Emitted { rust, .. } = &emission.status else {
         panic!("verified typedef cast must emit: {emission:?}")
@@ -60,6 +82,8 @@ fn emitted(emission: &MacroEmission) -> &str {
     rust
 }
 
+/// Extract the generated value-context arm so assertions inspect the translated expression
+/// rather than public forwarding syntax.
 fn value_body(source: &str, name: &str) -> String {
     let parsed = syn::parse_file(source).unwrap();
     let item = parsed
@@ -83,6 +107,8 @@ fn value_body(source: &str, name: &str) -> String {
         .replace(' ', "")
 }
 
+/// Assemble a standalone Rust producer with the real semantic support and generated adapter
+/// definitions.
 fn base(directory: &std::path::Path, bindings: &str, support: &str) -> String {
     let runtime = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     format!(
@@ -90,6 +116,7 @@ fn base(directory: &std::path::Path, bindings: &str, support: &str) -> String {
     )
 }
 
+/// Checks that verified alias names retain C type identity qualifiers layout and null tags.
 #[test]
 fn verified_alias_names_retain_c_type_identity_qualifiers_layout_and_null_tags() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -323,6 +350,8 @@ fn main() {
     check_fallback(&directory, &bindings, &session, &catalog, true);
 }
 
+/// Require an unverified alias case to explain its fallback rather than displaying a misleading
+/// symbolic cast.
 fn check_fallback(
     directory: &std::path::Path,
     bindings: &str,

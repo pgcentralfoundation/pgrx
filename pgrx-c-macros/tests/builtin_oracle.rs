@@ -2,28 +2,51 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate compiler builtins and isolate failed capability probes.
+//!
+//! Original C prototypes, native executions, and compiler witnesses establish
+//! builtin types and effects. Conflicts or shadowed proof helpers must disable
+//! only the affected capabilities; unrelated macro translations must survive.
+//! Configured PostgreSQL checks additionally cover its actual Datum storage.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuiltinKind, EmissionStatus, FrontendOutput, IntegerKind,
     MacroScanner, PostgresConfig, TypeCategory, generate_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "BUILTIN_SWAP16",
     "BUILTIN_SWAP32",
@@ -42,6 +65,8 @@ const NAMES: &[&str] = &[
     "BUILTIN_NULL_CALL",
     "BUILTIN_RUNTIME_NULL",
 ];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[&str] = &[
     "BUILTIN_WRONG0",
     "BUILTIN_WRONG2",
@@ -50,6 +75,7 @@ const REJECTED: &[&str] = &[
     "BUILTIN_DEREF",
     "BUILTIN_CALLBACK",
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int builtin_evaluations;
 volatile unsigned int builtin_signal;
@@ -59,6 +85,8 @@ unsigned int *builtin_address(unsigned int *value) { builtin_evaluations++; retu
 int *builtin_take_pointer(int *value) { return value; }
 unsigned int builtin_use_callback(BuiltinCallback callback) { return callback(17); }
 "#;
+/// Original C recorder source whose header invocations establish expected semantic
+/// observations.
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 #define C_RANK(value) _Generic((value), unsigned short: 2, unsigned int: 3, unsigned long: 4, unsigned long long: 5, default: 0)
@@ -94,6 +122,7 @@ int main(void) {
     printf("%d %d %d\n", BUILTIN_NULL_SELECT(1,pointer)==0, BUILTIN_NULL_SELECT(0,pointer)==pointer, BUILTIN_NULL_CALL()==0);
 }
 "#;
+/// Rust consumer source exercising actual generated macros and adapters.
 const CONSUMER: &str = r#"
 fn rank<K: __pgrx_c_macros::CInteger>(_: __pgrx_c_macros::CValue<K>) -> u8 { K::RANK }
 fn main() {
@@ -148,6 +177,8 @@ fn main() {
 }
 "#;
 
+/// Inspect the fixture under an explicit compiler profile and retain the facts needed by
+/// generation and native comparison.
 fn profile(
     scanner: &MacroScanner,
     header: &Path,
@@ -157,6 +188,8 @@ fn profile(
     inspect(scanner, header, &arguments(optimization, shadow), None).unwrap()
 }
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
     let mut arguments = vec!["-std=c17".into(), optimization.into(), "-ffp-contract=off".into()];
     if shadow {
@@ -173,6 +206,8 @@ fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
     arguments
 }
 
+/// Build the fixture binding catalog used to validate symbolic references and native adapters
+/// against compiler facts.
 fn bindings(frontend: &FrontendOutput) -> String {
     bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -192,6 +227,8 @@ fn bindings(frontend: &FrontendOutput) -> String {
         .to_string()
 }
 
+/// Assemble a standalone Rust producer with the real semantic support and generated adapter
+/// definitions.
 fn base(directory: &Path, bindings: &str, support: &str) -> String {
     let runtime = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     format!(
@@ -199,6 +236,8 @@ fn base(directory: &Path, bindings: &str, support: &str) -> String {
     )
 }
 
+/// Checks that compiler builtins preserve prototypes evaluation null constants and macro
+/// shadowing.
 #[test]
 fn compiler_builtins_preserve_prototypes_evaluation_null_constants_and_macro_shadowing() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -321,19 +360,30 @@ fn compiler_builtins_preserve_prototypes_evaluation_null_constants_and_macro_sha
     assert_eq!(actual.lines().count(), 4);
 }
 
+/// Original C input used to demonstrate that one rejected capability does not remove unrelated
+/// peers.
 const ISOLATION_HEADER: &str = r#"
 #define ISOLATED16(value) __builtin_bswap16(value)
 #define ISOLATED32(value) __builtin_bswap32(value)
 #define ISOLATED64(value) __builtin_bswap64(value)
 #define ISOLATED_PLAIN(value) (value)
 "#;
+/// Builtin and ordinary peers selected together for probe-isolation assertions.
 const ISOLATION_NAMES: &[&str] = &["ISOLATED16", "ISOLATED32", "ISOLATED64", "ISOLATED_PLAIN"];
+/// C input providing a branch-hint operation alongside independent builtin capabilities.
 const EXPECT_HEADER: &str =
     "#define ISOLATED_EXPECT(value, expected) __builtin_expect(value, expected)";
 
-struct Directory(PathBuf);
+/// Own the temporary header tree for this test and remove only its fixture files afterward.
+struct Directory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Construct owned header trees for freshness and include-identity tests.
 impl Directory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         for attempt in 0..64 {
             let path = std::env::temp_dir()
@@ -347,6 +397,8 @@ impl Directory {
         panic!("could not reserve builtin fixture directory");
     }
 
+    /// Return the original fixture header whose preprocessing and C definitions supply this
+    /// test's semantics.
     fn header(&self, prefix: &str) -> PathBuf {
         let header = self.0.join("isolation.h");
         std::fs::write(&header, format!("{prefix}\n{ISOLATION_HEADER}")).unwrap();
@@ -354,12 +406,16 @@ impl Directory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for Directory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
 
+/// Require a failed capability witness to leave ordinary supported macros emitted.
 fn assert_isolated_emission(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -393,6 +449,7 @@ fn assert_isolated_emission(
     rust
 }
 
+/// Execute the surviving builtin peers against C after one capability is deliberately rejected.
 fn assert_supported_peers_run(rust: &str) {
     let output = rust_oracle::run_rust(&format!(
         r#"{rust}
@@ -407,6 +464,7 @@ fn main() {{
     assert!(output.is_empty());
 }
 
+/// Checks that original builtin declaration conflict does not remove other operations.
 #[test]
 fn original_builtin_declaration_conflict_does_not_remove_other_operations() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -429,6 +487,7 @@ fn original_builtin_declaration_conflict_does_not_remove_other_operations() {
     assert_supported_peers_run(&rust);
 }
 
+/// Checks that shadowed typeof proof helper skips builtins and keeps ordinary macros.
 #[test]
 fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -455,6 +514,7 @@ fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
     );
 }
 
+/// Checks that expect uses exact C long rank and both parameter identities in each profile.
 #[test]
 fn expect_uses_exact_c_long_rank_and_both_parameter_identities_in_each_profile() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -484,6 +544,7 @@ fn expect_uses_exact_c_long_rank_and_both_parameter_identities_in_each_profile()
     }
 }
 
+/// Checks that expect macro and declaration shadowing are isolated from byte swaps.
 #[test]
 fn expect_macro_and_declaration_shadowing_are_isolated_from_byte_swaps() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -521,12 +582,16 @@ fn expect_macro_and_declaration_shadowing_are_isolated_from_byte_swaps() {
     }
 }
 
+/// Construct a compiler wrapper that rejects a selected witness so capability isolation and
+/// driver bounds can be tested.
 #[cfg(unix)]
 fn reject_llvm_witness(
     directory: &Directory,
     compiler: &Path,
     rejected: &str,
 ) -> (PathBuf, PathBuf) {
+    /// Make fixture compiler or pg_config wrappers executable so process failures can be tested
+    /// directly.
     use std::os::unix::fs::PermissionsExt;
 
     let wrapper = directory.0.join("clang-wrapper");
@@ -579,6 +644,7 @@ exec {compiler} "$@"
     (wrapper, log)
 }
 
+/// Checks that rejected LLVM witness is isolated within four driver runs.
 #[cfg(unix)]
 #[test]
 fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
@@ -621,6 +687,7 @@ fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
     assert_supported_peers_run(&rust);
 }
 
+/// Checks that rejected expect witness keeps all byte swaps within five driver runs.
 #[cfg(unix)]
 #[test]
 fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
@@ -668,8 +735,12 @@ fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
     assert_supported_peers_run(&rust);
 }
 
+/// Find the configured PG19 installation for a real-header oracle, allowing environments
+/// without it to omit that optional case.
 #[cfg(target_pointer_width = "64")]
 fn configured_pg19() -> Option<PostgresConfig> {
+    /// Resolve configured PostgreSQL installations through the same metadata used by ordinary
+    /// pgrx builds.
     use pgrx_pg_config::Pgrx;
 
     let explicit_pg_config = match std::env::var("PGRX_PG_CONFIG_PATH") {
@@ -705,6 +776,8 @@ fn configured_pg19() -> Option<PostgresConfig> {
     Some(PostgresConfig::from_pg_config(selected).expect("resolve installed PG19 headers"))
 }
 
+/// Checks that configured pg19 datum conversion matches original C without entering backend
+/// guards.
 #[cfg(target_pointer_width = "64")]
 #[test]
 fn configured_pg19_datum_conversion_matches_original_c_without_entering_backend_guards() {

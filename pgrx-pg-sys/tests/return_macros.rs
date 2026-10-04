@@ -2,21 +2,36 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test generated PostgreSQL return forms inside ordinary Rust caller functions.
+//!
+//! The suite observes Datum conversion, pointer provenance, null flags, and
+//! set-returning mutations in the selected bindings. Raw test storage initializes
+//! only fields required by each macro and does not enter a PostgreSQL backend.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
+/// accesses.
 use core::mem::MaybeUninit;
+/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::{addr_of, addr_of_mut};
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
+/// Exercise PG_RETURN_DATUM in a caller function so returned bits and pointer provenance can be
+/// observed.
 fn return_datum(value: pg::Datum) -> pg::Datum {
     pg::PG_RETURN_DATUM!(value);
 }
 
+/// Exercise PG_RETURN_VOID in a caller function, observing the C zero-Datum result.
 fn return_void() -> pg::Datum {
     pg::PG_RETURN_VOID!();
 }
 
+/// Exercise the generated null return while observing its write to the call frame.
+///
 /// # Safety
 /// `fcinfo` must point to aligned, live storage whose isnull field is exclusively
 /// writable. Other fields need not be initialized because this macro never reads them.
@@ -25,6 +40,8 @@ unsafe fn return_null(fcinfo: pg::FunctionCallInfo) -> pg::Datum {
     unsafe { pg::PG_RETURN_NULL!(fcinfo) }
 }
 
+/// Exercise the generated set-returning continuation with caller-owned raw context fields.
+///
 /// # Safety
 /// `context.call_cntr` must be initialized and exclusively writable. `fcinfo.resultinfo`
 /// must point to aligned, live ReturnSetInfo storage with an exclusively writable
@@ -39,6 +56,8 @@ unsafe fn return_next(
     unsafe { pg::SRF_RETURN_NEXT!(context, value, fcinfo) }
 }
 
+/// Exercise a null set-returning continuation and observe both null state and counter mutation.
+///
 /// # Safety
 /// The same counter/resultinfo obligations as return_next apply. Additionally,
 /// fcinfo.isnull must be exclusively writable.
@@ -54,6 +73,9 @@ unsafe fn return_next_null(
 // These actual generated macros call pgrx-guarded native functions. Type-check
 // their public expansions here; executing them requires the backend test harness.
 
+/// Type-check an actual generated integer return whose guarded native conversion requires a
+/// backend.
+///
 /// # Safety
 /// Must run on the backend thread under the generated native-call contract.
 unsafe fn return_int32(value: i32) -> pg::Datum {
@@ -62,6 +84,8 @@ unsafe fn return_int32(value: i32) -> pg::Datum {
     unsafe { pg::PG_RETURN_INT32!(value) }
 }
 
+/// Type-check an actual generated boolean return through its guarded native conversion.
+///
 /// # Safety
 /// Must run on the backend thread under the generated native-call contract.
 unsafe fn return_bool(value: bool) -> pg::Datum {
@@ -69,6 +93,9 @@ unsafe fn return_bool(value: bool) -> pg::Datum {
     unsafe { pg::PG_RETURN_BOOL!(value) }
 }
 
+/// Type-check a pointer return without dereferencing the pointer or executing its backend
+/// guard.
+///
 /// # Safety
 /// Must run on the backend thread. Any subsequent pointer use must separately
 /// establish the pointee's allocation, lifetime, initialization and aliasing.
@@ -78,6 +105,8 @@ unsafe fn return_pointer(value: *mut i32) -> pg::Datum {
     unsafe { pg::PG_RETURN_POINTER!(value) }
 }
 
+/// Type-check the generated float return through the native conversion boundary.
+///
 /// # Safety
 /// Must run on the backend thread under the generated native-call contract.
 unsafe fn return_float4(value: f32) -> pg::Datum {
@@ -86,6 +115,8 @@ unsafe fn return_float4(value: f32) -> pg::Datum {
     unsafe { pg::PG_RETURN_FLOAT4!(value) }
 }
 
+/// Type-check the generated set-returning completion without invoking backend resource cleanup.
+///
 /// # Safety
 /// Must run on the backend thread with a fully initialized, valid active SRF
 /// call context and fcinfo, as required by end_MultiFuncCall and its guards.
@@ -98,6 +129,7 @@ unsafe fn return_done(
     unsafe { pg::SRF_RETURN_DONE!(context, fcinfo) }
 }
 
+/// Checks that actual generated datum returns preserve values and pointer provenance.
 #[test]
 fn actual_generated_datum_returns_preserve_values_and_pointer_provenance() {
     for bits in [0_usize, 1, 0xFFFFFFFF, usize::MAX] {
@@ -117,6 +149,7 @@ fn actual_generated_datum_returns_preserve_values_and_pointer_provenance() {
     assert_eq!(value, 91);
 }
 
+/// Checks that actual generated null and srf returns access only the required fields.
 #[test]
 fn actual_generated_null_and_srf_returns_access_only_the_required_fields() {
     let mut call_storage = MaybeUninit::<pg::FunctionCallInfoBaseData>::uninit();

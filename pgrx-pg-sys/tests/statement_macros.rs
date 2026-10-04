@@ -2,13 +2,24 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check generated PostgreSQL statement macros through public bindings.
+//!
+//! Initialization helpers, object addresses, and checksum rounds exercise field
+//! mutation, sequencing, and C arithmetic. The tests use isolated local storage
+//! and selected-build exports, with explicit raw-access safety arguments.
+
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
+/// accesses.
 use core::mem::MaybeUninit;
+/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::{addr_of, addr_of_mut};
+/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
+/// Checks that generated function call initialization writes only the documented fields.
 #[test]
 fn generated_function_call_initialization_writes_only_the_documented_fields() {
     let mut storage = MaybeUninit::<pg::FunctionCallInfoBaseData>::uninit();
@@ -33,6 +44,7 @@ fn generated_function_call_initialization_writes_only_the_documented_fields() {
     }
 }
 
+/// Checks that generated object address statements initialize fields and clear subid.
 #[test]
 fn generated_object_address_statements_initialize_fields_and_clear_subid() {
     let mut storage = MaybeUninit::<pg::ObjectAddress>::uninit();
@@ -59,6 +71,7 @@ fn generated_object_address_statements_initialize_fields_and_clear_subid() {
     }
 }
 
+/// Checks that generated checksum round matches original C boundary vectors.
 #[test]
 fn generated_checksum_round_matches_original_c_boundary_vectors() {
     // Evaluated with CHECKSUM_COMP from storage/checksum_impl.h under PG18's

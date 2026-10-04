@@ -7,28 +7,55 @@
 //! The ordinary expansion stays authoritative. A second pass masks constants;
 //! substituting their original expansions must reproduce every original token.
 
+//! Symbol retention preserves readable references to object macros only when the reference
+//! is an atomic integer expression with independently verified C type and value. A masking
+//! pass must reproduce the authoritative ordinary expansion after restoring original tokens.
+//! Missing proofs leave the compiler expansion intact and record an explanatory fallback;
+//! these C facts are later compared against actual Rust bindings before emission.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::{
     ConstantFallback, ExpansionBatch, ExpansionLimits, ExpansionResult, Prepared, ProbeDirectory,
     extract_bodies, namespace, overlay, parameters, verify_original_environment,
 };
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     Error, FrontendError, FrontendOutput, IntegerConstant, IntegerKind, IntegerValue, MacroKind,
     MacroScanner, Token, TokenKind, TypeCategory,
 };
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult, EvaluationResult};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap};
+/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
+/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::Path;
 
+/// Bound retry isolation during optional object-constant proof so malformed candidates cannot cause
+/// unlimited compiler passes.
 const MAX_PROBE_ATTEMPTS: usize = 32;
 
+/// Borrow the coherent scanner/profile and owned-overlay inputs shared by constant-retention proof
+/// phases.
 struct ConstantContext<'a> {
+    /// The live libclang runtime used for parsing and typed witness extraction.
     scanner: &'a MacroScanner,
+    /// The coherent inspected environment borrowed by this phase; it is never reconstructed from
+    /// snapshots.
     frontend: &'a FrontendOutput,
+    /// The unique owned scratch directory containing this phase’s temporary overlays and probes.
     directory: &'a Path,
+    /// Original main-file bytes retained to prove instrumentation preserves its preprocessing
+    /// context.
     original: &'a [u8],
+    /// A collision-free generated identifier prefix chosen from the inspected environment.
     prefix: &'a str,
+    /// Finite source/token/run budgets enforced by this proof or dependency inspection.
     limits: ExpansionLimits,
 }
 
@@ -258,12 +285,15 @@ pub(crate) fn retain_integer_constants(
     Ok(constants)
 }
 
+/// Record one conservative reason for a bounded group of constant candidates that cannot be verified.
 fn reject_all(names: &BTreeSet<String>, rejected: &mut BTreeMap<String, String>, reason: &str) {
     for name in names {
         rejected.insert(name.clone(), reason.into());
     }
 }
 
+/// Preserve compiler-discovered integer references before masking object constants hides their
+/// tokens.
 fn record_integer_references(
     frontend: &FrontendOutput,
     name: &str,
@@ -286,6 +316,8 @@ fn record_integer_references(
     }
 }
 
+/// Attach failed symbol-retention reasons to macro expansions that must keep compiler-expanded
+/// values.
 fn record_fallbacks(batch: &mut ExpansionBatch, rejected: &BTreeMap<String, String>) {
     for result in batch.results.values_mut() {
         let ExpansionResult::Expanded { expansion } = result else { continue };
@@ -300,6 +332,8 @@ fn record_fallbacks(batch: &mut ExpansionBatch, rejected: &BTreeMap<String, Stri
     }
 }
 
+/// Classify candidate-specific proof failures that can leave ordinary expansion intact rather than
+/// aborting inspection.
 fn optional_failure(error: &FrontendError) -> bool {
     matches!(
         error,
@@ -311,6 +345,8 @@ fn optional_failure(error: &FrontendError) -> bool {
     )
 }
 
+/// Build phase-specific arguments for constant probes while retaining the inspected header overlay
+/// context.
 fn probe_arguments(
     frontend: &FrontendOutput,
     directory: &Path,
@@ -331,6 +367,8 @@ fn probe_arguments(
     Ok(arguments)
 }
 
+/// Expand prepared object candidates and isolate bounded failures without replacing authoritative
+/// ordinary tokens.
 fn expand_bodies(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -380,6 +418,7 @@ fn expand_bodies(
         .collect()
 }
 
+/// Check that one replacement is a complete atomic expression suitable for safe symbol retention.
 fn atomic(tokens: &[Token]) -> bool {
     if tokens.len() == 1 {
         return matches!(tokens[0].kind, TokenKind::Literal | TokenKind::Identifier);
@@ -406,6 +445,7 @@ fn atomic(tokens: &[Token]) -> bool {
     depth == 0
 }
 
+/// Establish original object-macro integer types and values through matched compiler observations.
 fn probe_constants(
     context: &ConstantContext<'_>,
     supported: &BTreeMap<String, Vec<Token>>,
@@ -478,6 +518,8 @@ fn probe_constants(
     Ok(constants)
 }
 
+/// Evaluate bounded typed constant witnesses with libclang and verify the driver accepts the same
+/// source.
 fn probe_values(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -572,6 +614,7 @@ fn probe_values(
     Ok(constants)
 }
 
+/// Render the fundamental C spelling for a verified integer identity in proof source.
 fn c_integer_name(kind: IntegerKind) -> &'static str {
     match kind {
         IntegerKind::Bool => "_Bool",
@@ -591,6 +634,7 @@ fn c_integer_name(kind: IntegerKind) -> &'static str {
     }
 }
 
+/// Replace candidates by fresh marker macros for an independent exact-token restoration comparison.
 fn mask_constants(
     context: &ConstantContext<'_>,
     batch: &mut ExpansionBatch,

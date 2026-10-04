@@ -2,21 +2,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Validate ordinary C character literals using original-header executions.
+//!
+//! Generated Rust must preserve C literal type, encoded value, and occurrences,
+//! including the SQLSTATE macros from a configured PostgreSQL installation.
+//! Unsupported character forms stay explicit skips rather than guessed strings.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, ConstCapability, EmissionStatus, FrontendOutput, MacroScanner, PostgresConfig,
     SkipReasonCode, emit, inspect,
 };
+/// Append complete paired source and observation records without ad hoc string replacement.
 use std::fmt::Write;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Literal macro cases whose C type, encoded value, and evaluation counts must be preserved.
 const CONSTANTS: &[&str] = &[
     "CHARACTER_DIGIT",
     "CHARACTER_UPPER",
@@ -43,7 +61,10 @@ const CONSTANTS: &[&str] = &[
     "CHARACTER_HEX_MAX",
     "CHARACTER_HEX_LEADING_ZEROES",
 ];
+/// Operator cases whose token spelling and semantic treatment are checked by this suite.
 const OPERATORS: &[&str] = &["CHARACTER_OFFSET", "CHARACTER_REPEAT", "CHARACTER_COMPARE"];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[(&str, &str)] = &[
     ("CHARACTER_WIDE", "prefixed"),
     ("CHARACTER_UTF16", "prefixed"),
@@ -57,6 +78,8 @@ const REJECTED: &[(&str, &str)] = &[
     ("CHARACTER_NOT_BASIC", "basic execution"),
 ];
 
+/// C recorder helper source reporting type, value, and operand effects from original macro
+/// calls.
 const C_RECORDING: &str = r#"
 #include <limits.h>
 #include <stdio.h>
@@ -76,6 +99,7 @@ static int argument(void) { ++evaluations; return 7; }
 int main(void) {
 "#;
 
+/// Matching Rust recorder helper source for comparisons with the independent C observations.
 const RUST_RECORDING: &str = r#"
 use __pgrx_c_macros::{CInteger, CLong, CUnsignedLong, CValue};
 use std::cell::Cell;
@@ -89,6 +113,8 @@ fn main() {
     let argument = || { evaluations.set(evaluations.get() + 1); 7_i32 };
 "#;
 
+/// Assemble emitted definitions and recording helpers into the Rust half of the original-C
+/// comparison.
 fn generated_source(session: &AnalysisSession<'_>, names: &[&str]) -> String {
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -116,6 +142,8 @@ fn generated_source(session: &AnalysisSession<'_>, names: &[&str]) -> String {
     source
 }
 
+/// Run both literal-recording programs and compare the values, C kinds, and operand effects
+/// they report.
 fn compare_original(frontend: &FrontendOutput, c: &str, rust: &str, records: usize) {
     let profile = frontend.profile();
     let original = oracle::run_c(
@@ -133,6 +161,8 @@ fn compare_original(frontend: &FrontendOutput, c: &str, rust: &str, records: usi
     }
 }
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(target_os = "macos")]
 fn native_include_arguments() -> Vec<String> {
     let sdk = rust_oracle::run_tool(
@@ -147,11 +177,14 @@ fn native_include_arguments() -> Vec<String> {
     vec!["-isysroot".to_owned(), sdk.to_owned()]
 }
 
+/// Resolve platform include arguments for native oracle compilation without changing the
+/// fixture's C definitions.
 #[cfg(not(target_os = "macos"))]
 fn native_include_arguments() -> Vec<String> {
     Vec::new()
 }
 
+/// Checks that ordinary character literals match original C types values and occurrences.
 #[test]
 fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -249,6 +282,7 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
     compare_original(&frontend, &c, &rust, CONSTANTS.len() + OPERATORS.len() * (samples.len() + 5));
 }
 
+/// Checks that postgres sqlstate macros match original C at runtime.
 #[test]
 #[ignore = "requires a configured native PostgreSQL 18 installation"]
 fn postgres_sqlstate_macros_match_original_c_at_runtime() {

@@ -4,37 +4,89 @@
 
 //! Check inspected C target facts against the runtime's modeled representations and policies.
 
+//! This is the gate between inspected C profiles and pgrx-pg-sys runtime helpers.
+//!
+//! The helpers implement a bounded target and policy family, so generation checks widths,
+//! ranks, byte order, overflow policy, and the original PostgreSQL integer typedefs first.
+//! Emitted target assertions protect consumers from using an artifact on a different Rust
+//! target; opaque pg-sys integer bridges preserve the verified C identity.
+
+/// Use owned C profile and declaration facts instead of reconstructing compiler identities from Rust
+/// storage.
 use crate::model::{
     ByteOrder, CompilationProfile, FrontendOutput, IntegerKind, IntegerType, SignedOverflow,
     TypeCategory, TypeInfo,
 };
 
+/// Explain which inspected target or PostgreSQL typedef fact falls outside the runtime helper
+/// contract.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum SupportProfileError {
+    /// The recorded compiler semantic flags exceed the runtime helper contract.
     #[error("runtime support does not model compiler options: {0}")]
-    UnsupportedOptions(String),
+    UnsupportedOptions(
+        /// Recorded semantic flags not modeled by the runtime helper family.
+        String,
+    ),
+    /// Trapping signed arithmetic lacks an implemented equivalent runtime policy.
     #[error("runtime support does not yet model trapping signed overflow")]
     TrappingOverflow,
+    /// The target C byte is not the eight-bit representation implemented by the helpers.
     #[error("runtime support requires 8-bit C bytes, found {0}")]
-    ByteWidth(u32),
+    ByteWidth(
+        /// Observed bits in one target C byte.
+        u32,
+    ),
+    /// The target object-pointer representation lies outside the supported helper family.
     #[error("runtime support requires 64-bit C pointers, found {0}")]
-    PointerWidth(u32),
+    PointerWidth(
+        /// Observed target object-pointer width in bits.
+        u32,
+    ),
+    /// The target sizeof/alignment result does not have the supported C identity.
     #[error("runtime support requires C unsigned long size_t, found {0:?}")]
-    SizeType(IntegerKind),
+    SizeType(
+        /// Observed sizeof/alignment C integer identity.
+        IntegerKind,
+    ),
+    /// Plain char signedness disagrees with the currently supported runtime profile.
     #[error("runtime support currently requires signed plain char")]
     UnsignedChar,
+    /// A fundamental C type differs in identity, width, signedness, or rank from the helper contract.
     #[error("runtime support requires {expected:?}, found {actual:?}")]
-    IntegerLayout { expected: IntegerType, actual: Option<IntegerType> },
+    IntegerLayout {
+        /// The complete runtime-supported integer identity and representation.
+        expected: IntegerType,
+        /// The inspected fact, or its absence, that prevented proving the runtime or pg-sys bridge
+        /// contract.
+        actual: Option<IntegerType>,
+    },
+    /// The inspected C target cannot be guarded by the bounded Rust architecture/OS mapping.
     #[error("runtime support cannot establish a downstream Rust target guard for {0:?}")]
-    TargetFamily(String),
+    TargetFamily(
+        /// The C triple that lacks a supported Rust target guard.
+        String,
+    ),
+    /// The inspected target has an endian representation outside the recognized runtime family.
     #[error("runtime support's recognized target architecture requires little endian")]
     ByteOrder,
+    /// An opaque pg-sys integer wrapper lacks its required original C typedef identity or storage.
     #[error(
         "pg-sys {name} requires an unqualified C unsigned int typedef with 4-byte storage, found {actual:?}"
     )]
-    PgSysIntegerType { name: &'static str, actual: Option<TypeInfo> },
+    PgSysIntegerType {
+        /// The PostgreSQL typedef whose opaque Rust bridge could not be established.
+        name: &'static str,
+        /// The inspected fact, or its absence, that prevented proving the runtime or pg-sys bridge
+        /// contract.
+        actual: Option<TypeInfo>,
+    },
+    /// Datum lacks the unqualified pointer-width unsigned C integer contract required by its bridge.
     #[error("pg-sys Datum requires an unqualified pointer-width unsigned C integer, found {0:?}")]
-    PgSysDatumType(Option<TypeInfo>),
+    PgSysDatumType(
+        /// The inspected Datum type, or its absence, that prevented its opaque integer bridge.
+        Option<TypeInfo>,
+    ),
 }
 
 /// Require the complete integer representation and compiler policy implemented by the helpers.
@@ -184,6 +236,7 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
     Ok(rust)
 }
 
+/// Map the inspected C triple to the bounded Rust target guard supported by runtime helpers.
 fn rust_target(
     profile: &CompilationProfile,
 ) -> Result<(&'static str, &'static str), SupportProfileError> {
@@ -212,12 +265,22 @@ fn rust_target(
     Ok((arch, os))
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
+    /// Use owned C profile and declaration facts instead of reconstructing compiler identities from
+    /// Rust storage.
     use crate::model::{BuildInputs, CompilerIdentity, TargetFacts};
+    /// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
     use std::collections::BTreeMap;
 
+    /// Construct a reviewed C target profile for support gates without depending on the host
+    /// compiler.
     fn profile() -> CompilationProfile {
         let integers = [
             (IntegerKind::Bool, 8, false, 0),
@@ -266,8 +329,10 @@ mod tests {
         }
     }
 
+    /// Checks pg-sys bridges require the original typedef identity and storage.
     #[test]
     fn pg_sys_bridges_require_the_original_typedef_identity_and_storage() {
+        /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
         use crate::{DeclarationCatalog, MacroEnvironment, MacroInventory};
         let environment = MacroEnvironment::default();
         let dependencies = crate::MacroDependencyGraph::from_environment(&environment);
@@ -325,6 +390,7 @@ mod tests {
         ));
     }
 
+    /// Checks rejects erased identity mismatches and unmodeled policies.
     #[test]
     fn rejects_erased_identity_mismatches_and_unmodeled_policies() {
         let mut profile = profile();
@@ -339,6 +405,7 @@ mod tests {
         assert_eq!(validate_support_profile(&profile), Err(SupportProfileError::TrappingOverflow));
     }
 
+    /// Checks size type gate keeps same width integer ranks distinct.
     #[test]
     fn size_type_gate_keeps_same_width_integer_ranks_distinct() {
         let mut profile = profile();
@@ -351,6 +418,7 @@ mod tests {
         );
     }
 
+    /// Checks downstream assertions follow inspected target not host.
     #[test]
     fn downstream_assertions_follow_inspected_target_not_host() {
         let mut profile = profile();

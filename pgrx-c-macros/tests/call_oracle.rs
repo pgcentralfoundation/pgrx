@@ -2,31 +2,52 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare generated calls with original C functions and fresh fixture bindings.
+//!
+//! The C oracle supplies ABI, conversion, value, and evaluation behavior. Rust
+//! consumer runs exercise the generated adapters; negative compilations require
+//! unsafe call sites and reject incompatible prototypes rather than coercing them.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)] // This integration needs the linked subset of the shared oracle helpers.
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner, RustBindingType,
     SkipReasonCode, TypeCategory, emit_batch_with_bindings, emit_support_artifact_with_bindings,
     emit_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 // Parent-module context required by the included production collector. The call
 // fixture has no OID constants; this also preserves the collector's existing tests.
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
+/// Fixture macros whose emitted behavior is compared with the original header.
 const SUPPORTED: &[&str] = &[
     "CALL_BYTE",
     "CALL_SHORT",
@@ -53,16 +74,22 @@ const SUPPORTED: &[&str] = &[
     "CALL_RECORD_NESTED",
     "CALL_RECORD_FIELD",
 ];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[(&str, SkipReasonCode)] = &[
     ("CALL_UNPROTOTYPED", SkipReasonCode::Call),
     ("CALL_VARIADIC", SkipReasonCode::Variadic),
     ("CALL_WRONG_ARITY", SkipReasonCode::Call),
 ];
 
+/// Return the original fixture header whose preprocessing and C definitions supply this test's
+/// semantics.
 fn header() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/call_oracle.h")
 }
 
+/// Supply native compiler arguments for the oracle, including the platform SDK needed by the
+/// original header.
 #[cfg(target_os = "macos")]
 fn native_arguments() -> Vec<String> {
     let sdk =
@@ -77,6 +104,8 @@ fn native_arguments() -> Vec<String> {
     ]
 }
 
+/// Supply native compiler arguments for the oracle, including the platform SDK needed by the
+/// original header.
 #[cfg(not(target_os = "macos"))]
 fn native_arguments() -> Vec<String> {
     vec![
@@ -87,6 +116,8 @@ fn native_arguments() -> Vec<String> {
     ]
 }
 
+/// Generate and collect fresh fixture bindings, preserving the actual Rust ABI and paths that
+/// the emitter must reconcile with C.
 fn original_bindings(
     frontend: &FrontendOutput,
     session: &AnalysisSession<'_>,
@@ -118,6 +149,8 @@ fn original_bindings(
     (source, catalog)
 }
 
+/// Assemble emitted public macros with their real native support for the independently compiled
+/// Rust consumer.
 fn emitted_source(
     session: &AnalysisSession<'_>,
     source: &str,
@@ -144,6 +177,7 @@ fn emitted_source(
     (rust, artifact.c_source)
 }
 
+/// Checks that actual bindgen calls match original C abi types values and evaluation.
 #[test]
 fn actual_bindgen_calls_match_original_c_abi_types_values_and_evaluation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -215,6 +249,8 @@ fn actual_bindgen_calls_match_original_c_abi_types_values_and_evaluation() {
     );
 }
 
+/// Checks that generated calls require unsafe and reject non C or incompatible prototype
+/// inputs.
 #[test]
 fn generated_calls_require_unsafe_and_reject_non_c_or_incompatible_prototype_inputs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

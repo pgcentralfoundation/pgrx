@@ -3,29 +3,47 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Compiler-established field projection capabilities for the actual Rust bindings.
+//!
+//! Field capability generation pairs compiler record identities and offsets with
+//! actual binding field paths. Ordinary projections retain typed layout witnesses;
+//! bitfields delegate storage access to C. Offset-only capabilities are planned
+//! separately because computing an offset must not require reading the member or
+//! constructing a fully initialized record.
 
+/// Reuse compiler-anchored type and binding paths for member projection witnesses.
 use super::types::{Lowering, rust_path};
+/// Pair compiler member layouts with actual record, array, and field binding storage.
 use crate::{
     ArrayKind, BindingCatalog, DeclarationCatalog, FieldBinding, FieldInfo, TargetFacts,
     TypeCategory, TypeInfo, TypeShapeKind,
 };
+/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Private runtime namespace used by generated member and record capabilities.
 const EXPRESSION: &str = "c::expression";
+/// Bound generated field support independently of macro expansion source size.
 const MAX_ADAPTER_BYTES: usize = 16 * 1024 * 1024;
 
+/// Named members or the full member family retained for one owner request.
 #[derive(Clone, Default, PartialEq, Eq)]
 struct RequestedFields {
+    /// Concrete C member names selected by analyzed projections or offset paths.
     names: BTreeSet<String>,
+    /// Keep every member when the caller supplies an unresolved field designator.
     all: bool,
 }
 
+/// Union concrete member demands without losing the possibility of a wildcard designator.
 impl RequestedFields {
+    /// Admit a member selected explicitly or by a wildcard owner request.
     fn contains(&self, name: &str) -> bool {
         self.all || self.names.contains(name)
     }
 
+    /// Union member demands without losing an existing wildcard family.
     fn extend(&mut self, other: &Self) {
         self.all |= other.all;
         self.names.extend(other.names.iter().cloned());
@@ -36,19 +54,25 @@ impl RequestedFields {
 /// for a caller whose record identity cannot be established by the planner.
 #[derive(Default, PartialEq, Eq)]
 pub(super) struct FieldRequests {
+    /// Load or projection demand, distinct from unevaluated offset-only use.
     fields: BTreeMap<Option<String>, RequestedFields>,
+    /// Offset capability demand that does not imply a loadable member representation.
     offsets: BTreeMap<Option<String>, RequestedFields>,
 }
 
+/// Keep access and offset requests distinct while collecting their type dependencies.
 impl FieldRequests {
+    /// Retain a member access for a known owner, or all possible owners when unresolved.
     pub(super) fn field(&mut self, record: Option<&str>, name: Option<&str>) {
         Self::insert(&mut self.fields, record, name);
     }
 
+    /// Retain an offsetof step independently of memory-access capabilities.
     pub(super) fn offset(&mut self, record: Option<&str>, name: Option<&str>) {
         Self::insert(&mut self.offsets, record, name);
     }
 
+    /// Close type dependencies of requested members, including anonymous promotions.
     pub(super) fn required_types(&self, declarations: &DeclarationCatalog) -> Vec<TypeInfo> {
         let mut types = Vec::new();
         for (owner, request) in selected_records(&self.fields, declarations, false) {
@@ -71,6 +95,7 @@ impl FieldRequests {
         types
     }
 
+    /// Union concrete and wildcard requests into the selected access or offset family.
     fn insert(
         requests: &mut BTreeMap<Option<String>, RequestedFields>,
         record: Option<&str>,
@@ -85,6 +110,10 @@ impl FieldRequests {
     }
 }
 
+/// Match requests by compiler record identity and retain qualified spellings sharing that identity.
+///
+/// Wildcard offset paths can traverse nested records; an unresolved owner retains
+/// all possible record capabilities rather than guessing a binding type.
 fn selected_records(
     requests: &BTreeMap<Option<String>, RequestedFields>,
     declarations: &DeclarationCatalog,
@@ -134,6 +163,7 @@ fn selected_records(
         .collect()
 }
 
+/// Generated field support with independent success and rejection maps for access and offsets.
 pub(super) struct FieldAdapters {
     /// Items included once in the defining crate's `__pgrx_c_generated` module.
     pub rust: String,
@@ -152,10 +182,13 @@ pub(super) struct FieldAdapters {
 /// IDs depend on the complete immutable C catalog, so changing requested roots
 /// or removing rejected macros cannot change an already emitted field identity.
 struct FieldIds<'a> {
+    /// Sorted immutable C member names assigned deterministic capability IDs.
     names: BTreeMap<&'a str, u64>,
 }
 
+/// Assign immutable catalog identities before emission demand can remove any member.
 impl<'a> FieldIds<'a> {
+    /// Assign sorted IDs from the complete declaration catalog before requested roots are pruned.
     fn new(declarations: &'a DeclarationCatalog) -> Result<Self, String> {
         let mut names = BTreeMap::new();
         for record in declarations.records.values() {
@@ -172,6 +205,7 @@ impl<'a> FieldIds<'a> {
         Ok(Self { names })
     }
 
+    /// Resolve a catalog-owned member name without fabricating an identity for missing fields.
     fn marker(&self, name: &str) -> Result<String, String> {
         let id = self.names.get(name).ok_or_else(|| {
             format!("C field `{name}` has no immutable declaration-catalog identity")
@@ -180,6 +214,10 @@ impl<'a> FieldIds<'a> {
     }
 }
 
+/// Reconcile requested field paths with actual binding storage and emit their capability witnesses.
+///
+/// Record registration, ordinary projections, original-C bitfield access, and
+/// offset-only paths have distinct proof requirements and rejection diagnostics.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -515,21 +553,33 @@ pub(super) fn generate(
     Ok(output)
 }
 
+/// One compiler record edge paired with the actual Rust field used to project it.
 #[derive(Clone, Copy)]
 struct ProjectionStep<'a> {
+    /// Compiler parent record spelling anchoring the layout for this step.
     canonical: &'a str,
+    /// Original field facts, including qualifiers, offsets, and any bit width.
     field: &'a FieldInfo,
+    /// Actual binding field name and storage used by the typed Rust projection.
     binding: &'a FieldBinding,
 }
+/// A requested leaf reached through direct fields or anonymous member promotions.
 struct Projection<'a> {
+    /// Compiler leaf field whose declared type and access semantics must be preserved.
     field: &'a FieldInfo,
+    /// Anchored parent-to-leaf path; empty paths retain an unsupported witness.
     steps: Vec<ProjectionStep<'a>>,
 }
 
+/// Validated offset expression and layout witnesses without member-load requirements.
 struct OffsetAdapter {
+    /// Containing layouts and per-step offsets that Rust must agree with at compilation.
     layouts: Vec<OffsetLayout>,
+    /// Checked Rust offset expression for the complete promoted member path.
     offset: String,
+    /// Nested record marker, or unit for an offset-only leaf.
     member_marker: String,
+    /// Compiler identity allowing further offsetof steps through a complete nested record.
     member_record: Option<String>,
 }
 
@@ -537,35 +587,53 @@ struct OffsetAdapter {
 /// the compiler record identities and the same anchored storage path.
 #[derive(PartialEq, Eq)]
 struct OffsetIdentity {
+    /// Nominal C parent record retained when sharing a qualified spelling’s implementation.
     record: String,
+    /// Nested member record identity, absent for an offset-only leaf.
     member: Option<String>,
+    /// Semantic member marker used by the offset capability.
     marker: String,
+    /// Actual binding projection path that must match before an implementation is shared.
     path: String,
 }
 
+/// Compiler facts needed to anchor one Rust offset step to its containing record.
 struct OffsetLayout {
+    /// Actual Rust parent record type used in offset and layout assertions.
     storage: String,
+    /// Compiler-established containing record size in bytes.
     size: u64,
+    /// Compiler-established containing record alignment in bytes.
     alignment: u64,
+    /// Actual Rust member name used in the offset witness.
     field: String,
+    /// Compiler field offset in bytes, checked against Rust rather than substituted blindly.
     offset: u64,
 }
 
+/// Deduplicate identical witnesses while retaining every distinct or conflicting layout fact.
 #[derive(Default)]
 struct LayoutChecks {
+    /// Emitted record size/alignment tuples; differing compiler facts remain separate assertions.
     objects: BTreeSet<(String, u64, u64)>,
+    /// Emitted parent/member/offset tuples, including conflicting offsets.
     fields: BTreeSet<(String, String, u64)>,
+    /// Typed field storage witnesses, preventing equal-layout type substitution.
     projections: BTreeSet<(String, String, String)>,
+    /// Whether the shared projection witness alias has already been written.
     projection_imported: bool,
 }
 
+/// Share only identical layout facts and retain typed projection or disagreement witnesses.
 impl LayoutChecks {
+    /// Emit a size/alignment witness once for each exact storage and compiler-fact tuple.
     fn object(&mut self, rust: &mut String, storage: &str, size: u64, alignment: u64) {
         if self.objects.insert((storage.to_owned(), size, alignment)) {
             writeln!(rust, "const _: () = {{ assert!(::core::mem::size_of::<{storage}>() == {size}); assert!(::core::mem::align_of::<{storage}>() == {alignment}); }};").expect("String output");
         }
     }
 
+    /// Emit an offset witness once per exact fact without merging disagreeing offsets.
     fn field(&mut self, rust: &mut String, storage: &str, field: &str, offset: u64) {
         if self.fields.insert((storage.to_owned(), field.to_owned(), offset)) {
             writeln!(
@@ -576,6 +644,7 @@ impl LayoutChecks {
         }
     }
 
+    /// Prove the Rust field’s exact storage through an uncalled typed address projection.
     fn projection(&mut self, rust: &mut String, parent: &str, field: &str, storage: &str) {
         if self.projections.insert((parent.to_owned(), field.to_owned(), storage.to_owned())) {
             if !self.projection_imported {
@@ -588,6 +657,7 @@ impl LayoutChecks {
     }
 }
 
+/// Emit each catalog-owned member marker once and expose its hygienic macro-facing path.
 fn register_marker(
     output: &mut FieldAdapters,
     ids: &FieldIds<'_>,
@@ -690,6 +760,7 @@ fn offset_adapter(
     Ok(OffsetAdapter { layouts, offset, member_marker, member_record })
 }
 
+/// Follow actual binding edges through anonymous promotions, retaining missing-path failures.
 fn collect_projections<'a>(
     canonical: &'a str,
     declarations: &'a DeclarationCatalog,
@@ -741,14 +812,24 @@ fn collect_projections<'a>(
     }
 }
 
+/// Access facts established before emitting a member capability or raw address projection.
 struct ValidatedProjection {
+    /// Declared semantic member type preserving C identity and qualification.
     marker: String,
+    /// Required leaf alignment used to select aligned or unaligned access.
     alignment: u64,
+    /// Exact Rust member storage reconciled with its C declaration.
     storage: String,
+    /// Whether the leaf is a compiler-owned incomplete array requiring element-based access.
     flexible: bool,
+    /// Complete parent-to-leaf byte offset established by compiler field facts.
     offset: u64,
 }
 
+/// Prove every path step’s storage and offset before admitting access to the leaf.
+///
+/// Incomplete arrays use their element alignment; unaligned volatile loads remain
+/// rejected because no verified runtime access can satisfy both requirements.
 fn validate_projection(
     projection: &Projection<'_>,
     record_alignment: Option<u64>,
@@ -808,6 +889,7 @@ fn validate_projection(
     })
 }
 
+/// Register complete native records with layout checks, or incomplete records as opaque storage.
 fn record_bridge(
     rust: &mut String,
     checks: &mut LayoutChecks,
@@ -825,20 +907,38 @@ fn record_bridge(
     writeln!(rust, "impl {EXPRESSION}::NativeRecord for {storage} {{}}").expect("String output");
 }
 
+/// Layout, nominal field identity, and C-oracle checks for projections and offset-only capabilities.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private field identity and layout helpers directly in regression tests.
     use super::*;
+    /// Serialize fixture Clang use with the crate’s shared scanner test lock.
     use crate::SCANNER_LOCK;
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{FieldBinding, MacroScanner, RecordBinding, RecordKind, RustBindingType, inspect};
+    /// Resolve original C fixture headers from the crate’s manifest directory.
     use std::path::PathBuf;
 
+    /// C oracle compilation support used to compare generated access against the original header.
     mod oracle {
+        //! Execute original-header C witnesses independently of field lowering.
+        //!
+        //! The shared harness owns compiler artifacts and bounds process runtime
+        //! and output. Its native observations establish layout and access behavior;
+        //! translated Rust or existing pgrx ports never supply the expected result.
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/oracle.rs"));
     }
+    /// Rust consumer compilation support used to exercise capability and negative type checks.
     mod rust_oracle {
+        //! Compile actual generated field adapters in independent Rust consumers.
+        //!
+        //! Positive consumers are compared with the original C witnesses, while
+        //! negative consumers must fail type checking before linking. The shared
+        //! harness isolates artifacts and enforces the same process limits as C.
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/rust_oracle.rs"));
     }
 
+    /// Build immutable record/member catalogs for field identity stability tests.
     fn registry_catalog(records: &[(&str, &[&str])]) -> DeclarationCatalog {
         let mut catalog = DeclarationCatalog::default();
         for (record, names) in records {
@@ -875,6 +975,7 @@ mod tests {
         catalog
     }
 
+    /// Construct an empty output accumulator to test local marker registration independently.
     fn empty_adapters() -> FieldAdapters {
         FieldAdapters {
             rust: String::new(),
@@ -886,12 +987,14 @@ mod tests {
         }
     }
 
+    /// Extract the locally defined marker name from its hygienic crate-relative path.
     fn local_marker<'a>(adapters: &'a FieldAdapters, name: &str) -> &'a str {
         adapters.markers[name]
             .strip_prefix("$crate::__pgrx_c_generated::")
             .expect("generated markers refer to the defining crate's local types")
     }
 
+    /// Prove field IDs are deterministic, unique, and independent of record insertion order.
     #[test]
     fn field_ids_are_sorted_unique_and_independent_of_record_order() {
         let original = registry_catalog(&[
@@ -913,6 +1016,7 @@ mod tests {
         assert_ne!(ids.marker("a").unwrap(), ids.marker("a_").unwrap());
     }
 
+    /// Check pruning keeps stable field IDs and repeated requests emit one nominal marker.
     #[test]
     fn field_ids_preserve_subset_identity_and_emit_each_local_marker_once() {
         let catalog = registry_catalog(&[("Owner", &["unrequested", "z", "a", "self"])]);
@@ -936,6 +1040,7 @@ mod tests {
         syn::parse_file(&original.rust).unwrap();
     }
 
+    /// Check empty catalogs and missing fields cannot create unanchored capability identities.
     #[test]
     fn empty_and_missing_field_ids_emit_no_markers_or_fabricated_identity() {
         let catalog = DeclarationCatalog::default();
@@ -948,6 +1053,7 @@ mod tests {
         assert!(output.markers.is_empty());
     }
 
+    /// Prove deduplication removes only identical layout witnesses and retains conflicting assertions.
     #[test]
     fn layout_checks_share_identical_facts_but_retain_disagreements() {
         let mut checks = LayoutChecks::default();
@@ -969,16 +1075,24 @@ mod tests {
         assert_eq!(rust.matches("use c::expression::FieldProjection").count(), 1);
     }
 
+    /// Check the shared projection alias reduces repeated pointer/function AST shapes in layout witnesses.
     #[test]
     fn projection_alias_removes_repeated_function_shape_types() {
+        /// Inspect generated projection witnesses structurally to measure redundant Rust type syntax.
         use syn::visit_mut::{self, VisitMut};
+        /// AST counter measuring witness type-shape duplication without compiling generated snippets.
         #[derive(Default)]
         struct Types {
+            /// Total visited Rust type nodes in the parsed projection witness.
             total: usize,
+            /// Function type nodes retained by the witness representation.
             functions: usize,
+            /// Raw pointer type nodes retained by the witness representation.
             pointers: usize,
         }
+        /// Traverse parsed witness types to measure structural duplication removed by the projection alias.
         impl VisitMut for Types {
+            /// Count nested type shapes while delegating recursion to syn’s standard visitor.
             fn visit_type_mut(&mut self, ty: &mut syn::Type) {
                 self.total += 1;
                 self.functions += usize::from(matches!(ty, syn::Type::BareFn(_)));
@@ -1001,10 +1115,12 @@ mod tests {
         assert_eq!(after.pointers, 0);
     }
 
+    /// Locate the original C field-oracle header used for layout and access comparisons.
     fn fixture() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/field_adapters.h")
     }
 
+    /// Supply the fixture’s include path and compiler profile for field analysis.
     fn arguments() -> Vec<String> {
         let mut arguments = vec!["-std=c11".into()];
         #[cfg(target_os = "macos")]
@@ -1018,6 +1134,7 @@ mod tests {
         arguments
     }
 
+    /// Check concrete owner demand retains equivalent compiler spellings and required layout witnesses.
     #[test]
     fn concrete_owner_requests_preserve_equivalent_layout_witnesses() {
         let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1079,6 +1196,7 @@ mod tests {
         );
     }
 
+    /// Prove typed projections reject equal-sized wrong member types while accepting true storage aliases.
     #[test]
     fn typed_projection_rejects_equal_layout_field_substitution_but_accepts_aliases() {
         let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1145,6 +1263,7 @@ mod tests {
         }
     }
 
+    /// Check ManuallyDrop fields preserve the inner member storage in their projection witness.
     #[test]
     fn typed_projection_witness_retains_manually_drop_inner_storage() {
         let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -1170,6 +1289,7 @@ mod tests {
         }
     }
 
+    /// Describe fixture Rust records and fields independently of the compiler’s C layout facts.
     fn bindings() -> BindingCatalog {
         let unsigned = RustBindingType::Integer { signed: false, bits: 32 };
         let signed = RustBindingType::Integer { signed: true, bits: 32 };
@@ -1241,6 +1361,7 @@ mod tests {
         catalog
     }
 
+    /// Compare generated field access with C using partially initialized records and promoted members.
     #[test]
     fn generated_field_projections_match_original_c_without_whole_record_reads() {
         let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1348,6 +1469,7 @@ int main(void) {
         assert_eq!(actual, expected);
     }
 
+    /// Check mismatched field storage and incomplete access layouts yield explicit capability rejections.
     #[test]
     fn field_capabilities_reject_storage_disagreements_and_deferred_layouts() {
         let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1387,6 +1509,7 @@ int main(void) {
         assert_eq!(generated.markers["count"], subset.markers["count"]);
     }
 
+    /// Prove offsetof support remains available when the leaf cannot safely expose a load capability.
     #[test]
     fn offset_capabilities_are_independent_of_loadable_leaf_storage() {
         let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1469,6 +1592,7 @@ int main(void) {
         assert_eq!(actual, expected);
     }
 
+    /// Check Rust type checking rejects overflowing offset sums and overlong designator paths.
     #[test]
     fn offset_paths_reject_overflow_and_excess_depth_during_type_checking() {
         let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))

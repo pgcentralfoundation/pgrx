@@ -5,9 +5,18 @@
 //! Rustfmt leaves definitions containing transcriber repetitions untouched.
 //! Lay out their original source slices instead of rewriting Rust syntax.
 
+//! Generated macro bodies need a formatter that understands token trees where rustfmt may
+//! leave a macro transcriber on one long line. This module preserves source token spellings
+//! while grouping delimiters, generic arguments, and compound punctuation for layout. Width
+//! estimates select compact or indented forms; formatting does not change the emitted macro
+//! contract or reinterpret C semantics.
+
+/// Inspect generated Rust token groups without reinterpreting their original source spellings.
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
+/// Keep source byte ranges explicit while laying out generated token trees.
 use std::ops::Range;
 
+/// The preferred generated macro-body width used by source-preserving layout decisions.
 const WIDTH: usize = 100;
 
 /// Indent macro definitions while preserving their tokens, literals and comments.
@@ -35,6 +44,8 @@ pub fn format_rust_macros(source: &str) -> Result<String, String> {
     Ok(result)
 }
 
+/// Locate macro transcriber groups so custom layout touches generated bodies rather than unrelated
+/// Rust syntax.
 fn definitions(tokens: TokenStream, bodies: &mut Vec<Group>) {
     let mut tokens = tokens.into_iter().peekable();
     while let Some(token) = tokens.next() {
@@ -57,18 +68,37 @@ fn definitions(tokens: TokenStream, bodies: &mut Vec<Group>) {
     }
 }
 
+/// A source-preserving token-layout node with a cached compact width for generated macro formatting.
 struct Node {
+    /// The original Rust source byte range copied by formatting rather than regenerated from token
+    /// spelling.
     range: Range<usize>,
+    /// Atomic source run or explicit delimiter tree used only for layout decisions.
     kind: Kind,
+    /// Precomputed compact-render width used to avoid repeated subtree measurement.
     width: usize,
 }
 
+/// Formatting structure only; semantic tokens remain in their original source ranges.
 enum Kind {
+    /// A source token run whose internal punctuation must stay together during layout.
     Atom,
-    Group { open: Range<usize>, close: Range<usize>, delimiter: char, children: Vec<Node> },
+    /// A delimiter group with children and source punctuation used only for layout.
+    Group {
+        /// The opening delimiter text retained from the generated Rust source.
+        open: Range<usize>,
+        /// The closing delimiter text retained from the generated Rust source.
+        close: Range<usize>,
+        /// The token-tree delimiter controlling layout grouping rather than semantic evaluation.
+        delimiter: char,
+        /// Ordered child layout nodes, retaining original token-tree order.
+        children: Vec<Node>,
+    },
 }
 
+/// Build source-preserving formatting groups with cached compact widths.
 impl Node {
+    /// Build a layout tree for a token group while preserving original source ranges.
     fn group(group: Group, source: &str) -> Self {
         // Visit spans in source order. Proc-macro2 caches Unicode byte offsets;
         // visiting each enclosing closing span first would repeatedly scan it.
@@ -105,6 +135,7 @@ impl Node {
         Self::delimited(open, close, delimiter, angles(children, source), source)
     }
 
+    /// Construct delimiter layout and precompute its compact width before choosing line breaks.
     fn delimited(
         open: Range<usize>,
         close: Range<usize>,
@@ -133,6 +164,7 @@ impl Node {
 
 // Generic argument lists are not token-tree groups. Pair their delimiters once,
 // then fold them into the same layout tree without changing either delimiter.
+/// Recognize generic argument groups so Rust type paths can be laid out like other delimiters.
 fn angles(nodes: Vec<Node>, source: &str) -> Vec<Node> {
     let mut pairs = vec![None; nodes.len()];
     let mut stack = Vec::new();
@@ -151,6 +183,7 @@ fn angles(nodes: Vec<Node>, source: &str) -> Vec<Node> {
             stack.clear();
         }
     }
+    /// Fold adjacent tokens into layout nodes without rewriting their source spelling.
     fn fold(
         nodes: &mut std::iter::Peekable<std::iter::Enumerate<std::vec::IntoIter<Node>>>,
         pairs: &[Option<usize>],
@@ -173,6 +206,7 @@ fn angles(nodes: Vec<Node>, source: &str) -> Vec<Node> {
     fold(&mut nodes.into_iter().enumerate().peekable(), &pairs, usize::MAX, source)
 }
 
+/// Keep Rust compound punctuation and macro fragment syntax together across line breaks.
 fn compound(source: &str, boundary: usize) -> bool {
     if boundary == 0 || boundary == source.len() {
         return false;
@@ -203,6 +237,7 @@ fn compound(source: &str, boundary: usize) -> bool {
     )
 }
 
+/// Measure required spacing between source ranges for the compact layout estimate.
 fn gap_width(gap: &str, source: &str, previous: usize, next: usize) -> usize {
     if !gap.trim().is_empty() {
         gap.trim().len() + 2
@@ -215,13 +250,20 @@ fn gap_width(gap: &str, source: &str, previous: usize, next: usize) -> usize {
     }
 }
 
+/// Accumulate formatted output while tracking the current column for compact-versus-indented
+/// decisions.
 struct Layout<'a> {
+    /// Original generated Rust text whose token spellings and comments formatting preserves.
     source: &'a str,
+    /// Accumulated formatted Rust source returned to the macro file writer.
     output: String,
+    /// Current formatted-output column used for line-width decisions.
     column: usize,
 }
 
+/// Render the layout tree into readable macro bodies without rewriting semantic token spellings.
 impl Layout<'_> {
+    /// Append source text and update the output column used by width decisions.
     fn write(&mut self, text: &str) {
         self.output.push_str(text);
         if let Some((_, last)) = text.rsplit_once('\n') {
@@ -231,6 +273,7 @@ impl Layout<'_> {
         }
     }
 
+    /// Start an indented line without accumulating trailing whitespace.
     fn newline(&mut self, indent: usize) {
         // Remove only indentation on an empty line. Spaces inside retained
         // line comments (including doc comments) are part of their source.
@@ -245,6 +288,7 @@ impl Layout<'_> {
         self.column = indent;
     }
 
+    /// Render a token-layout node compactly when it fits and recursively indent larger groups.
     fn node(&mut self, node: &Node, indent: usize, force: bool) {
         let Kind::Group { open, close, delimiter, children } = &node.kind else {
             self.write(&self.source[node.range.clone()]);

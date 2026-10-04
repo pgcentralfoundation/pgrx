@@ -4,16 +4,28 @@
 
 //! Copy declaration type edges while the translation unit owns their Clang handles.
 
+//! The collector copies type relationships into owned declaration facts while Clang handles
+//! are live. A worklist visits canonical shapes once, including self-referential records,
+//! pointers, arrays, and function signatures. Record identity, field offsets, qualifiers, and
+//! linkage survive the copy so native adapters can check layout and C compatibility later.
+
+/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
+/// and input contract.
 use super::type_info;
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ArrayKind, DeclarationCatalog, DeclarationLinkage, FieldInfo, FunctionInfo, FunctionSignature,
     RecordInfo, RecordKind, TypeShape, TypeShapeKind,
 };
+/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{
     Entity, EntityKind, EntityVisitResult, Linkage, StorageClass, TranslationUnit, Type, TypeKind,
 };
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeSet;
 
+/// Visit declarations and copy all reachable C type relationships while translation-unit handles are
+/// valid.
 pub(super) fn collect(unit: &TranslationUnit<'_>, catalog: &mut DeclarationCatalog) {
     let mut collector = Collector { catalog, visited: BTreeSet::new(), pending: Vec::new() };
     unit.get_entity().visit_children(|entity, _| {
@@ -43,18 +55,27 @@ pub(super) fn collect(unit: &TranslationUnit<'_>, catalog: &mut DeclarationCatal
     });
 }
 
+/// Copy each reachable canonical C type once using an iterative worklist, retaining owned catalog
+/// facts.
 struct Collector<'a, 'tu> {
+    /// The owned C declaration destination populated while Clang handles remain live.
     catalog: &'a mut DeclarationCatalog,
+    /// Canonical identities already copied, preventing repeated traversal and record cycles.
     visited: BTreeSet<String>,
+    /// Iterative worklist of reachable types awaiting catalog collection.
     pending: Vec<Type<'tu>>,
 }
 
+/// Copy canonical shape graphs iteratively before borrowed Clang types become invalid.
 impl<'tu> Collector<'_, 'tu> {
+    /// Queue an encountered Clang type and drain its reachable shape graph.
     fn collect_type(&mut self, ty: Type<'tu>) {
         self.pending.push(ty);
         self.drain_types();
     }
 
+    /// Process the type worklist iteratively so long declaration chains do not consume recursive
+    /// stack space.
     fn drain_types(&mut self) {
         // A worklist bounds stack use even for long chains of record/pointer types.
         while let Some(ty) = self.pending.pop() {
@@ -62,6 +83,7 @@ impl<'tu> Collector<'_, 'tu> {
         }
     }
 
+    /// Record a canonical type once and enqueue pointees, elements, fields, or signature edges.
     fn collect_shape(&mut self, ty: Type<'tu>) {
         let canonical = ty.get_canonical_type();
         let spelling = canonical.get_display_name();
@@ -144,6 +166,8 @@ impl<'tu> Collector<'_, 'tu> {
         );
     }
 
+    /// Copy complete prototype metadata and queue argument/result types without guessing missing
+    /// prototypes.
     fn collect_signature(&mut self, ty: Type<'tu>) -> Option<FunctionSignature> {
         let result = ty.get_result_type()?;
         self.pending.push(result);
@@ -168,6 +192,7 @@ impl<'tu> Collector<'_, 'tu> {
         })
     }
 
+    /// Copy nominal record identity and physical layout, including anonymous promoted fields.
     fn collect_record(&mut self, ty: Type<'tu>, spelling: &str) -> TypeShapeKind {
         let Some(declaration) = ty.get_declaration() else { return TypeShapeKind::Unsupported };
         let declaration = declaration.get_definition().unwrap_or(declaration);
@@ -223,6 +248,7 @@ impl<'tu> Collector<'_, 'tu> {
         TypeShapeKind::Record { identity }
     }
 
+    /// Record linkage and inline/storage properties alongside a copied complete function signature.
     fn collect_function(&mut self, entity: Entity<'tu>, ty: Type<'tu>) {
         let (Some(name), Some(signature)) = (entity.get_name(), self.collect_signature(ty)) else {
             return;
@@ -244,6 +270,7 @@ impl<'tu> Collector<'_, 'tu> {
     }
 }
 
+/// Recover an anonymous member offset by comparing promoted-field offsets with its own record layout.
 fn anonymous_offset(owner: Type<'_>, member: Type<'_>) -> Option<u64> {
     member.get_fields()?.into_iter().find_map(|field| {
         let name = field.get_name().filter(|name| !name.is_empty())?;

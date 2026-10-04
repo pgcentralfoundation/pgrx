@@ -2,32 +2,63 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare branch-prediction hint semantics and LLVM branch directions with C.
+//!
+//! Runtime observations check C long identity and both operand evaluations.
+//! Separate code-generation witnesses inspect successor paths and branch weights,
+//! including a cross-crate consumer, so successful values alone cannot hide a lost
+//! or reversed hint.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, EvaluationRequirement, FrontendOutput, MacroScanner,
     generate_with_bindings, inspect,
 };
+/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
+/// publication comparisons.
 use std::collections::{BTreeMap, BTreeSet};
+/// Read original fixtures and manage only the owned inputs and outputs used by generation
+/// checks.
 use std::fs;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::{Path, PathBuf};
+/// Invoke independent compilers and consumers and inspect their actual exit status rather than
+/// trusting generated source alone.
 use std::process::Command;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
+/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
+/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "EXPECT_RAW",
     "EXPECT_TYPE_CAST",
@@ -73,6 +104,8 @@ const NAMES: &[&str] = &[
     "EXPECT_RUNTIME_NULL",
     "EXPECT_IMPURE_NULL",
 ];
+/// Fixture candidates deliberately outside the supported contract; each must retain an
+/// explained skip.
 const REJECTED: &[&str] = &[
     "EXPECT_WRONG0",
     "EXPECT_WRONG1",
@@ -82,6 +115,7 @@ const REJECTED: &[&str] = &[
     "EXPECT_DEREF",
     "EXPECT_CALLBACK",
 ];
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int expect_value_calls;
 unsigned int expect_hint_calls;
@@ -100,6 +134,8 @@ void expect_process_interrupts(void) {
     if (expect_interrupt_clear) expect_interrupt_flag=0;
 }
 "#;
+/// Original C recorder source whose header invocations establish expected semantic
+/// observations.
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 #include <limits.h>
@@ -179,6 +215,7 @@ int main(void) {
     }
 }
 "#;
+/// Rust consumer source exercising actual generated macros and adapters.
 const CONSUMER: &str = r#"
 fn rank<K: __pgrx_c_macros::CInteger>(_: __pgrx_c_macros::CValue<K>) -> u8 { K::RANK }
 fn long(value:i64) -> __pgrx_c_macros::CValue<__pgrx_c_macros::CLong> { __pgrx_c_macros::CValue::new(value) }
@@ -302,6 +339,7 @@ fn main() {
 
 // Different sink tags keep LLVM's function-merging pass from combining wrappers
 // whose runtime behavior agrees but whose expectation directions are opposite.
+/// Original C functions used as compiler witnesses for branch-prediction direction.
 const C_CODEGEN: &str = r#"
 void expect_codegen_likely(int value) {
     if(EXPECT_LIKELY(value)) expect_branch_yes(1); else expect_branch_no(1);
@@ -395,6 +433,7 @@ void expect_codegen_source_size(long value) {
 }
 "#;
 
+/// Generated Rust consumer functions used to inspect retained LLVM branch weights.
 const RUST_CODEGEN: &str = r#"
 /// # Safety
 /// Linked sinks must implement the fixture's C scalar-only prototypes and must
@@ -651,6 +690,8 @@ pub unsafe extern "C" fn expect_codegen_typed_dynamic(value:core::ffi::c_long,hi
 }
 "#;
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
     let mut arguments = vec!["-std=c17".into(), optimization.into(), "-ffp-contract=off".into()];
     if shadow {
@@ -667,6 +708,8 @@ fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
     arguments
 }
 
+/// Build the fixture binding catalog used to validate symbolic references and native adapters
+/// against compiler facts.
 fn bindings(frontend: &FrontendOutput) -> String {
     bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -686,6 +729,8 @@ fn bindings(frontend: &FrontendOutput) -> String {
         .to_string()
 }
 
+/// Assemble the Rust oracle prelude with real support and this fixture's generated bindings and
+/// adapters.
 fn rust_base(directory: &Path, bindings: &str, support: &str) -> String {
     let runtime = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     format!(
@@ -693,6 +738,7 @@ fn rust_base(directory: &Path, bindings: &str, support: &str) -> String {
     )
 }
 
+/// Checks that expectation builtins preserve long identity and both operand evaluations.
 #[test]
 fn expectation_builtins_preserve_long_identity_and_both_operand_evaluations() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -859,6 +905,7 @@ fn expectation_builtins_preserve_long_identity_and_both_operand_evaluations() {
     assert_eq!(actual, expected, "source macros shadow compiler builtins before lowering");
 }
 
+/// Checks that expectation builtins preserve native branch weight directions.
 #[test]
 fn expectation_builtins_preserve_native_branch_weight_directions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1035,6 +1082,7 @@ fn expectation_builtins_preserve_native_branch_weight_directions() {
     }
 }
 
+/// Extract a named LLVM function's body for control-flow and branch-weight inspection.
 fn function_body<'a>(llvm: &'a str, name: &str) -> &'a str {
     let definition = llvm
         .lines()
@@ -1045,6 +1093,8 @@ fn function_body<'a>(llvm: &'a str, name: &str) -> &'a str {
     &tail[..tail.find("\n}").expect("LLVM function must terminate") + 2]
 }
 
+/// Read a basic block's outgoing branch labels instead of inferring direction from condition
+/// spelling.
 fn successors(line: &str) -> Vec<&str> {
     line.split("label %")
         .skip(1)
@@ -1057,6 +1107,8 @@ fn successors(line: &str) -> Vec<&str> {
         .collect()
 }
 
+/// Follow successor blocks to determine whether a branch reaches the observable call used by
+/// the hint witness.
 fn reaches_call(blocks: &BTreeMap<&str, Vec<&str>>, first: &str, callee: &str) -> bool {
     let mut pending = vec![first];
     let mut seen = BTreeSet::new();
@@ -1078,6 +1130,7 @@ fn reaches_call(blocks: &BTreeMap<&str, Vec<&str>>, first: &str, callee: &str) -
     false
 }
 
+/// Extract the integer weights attached to a branch metadata node.
 fn branch_weights(metadata: &str) -> Option<[u32; 2]> {
     let payload = metadata.split_once("!{").expect("LLVM metadata must contain a node").1;
     let payload = payload.rsplit_once('}').expect("LLVM metadata node must terminate").0;
@@ -1105,6 +1158,8 @@ fn branch_weights(metadata: &str) -> Option<[u32; 2]> {
     }))
 }
 
+/// Resolve which weighted successor reaches the witness call, distinguishing a preserved hint
+/// from a reversed one.
 fn weighted_call_direction(llvm: &str, function: &str, callee: &str) -> bool {
     let body = function_body(llvm, function);
     let mut blocks = BTreeMap::<&str, Vec<&str>>::new();
@@ -1157,6 +1212,7 @@ fn weighted_call_direction(llvm: &str, function: &str, callee: &str) -> bool {
     directions[0]
 }
 
+/// Checks that branch direction parser resolves successors instead of condition spelling.
 #[test]
 fn branch_direction_parser_resolves_successors_instead_of_condition_spelling() {
     let llvm = r#"
@@ -1204,9 +1260,18 @@ exit:
     ));
 }
 
-struct TemporaryDirectory(PathBuf);
+/// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+/// leave a growing target tree.
+struct TemporaryDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
+/// ownership.
 impl TemporaryDirectory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
         let path = std::env::temp_dir()
@@ -1216,7 +1281,10 @@ impl TemporaryDirectory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for TemporaryDirectory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }

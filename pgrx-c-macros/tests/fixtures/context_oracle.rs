@@ -1,11 +1,24 @@
+/// Standalone Rust consumer for the context oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Use the production semantic markers and expression wrappers to retain exact C type identity
+/// in the consumer.
 use __pgrx_c_macros::{CInteger, IntoCValue};
 
+/// Print the observation format consumed by the paired oracle, retaining C kind and value
+/// information rather than only the result.
 fn record<T: IntoCValue>(name: &str, value: T) {
     let value = value.into_c_value();
     // SAFETY: This fixture reads only its process-local native counter.
     println!("{name}:{}:{}", T::Kind::encode(value.get()) as u64, unsafe { context_count() });
 }
 
+/// Record the expression's C type identity and side effects so value equality alone cannot
+/// bless an incorrect conversion.
 fn record_type<T: IntoCValue>(name: &str, value: T) {
     let _ = value.into_c_value();
     let kind = core::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
@@ -14,15 +27,29 @@ fn record_type<T: IntoCValue>(name: &str, value: T) {
 }
 
 // Same-spelled unrelated Rust macros remain usable through the native escape.
+/// Provide an unrelated Rust macro with a C macro's spelling to test explicit native invocation
+/// hygiene.
 mod native {
+    //! Provide an unrelated Rust macro with a C macro's spelling to test explicit native
+    //! invocation hygiene.
+    //!
+    //! The enclosing selector or oracle owns this scope; generated paths must retain that
+    //! ownership when expanded from a downstream consumer.
+
+    /// Provide an unrelated same-spelled Rust operation to exercise the explicit native escape
+    /// without invoking the C translation.
     macro_rules! native_field {
         ($value:expr) => {
             $value
         };
     }
+    /// Expose the unrelated same-spelled fixture macro to test the explicit native escape
+    /// route.
     pub(crate) use native_field as CTX_FIELD;
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     let mut storage = core::mem::MaybeUninit::<ContextRecord>::zeroed();
     let pointer = storage.as_mut_ptr();
@@ -149,6 +176,9 @@ fn main() {
     }
 }
 
+/// Read the fixture's volatile expression to make discard-context loads observable to the
+/// C/Rust oracle.
+///
 /// # Safety
 /// `pointer` must designate a live initialized fixture record with valid access.
 #[unsafe(no_mangle)]

@@ -2,39 +2,68 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! The CLI exposes the same PostgreSQL resolution and compiler inspection used by library
+//! clients. List shows PostgreSQL-owned function macros; analyze reports symbolic candidates
+//! and structured skips; emit writes supported translations or a JSON report. Reports retain
+//! the selected profile for auditing, diagnostics go to stderr, and broken output pipes are
+//! treated as successful termination for ordinary shell pipelines.
+
+/// Parse cargo-pgrx-style command selections and explicit output formats at the executable boundary.
 use clap::{Args, Parser, Subcommand, ValueEnum};
+/// Use the library’s coherent inspection/session/emission pipeline instead of duplicating compiler
+/// semantics in the CLI.
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, CompilationProfile, Diagnostic,
     EmissionStatus, Error, FrontendError, FrontendOutput, MacroAnalysis, MacroEmission,
     MacroScanner, PostgresConfig, PostgresError, emit_batch_with_bindings,
     postgres_function_macro_names,
 };
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::HashSet;
+/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::{self, BufWriter, Write};
+/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
+/// tracking.
 use std::path::{Path, PathBuf};
+/// Run compiler tools with explicit owned process and stream boundaries.
 use std::process::ExitCode;
 
+/// Top-level clap grammar shared by the inventory, analysis, and emission commands.
 #[derive(Parser)]
 #[command(
     version,
     about = "Discover, analyze, and emit C macros for a pgrx-managed PostgreSQL installation"
 )]
 struct Cli {
+    /// The requested discovery, symbolic-analysis, or Rust-emission stage.
     #[command(subcommand)]
     command: Command,
 }
 
+/// Select the observable pipeline stage without giving discovery output the stronger guarantees of
+/// emission.
 #[derive(Subcommand)]
 enum Command {
     /// List function-like macros from the selected PostgreSQL version's pgrx headers.
-    List(ListArgs),
+    List(
+        /// Installation and inventory filters for raw function-macro discovery.
+        ListArgs,
+    ),
     /// Analyze final active PostgreSQL macros without claiming validated Rust support.
-    Analyze(AnalyzeArgs),
+    Analyze(
+        /// Installation, compiler overrides, and reporting options for symbolic candidates.
+        AnalyzeArgs,
+    ),
     /// Emit Rust macros for supported C expressions and statements; log skipped definitions.
-    Emit(EmitArgs),
+    Emit(
+        /// Installation, compiler overrides, and source/report options for standalone lowering.
+        EmitArgs,
+    ),
 }
 
+/// Select an installation and compiler context for symbolic analysis and structured skip reporting.
 #[derive(Args)]
 struct AnalyzeArgs {
     /// Configured PostgreSQL major version, such as 18 or pg18.
@@ -60,6 +89,8 @@ struct AnalyzeArgs {
     clang_args: Vec<String>,
 }
 
+/// Select standalone Rust emission and its report format using the same inspected profile as
+/// analysis.
 #[derive(Args)]
 struct EmitArgs {
     /// Configured PostgreSQL major version, such as 18 or pg18.
@@ -80,32 +111,50 @@ struct EmitArgs {
     clang_args: Vec<String>,
 }
 
+/// Choose compilable Rust source or a machine-readable emission report.
 #[derive(Clone, Copy, ValueEnum)]
 enum EmissionFormat {
+    /// Write generated macro_rules source for supported standalone translations.
     Rust,
+    /// Write a machine-readable inventory or pipeline report with structured facts and skips.
     Json,
 }
 
+/// Include the selected C profile alongside emission results so generated text remains auditable.
 #[derive(Serialize)]
 struct EmissionReport<'a> {
+    /// Resolved installation version associated with the report’s compiler profile.
     postgres_version: String,
+    /// The inspected compiler flags and target facts under which these observations are valid.
     profile: &'a CompilationProfile,
+    /// Selected per-macro results, retaining candidates or explicit refusals in deterministic
+    /// output order.
     macros: Vec<MacroEmission>,
 }
 
+/// Choose readable candidate diagnostics or a machine-readable analysis report.
 #[derive(Clone, Copy, ValueEnum)]
 enum AnalysisFormat {
+    /// Write readable analysis outcomes and physical source locations.
     Human,
+    /// Write a machine-readable inventory or pipeline report with structured facts and skips.
     Json,
 }
 
+/// Include the selected C profile alongside symbolic analysis results and skip reasons.
 #[derive(Serialize)]
 struct AnalysisReport<'a> {
+    /// Resolved installation version associated with the report’s compiler profile.
     postgres_version: String,
+    /// The inspected compiler flags and target facts under which these observations are valid.
     profile: &'a CompilationProfile,
+    /// Selected per-macro results, retaining candidates or explicit refusals in deterministic
+    /// output order.
     macros: Vec<MacroAnalysis>,
 }
 
+/// Select PostgreSQL-owned function macro discovery and inventory output without preparing
+/// expansions.
 #[derive(Args)]
 struct ListArgs {
     /// Configured PostgreSQL major version, such as 18 or pg18.
@@ -131,27 +180,59 @@ struct ListArgs {
     clang_args: Vec<String>,
 }
 
+/// Choose the amount of inventory detail written by the list command.
 #[derive(Clone, Copy, ValueEnum)]
 enum Format {
+    /// Write only selected discovered macro identifiers.
     Names,
+    /// Write normalized #define text with the original macro signature and replacement tokens.
     Definitions,
+    /// Write a machine-readable inventory or pipeline report with structured facts and skips.
     Json,
 }
 
+/// Preserve configuration, compiler, output, and serialization failures through CLI dispatch.
 #[derive(Debug, thiserror::Error)]
 enum CliError {
+    /// Installation resolution or PostgreSQL header ownership failed.
     #[error(transparent)]
-    Postgres(#[from] PostgresError),
+    Postgres(
+        /// Original PostgreSQL resolution error.
+        #[from]
+        PostgresError,
+    ),
+    /// The underlying scanner could not produce a complete reliable inventory.
     #[error(transparent)]
-    Discovery(#[from] Error),
+    Discovery(
+        /// Original scanner failure preserved through the frontend/CLI boundary.
+        #[from]
+        Error,
+    ),
+    /// Compiler inspection or a required probe failed.
     #[error(transparent)]
-    Frontend(#[from] FrontendError),
+    Frontend(
+        /// Original coherent-inspection or probe error.
+        #[from]
+        FrontendError,
+    ),
+    /// Writing reports or reading configuration failed at the filesystem/stream boundary.
     #[error(transparent)]
-    Io(#[from] io::Error),
+    Io(
+        /// Original report-stream I/O error.
+        #[from]
+        io::Error,
+    ),
+    /// Report serialization failed, retaining possible broken-pipe context for shell termination.
     #[error(transparent)]
-    Json(#[from] serde_json::Error),
+    Json(
+        /// Original serialization error, including possible broken-pipe context.
+        #[from]
+        serde_json::Error,
+    ),
 }
 
+/// Translate CLI completion and compiler diagnostics into shell exit status, accepting intentional
+/// broken pipes.
 fn main() -> ExitCode {
     match run(Cli::parse()) {
         Ok(()) => ExitCode::SUCCESS,
@@ -177,6 +258,7 @@ fn main() -> ExitCode {
     }
 }
 
+/// Dispatch the parsed command while keeping argument parsing outside the library pipeline.
 fn run(cli: Cli) -> Result<(), CliError> {
     match cli.command {
         Command::List(args) => list(args),
@@ -185,6 +267,7 @@ fn run(cli: Cli) -> Result<(), CliError> {
     }
 }
 
+/// Discover and filter PostgreSQL-owned function macros, then write the selected inventory format.
 fn list(args: ListArgs) -> Result<(), CliError> {
     let postgres = PostgresConfig::resolve(&args.pg_version)?;
     let scanner = MacroScanner::new()?;
@@ -224,6 +307,8 @@ fn list(args: ListArgs) -> Result<(), CliError> {
     Ok(())
 }
 
+/// Resolve the installation, prepare a coherent session, and report candidates and skip reasons with
+/// their profile.
 fn analyze_postgres(args: AnalyzeArgs) -> Result<(), CliError> {
     let postgres = PostgresConfig::resolve(&args.pg_version)?;
     let scanner = MacroScanner::new()?;
@@ -292,6 +377,8 @@ fn analyze_postgres(args: AnalyzeArgs) -> Result<(), CliError> {
     Ok(())
 }
 
+/// Run supported standalone emission and send untranslated macro reasons to stderr or the JSON
+/// report.
 fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
     let postgres = PostgresConfig::resolve(&args.pg_version)?;
     let scanner = MacroScanner::new()?;
@@ -343,6 +430,7 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
     Ok(())
 }
 
+/// Apply exact CLI name filters after authoritative PostgreSQL source ownership filtering.
 fn selected_macro_names(
     inspected: &FrontendOutput,
     root: &Path,
@@ -355,6 +443,7 @@ fn selected_macro_names(
         .collect())
 }
 
+/// Render owned compiler diagnostics with physical locations when available.
 fn print_diagnostic(diagnostic: &Diagnostic) {
     if let Some(location) = &diagnostic.location {
         eprintln!(

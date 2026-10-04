@@ -2,20 +2,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Verify preserved cross-macro calls and explained expansion fallbacks.
+//!
+//! Generated bodies are inspected for call shape and then executed beside the
+//! unchanged C definitions. Type, value, and occurrence comparisons ensure
+//! readable delegation does not change textual substitution semantics.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit,
     emit_support_with_bindings, emit_with_bindings, inspect,
 };
+/// Append complete paired source and observation records without ad hoc string replacement.
 use std::fmt::Write;
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "DELEGATE_TYPEALIGN",
     "DELEGATE_BUFFERALIGN",
@@ -39,10 +58,14 @@ const NAMES: &[&str] = &[
     "DELEGATE_GROUPING_FIXED",
 ];
 
+/// Return the original fixture header whose preprocessing and C definitions supply this test's
+/// semantics.
 fn header() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/macro_delegation.h")
 }
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments() -> Vec<String> {
     let arguments = vec!["-std=c11".into(), "-fwrapv".into()];
     #[cfg(target_os = "macos")]
@@ -63,6 +86,8 @@ fn arguments() -> Vec<String> {
     }
 }
 
+/// Require the selected macro to have an emitted body and surface its structured skip if
+/// generation rejects it.
 fn emitted(source: pgrx_c_macros::MacroEmission) -> String {
     match source.status {
         EmissionStatus::Emitted { rust, .. } => rust,
@@ -70,6 +95,7 @@ fn emitted(source: pgrx_c_macros::MacroEmission) -> String {
     }
 }
 
+/// Locate a named generated arm by its token structure for delegation assertions.
 fn arm_boundary(source: &str, marker: &str) -> usize {
     source
         .match_indices('\n')
@@ -83,12 +109,16 @@ fn arm_boundary(source: &str, marker: &str) -> usize {
         .expect("generated normalized macro arm")
 }
 
+/// Extract the generated value-context arm so assertions inspect the translated expression
+/// rather than public forwarding syntax.
 fn value_body(source: &str) -> &str {
     let value_arm = &source[arm_boundary(source, "(@__pgrx_emit_value;") + 1..];
     let body = value_arm.split_once("=> {").expect("generated macro rule").1;
     &body[..arm_boundary(body, "(@__pgrx_c_value;")]
 }
 
+/// Build the fixture binding catalog used to validate symbolic references and native adapters
+/// against compiler facts.
 fn bindings() -> BindingCatalog {
     BindingCatalog {
         macros: NAMES
@@ -100,6 +130,7 @@ fn bindings() -> BindingCatalog {
     }
 }
 
+/// Checks that direct calls preserve shape and explain fallbacks.
 #[test]
 fn direct_calls_preserve_shape_and_explain_fallbacks() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -143,6 +174,7 @@ fn direct_calls_preserve_shape_and_explain_fallbacks() {
     assert!(body.contains("/* PGRX:"));
 }
 
+/// Checks that preserved macro calls match original C types values and evaluation.
 #[test]
 fn preserved_macro_calls_match_original_c_types_values_and_evaluation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

@@ -2,26 +2,43 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Nominal enum identities and checked bridges for the actual binding storage.
+//!
+//! Bindgen can represent C enums as integer aliases or as Rust enums whose valid
+//! values are restricted to declared variants. This pass preserves nominal C enum
+//! identity separately from numeric arithmetic and emits checked storage bridges
+//! only after the compiler-compatible integer and binding layout agree.
 
+/// Resolve compatible integer storage without conflating enum identity with native representation.
 use super::types::{LoweredType, Lowering, enum_key};
+/// Reconcile compiler enum identities and values with actual binding constructors and storage.
 use crate::{
     BindingCatalog, DeclarationCatalog, EnumBinding, IntegerValue, RustBindingType, TargetFacts,
     TypeInfo, TypeShapeKind,
 };
+/// Derive stable nominal enum marker names from the compiler declaration identity.
 use sha2::{Digest, Sha256};
+/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Private expression runtime path shared by the generated enum support module.
 const EXPRESSION: &str = "c::expression";
+/// Bound aggregate enum source size independently of the number of retained macros.
 const SOURCE_LIMIT: usize = 16 * 1024 * 1024;
 
+/// Checked enum support source plus catalog-wide representation rejection reasons.
 pub(super) struct EnumAdapters {
+    /// Nominal identity markers and numeric or Rust enum storage capability implementations.
     pub rust: String,
+    /// Identity and layout failures that must still invalidate dependent lowering after pruning.
     pub unsupported: BTreeMap<String, String>,
 }
 
+/// Exact enum dependencies and open native scalar inputs requiring representation capabilities.
 #[derive(Default, PartialEq, Eq)]
 pub(super) struct EnumRequests {
+    /// Compiler enum identities explicitly referenced by expressions or selected native prototypes.
     pub types: BTreeSet<String>,
     /// Open native operands can introduce actual Rust enum objects. Integer
     /// aliases already use primitive bridges and require a C enum identity only
@@ -29,18 +46,27 @@ pub(super) struct EnumRequests {
     pub open_scalar: bool,
 }
 
+/// One enum whose compatible integer and optional Rust object storage agree with compiler facts.
 struct ValidatedEnum<'a> {
+    /// Compiler-owned nominal identity and enum object layout.
     ty: &'a TypeInfo,
+    /// Compatible C integer marker and native numeric storage for arithmetic and ABI transport.
     numeric: LoweredType,
+    /// Actual Rust enum binding and checked object marker, absent for integer aliases.
     object: Option<(&'a EnumBinding, LoweredType)>,
 }
 
+/// Derive a deterministic nominal marker path from the unqualified compiler enum identity.
 pub(super) fn identity_path(ty: &TypeInfo) -> String {
     let digest = Sha256::digest(enum_key(ty).as_bytes());
     let identity = digest.iter().map(|byte| format!("{byte:02x}")).collect::<String>();
     format!("$crate::__pgrx_c_generated::EnumIdentity_{identity}")
 }
 
+/// Validate the full enum catalog before emitting demanded identity and storage bridges.
+///
+/// Checked discriminant conversion prevents arbitrary C numeric values from becoming
+/// invalid Rust enum variants; identical layout checks can be shared across identities.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -157,6 +183,7 @@ pub(super) fn generate(
     Ok(EnumAdapters { rust, unsupported })
 }
 
+/// Render a verified discriminant for generated match arms without changing its signed value.
 fn integer_literal(value: IntegerValue) -> String {
     match value {
         IntegerValue::Signed(value) => value.to_string(),
@@ -164,13 +191,17 @@ fn integer_literal(value: IntegerValue) -> String {
     }
 }
 
+/// Regressions for enum identity selection, checked storage bridges, and layout-witness sharing.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private enum representation helpers directly in regression tests.
     use super::*;
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{
         AliasBinding, ByteOrder, IntegerKind, IntegerType, PointerLayout, TypeCategory, TypeShape,
     };
 
+    /// Build distinct C enum identities sharing numeric storage for selection and ambiguity tests.
     fn fixture() -> (DeclarationCatalog, BindingCatalog, TargetFacts) {
         let target = TargetFacts {
             triple: "fixture".into(),
@@ -243,6 +274,7 @@ mod tests {
         (declarations, bindings, target)
     }
 
+    /// Check enum demand prunes output while retaining unselected validation failures and checked object bridges.
     #[test]
     fn selection_preserves_unselected_enum_validation_and_checked_storage_bridges() {
         let (declarations, bindings, target) = fixture();
@@ -262,6 +294,7 @@ mod tests {
         assert!(selected.rust.contains("C enum value has no corresponding Rust variant"));
     }
 
+    /// Prove layout deduplication retains separate C identities and does not conceal a disagreement.
     #[test]
     fn shared_layout_assertions_preserve_distinct_identities_and_rejected_layouts() {
         let (declarations, bindings, target) = fixture();
@@ -283,6 +316,7 @@ mod tests {
         assert!(!output.rust.contains("crate::Invalid"));
     }
 
+    /// Check open scalar demand retains Rust enum object bridges without inventing C identities for integer aliases.
     #[test]
     fn open_native_operands_retain_rust_enum_objects_without_alias_identities() {
         let (declarations, bindings, target) = fixture();
@@ -298,6 +332,7 @@ mod tests {
         assert!(!output.rust.contains(identity.rsplit("::").next().unwrap()));
     }
 
+    /// Check an explicit C enum dependency retains its identity even when bindgen emits integer alias storage.
     #[test]
     fn explicit_alias_dependencies_retain_their_nominal_integer_storage_bridge() {
         let (declarations, bindings, target) = fixture();

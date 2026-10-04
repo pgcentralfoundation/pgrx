@@ -3,65 +3,107 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! Exact native callback signatures recovered from matching C and binding edges.
+//!
+//! Callback identity is the compiler C prototype, not merely a Rust function-pointer
+//! representation. This pass validates the complete C/Rust witness catalog before
+//! pruning requested operations, rejects ambiguous raw-input bridges, and shares
+//! physical call machinery without merging distinct C identities.
 
+/// Share nominal type reconciliation and path rendering with field and function adapters.
 use super::types::{LoweredType, Lowering, rust_path};
+/// Compare compiler prototypes with fresh binding representations and selected target ABI facts.
 use crate::{
     BindingCatalog, CallbackBinding, DeclarationCatalog, FunctionSignature, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
+/// Fingerprint matched compiler prototypes and storage for deterministic callback identity markers.
 use sha2::{Digest, Sha256};
+/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
+/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
+/// Private semantic runtime path shared by the native callback support module.
 const EXPRESSION: &str = "c::expression";
+/// Limit total callback support so an unusually large catalog fails as a structured error.
 const SOURCE_LIMIT: usize = 16 * 1024 * 1024;
+/// Bound nested C/Rust signature and alias walks, treating exhaustion as unresolved evidence.
 const DEPTH_LIMIT: usize = 64;
 
+/// Validated callback identities plus only the operations needed by emitted roots.
 pub(super) struct CallbackAdapters {
+    /// Nominal signature markers, physical pointer families, and selected call adapters.
     pub rust: String,
+    /// Compiler canonical function types mapped to verified nullable Rust pointer storage.
     pub markers: BTreeMap<String, CallbackBinding>,
+    /// Rejected signature witnesses retained even when demand would omit their code.
     pub unsupported: BTreeMap<String, String>,
+    /// Prototype dependencies whose semantic markers need native record or enum support.
     pub required_types: Vec<TypeInfo>,
 }
 
 /// Operations that emitted macros can perform on compiler-owned callbacks.
 #[derive(Default, PartialEq, Eq)]
 pub(super) struct CallbackRequests {
+    /// Exact C identities needed for values, comparisons, or other noncall operations.
     pub identity_types: BTreeSet<String>,
     /// Caller operands may introduce raw binding storage, unlike tagged
     /// callback values recovered from globals, fields, or native call results.
     pub native_input_types: BTreeSet<String>,
+    /// Exact prototypes whose call capability is required by an analyzed expression.
     pub call_types: BTreeSet<String>,
+    /// Retain all possible identities when caller-provided callback types remain unknown.
     pub open_identity: bool,
     /// Each arity excludes only canonical function types incompatible with all
     /// requested open call sites. Missing compiler facts never exclude a type.
     pub open_calls: BTreeMap<usize, BTreeSet<String>>,
 }
 
+/// One matched C prototype and Rust storage witness awaiting complete ABI validation.
 struct Candidate {
+    /// Source callback object type, retaining pointer layout and canonical identity.
     pointer: TypeInfo,
+    /// Function declaration type underlying this callback identity.
     function: TypeInfo,
+    /// Compiler-owned parameter, result, and calling-convention facts.
     signature: FunctionSignature,
+    /// Actual binding storage, including nullable function-pointer representation.
     storage: RustBindingType,
 }
 
+/// Catalog-wide evidence used to decide whether raw Rust storage identifies one C callback.
+///
+/// Missing or rejected edges remain witnesses because pruning them could falsely
+/// prove that an equal-storage callback identity is unique.
 struct CallbackWitnesses<'catalog, 'lowering> {
+    /// Visited C identity and normalized storage pairs, preventing repeated nested walks.
     seen: BTreeSet<(Option<String>, String)>,
     /// Retain missing/rejected C edges as well as usable callback candidates.
     native: Vec<(Option<String>, RustBindingType)>,
     /// A bounded walk failure cannot prove which physical callbacks it hides.
     unresolved: bool,
+    /// Known record and enum constructors that cannot hide unresolved alias storage.
     nominal_paths: BTreeSet<&'catalog [String]>,
+    /// Central storage renderer used to distinguish constructors from unknown binding aliases.
     lowering: &'lowering Lowering<'catalog>,
 }
 
+/// Exact native storage and semantic parameter/result markers after prototype reconciliation.
 struct ValidatedAdapter {
+    /// Nullable Rust function-pointer storage for the original binding signature.
     storage: String,
+    /// Argument markers and ABI storage used after C implicit conversion.
     parameters: Vec<LoweredType>,
+    /// Result conversion facts, absent for a C void return.
     result: Option<LoweredType>,
+    /// Original and raw ABI signatures when enums or records need validity-preserving transport.
     native_cast: Option<(String, String)>,
 }
 
+/// Validate all callback witnesses before selecting identity, raw-input, and call capabilities.
+///
+/// Raw storage bridges require catalog-wide uniqueness. Rejections and unresolved
+/// edges prevent that proof, even if their operations are not requested for output.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
@@ -460,6 +502,10 @@ pub(super) fn generate(
     Ok(output)
 }
 
+/// Walk matching C/Rust edges, retaining usable callbacks and negative uniqueness evidence.
+///
+/// Alias failure or bounded-depth exhaustion remains unresolved rather than silently
+/// removing a possible competing callback representation.
 #[allow(clippy::too_many_arguments)] // One bounded walk owns matching C/Rust type edges.
 fn collect(
     ty: Option<&TypeInfo>,
@@ -602,6 +648,10 @@ fn collect(
     }
 }
 
+/// Inspect nested binding storage even when its C edge is missing or incompatible.
+///
+/// Unknown aliases block uniqueness; recognized record, enum, and c_void constructors
+/// do not conceal another function-pointer representation.
 fn collect_unknown_storage(
     storage: &RustBindingType,
     declarations: &DeclarationCatalog,
@@ -655,6 +705,7 @@ fn collect_unknown_storage(
     }
 }
 
+/// Register a canonical prototype witness and recursively inspect its parameter/result storage.
 #[allow(clippy::too_many_arguments)] // Matching prototypes share the same bounded C/Rust walk.
 fn collect_signature(
     pointer: &TypeInfo,
@@ -715,6 +766,7 @@ fn collect_signature(
     }
 }
 
+/// Expand binding aliases and nested callback storage within a fixed depth budget.
 fn normalize_storage(
     storage: &RustBindingType,
     bindings: &BindingCatalog,
@@ -765,6 +817,7 @@ fn normalize_storage(
     })
 }
 
+/// Represent a function binding as nullable unsafe storage for callback ABI comparisons.
 fn function_pointer_storage(binding: &crate::FunctionBinding) -> RustBindingType {
     RustBindingType::Option {
         value: Box::new(RustBindingType::Function {
@@ -777,6 +830,7 @@ fn function_pointer_storage(binding: &crate::FunctionBinding) -> RustBindingType
     }
 }
 
+/// Collect nested function identities without demanding call operations for those identities.
 fn callback_dependencies(
     ty: &TypeInfo,
     declarations: &DeclarationCatalog,
@@ -804,6 +858,10 @@ fn callback_dependencies(
     }
 }
 
+/// Reconcile arity, ABI, nullability, qualifiers, and every parameter/result representation.
+///
+/// By-value aggregates use raw record storage and C enums use their compatible
+/// integer ABI so the native call does not materialize invalid Rust values.
 fn validate_adapter(
     candidate: &Candidate,
     lowering: &Lowering<'_>,
@@ -907,6 +965,10 @@ fn validate_adapter(
     Ok(ValidatedAdapter { storage, parameters: lowered, result: lowered_result, native_cast })
 }
 
+/// Emit a nominal callback shell and, when requested, its explicit unsafe call capability.
+///
+/// Argument conversions precede the guarded native call and result decoding follows
+/// it; physical pointer operations can be shared without merging C prototypes.
 fn render_adapter(
     candidate: &Candidate,
     name: &str,
@@ -1020,6 +1082,7 @@ fn physical_family(
     name
 }
 
+/// Reject function, void, and unresolved object categories at by-value ABI positions.
 fn value_type(ty: &TypeInfo) -> Result<(), String> {
     if matches!(ty.category, TypeCategory::Void | TypeCategory::Function | TypeCategory::Other) {
         return Err("callback value has no established scalar or pointer ABI representation".into());
@@ -1027,6 +1090,7 @@ fn value_type(ty: &TypeInfo) -> Result<(), String> {
     Ok(())
 }
 
+/// Emit compiler-owned size and alignment witnesses for admitted Rust callback storage.
 fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
     if let Some(size) = ty.size {
         writeln!(output, "const _: () = assert!(::core::mem::size_of::<{storage}>() == {size});")
@@ -1041,11 +1105,15 @@ fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
     }
 }
 
+/// Synthetic-catalog regressions for callback identity, complete witness validation, and demand pruning.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private callback witness and selection helpers directly in regression tests.
     use super::*;
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{AliasBinding, ByteOrder, IntegerKind, IntegerType, PointerLayout, TypeShape};
 
+    /// Construct a fixed-width C int witness for synthetic callback catalogs.
     fn integer() -> TypeInfo {
         TypeInfo {
             spelling: "int".into(),
@@ -1058,10 +1126,12 @@ mod tests {
         }
     }
 
+    /// Provide the Rust integer storage paired with the synthetic C int witness.
     fn storage() -> RustBindingType {
         RustBindingType::Integer { signed: true, bits: 32 }
     }
 
+    /// Add a matched named C callback and Rust alias, including nested signature facts.
     fn add_callback(
         declarations: &mut DeclarationCatalog,
         bindings: &mut BindingCatalog,
@@ -1129,6 +1199,7 @@ mod tests {
         pointer
     }
 
+    /// Build a small target and callback catalog with both scalar and nested signatures.
     fn fixture() -> (DeclarationCatalog, BindingCatalog, TargetFacts) {
         let target = TargetFacts {
             triple: "fixture".into(),
@@ -1156,6 +1227,7 @@ mod tests {
         (declarations, bindings, target)
     }
 
+    /// Check demand omits unused call bodies while keeping complete callback metadata for validation.
     #[test]
     fn requests_select_identity_and_call_operations_without_pruning_metadata() {
         let (declarations, bindings, target) = fixture();
@@ -1196,6 +1268,7 @@ mod tests {
         assert_eq!(calls.required_types, [integer()]);
     }
 
+    /// Check exact raw-input demand emits only the uniquely justified storage bridge.
     #[test]
     fn one_native_input_identity_retains_only_its_concrete_storage_bridge() {
         let (mut declarations, mut bindings, target) = fixture();
@@ -1216,6 +1289,7 @@ mod tests {
         assert!(output.required_types.is_empty());
     }
 
+    /// Construct equal-width long and long long callback types with distinct C arithmetic ranks.
     fn rank_fixture() -> (DeclarationCatalog, BindingCatalog, TargetFacts, TypeInfo, TypeInfo) {
         let (mut declarations, mut bindings, mut target) = fixture();
         let [long, wide] =
@@ -1244,6 +1318,7 @@ mod tests {
         (declarations, bindings, target, long, wide)
     }
 
+    /// Prove an unselected equal-storage prototype still prevents inferring a unique raw callback identity.
     #[test]
     fn unselected_equal_storage_c_ranks_keep_native_inputs_tagged() {
         let (declarations, bindings, target, selected, other) = rank_fixture();
@@ -1265,6 +1340,7 @@ mod tests {
         );
     }
 
+    /// Prove rejected callback evidence cannot be discarded to manufacture a raw-input uniqueness proof.
     #[test]
     fn rejected_equal_storage_witness_cannot_prove_native_uniqueness() {
         let (mut declarations, bindings, target, selected, other) = rank_fixture();
@@ -1293,6 +1369,7 @@ mod tests {
         assert!(!output.rust.contains("::IntoExpression for"));
     }
 
+    /// Check missing C declarations preserve tagged callback requirements for equal native storage.
     #[test]
     fn missing_c_witnesses_keep_matching_native_storage_tagged() {
         for missing_declaration in [false, true] {
@@ -1316,6 +1393,7 @@ mod tests {
         }
     }
 
+    /// Check unresolved binding aliases block raw-input inference instead of hiding possible callbacks.
     #[test]
     fn a_missing_rust_alias_cannot_prove_native_uniqueness() {
         let (declarations, mut bindings, target, selected, _) = rank_fixture();
@@ -1335,6 +1413,7 @@ mod tests {
         assert!(!output.rust.contains("::IntoExpression for"));
     }
 
+    /// Check a function binding without a matching C witness prevents unjustified native uniqueness.
     #[test]
     fn an_unmatched_function_item_blocks_matching_native_storage() {
         let (declarations, mut bindings, target) = fixture();
@@ -1363,6 +1442,7 @@ mod tests {
         assert!(!output.rust.contains("::IntoExpression for"));
     }
 
+    /// Check bounded alias-walk failure remains unresolved evidence rather than proving uniqueness.
     #[test]
     fn a_bounded_unknown_storage_failure_cannot_prove_native_uniqueness() {
         let (declarations, mut bindings, target) = fixture();
@@ -1386,6 +1466,7 @@ mod tests {
         assert!(!output.rust.contains("::IntoExpression for"));
     }
 
+    /// Check unrenderable callback storage still prevents a competing raw-input identity bridge.
     #[test]
     fn an_unrenderable_native_witness_cannot_prove_uniqueness() {
         let (declarations, mut bindings, target) = fixture();
@@ -1406,6 +1487,7 @@ mod tests {
         assert!(!output.rust.contains("::IntoExpression for"));
     }
 
+    /// Check mismatched outer signatures still expose callback types nested in binding storage.
     #[test]
     fn incompatible_outer_function_storage_does_not_hide_nested_witnesses() {
         for (abi, variadic, nested) in
@@ -1437,6 +1519,7 @@ mod tests {
         }
     }
 
+    /// Check open-call exclusions prune bodies only and cannot override an exact requested prototype.
     #[test]
     fn open_exclusions_keep_metadata_and_yield_to_exact_calls() {
         let (declarations, bindings, target) = fixture();
@@ -1461,6 +1544,7 @@ mod tests {
         assert_eq!(exact.markers.len(), excluded.markers.len());
     }
 
+    /// Check shared physical pointer mechanics retain distinct nominal C prototype markers.
     #[test]
     fn physical_bodies_are_shared_without_merging_equal_storage_c_prototypes() {
         let (declarations, bindings, target, _, _) = rank_fixture();
@@ -1485,6 +1569,7 @@ mod tests {
         assert!(output.required_types.is_empty());
     }
 
+    /// Check physical pointer support is shared only within the same ABI and argument count.
     #[test]
     fn physical_families_keep_abi_and_arity_distinct() {
         let mut rust = String::new();
@@ -1501,6 +1586,7 @@ mod tests {
         assert!(rust.contains("A39) -> R"));
     }
 
+    /// Check selected calls retain nested prototype identities without unnecessarily adding nested call bodies.
     #[test]
     fn selected_calls_retain_nested_callback_identities_without_nested_calls() {
         let (mut declarations, mut bindings, target) = fixture();
@@ -1520,6 +1606,7 @@ mod tests {
         assert_eq!(output.required_types, [declarations.types["One"].clone()]);
     }
 
+    /// Check a noncall callback shell does not pull in its prototype’s semantic conversion dependencies.
     #[test]
     fn identity_only_callback_does_not_require_nested_signature_bridges() {
         let (mut declarations, mut bindings, target) = fixture();
@@ -1539,6 +1626,7 @@ mod tests {
         assert_eq!(output.markers.len(), 6, "validation metadata remains complete");
     }
 
+    /// Check call dependency closure excludes nested types of unrelated identity-only callbacks.
     #[test]
     fn selected_calls_do_not_retain_identity_only_prototype_dependencies() {
         let (mut declarations, mut bindings, target) = fixture();
@@ -1573,6 +1661,7 @@ mod tests {
         );
     }
 
+    /// Prove an unselected conflicting ABI witness invalidates a selected callback identity.
     #[test]
     fn alternate_unselected_abi_witness_still_invalidates_selected_callback() {
         let (mut declarations, mut bindings, target) = fixture();
@@ -1612,6 +1701,7 @@ mod tests {
         assert!(!output.markers.contains_key(&declarations.types["One"].canonical_spelling));
     }
 
+    /// Check nested prototype validation failures propagate through the catalog before demand pruning.
     #[test]
     fn nested_callback_failure_propagates_even_without_emission_requests() {
         let (mut declarations, mut bindings, target) = fixture();

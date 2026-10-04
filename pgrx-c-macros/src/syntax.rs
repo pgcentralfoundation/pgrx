@@ -8,28 +8,47 @@
 //! declaration. The arena preserves explicit grouping and parameter occurrences, and avoids
 //! recursively serialized trees for long left-associated expressions.
 
+//! The parser is deliberately separate from preprocessing and declaration discovery. Formal
+//! arguments remain holes, and a known-type predicate resolves only syntax supported by the
+//! inspected catalog. The node arena keeps source grouping and occurrences without a recursive
+//! expression tree. Structured statement parsing shares that arena and tracks scopes, returns,
+//! and invocation boundaries needed by later analysis and emission.
+
+/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{Token, TokenKind};
+/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::{Deserialize, Serialize};
+/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{HashMap, HashSet};
 
+/// Parse ordered blocks, conditionals, locals, and returns within the shared bounded expression
+/// arena.
 mod statements;
 
+/// Bound replacement-list work before constructing a syntax arena.
 const MAX_TOKENS: usize = 4096;
+/// Bound nested parser recursion while leaving long left-associated expressions in the iterative
+/// arena.
 const MAX_DEPTH: usize = 64;
 
 /// Half-open indices into a macro's replacement-token list, including comment tokens.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenRange {
+    /// Inclusive original replacement-token index, retaining comment offsets.
     pub start: usize,
+    /// Exclusive original replacement-token index, including original comment positions.
     pub end: usize,
 }
 
 /// An index into [`Expression::nodes`]. Children precede their parents.
 pub type NodeId = usize;
 
+/// An ordered syntax arena retaining C grouping and parameter holes for analysis and emission.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Expression {
+    /// Arena nodes in child-before-parent order for iterative semantic analysis.
     pub nodes: Vec<ExpressionNode>,
+    /// Complete expression root, first return operand, or an Empty node for void statement bodies.
     pub root: NodeId,
     /// A complete statement replacement with expressions in this same arena.
     /// The root is the first return operand, or `Empty` when there is no return.
@@ -37,9 +56,13 @@ pub struct Expression {
     pub statement_body: Option<StatementBody>,
 }
 
+/// A complete structured replacement with source scopes and return/boundary facts used by statement
+/// emission.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StatementBody {
+    /// Source-order statements retained with explicit lexical scopes.
     pub statements: Vec<Statement>,
+    /// Original replacement-list token coordinates used to explain syntax and reconstruct source.
     pub tokens: TokenRange,
     /// The first return in source order, including returns inside branches.
     pub return_tokens: Option<TokenRange>,
@@ -49,6 +72,7 @@ pub struct StatementBody {
     pub requires_boundary: bool,
 }
 
+/// Traverse explicit statement scopes in source order for later analysis and emission.
 impl StatementBody {
     /// Visit statements in source order, yielding blocks before their children.
     /// Scopes remain explicit; callers that execute statements must honor them.
@@ -76,113 +100,355 @@ impl StatementBody {
     }
 }
 
+/// The bounded C statement grammar accepted for source-ordered, scope-preserving macro lowering.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Statement {
+    /// Evaluate one complete C expression statement in source order and discard its result.
     Expression {
+        /// Operand node in the shared expression arena, retaining source position and C evaluation
+        /// rules.
         expression: NodeId,
+        /// Original token range of this complete statement, including its scope or semicolon
+        /// boundary.
         tokens: TokenRange,
     },
+    /// Introduce a checked C local type/name and optional initializer within an explicit lexical
+    /// scope.
     Declaration {
+        /// Original local identifier checked for rebinding and definite initialization before
+        /// emission.
         name: String,
+        /// Original declared C type spelling checked against the inspected declaration catalog.
         type_name: String,
+        /// Optional initializer node whose existence contributes to definite-initialization checks.
         initializer: Option<NodeId>,
+        /// Original token range of this complete statement, including its scope or semicolon
+        /// boundary.
         tokens: TokenRange,
     },
+    /// Keep a nested lexical scope and source-order child statements explicit.
     Block {
+        /// Source-order statements retained with explicit lexical scopes.
         statements: Vec<Statement>,
+        /// Original token range of this complete statement, including its scope or semicolon
+        /// boundary.
         tokens: TokenRange,
     },
+    /// Return the typed operand from the macro caller rather than from a generated helper closure.
     Return {
+        /// Operand node in the shared expression arena, retaining source position and C evaluation
+        /// rules.
         expression: NodeId,
+        /// Original token range of this complete statement, including its scope or semicolon
+        /// boundary.
         tokens: TokenRange,
     },
+    /// Execute only the selected statement branch and preserve the C dangling-else structure.
     If {
+        /// Condition node whose C truth conversion controls one lazy branch.
         condition: NodeId,
+        /// Statement executed only when the condition has C true value.
         then_branch: Box<Statement>,
+        /// Optional statement executed only when the condition has C false value.
         else_branch: Option<Box<Statement>>,
+        /// Original token range of this complete statement, including its scope or semicolon
+        /// boundary.
         tokens: TokenRange,
     },
 }
 
+/// One arena operation and its original replacement-token range for diagnostics and source
+/// reconstruction.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExpressionNode {
+    /// The original C operation, retained until analysis establishes types and emission selects
+    /// capabilities.
     pub kind: ExpressionKind,
+    /// Original replacement-list token coordinates used to explain syntax and reconstruct source.
     pub tokens: TokenRange,
 }
 
+/// Keep evaluated operands, places, type operands, and structural designators distinct until semantic
+/// lowering.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ExpressionKind {
+    /// A void/empty statement root without an evaluated return operand.
     Empty,
-    Parameter { index: usize },
-    IntegerLiteral { literal: IntegerLiteral },
-    Identifier { name: String },
-    Group { operand: NodeId },
-    Unary { operator: UnaryOperator, operand: NodeId },
-    Binary { operator: BinaryOperator, left: NodeId, right: NodeId },
-    Cast { type_name: String, operand: NodeId },
-    Conditional { condition: NodeId, then_value: NodeId, else_value: NodeId },
-    Comma { left: NodeId, right: NodeId },
-    Call { callee: NodeId, arguments: Vec<NodeId> },
-    Member { base: NodeId, field: String, field_parameter: Option<usize>, indirect: bool },
-    Index { base: NodeId, index: NodeId },
-    Dereference { operand: NodeId },
-    AddressOf { operand: NodeId },
-    Assignment { operator: Option<BinaryOperator>, place: NodeId, value: NodeId },
-    Update { operand: NodeId, increment: bool, postfix: bool },
-    SizeOfType { type_name: String },
-    SizeOfExpression { operand: NodeId },
-    AlignOfType { type_name: String },
-    SizeOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
-    AlignOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
-    TypeParameterCast { parameter: usize, pointers: u8, is_const: bool, operand: NodeId },
-    OffsetOf { record: OffsetRecord, fields: Vec<OffsetComponent> },
+    /// A formal hole whose role is supplied by the caller rather than one sampled type.
+    Parameter {
+        /// The arena, formal, or token position referenced by this structural representation.
+        index: usize,
+    },
+    /// A source integer/basic-character spelling before target-dependent C type selection.
+    IntegerLiteral {
+        /// Original C spelling, magnitude, radix, and suffix before target-dependent type selection.
+        literal: IntegerLiteral,
+    },
+    /// An original named constant/declaration or later explicit caller capture awaiting analysis.
+    Identifier {
+        /// Original identifier spelling awaiting declaration lookup or explicit caller-capture
+        /// analysis.
+        name: String,
+    },
+    /// Explicit delimiter grouping retained for source-preserving layout or C precedence.
+    Group {
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// A unary C operation whose operand remains a distinct arena node.
+    Unary {
+        /// Original C operator identity, including the underlying binary operation of compound
+        /// assignment.
+        operator: UnaryOperator,
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// A binary C operation with original operator identity and independently typed operands.
+    Binary {
+        /// Original C operator identity, including the underlying binary operation of compound
+        /// assignment.
+        operator: BinaryOperator,
+        /// The left operand node; its C type and evaluation context remain independently represented.
+        left: NodeId,
+        /// The right operand node; lazy or ordered evaluation is established by the enclosing
+        /// operator.
+        right: NodeId,
+    },
+    /// An independently established concrete C type conversion, retaining the source type spelling.
+    Cast {
+        /// Original concrete C type operand, resolved by analysis rather than guessed from Rust
+        /// storage.
+        type_name: String,
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// A lazy C conditional expression with separate condition and value branches.
+    Conditional {
+        /// C condition node evaluated before choosing exactly one value branch.
+        condition: NodeId,
+        /// Value node evaluated only for a C true condition.
+        then_value: NodeId,
+        /// Value node evaluated only for a C false condition.
+        else_value: NodeId,
+    },
+    /// C sequencing of a discarded left expression followed by the right value.
+    Comma {
+        /// The left operand node; its C type and evaluation context remain independently represented.
+        left: NodeId,
+        /// The right operand node; lazy or ordered evaluation is established by the enclosing
+        /// operator.
+        right: NodeId,
+    },
+    /// An evaluated callee and ordered argument nodes awaiting callable capability checks.
+    Call {
+        /// Evaluated callable node whose signature and native identity analysis must establish.
+        callee: NodeId,
+        /// Argument expression nodes in source order, without invented C sequencing guarantees.
+        arguments: Vec<NodeId>,
+    },
+    /// A direct or indirect record member place, including structural member-name formals.
+    Member {
+        /// Record or array expression whose place/value semantics remain distinct during lowering.
+        base: NodeId,
+        /// An original C member designator validated before being embedded into probe or generated
+        /// syntax.
+        field: String,
+        /// Formal index when the member designator comes from a caller identifier fragment.
+        field_parameter: Option<usize>,
+        /// Whether C uses -> through a pointer rather than . on a record place.
+        indirect: bool,
+    },
+    /// An array/pointer element place with an evaluated C index expression.
+    Index {
+        /// Record or array expression whose place/value semantics remain distinct during lowering.
+        base: NodeId,
+        /// The arena, formal, or token position referenced by this structural representation.
+        index: NodeId,
+    },
+    /// A pointed-to place whose loading and qualifiers are resolved during lowering.
+    Dereference {
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// An address computation over a place, distinct from loading its stored value.
+    AddressOf {
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// Simple or compound assignment retaining a place and its original result semantics.
+    Assignment {
+        /// Original C operator identity, including the underlying binary operation of compound
+        /// assignment.
+        operator: Option<BinaryOperator>,
+        /// Assignment destination node, retained as a place instead of an eagerly loaded value.
+        place: NodeId,
+        /// Right-hand assignment operand, converted to the original destination’s C type.
+        value: NodeId,
+    },
+    /// Prefix/postfix increment or decrement with distinct old-versus-new result behavior.
+    Update {
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+        /// Whether update adds one rather than subtracting one using the operand’s C type.
+        increment: bool,
+        /// Whether update returns the original value instead of the stored updated value.
+        postfix: bool,
+    },
+    /// A non-evaluated sizeof operand resolved from the inspected C type catalog.
+    SizeOfType {
+        /// Original concrete C type operand, resolved by analysis rather than guessed from Rust
+        /// storage.
+        type_name: String,
+    },
+    /// An unevaluated expression whose type determines the C size result.
+    SizeOfExpression {
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// A non-evaluated alignment operand using an independently established C type.
+    AlignOfType {
+        /// Original concrete C type operand, resolved by analysis rather than guessed from Rust
+        /// storage.
+        type_name: String,
+    },
+    /// A formal type operand with bounded pointer/qualifier layers for sizeof.
+    SizeOfTypeParameter {
+        /// Formal index supplying a type operand, independently established from ambiguous call
+        /// syntax.
+        parameter: usize,
+        /// Number of supported pointer layers applied to the supplied formal type.
+        pointers: u8,
+        /// The qualifier on this C layer, retained to restrict writes and type compatibility.
+        is_const: bool,
+    },
+    /// A formal type operand with bounded pointer/qualifier layers for alignment.
+    AlignOfTypeParameter {
+        /// Formal index supplying a type operand, independently established from ambiguous call
+        /// syntax.
+        parameter: usize,
+        /// Number of supported pointer layers applied to the supplied formal type.
+        pointers: u8,
+        /// The qualifier on this C layer, retained to restrict writes and type compatibility.
+        is_const: bool,
+    },
+    /// A formal-type conversion admitted only with independent evidence for its type role.
+    TypeParameterCast {
+        /// Formal index supplying a type operand, independently established from ambiguous call
+        /// syntax.
+        parameter: usize,
+        /// Number of supported pointer layers applied to the supplied formal type.
+        pointers: u8,
+        /// The qualifier on this C layer, retained to restrict writes and type compatibility.
+        is_const: bool,
+        /// The child expression node, retained separately so promotion, grouping, or unevaluated use
+        /// remains visible.
+        operand: NodeId,
+    },
+    /// A non-evaluated record/member path preserving structural type and field holes.
+    OffsetOf {
+        /// Non-evaluated record designator for an offsetof computation.
+        record: OffsetRecord,
+        /// Non-evaluated ordered member path used to establish a record offset.
+        fields: Vec<OffsetComponent>,
+    },
 }
 
+/// The record type operand of offsetof, supplied by an inspected spelling or a caller type hole.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum OffsetRecord {
-    Named { name: String },
-    Parameter { index: usize },
+    /// An original inspected spelling rather than a caller-supplied structural hole.
+    Named {
+        /// The original C identifier retained for reports, symbol lookup, and readable generated
+        /// output.
+        name: String,
+    },
+    /// A formal hole whose role is supplied by the caller rather than one sampled type.
+    Parameter {
+        /// Formal supplying the offsetof record type as a structural Rust type fragment.
+        index: usize,
+    },
 }
 
+/// One non-evaluated member designator in an offsetof path.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum OffsetComponent {
-    Named { name: String },
-    Parameter { index: usize },
+    /// An original inspected spelling rather than a caller-supplied structural hole.
+    Named {
+        /// The original C identifier retained for reports, symbol lookup, and readable generated
+        /// output.
+        name: String,
+    },
+    /// A formal hole whose role is supplied by the caller rather than one sampled type.
+    Parameter {
+        /// Formal supplying one offsetof member name as a structural Rust identifier fragment.
+        index: usize,
+    },
 }
 
+/// C unary operators whose promotions and truth rules are applied later by analysis/runtime helpers.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum UnaryOperator {
+    /// C unary plus, including the operand’s integer promotion.
     Plus,
+    /// C unary minus within the inspected arithmetic and overflow domain.
     Negate,
+    /// C bitwise complement after the required integer promotion.
     BitwiseNot,
+    /// C logical negation producing the C truth result.
     LogicalNot,
 }
 
+/// C binary operator identity kept separate from Rust syntax and conversion semantics.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum BinaryOperator {
+    /// C multiplication with usual arithmetic conversions.
     Multiply,
+    /// C quotient within the defined zero/overflow operand domain.
     Divide,
+    /// C remainder paired with truncating integer division.
     Remainder,
+    /// C addition, retaining arithmetic or pointer semantics for later lowering.
     Add,
+    /// C subtraction, retaining arithmetic or pointer semantics for later lowering.
     Subtract,
+    /// C left shift with independent promoted operand identities and shift-count restrictions.
     ShiftLeft,
+    /// C right shift under the admitted signedness and target semantic profile.
     ShiftRight,
+    /// C strict less-than comparison after compatible operand conversion.
     Less,
+    /// C less-than-or-equal comparison after compatible operand conversion.
     LessEqual,
+    /// C strict greater-than comparison after compatible operand conversion.
     Greater,
+    /// C greater-than-or-equal comparison after compatible operand conversion.
     GreaterEqual,
+    /// C equality after compatible operand conversion.
     Equal,
+    /// C inequality after compatible operand conversion.
     NotEqual,
+    /// C bitwise AND with usual integer conversions.
     BitAnd,
+    /// C bitwise XOR with usual integer conversions.
     BitXor,
+    /// C bitwise OR with usual integer conversions.
     BitOr,
+    /// C short-circuit conjunction; the right operand is evaluated only after a true left operand.
     LogicalAnd,
+    /// C short-circuit disjunction; the right operand is evaluated only after a false left operand.
     LogicalOr,
 }
 
@@ -193,54 +459,86 @@ pub enum BinaryOperator {
 /// must establish the target's basic execution character set before accepting those constants.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IntegerLiteral {
+    /// Full original C literal spelling preserved in readable generated Rust when supported.
     pub spelling: String,
     /// The positive magnitude; unary minus is a separate C operator.
     pub value: u128,
+    /// Source base controlling C’s decimal versus nondecimal type-candidate order.
     pub radix: u8,
+    /// Unsigned and long-rank suffix facts used during target-dependent literal selection.
     pub suffix: IntegerSuffix,
 }
 
+/// Retain unsignedness and long-rank suffixes for target-dependent C literal type selection.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IntegerSuffix {
+    /// Whether a U suffix restricts type candidates to unsigned C identities.
     pub unsigned: bool,
     /// Zero, one, or two `L` characters.
     pub long: u8,
 }
 
+/// A parser refusal with original token coordinates rather than a partial syntax tree.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SyntaxError {
+    /// The semantic or structural category kept separate from representation and source spelling.
     pub kind: SyntaxErrorKind,
+    /// Original replacement-list token coordinates used to explain syntax and reconstruct source.
     pub tokens: TokenRange,
+    /// Human-readable detail explaining the compiler observation or unsupported construct.
     pub message: String,
 }
 
+/// Stable parser failure families translated into analysis skip reasons.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SyntaxErrorKind {
+    /// The complete replacement cannot be parsed with the bounded supported grammar.
     InvalidExpression,
+    /// The literal lies outside the verified ordinary integer/basic-character subset.
     UnsupportedLiteral,
+    /// Pointer syntax or operand compatibility lacks the required semantic proof.
     PointerOperation,
+    /// Assignment or update lacks a supported place/evaluation contract.
     Mutation,
+    /// Statement syntax lies outside the bounded scope-preserving grammar.
     Statement,
+    /// A callable signature or supported call construct could not be established.
     Call,
+    /// A sizeof/alignment operand lacks the required structural type/value proof.
     UnevaluatedExpression,
+    /// A formal type role is ambiguous or exceeds the supported declarator grammar.
     TypeParameter,
+    /// Comma sequencing cannot be admitted under the selected invocation contract.
     CommaExpression,
+    /// Source, token, dependency, depth, or compiler-pass work exceeded a finite configured limit.
     BudgetExceeded,
 }
 
+/// A significant token paired with its original replacement-list index after comments are filtered.
 struct Lexeme<'a> {
+    /// Borrowed significant token, keeping scanner spelling and lexical category.
     token: &'a Token,
+    /// Original token index before comments are filtered, used by source-range diagnostics.
     index: usize,
 }
 
+/// Bounded parser state with one arena and independently established formal-type evidence.
 struct Parser<'a, F> {
+    /// Significant token view with original indices preserved.
     tokens: Vec<Lexeme<'a>>,
+    /// Next significant token to consume during bounded parsing.
     position: usize,
+    /// Formal-name to index lookup so every occurrence refers to the same operand hole.
     parameters: HashMap<&'a str, usize>,
+    /// Formals independently established as type operands before ambiguous expressions are reparsed.
     type_parameters: HashSet<usize>,
+    /// Potential formal applications that need independent type evidence before becoming casts.
     ambiguous_casts: HashSet<NodeId>,
+    /// One shared expression arena for the complete expression or structured statement replacement.
     nodes: Vec<ExpressionNode>,
+    /// Catalog-backed predicate admitting concrete C type spellings into the cast grammar.
     is_type: F,
+    /// Original replacement-token count used to report complete boundaries after comment filtering.
     original_len: usize,
 }
 
@@ -262,6 +560,8 @@ pub(crate) fn parse_replacement(
     parse(tokens, parameters, is_type, true)
 }
 
+/// Initialize the bounded parser, resolve supported type holes, and require a complete expression or
+/// statement body.
 fn parse(
     tokens: &[Token],
     parameters: &[String],
@@ -371,7 +671,11 @@ fn parse(
     Ok(Expression { nodes: parser.nodes, root, statement_body })
 }
 
+/// Parse bounded replacement grammar while preserving original indices and independently proved type
+/// holes.
 impl<F: Fn(&str) -> bool> Parser<'_, F> {
+    /// Parse precedence-sensitive C operators into arena nodes while retaining source grouping and
+    /// occurrence order.
     fn expression(&mut self, minimum: u8, depth: usize) -> Result<NodeId, SyntaxError> {
         if depth >= MAX_DEPTH {
             return Err(self.error(
@@ -508,6 +812,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Ok(left)
     }
 
+    /// Parse a primary or prefix expression, preserving casts, unevaluated operands, and mutation as
+    /// distinct syntax.
     fn prefix(&mut self, depth: usize) -> Result<NodeId, SyntaxError> {
         let Some(lexeme) = self.tokens.get(self.position) else {
             return Err(self.error(SyntaxErrorKind::InvalidExpression, "expected an operand"));
@@ -684,6 +990,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Err(self.unexpected())
     }
 
+    /// Parse offsetof record and field designators as structural operands rather than evaluated
+    /// expressions.
     fn offset_of(&mut self, start: usize) -> Result<NodeId, SyntaxError> {
         self.position += 1;
         self.expect("(")?;
@@ -761,6 +1069,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
 
     // Only a flat, catalog-recognized concrete type is a cast. Parenthesized expressions
     // stay expressions; a macro parameter is never guessed to be a typedef.
+    /// Recognize concrete cast syntax only with independent catalog evidence for the named type.
     fn cast_type(&self) -> Option<(usize, String)> {
         let mut end = self.position + 1;
         while let Some(lexeme) = self.tokens.get(end) {
@@ -787,6 +1096,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         (self.is_type)(&type_name).then_some((end, type_name))
     }
 
+    /// Decode a supported formal type operand with its pointer and qualifier layers.
     fn type_parameter(&self) -> Option<(usize, usize, u8, bool)> {
         let (end, parameter, pointers, is_const) = self.parenthesized_type_parameter()?;
         let next = self.tokens.get(end + 1)?;
@@ -797,6 +1107,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         .then_some((end, parameter, pointers, is_const))
     }
 
+    /// Recognize an independently established formal type inside parentheses without proving an
+    /// ambiguous invocation by itself.
     fn parenthesized_type_parameter(&self) -> Option<(usize, usize, u8, bool)> {
         let mut end = self.position + 1;
         let mut has_parameter = false;
@@ -823,16 +1135,19 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             .then_some((end, parameter, pointers, is_const))
     }
 
+    /// Append a node after its children so later analysis can traverse the arena in dependency order.
     fn push(&mut self, kind: ExpressionKind, tokens: TokenRange) -> NodeId {
         let id = self.nodes.len();
         self.nodes.push(ExpressionNode { kind, tokens });
         id
     }
 
+    /// Borrow the next significant token spelling without changing original token offsets.
     fn spelling(&self) -> Option<&str> {
         self.tokens.get(self.position).map(|token| token.token.spelling.as_str())
     }
 
+    /// Consume an exact punctuation token or report a source-ranged parser error.
     fn expect(&mut self, expected: &str) -> Result<(), SyntaxError> {
         if self.spelling() != Some(expected) {
             // Unsupported postfix/place syntax can occur inside parentheses. Keep its
@@ -849,6 +1164,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Ok(())
     }
 
+    /// Describe the unexpected current token or end of input for syntax diagnostics.
     fn unexpected(&self) -> SyntaxError {
         let spelling = self.spelling().unwrap_or("end of replacement list");
         let (kind, message) = match spelling {
@@ -867,6 +1183,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         self.error(kind, format!("{message}: {spelling:?}"))
     }
 
+    /// Attach an error category and original replacement-token range to a parser refusal.
     fn error(&self, kind: SyntaxErrorKind, message: impl Into<String>) -> SyntaxError {
         let start = self.tokens.get(self.position).map_or(self.original_len, |token| token.index);
         SyntaxError {
@@ -877,6 +1194,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
     }
 }
 
+/// Map accepted operator spelling to precedence and semantic operator identity.
 fn binary_operator(spelling: &str) -> Option<(BinaryOperator, u8)> {
     Some(match spelling {
         "||" => (BinaryOperator::LogicalOr, 2),
@@ -901,6 +1219,8 @@ fn binary_operator(spelling: &str) -> Option<(BinaryOperator, u8)> {
     })
 }
 
+/// Decode compound assignment as its underlying binary operation, retaining simple assignment
+/// separately.
 fn assignment_operator(spelling: &str) -> Option<Option<BinaryOperator>> {
     Some(match spelling {
         "=" => None,
@@ -918,6 +1238,7 @@ fn assignment_operator(spelling: &str) -> Option<Option<BinaryOperator>> {
     })
 }
 
+/// Parse magnitude, radix, and suffix without choosing a target-dependent C type.
 fn parse_integer_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     let bytes = spelling.as_bytes();
     let (radix, start) = if spelling.starts_with("0x") || spelling.starts_with("0X") {
@@ -967,6 +1288,8 @@ fn parse_integer_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     Ok(IntegerLiteral { spelling: spelling.into(), value, radix: radix as u8, suffix })
 }
 
+/// Select the supported integer or basic character literal grammar while retaining the original
+/// spelling.
 fn parse_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     if spelling.starts_with('\'') {
         return parse_character_literal(spelling);
@@ -982,6 +1305,8 @@ fn parse_literal(spelling: &str) -> Result<IntegerLiteral, String> {
 // C ordinary single-character constants have int type, including numeric escapes.
 // Only the basic execution set and positive ASCII escape range are decoded here;
 // the independently verified compilation profile establishes their actual C values.
+/// Decode only the verified basic character subset whose C int value can be established for supported
+/// targets.
 fn parse_character_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     let body = spelling
         .strip_prefix('\'')
@@ -1072,10 +1397,17 @@ fn parse_character_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     })
 }
 
+/// Exercise this phase’s semantic boundaries with owned fixtures.
+/// These regressions check accepted proofs and explicit refusals without changing production
+/// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
+    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
+    /// validation and input contract.
     use super::*;
 
+    /// Construct lexer-category fixtures for parser regressions without requiring a live Clang
+    /// runtime.
     fn tokens(spellings: &[&str]) -> Vec<Token> {
         spellings
             .iter()
@@ -1096,6 +1428,7 @@ mod tests {
             .collect()
     }
 
+    /// Checks precedence and left associativity.
     #[test]
     fn precedence_and_left_associativity() {
         let expression = parse_expression(
@@ -1129,6 +1462,7 @@ mod tests {
         ));
     }
 
+    /// Checks offset operands are structural holes and establish earlier type uses.
     #[test]
     fn offset_operands_are_structural_holes_and_establish_earlier_type_uses() {
         let parsed = parse_expression(
@@ -1176,6 +1510,7 @@ mod tests {
         );
     }
 
+    /// Checks offset paths reject evaluated and malformed operands.
     #[test]
     fn offset_paths_reject_evaluated_and_malformed_operands() {
         for fields in [
@@ -1203,6 +1538,7 @@ mod tests {
         assert_eq!(error.kind, SyntaxErrorKind::BudgetExceeded);
     }
 
+    /// Checks cast grouping and negative literal are preserved.
     #[test]
     fn cast_grouping_and_negative_literal_are_preserved() {
         let expression = parse_expression(
@@ -1229,6 +1565,7 @@ mod tests {
         ));
     }
 
+    /// Checks literal radix suffix and overflow.
     #[test]
     fn literal_radix_suffix_and_overflow() {
         assert_eq!(parse_integer_literal("077UL").unwrap().value, 63);
@@ -1249,6 +1586,7 @@ mod tests {
         }
     }
 
+    /// Checks basic character constants keep c int literal metadata.
     #[test]
     fn basic_character_constants_keep_c_int_literal_metadata() {
         for (spelling, value) in [
@@ -1288,6 +1626,7 @@ mod tests {
         }
     }
 
+    /// Checks character constants outside the verified basic subset are rejected.
     #[test]
     fn character_constants_outside_the_verified_basic_subset_are_rejected() {
         for spelling in [
@@ -1321,6 +1660,7 @@ mod tests {
         }
     }
 
+    /// Checks complete expressions and budgets.
     #[test]
     fn complete_expressions_and_budgets() {
         let call =
@@ -1356,6 +1696,7 @@ mod tests {
         assert_eq!(expression.nodes.len(), 2001);
     }
 
+    /// Checks postfix places calls and comma keep their structure inside grouping.
     #[test]
     fn postfix_places_calls_and_comma_keep_their_structure_inside_grouping() {
         for (body, expected) in [
@@ -1382,6 +1723,7 @@ mod tests {
         }
     }
 
+    /// Checks sizEOF keeps ambiguous value holes until another use establishes a type.
     #[test]
     fn sizeof_keeps_ambiguous_value_holes_until_another_use_establishes_a_type() {
         let value = parse_expression(&tokens(&["sizeof", "(", "t", ")"]), &["t".into()], |_| false)
@@ -1430,6 +1772,7 @@ mod tests {
         );
     }
 
+    /// Checks parenthesized formal application does not establish its own type role.
     #[test]
     fn parenthesized_formal_application_does_not_establish_its_own_type_role() {
         for body in [
@@ -1461,6 +1804,7 @@ mod tests {
         }
     }
 
+    /// Checks independent type uses resolve formal applications in either source order.
     #[test]
     fn independent_type_uses_resolve_formal_applications_in_either_source_order() {
         for proof in [
@@ -1522,6 +1866,7 @@ mod tests {
         );
     }
 
+    /// Checks unambiguous callable grouping and catalog casts keep their roles.
     #[test]
     fn unambiguous_callable_grouping_and_catalog_casts_keep_their_roles() {
         for body in [vec!["fn", "(", "x", ")"], vec!["(", "(", "fn", ")", ")", "(", "x", ")"]] {
@@ -1544,6 +1889,7 @@ mod tests {
         assert!(matches!(expression.nodes[expression.root].kind, ExpressionKind::Cast { .. }));
     }
 
+    /// Checks explicit pointer and const size operands preserve type holes and qualifiers.
     #[test]
     fn explicit_pointer_and_const_size_operands_preserve_type_holes_and_qualifiers() {
         for (body, pointers, is_const) in [
@@ -1577,6 +1923,7 @@ mod tests {
         );
     }
 
+    /// Checks terminal returns are statements without becoming expression operands.
     #[test]
     fn terminal_returns_are_statements_without_becoming_expression_operands() {
         for body in [vec!["return", "x"], vec!["return", "x", ";"]] {
@@ -1603,6 +1950,7 @@ mod tests {
         }
     }
 
+    /// Checks compiler and declaration constructs never become runtime captures.
     #[test]
     fn compiler_and_declaration_constructs_never_become_runtime_captures() {
         for name in ["_Static_assert", "static_assert", "_Generic", "_Alignas", "alignas"] {
@@ -1634,6 +1982,7 @@ mod tests {
         }
     }
 
+    /// Checks keyword formals remain expression holes inside blocks.
     #[test]
     fn keyword_formals_remain_expression_holes_inside_blocks() {
         for name in ["return", "do", "if", "else", "while", "_Static_assert", "_Generic"] {
@@ -1676,6 +2025,7 @@ mod tests {
         );
     }
 
+    /// Checks return body preserves statement order arena and original offsets.
     #[test]
     fn return_body_preserves_statement_order_arena_and_original_offsets() {
         let mut body = tokens(&[
@@ -1710,6 +2060,7 @@ mod tests {
         assert_eq!(parsed.nodes[parsed.root].tokens, TokenRange { start: 15, end: 16 });
     }
 
+    /// Checks return local bindings and control flow are bounded.
     #[test]
     fn return_local_bindings_and_control_flow_are_bounded() {
         for body in [
@@ -1742,6 +2093,7 @@ mod tests {
         ));
     }
 
+    /// Checks type hole reparse keeps return statements in one arena.
     #[test]
     fn type_hole_reparse_keeps_return_statements_in_one_arena() {
         let parsed = parse_replacement(
@@ -1765,6 +2117,7 @@ mod tests {
         );
     }
 
+    /// Checks nested terminal wrappers keep order and reject scope changes.
     #[test]
     fn nested_terminal_wrappers_keep_order_and_reject_scope_changes() {
         let parsed = parse_replacement(
@@ -1812,6 +2165,7 @@ mod tests {
         }
     }
 
+    /// Checks straight line and noop blocks have a void root without a return.
     #[test]
     fn straight_line_and_noop_blocks_have_a_void_root_without_a_return() {
         for body in [
@@ -1850,6 +2204,7 @@ mod tests {
         assert!(!body.always_returns);
     }
 
+    /// Checks nested nonterminal scopes preserve order and local visibility.
     #[test]
     fn nested_nonterminal_scopes_preserve_order_and_local_visibility() {
         let parsed = parse_replacement(
@@ -1894,6 +2249,7 @@ mod tests {
         }
     }
 
+    /// Checks nested terminal returns cannot be followed by effects.
     #[test]
     fn nested_terminal_returns_cannot_be_followed_by_effects() {
         for body in [
@@ -1916,6 +2272,7 @@ mod tests {
         );
     }
 
+    /// Checks conditionals attach else to the nearest if and group condition tokens.
     #[test]
     fn conditionals_attach_else_to_the_nearest_if_and_group_condition_tokens() {
         let source = tokens(&[
@@ -1965,6 +2322,7 @@ mod tests {
         ));
     }
 
+    /// Checks conditional null branches and complete wrappers preserve boundaries.
     #[test]
     fn conditional_null_branches_and_complete_wrappers_preserve_boundaries() {
         let branch = ["if", "(", "x", ")", ";", "else", "{", "x", "++", ";", "}"];
@@ -2008,6 +2366,7 @@ mod tests {
         assert!(matches!(parsed.nodes[operand].kind, ExpressionKind::Comma { .. }));
     }
 
+    /// Checks conditional returns keep first return metadata separate from fallthrough.
     #[test]
     fn conditional_returns_keep_first_return_metadata_separate_from_fallthrough() {
         for (source, always_returns, returns) in [
@@ -2052,6 +2411,7 @@ mod tests {
         );
     }
 
+    /// Checks conditional block locals remain lexically scoped.
     #[test]
     fn conditional_block_locals_remain_lexically_scoped() {
         let parsed = parse_replacement(
@@ -2099,6 +2459,7 @@ mod tests {
         }
     }
 
+    /// Checks conditional statement grammar does not swallow semicolons or missing operands.
     #[test]
     fn conditional_statement_grammar_does_not_swallow_semicolons_or_missing_operands() {
         for source in [
@@ -2129,6 +2490,7 @@ mod tests {
         );
     }
 
+    /// Checks root conditional fragments allow a caller supplied final semicolon only at EOF.
     #[test]
     fn root_conditional_fragments_allow_a_caller_supplied_final_semicolon_only_at_eof() {
         for source in [

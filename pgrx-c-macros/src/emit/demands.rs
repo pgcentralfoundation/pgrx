@@ -6,31 +6,56 @@
 //!
 //! Caller operands remain type families. Structural constraints narrow those
 //! families without observing any invocation or prescribing PostgreSQL callers.
+//!
+//! Demand planning determines which native adapters a batch can actually use. It
+//! propagates operator and prototype constraints through the analyzed expression
+//! arena, indexes promoted fields, and caches qualified compatibility queries.
+//! Missing facts retain possible capabilities; they never justify excluding a valid
+//! caller type or replace the checks performed by lowering.
 
+/// Plan requests in the capability families consumed by the emission pipeline.
 use super::{BindingCatalog, callbacks, enumerations, fields, typed, types::Lowering};
+/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{AnalysisStatus, MacroAnalysis};
+/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
 };
+/// Use trusted declaration shapes and target facts to constrain caller families conservatively.
 use crate::{
     AnalysisSession, DeclarationCatalog, FrontendOutput, TargetFacts, TypeCategory, TypeInfo,
     TypeShapeKind,
 };
+/// Memoize pure family and compatibility queries through shared immutable planner access.
 use std::cell::RefCell;
+/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
+/// Share immutable finite source families instead of cloning every type for cached queries.
 use std::rc::Rc;
 
+/// Batch requirements consumed by native adapter generation rather than inferred from sample invocations.
 #[derive(Default, PartialEq, Eq)]
 pub(super) struct Requests {
+    /// Member projections and offsetof paths selected from compiler record identities.
     pub fields: fields::FieldRequests,
+    /// Declarations needed as calls, addresses, or callback storage witnesses.
     pub functions: BTreeSet<String>,
+    /// Functions whose native call body is required, distinct from identity-only use.
     pub called_functions: BTreeSet<String>,
+    /// Functions whose original C address must be exposed rather than a callable thunk.
     pub addresses: BTreeSet<String>,
+    /// Concrete C types whose native marker and storage support must remain available.
     pub types: BTreeMap<String, TypeInfo>,
+    /// Exact and open-family callback operations retained after structural constraints.
     pub callbacks: callbacks::CallbackRequests,
+    /// Enum identities and raw native operands that require checked representation bridges.
     pub enums: enumerations::EnumRequests,
 }
 
+/// Derive the capability union for admitted roots using declarations and conservative type constraints.
+///
+/// Unknown caller operands keep the relevant family open; known operator and
+/// prototype facts narrow it without prescribing one concrete invocation type.
 pub(super) fn plan(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
@@ -397,6 +422,7 @@ pub(super) fn plan(
     requests
 }
 
+/// Construct pointer facts for a finite source family while preserving the object’s pointee qualifiers.
 fn pointer_to(ty: &TypeInfo) -> TypeInfo {
     TypeInfo {
         spelling: format!("{} *", ty.spelling),
@@ -409,6 +435,9 @@ fn pointer_to(ty: &TypeInfo) -> TypeInfo {
     }
 }
 
+/// Conservatively retain syntaxes that could prove a C null pointer constant during lowering.
+///
+/// This predicate is a pruning bound, not the final constant-expression proof.
 fn possible_null_constant(expression: &crate::syntax::Expression, mut node: NodeId) -> bool {
     while let ExpressionKind::Group { operand } = expression.nodes[node].kind {
         node = operand;
@@ -428,37 +457,93 @@ fn possible_null_constant(expression: &crate::syntax::Expression, mut node: Node
     }
 }
 
+/// Category bit for C integers and arithmetic enum values.
 const INTEGER: u8 = 1;
+/// Category bit for modeled C floating values.
 const FLOAT: u8 = 2;
+/// Category bit for pointers and function values after applicable decay.
 const POINTER: u8 = 4;
+/// Category bit for by-value record objects.
 const RECORD: u8 = 8;
+/// Combined integer and floating categories admitted by arithmetic operations.
 const ARITHMETIC: u8 = INTEGER | FLOAT;
+/// Arithmetic and pointer categories admitted by truth tests and scalar consumers.
 const SCALAR: u8 = ARITHMETIC | POINTER;
 
+/// A consumer restriction propagated toward operands without assigning caller-supplied types.
 #[derive(Clone)]
 enum Requirement {
-    Kind(u8),
-    ImplicitTo { target: TypeInfo, null_possible: bool },
-    Member { name: Option<String>, output: NodeId, indirect: bool },
-    Element { output: NodeId },
-    Subscript { other: NodeId, output: NodeId },
-    Call { arity: usize, output: NodeId },
+    /// Restrict a source family to categories permitted by a C operator.
+    Kind(
+        /// Allowed category bits propagated from a C consumer.
+        u8,
+    ),
+    /// Retain sources capable of implicit conversion to a compiler-owned target type.
+    ImplicitTo {
+        /// Compiler-proved destination type for implicit conversion.
+        target: TypeInfo,
+        /// Whether source syntax may establish a C null pointer constant.
+        null_possible: bool,
+    },
+    /// Require a direct or indirect member whose result satisfies downstream constraints.
+    Member {
+        /// Concrete member name, or None for a caller-supplied designator family.
+        name: Option<String>,
+        /// Member result node whose consumer constraints must also hold.
+        output: NodeId,
+        /// Whether owner candidates must first dereference a pointer.
+        indirect: bool,
+    },
+    /// Require a dereferenceable element satisfying the result’s consumer restrictions.
+    Element {
+        /// Dereference result node whose accepted source family constrains the pointee.
+        output: NodeId,
+    },
+    /// Retain both C subscript orientations while relating the pointer, integer, and result.
+    Subscript {
+        /// Opposite subscript operand, retaining both C pointer/integer orientations.
+        other: NodeId,
+        /// Element result node whose requirements constrain admitted pointer families.
+        output: NodeId,
+    },
+    /// Require a callable prototype of the selected arity with a compatible result family.
+    Call {
+        /// Argument count required by the analyzed call site.
+        arity: usize,
+        /// Call result node whose downstream consumers constrain possible prototypes.
+        output: NodeId,
+    },
 }
 
+/// Per-expression consumer constraints and cached finite source families.
+///
+/// The arena orders children before consumers, so acceptance queries can follow
+/// result requirements without cycling through recursive compiler record types.
 struct Constraints<'a> {
+    /// Immutable compiler shapes used to prove object, pointer, and prototype relationships.
     declarations: &'a DeclarationCatalog,
+    /// Arena representatives that share constraints across grouping and equivalent nodes.
     representative: Vec<NodeId>,
+    /// Consumer restrictions accumulated for each representative node.
     requirements: Vec<Vec<Requirement>>,
+    /// Batch-wide promoted-field index reused by member-owner queries.
     records: &'a RecordIndex,
+    /// Batch-wide qualified C compatibility cache used only to exclude proven mismatches.
     compatibility: &'a Compatibility<'a>,
+    /// Memoized acceptance of a qualified source type at an expression representative.
     accepted: RefCell<BTreeMap<(NodeId, QualifiedType), bool>>,
+    /// Cached finite source families; None preserves an unresolved caller family.
     sources: RefCell<BTreeMap<NodeId, SourceFamily>>,
 }
 
+/// Qualified concrete C source types for a family proved finite by structural facts.
 type SourceTypes = BTreeMap<QualifiedType, TypeInfo>;
+/// Shared immutable finite family, or None when compiler facts cannot close the family.
 type SourceFamily = Option<Rc<SourceTypes>>;
 
+/// Build and query conservative operand-family constraints while sharing batch-wide indexes.
 impl<'a> Constraints<'a> {
+    /// Build representatives and consumer constraints from the analyzed expression and known objects.
     fn new(
         frontend: &'a FrontendOutput,
         analysis: &MacroAnalysis,
@@ -631,6 +716,7 @@ impl<'a> Constraints<'a> {
         result
     }
 
+    /// Attach a consumer restriction to the canonical representative of an operand.
     fn require(&mut self, node: NodeId, requirement: Requirement) {
         let category = match &requirement {
             Requirement::Member { indirect, .. } => Some(if *indirect { POINTER } else { RECORD }),
@@ -643,9 +729,11 @@ impl<'a> Constraints<'a> {
         }
         self.requirements[self.representative[node]].push(requirement);
     }
+    /// Add an operator’s allowed category mask to the operand constraints.
     fn kind(&mut self, node: NodeId, mask: u8) {
         self.require(node, Requirement::Kind(mask));
     }
+    /// Add a compiler-target conversion restriction while preserving possible null constants.
     fn implicit(
         &mut self,
         node: NodeId,
@@ -675,6 +763,7 @@ impl<'a> Constraints<'a> {
         expression: &crate::syntax::Expression,
         objects: &[Option<TypeInfo>],
     ) {
+        /// Universe of category bits used while propagating conservative operator constraints.
         const ALL: u8 = 31;
         let mut masks = vec![ALL; self.representative.len()];
         let mut relations = Vec::new();
@@ -741,6 +830,7 @@ impl<'a> Constraints<'a> {
         }
         let mut queue = (0..relations.len()).collect::<VecDeque<_>>();
         let mut queued = vec![true; relations.len()];
+        /// Individual category alternatives enumerated when solving binary result restrictions.
         const ATOMS: [u8; 5] = [INTEGER, FLOAT, POINTER, RECORD, 16];
         while let Some(relation) = queue.pop_front() {
             queued[relation] = false;
@@ -791,6 +881,7 @@ impl<'a> Constraints<'a> {
         }
     }
 
+    /// Detect consumers that leave pointer identities unconstrained, requiring an open family.
     fn open_pointer(&self, node: NodeId) -> bool {
         self.requirements[self.representative[node]].iter().all(|requirement| match requirement {
             Requirement::Kind(mask) => mask & POINTER != 0,
@@ -801,6 +892,7 @@ impl<'a> Constraints<'a> {
             _ => false,
         })
     }
+    /// Check category-level consumers where a complete concrete type is not available.
     fn accepts_category(&self, node: NodeId, category: TypeCategory) -> bool {
         self.requirements[self.representative[node]].iter().all(|requirement| match requirement {
             Requirement::Kind(mask) => mask & category_mask(category) != 0,
@@ -827,6 +919,10 @@ impl<'a> Constraints<'a> {
         })
     }
 
+    /// Memoize whether a qualified concrete source satisfies every propagated consumer.
+    ///
+    /// Unknown compatibility facts retain the source; only established mismatches prune
+    /// capabilities that a valid invocation might otherwise require.
     fn accepts(&self, node: NodeId, ty: &TypeInfo) -> bool {
         if ty.category == TypeCategory::Other && self.mask(ty) != POINTER {
             return true;
@@ -900,6 +996,7 @@ impl<'a> Constraints<'a> {
         accepted
     }
 
+    /// Request fields from accepted owner families, falling back to wildcard demand when unresolved.
     fn request_fields(
         &self,
         output: NodeId,
@@ -964,6 +1061,7 @@ impl<'a> Constraints<'a> {
         self.broad_member_owners(indirect, name).collect()
     }
 
+    /// Use the promoted-field index to retain possible owners when source inference is open.
     fn broad_member_owners(
         &self,
         indirect: bool,
@@ -1023,6 +1121,10 @@ impl<'a> Constraints<'a> {
         sources
     }
 
+    /// Infer finite families through fields, indexing, dereferences, and call results.
+    ///
+    /// Any unresolved structural dependency leaves the family open instead of guessing
+    /// a single caller type from the available declaration catalog.
     fn infer_sources(
         &self,
         node: NodeId,
@@ -1121,6 +1223,7 @@ impl<'a> Constraints<'a> {
         }
     }
 
+    /// Classify concrete objects, treating compiler arrays as pointer-capable after decay.
     fn mask(&self, ty: &TypeInfo) -> u8 {
         if matches!(
             self.declarations.type_shapes.get(&ty.canonical_spelling).map(|shape| &shape.kind),
@@ -1131,17 +1234,20 @@ impl<'a> Constraints<'a> {
             category_mask(ty.category)
         }
     }
+    /// Check only the propagated category restrictions for a candidate category bit.
     fn allows(&self, node: NodeId, category: u8) -> bool {
         self.requirements[self.representative[node]].iter().all(|requirement| match requirement {
             Requirement::Kind(mask) => mask & category != 0,
             _ => true,
         })
     }
+    /// Recover a subscript element only when it is neither void nor a function.
     fn index_element(&self, ty: &TypeInfo) -> Option<TypeInfo> {
         self.element(ty).filter(|element| {
             !matches!(element.category, TypeCategory::Void | TypeCategory::Function)
         })
     }
+    /// Recover compiler element facts through the shared qualifier-aware compatibility resolver.
     fn element(&self, ty: &TypeInfo) -> Option<TypeInfo> {
         self.compatibility.element(ty)
     }
@@ -1152,19 +1258,28 @@ impl<'a> Constraints<'a> {
 /// qualifiers are part of the key because inherited object qualifiers need not
 /// change the compiler's original canonical spelling.
 struct Compatibility<'a> {
+    /// Compiler type shapes required for structural and nominal compatibility proofs.
     declarations: &'a DeclarationCatalog,
+    /// Selected target integer and pointer facts used by fallback type resolution.
     target: &'a TargetFacts,
+    /// Tri-state compatibility results keyed by both qualified types and top-level treatment.
     pairs: RefCell<BTreeMap<TypePair, Option<bool>>>,
 }
 
+/// Cache identity that retains inherited qualifiers even when canonical spelling stays unchanged.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct QualifiedType {
+    /// Compiler canonical spelling used to recover structural and nominal identity.
     canonical: String,
+    /// Effective const qualification, including qualifiers inherited from containing objects.
     is_const: bool,
+    /// Effective volatile qualification preserved in compatibility and source-family caches.
     is_volatile: bool,
 }
 
+/// Construct ordered cache identities that include effective object qualifiers.
 impl QualifiedType {
+    /// Capture canonical identity and effective qualifiers as an ordered cache key.
     fn new(ty: &TypeInfo) -> Self {
         Self {
             canonical: ty.canonical_spelling.clone(),
@@ -1174,18 +1289,25 @@ impl QualifiedType {
     }
 }
 
+/// Directional compatibility query whose qualifier treatment is part of its identity.
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 struct TypePair {
+    /// Qualified source object before implicit conversion.
     source: QualifiedType,
+    /// Qualified destination or comparison type.
     target: QualifiedType,
+    /// Whether C value conversion permits ignoring top-level qualifiers for this query.
     ignore_top: bool,
 }
 
+/// Memoize compiler type compatibility as a pruning proof with an explicit unknown state.
 impl<'a> Compatibility<'a> {
+    /// Create one reusable compatibility cache for all macros in the batch.
     fn new(declarations: &'a DeclarationCatalog, target: &'a TargetFacts) -> Self {
         Self { declarations, target, pairs: RefCell::new(BTreeMap::new()) }
     }
 
+    /// Recover pointees or array elements without dropping inherited const or volatile qualifiers.
     fn element(&self, ty: &TypeInfo) -> Option<TypeInfo> {
         match self.declarations.type_shapes.get(&ty.canonical_spelling).map(|shape| &shape.kind) {
             Some(TypeShapeKind::Pointer { pointee }) => Some(pointee.clone()),
@@ -1204,6 +1326,10 @@ impl<'a> Compatibility<'a> {
         }
     }
 
+    /// Return a proved implicit-conversion verdict, retaining None when compiler facts are incomplete.
+    ///
+    /// Pointer compatibility considers null-constant possibility and pointee qualifiers
+    /// without using the native Rust representation as a C type identity.
     fn implicit(&self, source: &TypeInfo, target: &TypeInfo, null_possible: bool) -> Option<bool> {
         let array = matches!(
             self.declarations.type_shapes.get(&source.canonical_spelling).map(|shape| &shape.kind),
@@ -1286,6 +1412,7 @@ impl<'a> Compatibility<'a> {
         }
     }
 
+    /// Cache a directional structural C compatibility query with explicit top-qualifier treatment.
     fn types(
         &self,
         source: &TypeInfo,
@@ -1309,6 +1436,7 @@ impl<'a> Compatibility<'a> {
         compatible
     }
 
+    /// Compare compiler types recursively within the depth bound, preserving unknown verdicts.
     fn types_at(
         &self,
         source: &TypeInfo,
@@ -1418,6 +1546,7 @@ impl<'a> Compatibility<'a> {
     }
 }
 
+/// Classify C categories into conservative pruning bits rather than Rust storage types.
 fn category_mask(category: TypeCategory) -> u8 {
     match category {
         TypeCategory::Integer(_) | TypeCategory::Enum => INTEGER,
@@ -1431,20 +1560,27 @@ fn category_mask(category: TypeCategory) -> u8 {
 /// Index promoted fields once for the entire batch; constraints perform only
 /// lookups and visits to possible owners, rather than rescanning every record.
 struct RecordIndex {
+    /// Canonical records mapped to named and anonymously promoted field types.
     fields: BTreeMap<String, BTreeMap<String, TypeInfo>>,
+    /// Reverse member-name index used to select possible owners without scanning every record.
     by_name: BTreeMap<String, Vec<String>>,
 }
+/// Build promoted-member indexes and perform bounded named or wildcard family selection.
 impl RecordIndex {
+    /// Select a named member in logarithmic lookup time, or traverse the full wildcard family.
     fn select<'a>(
         fields: &'a BTreeMap<String, TypeInfo>,
         name: Option<&str>,
     ) -> std::collections::btree_map::Range<'a, String, TypeInfo> {
+        /// Select one indexed member or the complete wildcard range without cloning field catalogs.
         use std::ops::Bound::{Included, Unbounded};
         let bounds = name.map_or((Unbounded, Unbounded), |name| (Included(name), Included(name)));
         fields.range::<str, _>(bounds)
     }
 
+    /// Index promoted fields once so subsequent demand queries reuse compiler-owned owner facts.
     fn new(declarations: &DeclarationCatalog) -> Self {
+        /// Collect anonymous member promotions within the bounded record-depth limit.
         fn collect(
             declarations: &DeclarationCatalog,
             canonical: &str,
@@ -1512,6 +1648,7 @@ pub(super) fn type_dependencies(
     }
 }
 
+/// Compute possible conditional or arithmetic result categories without assigning a concrete type.
 fn common_category(left: u8, right: u8) -> u8 {
     if left & ARITHMETIC != 0 && right & ARITHMETIC != 0 {
         if left == FLOAT || right == FLOAT { FLOAT } else { INTEGER }
@@ -1525,7 +1662,9 @@ fn common_category(left: u8, right: u8) -> u8 {
         0
     }
 }
+/// Model C operator category combinations used to propagate conservative operand restrictions.
 fn binary_category(operator: BinaryOperator, left: u8, right: u8) -> u8 {
+    /// Use trusted declaration shapes and target facts to constrain caller families conservatively.
     use BinaryOperator::*;
     match operator {
         LogicalAnd | LogicalOr | Less | LessEqual | Greater | GreaterEqual | Equal | NotEqual => {
@@ -1557,11 +1696,15 @@ fn binary_category(operator: BinaryOperator, left: u8, right: u8) -> u8 {
     }
 }
 
+/// Regressions proving conservative type-family selection preserves qualifiers and unknown compiler facts.
 #[cfg(test)]
 mod tests {
+    /// Exercise the private type-family constraint helpers directly in regression tests.
     use super::*;
+    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{ArrayKind, IntegerKind, TypeShape};
 
+    /// Check indexed named selection keeps wildcard behavior and returns no fabricated missing member.
     #[test]
     fn named_field_selection_preserves_wildcard_and_missing_families() {
         let fields = ["first", "selected", "third"]
@@ -1575,6 +1718,7 @@ mod tests {
         assert_eq!(names(None), ["first", "selected", "third"]);
     }
 
+    /// Construct a minimal compiler type witness for conservative demand-planning fixtures.
     fn ty(name: &str, category: TypeCategory) -> TypeInfo {
         TypeInfo {
             spelling: name.into(),
@@ -1587,6 +1731,7 @@ mod tests {
         }
     }
 
+    /// Attach a compiler-owned structural shape to a synthetic type witness.
     fn shape(declarations: &mut DeclarationCatalog, ty: &TypeInfo, kind: TypeShapeKind) {
         declarations.type_shapes.insert(
             ty.canonical_spelling.clone(),
@@ -1594,6 +1739,7 @@ mod tests {
         );
     }
 
+    /// Provide integer rank and pointer facts needed by demand-planning fixture resolution.
     fn target() -> TargetFacts {
         TargetFacts {
             triple: "fixture".into(),
@@ -1615,6 +1761,7 @@ mod tests {
         }
     }
 
+    /// Check typedef-spelled pointers retain nominal pointee identity and nested qualifiers during inference.
     #[test]
     fn typedef_pointer_sources_preserve_identity_and_pointee_qualifiers() {
         let target = target();
@@ -1666,6 +1813,7 @@ mod tests {
         assert_eq!(compatibility.element(&ty("MissingAlias *", TypeCategory::Pointer)), None);
     }
 
+    /// Prove cache keys distinguish inherited array qualifiers when canonical spellings match.
     #[test]
     fn acceptance_cache_preserves_inherited_array_qualifiers() {
         let target = target();
@@ -1708,6 +1856,7 @@ mod tests {
         assert!(constraints.accepts(0, &array));
     }
 
+    /// Check missing qualifier compatibility facts retain candidates rather than prove restrict loss acceptable.
     #[test]
     fn first_pointee_restrict_loss_requires_compiler_proof() {
         let target = target();
@@ -1739,6 +1888,7 @@ mod tests {
         assert_ne!(compatibility.implicit(&outer, &void_pointer, false), Some(false));
     }
 
+    /// Check incomplete call-result facts cannot justify excluding a callback from open call demand.
     #[test]
     fn missing_result_metadata_cannot_exclude_a_callback() {
         let target = target();
@@ -1794,6 +1944,7 @@ mod tests {
         );
     }
 
+    /// Check finite subscript inference requires element facts and preserves both pointer-plus-integer orientations.
     #[test]
     fn finite_subscript_sources_require_pointee_facts_and_keep_both_orientations() {
         let target = target();

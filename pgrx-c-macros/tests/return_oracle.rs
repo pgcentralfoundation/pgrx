@@ -2,28 +2,49 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Compare generated return statements and destination conversions with C.
+//!
+//! The suite exercises scalar, pointer, null, and set-returning forms in caller
+//! functions, observing mutations and evaluation order. Negative cases reject
+//! assignment conversions that C does not permit.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, ParameterOrigin, TypeCategory,
     emit_batch_with_bindings, emit_support_artifact_with_bindings, inspect, pg_sys_integer_bridges,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
 unsigned int return_trace;
 unsigned int return_evaluations;
@@ -47,15 +68,25 @@ void return_end(FunctionCallInfo fcinfo, FuncCallContext *context) {
 }
 "#;
 
+/// Retain generated Rust, native support, and the exact inspected C profile for paired
+/// execution.
 struct Generated {
+    /// Complete translated consumer source paired with the C program.
     rust: String,
+    /// Original C implementation and generated access helpers linked into the Rust consumer.
     native: String,
+    /// Original fixture header compiled by both inspection and the independent oracle.
     header: PathBuf,
+    /// Compiler selected by the verified frontend profile.
     compiler: PathBuf,
+    /// Exact native profile arguments shared by C and Rust-linked compilation.
     arguments: Vec<String>,
 }
 
+/// Run paired native and generated consumers under one retained inspected profile.
 impl Generated {
+    /// Execute the original C program and generated Rust consumer and require their
+    /// observations to agree.
     fn compare(&self, c: &str, rust: &str, rows: usize) {
         let arguments = self.arguments.iter().map(String::as_str).collect::<Vec<_>>();
         let original = oracle::run_c(
@@ -77,6 +108,8 @@ impl Generated {
     }
 }
 
+/// Inspect fixture input, collect bindings, and prepare generated consumers for C/Rust
+/// comparison.
 fn generate(names: &[&str]) -> Generated {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let header = directory.join("tests/fixtures/return_oracle.h");
@@ -176,6 +209,7 @@ unsafe fn native_state() -> (u32, u32) {
     }
 }
 
+/// Checks that caller returns preserve destination conversion and argument evaluation.
 #[test]
 fn caller_returns_preserve_destination_conversion_and_argument_evaluation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -267,6 +301,7 @@ fn main() {
     generated.compare(original, rust, 7);
 }
 
+/// Checks that nullable and set returning macros preserve mutations native calls and order.
 #[test]
 fn nullable_and_set_returning_macros_preserve_mutations_native_calls_and_order() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -396,6 +431,7 @@ fn main() {
     }
 }
 
+/// Checks that return assignment constraints reject illegal pointer and storage conversions.
 #[test]
 fn return_assignment_constraints_reject_illegal_pointer_and_storage_conversions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

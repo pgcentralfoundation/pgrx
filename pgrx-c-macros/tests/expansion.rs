@@ -2,26 +2,50 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Test compiler-owned preprocessing before expression analysis.
+//!
+//! The batch expansion path must retain prescan, rescan, suppression, original
+//! include lookup, and late definitions. Malformed probes, unsafe preprocessing,
+//! and stale inputs must produce isolated structured skips without contaminating
+//! valid peers or changing the original header's interpretation.
+
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, ExpandedMacro, ExpansionBatch, ExpansionLimits, ExpansionResult,
     ExpansionSkipCode, FrontendError, MacroScanner, inspect, prepare_expansions,
     prepare_expansions_with_limits,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
+/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
-struct Directory(PathBuf);
+/// Own the temporary header tree for this test and remove only its fixture files afterward.
+struct Directory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
 
+/// Construct owned header trees for freshness and include-identity tests.
 impl Directory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
     fn new() -> Self {
         for attempt in 0..128 {
             let path = std::env::temp_dir()
@@ -36,12 +60,16 @@ impl Directory {
     }
 }
 
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
 impl Drop for Directory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
 
+/// Inspect and expand selected fixture macros under one verified frontend session.
 fn expanded<'a>(batch: &'a ExpansionBatch, name: &str) -> &'a ExpandedMacro {
     match &batch.results[name] {
         ExpansionResult::Expanded { expansion } => expansion,
@@ -49,6 +77,8 @@ fn expanded<'a>(batch: &'a ExpansionBatch, name: &str) -> &'a ExpandedMacro {
     }
 }
 
+/// Retrieve a supported expansion body and turn an unexpected structured skip into a useful
+/// test failure.
 fn body(expansion: &ExpandedMacro) -> Vec<&str> {
     let start =
         expansion.definition.tokens.iter().position(|token| token.spelling == ")").unwrap() + 1;
@@ -65,6 +95,8 @@ fn body(expansion: &ExpandedMacro) -> Vec<&str> {
         .collect()
 }
 
+/// Require the expected structured rejection, including the reason used to explain unsupported
+/// C syntax.
 fn assert_skip(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode) {
     let ExpansionResult::Skipped { reason } = &batch.results[name] else {
         panic!("{name} must skip as {code:?}: {:?}", batch.results[name]);
@@ -74,6 +106,8 @@ fn assert_skip(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode) {
     assert!(!reason.spans.is_empty(), "{name} retains original source provenance");
 }
 
+/// Checks that clang expands nested late prescanned rescanned and suppressed macros as one
+/// batch.
 #[test]
 fn clang_expands_nested_late_prescanned_rescanned_and_suppressed_macros_as_one_batch() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -135,6 +169,7 @@ fn clang_expands_nested_late_prescanned_rescanned_and_suppressed_macros_as_one_b
     assert!(checked.is_empty());
 }
 
+/// Checks that malformed ordinary probes are isolated before using clean output.
 #[test]
 fn malformed_ordinary_probes_are_isolated_before_using_clean_output() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -153,6 +188,7 @@ fn malformed_ordinary_probes_are_isolated_before_using_clean_output() {
     assert_eq!(expanded(&batch, "HEALTHY").occurrences.len(), 1);
 }
 
+/// Checks that parameter markers do not invent grouping and cannot collide with header symbols.
 #[test]
 fn parameter_markers_do_not_invent_grouping_and_cannot_collide_with_header_symbols() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -172,6 +208,7 @@ fn parameter_markers_do_not_invent_grouping_and_cannot_collide_with_header_symbo
     assert_eq!(expanded(&batch, "EXP_HOSTILE").occurrences.len(), 1);
 }
 
+/// Checks that unsafe preprocessing constructs reject through the dependency closure.
 #[test]
 fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -220,6 +257,7 @@ fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
     assert!(reason.spans.windows(2).all(|pair| pair[0].start_line <= pair[1].start_line));
 }
 
+/// Checks that expansion budgets and compiler rejection are structured skips.
 #[test]
 fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -250,6 +288,7 @@ fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
 }
 
+/// Checks that closed pastes reject erased operands dynamic helpers and probe collisions.
 #[test]
 fn closed_pastes_reject_erased_operands_dynamic_helpers_and_probe_collisions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -344,6 +383,7 @@ int __paste_native(int);
     }
 }
 
+/// Checks that malformed paste probes cannot swallow a later operand validation.
 #[test]
 fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -372,6 +412,7 @@ fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
     assert_eq!(expanded(&batch, "C_HEALTHY").occurrences.len(), 1);
 }
 
+/// Checks that original main file context preserves macros and conditional declarations.
 #[test]
 fn original_main_file_context_preserves_macros_and_conditional_declarations() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -384,6 +425,7 @@ fn original_main_file_context_preserves_macros_and_conditional_declarations() {
     assert!(body(expanded(&batch, "EXP_CONTEXT_TYPE")).contains(&"ExpansionContextType"));
 }
 
+/// Checks that nested expansion does not capture an identifier named like an unused formal.
 #[test]
 fn nested_expansion_does_not_capture_an_identifier_named_like_an_unused_formal() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -401,6 +443,7 @@ fn nested_expansion_does_not_capture_an_identifier_named_like_an_unused_formal()
     assert_ne!(expansion.symbolic_parameters[1], "captured");
 }
 
+/// Checks that original symlink path keeps quoted include lookup and main file context.
 #[test]
 #[cfg(unix)]
 fn original_symlink_path_keeps_quoted_include_lookup_and_main_file_context() {
@@ -421,6 +464,8 @@ fn original_symlink_path_keeps_quoted_include_lookup_and_main_file_context() {
     assert_eq!(body(expanded(&batch, "EXP_PATH")), ["(", "(", "x", ")", "+", "7", "+", "3", ")"]);
 }
 
+/// Checks that stale declarations and new shadowing headers reject even with identical macro
+/// maps.
 #[test]
 fn stale_declarations_and_new_shadowing_headers_reject_even_with_identical_macro_maps() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -474,6 +519,7 @@ fn stale_declarations_and_new_shadowing_headers_reject_even_with_identical_macro
     );
 }
 
+/// Checks that appending probes cannot turn a trailing backslash into a new macro body.
 #[test]
 fn appending_probes_cannot_turn_a_trailing_backslash_into_a_new_macro_body() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -487,6 +533,7 @@ fn appending_probes_cannot_turn_a_trailing_backslash_into_a_new_macro_body() {
     );
 }
 
+/// Checks that snapshot line protection preserves original comments and literal backslashes.
 #[test]
 fn snapshot_line_protection_preserves_original_comments_and_literal_backslashes() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

@@ -2,30 +2,49 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check PostgreSQL-style Datum adapters against the actual binding storage.
+//!
+//! Fresh fixture bindings determine integer ABI and pointer representation. Native
+//! round trips ensure the generated support does not confuse checked Rust
+//! wrappers with different C ranks or lose pointer provenance through conversion.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, IntegerKind, MacroScanner, emit_batch_with_bindings,
     emit_support_with_bindings, inspect, pg_sys_integer_bridges,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Native function declarations selected for the fixture's call and ABI comparisons.
 const FUNCTIONS: &str = "\
 Datum datum_identity(Datum value) { return value; }\n\
 Datum datum_next(Datum value) { return value + sizeof(unsigned int); }\n\
 unsigned int datum_read(Datum value) { return *(unsigned int *) value; }\n";
 
+/// Checks that actual datum storage preserves native integer abi and pointer roundtrips.
 #[test]
 fn actual_datum_storage_preserves_native_integer_abi_and_pointer_roundtrips() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

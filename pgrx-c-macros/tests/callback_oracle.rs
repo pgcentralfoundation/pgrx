@@ -2,26 +2,45 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+//! Check callback adapters without erasing nominal C function identities.
+//!
+//! The fixture combines aliases, raw callback storage, enums, and guard hooks.
+//! C/Rust observations establish conversions and call counts, while negative
+//! consumer builds reject storage that looks alike in Rust but differs in C.
+
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Compile generated consumers and paired negative cases through the bounded Rust oracle
+/// harness.
 #[path = "support/rust_oracle.rs"]
 #[allow(dead_code)] // Integration fixtures use different subsets of the shared oracle helpers.
 mod rust_oracle;
 
+/// Use the production scanner, analysis, and emission contracts so these checks exercise the
+/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, IntegerKind, MacroScanner, RustBindingType, TypeCategory,
     emit_batch_with_bindings, emit_support_artifact_with_bindings, inspect,
 };
+/// Keep fixture and generated-output locations explicit so consumer builds remain independent
+/// of the working directory.
 use std::path::PathBuf;
 
+/// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
+/// as the real binding build.
 fn is_builtin_oid(name: &str) -> bool {
     name.ends_with("OID") && name != "HEAP_HASOID"
         || name.ends_with("RelationId")
         || name == "TemplateDbOid"
 }
 
+/// Selected fixture macro names; explicit selection also exercises demand-driven adapter
+/// generation.
 const NAMES: &[&str] = &[
     "CALLBACK_DIRECT",
     "CALLBACK_TWO",
@@ -59,6 +78,8 @@ const NAMES: &[&str] = &[
     "CALLBACK_STATE_VALUE",
 ];
 
+/// Construct the C invocation used for both inspection and the native oracle, so
+/// compiler-profile differences cannot explain a mismatch.
 fn arguments() -> Vec<String> {
     let mut arguments = vec![
         "-std=c17".into(),
@@ -76,6 +97,7 @@ fn arguments() -> Vec<String> {
     arguments
 }
 
+/// Checks that generated callback signatures preserve native types calls and guards.
 #[test]
 fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
     let scanner = MacroScanner::new().expect("libclang must be available");
@@ -258,6 +280,8 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
     }
 }
 
+/// Normalize fixture function-pointer safety storage for this oracle without changing its C
+/// signature identities.
 fn mark_function_storage_safe(storage: &mut RustBindingType) {
     match storage {
         RustBindingType::Function { unsafe_, parameters, result, .. } => {
@@ -276,6 +300,8 @@ fn mark_function_storage_safe(storage: &mut RustBindingType) {
     }
 }
 
+/// Adjust OID wrapper storage in the fixture catalog to match the checked binding contract used
+/// by generation.
 fn oid_storage() -> &'static str {
     r#"
 #[repr(transparent)]

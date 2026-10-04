@@ -2,12 +2,26 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Compile native access primitives with the already inspected C invocation profile.
+//! Build the native primitives required by generated Rust macro adapters.
+//!
+//! The frontend has already selected and verified the C compiler invocation.
+//! This module reuses that exact profile to compile generated access helpers
+//! against the original header, archives the fresh object, and tells Cargo how to
+//! link it. Native helpers cover operations whose C layout or calling convention
+//! cannot be inferred from Rust storage alone.
 
+/// Preserve contextual generation and filesystem failures through the binding-build error
+/// contract.
 use eyre::{WrapErr, eyre};
+/// Use the emitter catalog and result types that connect C inspection to generated binding
+/// publication.
 use pgrx_c_macros::CompilationProfile;
+/// Keep provenance roots and generated relative paths explicit across module rendering and
+/// publication.
 use std::path::Path;
 
+/// Compile and archive generated C access primitives with the inspected invocation profile,
+/// then emit Cargo linkage for the selected PostgreSQL version.
 pub(super) fn compile_macro_support(
     major: u16,
     profile: &CompilationProfile,

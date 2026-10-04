@@ -2,29 +2,58 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Generated C macro modules and same-scope fragments of their shared adapters.
+//! Organize emitted PostgreSQL macros into readable modules without changing scope.
+//!
+//! Header provenance determines the public module tree. Shared adapters and the
+//! private native module are split only at complete Rust item boundaries, with
+//! include files retaining their original lexical scope. This produces a complete
+//! relative-path map for the build writer, which formats and publishes the tree
+//! and removes obsolete leaves. Names are encoded when natural header names would
+//! collide with indexes, directories, keywords, or reserved support files.
 
+/// Preserve contextual generation and filesystem failures through the binding-build error
+/// contract.
 use eyre::{WrapErr, eyre};
+/// Use the emitter catalog and result types that connect C inspection to generated binding
+/// publication.
 use pgrx_c_macros::{EmissionStatus, MacroEmission};
+/// Keep binding catalogs, header trees, and output maps ordered for deterministic generation
+/// and collision checks.
 use std::collections::{BTreeMap, BTreeSet};
+/// Render complete source fragments and module indexes into the versioned output map.
 use std::fmt::Write;
+/// Keep provenance roots and generated relative paths explicit across module rendering and
+/// publication.
 use std::path::{Component, Path, PathBuf};
+/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
+/// facts from names.
 use syn::{Item, spanned::Spanned};
 
+/// Reserved generated subtree holding same-scope support fragments, separated from public
+/// header modules.
 const SUPPORT_DIRECTORY: &str = "__pgrx_c_support";
+/// Soft support-file size bound; complete items may exceed it rather than be split into invalid
+/// or differently scoped Rust.
 const FRAGMENT_BYTES: usize = 256 * 1024;
 
 /// Paths are relative to the owning `cmacros/pgNN` directory. The caller writes
 /// this complete set and removes obsolete generated files in that directory.
 pub(super) struct MacroFiles {
+    /// Complete relative Rust source map; stable writing and stale-file pruning share this
+    /// ownership boundary.
     pub(super) sources: BTreeMap<PathBuf, String>,
 }
 
+/// Build the complete versioned output map used for both host and documentation publication.
 impl MacroFiles {
+    /// Produce a valid empty root index when C macro generation is unavailable, keeping the
+    /// include path compilable.
     pub(super) fn empty() -> Self {
         Self { sources: BTreeMap::from([(PathBuf::from("mod.rs"), String::new())]) }
     }
 
+    /// Partition adapter support and group emitted macros by verified header provenance,
+    /// rejecting external roots and duplicate public identifiers.
     pub(super) fn new(
         support: String,
         emissions: &[MacroEmission],
@@ -78,6 +107,8 @@ impl MacroFiles {
     }
 }
 
+/// Read the final exported macro's actual Rust identifier so reexports honor keyword escaping
+/// rather than guessing from the C name.
 fn public_identifier(source: &str) -> eyre::Result<String> {
     let file = syn::parse_file(source).wrap_err("generated macro source is invalid Rust")?;
     let item = file
@@ -93,19 +124,31 @@ fn public_identifier(source: &str) -> eyre::Result<String> {
     item.ident.as_ref().map(ToString::to_string).ok_or_else(|| eyre!("exported macro has no name"))
 }
 
+/// Retain the physical header directory tree so provenance determines readable, collision-free
+/// Rust modules.
 #[derive(Default)]
 struct Directory {
+    /// Child header directories, preserving physical provenance instead of flattening
+    /// basenames.
     directories: BTreeMap<String, Directory>,
+    /// Macro source and exported names grouped by the original header filename.
     headers: BTreeMap<String, Header>,
 }
 
+/// Accumulate one header's translated definitions and their public Rust export names.
 #[derive(Default)]
 struct Header {
+    /// Translated definitions belonging to this header, kept in deterministic name order.
     source: String,
+    /// Actual emitted Rust identifiers to forward from the header leaf.
     exports: BTreeSet<String>,
 }
 
+/// Resolve header provenance into one collision-checked module tree and render its public
+/// forwarding paths.
 impl Directory {
+    /// Find or create the header leaf using normal relative components, keeping equal basenames
+    /// in separate directories.
     fn header_mut(&mut self, source: &Path) -> eyre::Result<&mut Header> {
         let components = source
             .components()
@@ -126,6 +169,8 @@ impl Directory {
         Ok(directory.headers.entry(name.clone()).or_default())
     }
 
+    /// Render directory indexes, header leaves, and reexports while encoding names that collide
+    /// with modules or reserved support paths.
     fn write(
         &self,
         path: &Path,
@@ -193,6 +238,8 @@ impl Directory {
     }
 }
 
+/// Add a private module declaration and public forwarding import without using absolute paths
+/// to included macro_export definitions.
 fn write_module(index: &mut String, identifier: &str, filename: &str) {
     writeln!(
         index,
@@ -201,6 +248,7 @@ fn write_module(index: &mut String, identifier: &str, filename: &str) {
     .expect("String output");
 }
 
+/// Extract a usable header filename stem for human-readable generated modules.
 fn header_stem(filename: &str) -> eyre::Result<&str> {
     Path::new(filename)
         .file_stem()
@@ -209,6 +257,8 @@ fn header_stem(filename: &str) -> eyre::Result<&str> {
         .ok_or_else(|| eyre!("macro header filename has no usable stem"))
 }
 
+/// Preserve readable names where legal and encode reserved or invalid identifiers so the module
+/// tree stays collision-free.
 fn module_identifier(name: &str, category: &str) -> String {
     if name.starts_with("__pgrx_c_")
         || matches!(name, "_" | "self" | "Self" | "super" | "crate")
@@ -221,6 +271,8 @@ fn module_identifier(name: &str, category: &str) -> String {
     if syn::parse_str::<syn::Ident>(name).is_ok() { name.to_owned() } else { format!("r#{name}") }
 }
 
+/// Encode original UTF-8 bytes into a reserved Rust identifier, preserving distinct names
+/// without lossy sanitization.
 fn encoded_name(name: &str, category: &str) -> String {
     let mut encoded = format!("__pgrx_c_{category}_");
     for byte in name.bytes() {
@@ -229,6 +281,8 @@ fn encoded_name(name: &str, category: &str) -> String {
     encoded
 }
 
+/// Reject generated filesystem components exceeding the supported byte limit before any output
+/// is published.
 fn check_component(component: &str) -> eyre::Result<()> {
     if component.len() > 255 {
         return Err(eyre!("generated module filename exceeds the filesystem component limit"));
@@ -236,6 +290,8 @@ fn check_component(component: &str) -> eyre::Result<()> {
     Ok(())
 }
 
+/// Insert one generated source path and reject collisions instead of silently replacing a
+/// previous leaf.
 fn insert_file(
     files: &mut BTreeMap<PathBuf, String>,
     path: PathBuf,
@@ -247,6 +303,8 @@ fn insert_file(
     Ok(())
 }
 
+/// Render a UTF-8 relative include path with stable separators and reject escaping or absolute
+/// components.
 fn source_path(path: &Path) -> eyre::Result<String> {
     path.components()
         .map(|component| match component {
@@ -263,12 +321,19 @@ fn source_path(path: &Path) -> eyre::Result<String> {
 /// Offsets are indexed once, so fragment boundaries do not repeatedly scan the
 /// entire (often tens of megabytes) support source.
 struct SourceOffsets<'a> {
+    /// Original support source whose exact bytes must survive partitioning.
     source: &'a str,
+    /// Byte offset of each source line, built once for all item boundaries.
     lines: Vec<usize>,
+    /// Per-line character-to-byte corrections only for non-ASCII spans.
     unicode: BTreeMap<usize, Vec<(usize, usize)>>,
 }
 
+/// Translate compiler token positions to exact original-source byte boundaries in one indexed
+/// pass.
 impl<'a> SourceOffsets<'a> {
+    /// Partition adapter support and group emitted macros by verified header provenance,
+    /// rejecting external roots and duplicate public identifiers.
     fn new(source: &'a str) -> Self {
         let mut lines = vec![0];
         let mut unicode = BTreeMap::new();
@@ -293,6 +358,8 @@ impl<'a> SourceOffsets<'a> {
         Self { source, lines, unicode }
     }
 
+    /// Translate a proc_macro2 character span into a checked byte offset, including corrections
+    /// on non-ASCII lines.
     fn position(&self, position: proc_macro2::LineColumn) -> eyre::Result<usize> {
         let line = position
             .line
@@ -315,18 +382,30 @@ impl<'a> SourceOffsets<'a> {
     }
 }
 
+/// Accumulate complete support items into bounded include files without changing their
+/// enclosing lexical scope.
 struct Fragments<'a> {
+    /// Fragment family used for stable shared or native output filenames.
     label: &'a str,
+    /// Complete output map receiving each flushed leaf.
     files: &'a mut BTreeMap<PathBuf, String>,
+    /// Whole items accumulated since the previous flush.
     current: String,
+    /// Ordered include paths preserving the original support declaration sequence.
     paths: Vec<PathBuf>,
 }
 
+/// Accumulate whole support items and publish ordered include leaves without changing lexical
+/// scope.
 impl<'a> Fragments<'a> {
+    /// Partition adapter support and group emitted macros by verified header provenance,
+    /// rejecting external roots and duplicate public identifiers.
     fn new(label: &'a str, files: &'a mut BTreeMap<PathBuf, String>) -> Self {
         Self { label, files, current: String::new(), paths: Vec::new() }
     }
 
+    /// Append a complete Rust item, flushing at the soft fragment bound without splitting
+    /// tokens or lexical scopes.
     fn push(&mut self, item: &str) -> eyre::Result<()> {
         if !self.current.is_empty()
             && self.current.len().saturating_add(item.len()) > FRAGMENT_BYTES
@@ -339,6 +418,8 @@ impl<'a> Fragments<'a> {
         Ok(())
     }
 
+    /// Publish the current complete fragment into the source map and retain its ordered include
+    /// path.
     fn flush(&mut self) -> eyre::Result<()> {
         if self.current.is_empty() {
             return Ok(());
@@ -356,12 +437,15 @@ impl<'a> Fragments<'a> {
         Ok(())
     }
 
+    /// Flush the final fragment and return include paths in their original semantic order.
     fn finish(mut self) -> eyre::Result<Vec<PathBuf>> {
         self.flush()?;
         Ok(self.paths)
     }
 }
 
+/// Split shared and private-native support at parsed item boundaries, preserving comments and
+/// same-scope includes while guarding native adapters for docs.rs.
 fn partition_support(
     source: &str,
     files: &mut BTreeMap<PathBuf, String>,
@@ -435,21 +519,48 @@ fn partition_support(
     shared.finish()
 }
 
+/// Check catalog, publication, and invalidation invariants directly against the private
+/// binding-build implementation.
 #[cfg(test)]
 mod tests {
+    //! Check catalog, publication, and invalidation invariants directly against the private
+    //! binding-build implementation.
+    //!
+    //! The tests inspect real parsed output, generated leaf maps, and compiler dependency
+    //! directives. Temporary input trees make success and rejection conditions explicit without
+    //! relying on a configured server.
+
+    /// Exercise the private implementation directly in its unit tests without widening the
+    /// production API.
     use super::*;
+    /// Use the emitter catalog and result types that connect C inspection to generated binding
+    /// publication.
     use pgrx_c_macros::{
         AnalysisStatus, ConstCapability, EvaluationContract, InvocationContract, MacroAnalysis,
         SignedOverflow, SourceSpan,
     };
+    /// Read original fixtures and manage only the owned inputs and outputs used by generation
+    /// checks.
     use std::fs;
+    /// Allocate unique fixture paths or record process-local effects across concurrent test
+    /// invocations.
     use std::sync::atomic::{AtomicU64, Ordering};
 
+    /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
     static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
-    struct Fixture(PathBuf);
+    /// Own an isolated consumer or header tree whose generated artifacts can be inspected
+    /// without mutating the repository.
+    struct Fixture(
+        /// Owned fixture path used for isolated inputs and cleanup.
+        PathBuf,
+    );
 
+    /// Construct and inspect owned fixtures without changing repository snapshots or sharing
+    /// consumer build artifacts.
     impl Fixture {
+        /// Partition adapter support and group emitted macros by verified header provenance,
+        /// rejecting external roots and duplicate public identifiers.
         fn new() -> Self {
             let path = std::env::temp_dir().join(format!(
                 "pgrx-macro-files-{}-{}",
@@ -460,6 +571,8 @@ mod tests {
             Self(path)
         }
 
+        /// Create a supported macro with physical fixture provenance for module-tree collision
+        /// and export tests.
         fn emission(&self, header: &str, name: &str) -> MacroEmission {
             let path = self.0.join(header);
             fs::create_dir_all(path.parent().unwrap()).unwrap();
@@ -488,12 +601,18 @@ mod tests {
         }
     }
 
+    /// Release only temporary artifacts owned by this fixture, including on failed compiler or
+    /// assertion paths.
     impl Drop for Fixture {
+        /// Remove only this fixture's owned temporary storage after the test or oracle
+        /// completes.
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
     }
 
+    /// Checks that an empty macro tree is renderable without resolving a PostgreSQL header
+    /// root.
     #[test]
     fn empty_generation_does_not_require_a_postgres_installation() {
         let files = MacroFiles::new(String::new(), &[], Path::new("/does/not/exist")).unwrap();
@@ -502,6 +621,7 @@ mod tests {
         assert_eq!(MacroFiles::empty().sources, files.sources);
     }
 
+    /// Checks that equal header basenames remain in separate provenance-derived modules.
     #[test]
     fn header_paths_keep_duplicate_basenames_in_their_own_modules() {
         let fixture = Fixture::new();
@@ -520,6 +640,8 @@ mod tests {
         assert!(!source.contains("pub use crate::"));
     }
 
+    /// Checks that indexes, support names, and header/directory collisions receive distinct
+    /// Rust identifiers and output paths.
     #[test]
     fn reserved_index_names_and_header_directory_collisions_are_distinct() {
         let fixture = Fixture::new();
@@ -555,6 +677,7 @@ mod tests {
         assert!(!files.sources.contains_key(Path::new("__pgrx_c_support/mod.rs")));
     }
 
+    /// Checks that missing, external, or unrepresentable provenance fails before publication.
     #[test]
     fn unsupported_provenance_never_becomes_a_generated_path() {
         let fixture = Fixture::new();
@@ -575,6 +698,8 @@ mod tests {
         );
     }
 
+    /// Checks that escaped Rust macro identifiers are forwarded from the actual emitted
+    /// definition.
     #[test]
     fn public_reexports_use_the_emitted_rust_identifier_only() {
         let fixture = Fixture::new();
@@ -591,6 +716,8 @@ mod tests {
         assert!(!source.contains("pub use self;"));
     }
 
+    /// Checks character-to-byte span conversion without losing UTF-8 comments or splitting
+    /// support items.
     #[test]
     fn unicode_columns_preserve_exact_support_item_boundaries() {
         let support = "// é\nconst FIRST: &str = \"é\"; #[doc(hidden)] pub mod __pgrx_c_generated { pub const VALUE: &str = \"λ\"; } // Ω\n";
@@ -605,6 +732,8 @@ mod tests {
         syn::parse_file(native).unwrap();
     }
 
+    /// Checks that splitting support retains source comments, item order, and the original
+    /// private module scope.
     #[test]
     fn support_fragments_preserve_comments_and_native_private_scope() {
         let block = "x".repeat(FRAGMENT_BYTES / 2);
@@ -652,6 +781,8 @@ mod tests {
         }
     }
 
+    /// Checks that duplicate public Rust macro names fail instead of silently overwriting a
+    /// generated leaf.
     #[test]
     fn duplicate_public_identifiers_are_rejected_before_writing() {
         let fixture = Fixture::new();

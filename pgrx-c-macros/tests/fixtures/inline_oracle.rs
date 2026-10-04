@@ -1,10 +1,30 @@
 //LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/// Standalone Rust consumer for the inline oracle C comparison.
+///
+/// The harness appends this consumer after generated bindings, semantic support,
+/// and macro definitions. Its observations preserve types and operand effects
+/// for comparison with the original C header; helpers instrument those effects
+/// without replacing any C macro definition.
+///
+/// Expose the fixture guard observer under the path emitted native adapters expect.
 mod ffi {
+    //! Expose the fixture guard observer under the path emitted native adapters expect.
+    //!
+    //! The enclosing selector or oracle owns this scope; generated paths must retain that
+    //! ownership when expanded from a downstream consumer.
+
+    /// Allocate unique fixture paths or record process-local effects across concurrent test
+    /// invocations.
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    /// Record whether the fixture is inside its native guard when an argument conversion
+    /// occurs.
     pub static INSIDE: AtomicBool = AtomicBool::new(false);
+    /// Count fixture native-boundary calls independently of returned values.
     pub static CALLS: AtomicUsize = AtomicUsize::new(0);
+    /// Observe entry and exit from the fixture FFI guard so argument conversion and native
+    /// calls can be checked separately.
     pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(call: F) -> T {
         assert!(!INSIDE.swap(true, Ordering::SeqCst));
         CALLS.fetch_add(1, Ordering::SeqCst);
@@ -14,20 +34,33 @@ mod ffi {
     }
 }
 
-struct Input(i32);
+/// Observe conversion timing relative to a native guard without depending on backend state.
+struct Input(
+    /// Recorded payload retained for exact semantic comparison.
+    i32,
+);
+/// Register the fixture-only observable input with the same sealed semantic boundary as
+/// production operands.
 impl __pgrx_c_macros::sealed::Sealed for Input {}
+/// Instrument conversion into C expression support to make guard-boundary ordering observable.
 impl __pgrx_c_macros::expression::IntoExpression for Input {
+    /// Semantic expression result produced by the instrumented fixture input.
     type Value = __pgrx_c_macros::CValue<__pgrx_c_macros::CInt>;
+    /// Convert the fixture input while recording whether conversion occurs before entry into
+    /// the native guard.
     fn into_expression(self) -> Self::Value {
         assert!(!ffi::INSIDE.load(std::sync::atomic::Ordering::SeqCst));
         __pgrx_c_macros::CValue::new(self.0)
     }
 }
 
+/// Fail if a supposedly unevaluated operand is executed by the generated macro.
 fn unreachable_argument() -> u32 {
     panic!("lazy inline branch evaluated");
 }
 
+/// Exercise the generated definitions and print observations for the paired original-C oracle;
+/// assertions cover cases with no scalar output.
 fn main() {
     // SAFETY: The original fixture functions only touch counters and live local
     // integers. All supplied pointers are aligned, initialized, and in bounds.
