@@ -947,12 +947,14 @@ fn render(
         )
     })?);
     if matches!(original, InvocationSource::Inline(_)) {
-        comment.push_str("\n\nCalls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.");
+        comment.push_str("\n\n");
+        comment.push_str(INLINE_CALL);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::InvocationFile | ExpressionKind::InvocationLine)
     }) {
-        comment.push_str("\n\nInvocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.");
+        comment.push_str("\n\n");
+        comment.push_str(INVOCATION_DIAGNOSTICS);
     }
     if expression
         .syntax
@@ -960,7 +962,8 @@ fn render(
         .iter()
         .any(|node| matches!(node.kind, ExpressionKind::Stringification { .. }))
     {
-        comment.push_str("\n\nDependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips.");
+        comment.push_str("\n\n");
+        comment.push_str(STRINGIFICATION);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::StringLiteral { .. } | ExpressionKind::InvocationFile)
@@ -968,9 +971,11 @@ fn render(
         comment.push_str(" String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.");
     }
     if returning {
-        comment.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\n");
+        comment.push_str(CALLER_RETURNS);
     } else if statement_body.is_some() {
-        comment.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\n");
+        comment.push_str(STATEMENTS);
     }
     if local_guard.is_some() {
         comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
@@ -1012,7 +1017,8 @@ fn render(
         }
         comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
-    comment.push_str("\n\n# Safety\n\nPreserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.");
+    comment.push_str("\n\n# Safety\n\n");
+    comment.push_str(SAFETY);
     let mut failures = std::collections::BTreeSet::new();
     for node in &expression.syntax.nodes {
         match &node.kind {
@@ -1233,24 +1239,61 @@ pub struct MacroDocumentation {
     pub hidden: bool,
 }
 
+/// Documentation paragraphs that many generated macros repeat verbatim.
+///
+/// Documentation shells refer to each one through the macro named here instead of
+/// repeating its text; [`documentation_shell_support`] defines those macros.
+const SHARED_PARAGRAPHS: [(&str, &str); 6] = [
+    ("__pgrx_c_doc_inline_call", INLINE_CALL),
+    ("__pgrx_c_doc_invocation_diagnostics", INVOCATION_DIAGNOSTICS),
+    ("__pgrx_c_doc_stringification", STRINGIFICATION),
+    ("__pgrx_c_doc_caller_returns", CALLER_RETURNS),
+    ("__pgrx_c_doc_statements", STATEMENTS),
+    ("__pgrx_c_doc_safety", SAFETY),
+];
+/// How a typed inline-function adapter calls and converts.
+const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
+/// How `__FILE__` and `__LINE__` translate.
+const INVOCATION_DIAGNOSTICS: &str = "Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.";
+/// How dependency stringification translates.
+const STRINGIFICATION: &str = "Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips.";
+/// How C `return` statements behave in the caller.
+const CALLER_RETURNS: &str = "C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.";
+/// How statement macros execute.
+const STATEMENTS: &str = "This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.";
+/// Caller obligations shared by every generated macro.
+const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.";
+
 /// Shared expansion of every documentation-shell arm, defined by
 /// [`documentation_shell_support`]. Rustdoc shows arm bodies as `{ ... }`.
 const DOCUMENTATION_SHELL_BODY: &str = "$crate::__pgrx_c_documentation_shell!()";
 
-/// Define the macro that every documentation shell expands to.
+/// Define the macros that documentation shells use.
 ///
-/// Include this once in the crate that defines the shells rendered by
-/// [`MacroDocumentation::render_shell`].
+/// Every shell arm expands to one macro, and each paragraph in [`SHARED_PARAGRAPHS`]
+/// is defined once for shell doc comments. Include this once in the crate that defines
+/// the shells rendered by [`MacroDocumentation::render_shell`].
 pub fn documentation_shell_support() -> String {
-    "/// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.\n\
-     #[doc(hidden)]\n\
-     #[macro_export]\n\
-     macro_rules! __pgrx_c_documentation_shell {\n    \
-         () => {\n        \
-             ::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")\n    \
-         };\n\
-     }\n"
-        .into()
+    let mut rust = String::from(
+        "/// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.\n\
+         #[doc(hidden)]\n\
+         #[macro_export]\n\
+         macro_rules! __pgrx_c_documentation_shell {\n    \
+             () => {\n        \
+                 ::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")\n    \
+             };\n\
+         }\n",
+    );
+    for (name, paragraph) in SHARED_PARAGRAPHS {
+        // Doc comments keep the space after `///`; the shared line keeps it too.
+        writeln!(
+            rust,
+            "/// One documentation paragraph shared by snapshot shells.\n#[doc(hidden)]\n#[macro_export]\nmacro_rules! {name} {{\n    () => {{\n        {:?}\n    }};\n}}",
+            format!(" {paragraph}")
+        )
+        .expect("String output");
+    }
+    rust
 }
 
 /// Render documentation comments and shell macros for snapshots.
@@ -1267,11 +1310,23 @@ impl MacroDocumentation {
     ///
     /// Each arm expands to the defining crate's [`documentation_shell_support`] macro,
     /// which calls `unimplemented!()`, so a documentation build of a crate that calls
-    /// the macro inside a function body still succeeds. `attributes` is written before
-    /// the doc comment, for example a `#[cfg(...)]` line.
+    /// the macro inside a function body still succeeds. Doc lines that repeat a shared
+    /// paragraph name its macro instead of repeating the text. `attributes` is written
+    /// before the doc comment, for example a `#[cfg(...)]` line.
     pub fn render_shell(&self, location: Option<&str>, attributes: &str) -> Option<String> {
+        let mut comment = String::new();
+        write_doc_comments(&mut comment, &self.comment(location))?;
         let mut rust = String::from(attributes);
-        write_doc_comments(&mut rust, &self.comment(location))?;
+        for line in comment.lines() {
+            match SHARED_PARAGRAPHS
+                .iter()
+                .find(|(_, paragraph)| line.strip_prefix("/// ") == Some(paragraph))
+            {
+                Some((name, _)) => writeln!(rust, "#[doc = crate::{name}!()]"),
+                None => writeln!(rust, "{line}"),
+            }
+            .expect("String output");
+        }
         if self.hidden {
             rust.push_str("#[doc(hidden)]\n");
         }

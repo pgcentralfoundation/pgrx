@@ -1425,7 +1425,9 @@ snapshot covering every configured supported version. docs.rs builds have no
 PostgreSQL or Clang, so the snapshot keeps only what rustdoc shows. Each emitted
 macro becomes a shell with its generated documentation and one arm per accepted
 invocation form; every arm expands to one shared hidden macro that calls
-`unimplemented!()`. The generated
+`unimplemented!()`. Doc paragraphs that many macros repeat verbatim, such as the
+`# Safety` contract, are written once as hidden macros and referenced with
+`#[doc = crate::NAME!()]`, which renders the same text. The generated
 implementation, native support and target guards are left out. The snapshot
 merges versions:
 

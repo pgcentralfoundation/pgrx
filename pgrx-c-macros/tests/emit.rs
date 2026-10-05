@@ -185,6 +185,28 @@ fn documentation_shells_show_invocation_forms() {
     let names = ["SHELL_ADD", "SHELL_UNGROUPED", "SHELL_CAPTURE", "SHELL_RETURN"];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
     let mut shells = documentation_shell_support();
+    // Shared paragraph macros return one doc line each; expand references to them
+    // so shell docs can be compared with the generated macro's own doc comments.
+    let support = syn::parse_file(&shells).unwrap();
+    let shared = support
+        .items
+        .iter()
+        .filter_map(|item| {
+            let syn::Item::Macro(item) = item else { return None };
+            let name = item.ident.as_ref()?.to_string();
+            let body = item.mac.tokens.clone().into_iter().find_map(|token| match token {
+                proc_macro2::TokenTree::Group(group)
+                    if group.delimiter() == proc_macro2::Delimiter::Brace =>
+                {
+                    Some(group.stream())
+                }
+                _ => None,
+            })?;
+            let literal = syn::parse2::<syn::LitStr>(body).ok()?;
+            Some((format!("#[doc = crate::{name}!()]"), format!("///{}", literal.value())))
+        })
+        .collect::<std::collections::BTreeMap<_, _>>();
+    assert!(shared.contains_key("#[doc = crate::__pgrx_c_doc_safety!()]"));
     let mut forms = Vec::new();
     for name in names {
         let emission = emit(&session, name);
@@ -199,11 +221,14 @@ fn documentation_shells_show_invocation_forms() {
             source
                 .lines()
                 .map(str::trim_start)
-                .filter(|line| line.starts_with("///"))
-                .map(str::to_owned)
+                .filter_map(|line| match shared.get(line) {
+                    Some(paragraph) => Some(paragraph.clone()),
+                    None => line.starts_with("///").then(|| line.to_owned()),
+                })
                 .collect::<Vec<_>>()
         };
         assert_eq!(docs(&shell), docs(rust), "{name}");
+        assert!(shell.contains("#[doc = crate::__pgrx_c_doc_safety!()]"), "{name}");
         assert!(!shell.contains("__pgrx_c_macros"), "{name}: shells contain no implementation");
         assert_eq!(
             shell.matches("=> { $crate::__pgrx_c_documentation_shell!() };").count(),
