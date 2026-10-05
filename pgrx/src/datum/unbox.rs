@@ -70,9 +70,9 @@ unsafe impl UnboxDatum for i8 {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetChar!(datum.0).get() };
         value as i8
     }
@@ -87,9 +87,9 @@ unsafe impl UnboxDatum for i16 {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetInt16!(datum.0).get() };
         value
     }
@@ -104,9 +104,9 @@ unsafe impl UnboxDatum for i32 {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetInt32!(datum.0).get() };
         value
     }
@@ -121,9 +121,9 @@ unsafe impl UnboxDatum for i64 {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetInt64!(datum.0).get() };
         value
     }
@@ -138,9 +138,9 @@ unsafe impl UnboxDatum for bool {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetBool!(datum.0).get() };
         value
     }
@@ -154,10 +154,7 @@ unsafe impl UnboxDatum for f32 {
     where
         Self: 'src,
     {
-        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // This guarded native call must run on the backend thread,
-        // and the guard panics on any other thread.
-        unsafe { pg_sys::DatumGetFloat4(datum.0) }
+        f32::from_bits(datum.0.value() as u32)
     }
 }
 
@@ -169,10 +166,7 @@ unsafe impl UnboxDatum for f64 {
     where
         Self: 'src,
     {
-        // SAFETY: UnboxDatum's caller guarantees the datum has this initialized scalar type.
-        // This guarded native call must run on the backend thread,
-        // and the guard panics on any other thread.
-        unsafe { pg_sys::DatumGetFloat8(datum.0) }
+        f64::from_bits(datum.0.value() as u64)
     }
 }
 
@@ -253,9 +247,9 @@ unsafe impl UnboxDatum for pg_sys::Oid {
         Self: 'src,
     {
         // SAFETY: UnboxDatum's caller guarantees this is an initialized OID datum.
-        // On PG16+ this is a guarded native call: it must run on the backend thread,
-        // and the guard panics on any other thread.
-        #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+        // Where this conversion is a guarded native call, the guard panics off the
+        // backend thread.
+        #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
         let value = unsafe { pg_sys::DatumGetObjectId!(datum.0).get() };
         pg_sys::Oid::from(value)
     }

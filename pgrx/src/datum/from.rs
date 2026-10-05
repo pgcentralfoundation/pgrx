@@ -189,9 +189,9 @@ impl FromDatum for pg_sys::Oid {
             // DatumGetObjectId casts the Datum's stored value to Oid; it does not
             // treat those bits as a pointer to an unsigned integer and dereference it.
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetObjectId!(datum).get() };
             Some(pg_sys::Oid::from(value))
         }
@@ -221,9 +221,9 @@ impl FromDatum for bool {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetBool!(datum).get() };
             Some(value)
         }
@@ -242,9 +242,9 @@ impl FromDatum for i8 {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetChar!(datum).get() };
             Some(value as i8)
         }
@@ -263,9 +263,9 @@ impl FromDatum for i16 {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetInt16!(datum).get() };
             Some(value)
         }
@@ -284,9 +284,9 @@ impl FromDatum for i32 {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetInt32!(datum).get() };
             Some(value)
         }
@@ -305,9 +305,9 @@ impl FromDatum for u32 {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetUInt32!(datum).get() };
             Some(value)
         }
@@ -326,9 +326,9 @@ impl FromDatum for i64 {
             None
         } else {
             // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // On PG16+ this is a guarded native call: it must run on the backend thread,
-            // and the guard panics on any other thread.
-            #[allow(unused_unsafe, reason = "pure C macro or inline function")]
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
             let value = unsafe { pg_sys::DatumGetInt64!(datum).get() };
             Some(value)
         }
@@ -343,15 +343,7 @@ impl FromDatum for f32 {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<f32> {
-        if is_null {
-            None
-        } else {
-            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // This guarded native call must run on the backend thread,
-            // and the guard panics on any other thread.
-            let value = unsafe { pg_sys::DatumGetFloat4(datum) };
-            Some(value)
-        }
+        if is_null { None } else { Some(f32::from_bits(datum.value() as _)) }
     }
 }
 
@@ -366,10 +358,11 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
-            // This guarded native call must run on the backend thread,
-            // and the guard panics on any other thread.
-            let value = unsafe { pg_sys::DatumGetFloat8(datum) };
+            let value = if size_of::<i64>() <= size_of::<pg_sys::Datum>() {
+                f64::from_bits(datum.value() as _)
+            } else {
+                *(datum.cast_mut_ptr() as *const _)
+            };
             Some(value)
         }
     }
