@@ -232,6 +232,10 @@ impl PgMemoryContexts {
     /// Furthermore, users of this function's return value have no choice but to assume the returned
     /// [`PgMemoryContexts::Of`] variant represents a legitimate [`pg_sys::MemoryContext`].
     pub unsafe fn of(ptr: void_mut_ptr) -> Option<PgMemoryContexts> {
+        // `GetMemoryChunkContext` reads the chunk header before `ptr`, so NULL must not reach it.
+        if ptr.is_null() {
+            return None;
+        }
         let parent = unsafe {
             // (un)SAFETY: the caller assumes responsibility for ensuring the provided pointer is
             // going to be accepted by Postgres `GetMemoryChunkContext`.  Postgres will ERROR

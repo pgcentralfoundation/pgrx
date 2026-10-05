@@ -76,4 +76,16 @@ mod tests {
             drop(lock);
         }
     }
+
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked() {
+        use super::SPINLOCK;
+        let spinlock = SPINLOCK.get();
+        assert!(!spinlock.is_locked());
+        let lock = spinlock.lock();
+        assert!(spinlock.is_locked());
+        drop(lock);
+        assert!(!spinlock.is_locked());
+    }
 }

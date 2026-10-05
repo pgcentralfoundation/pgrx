@@ -125,6 +125,8 @@ impl IntoDatum for bool {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        // On PG16+ this is a guarded native call: it must run on the backend thread,
+        // and the guard panics on any other thread.
         #[allow(unused_unsafe, reason = "pure C macro or inline function")]
         let converted = unsafe { pg_sys::BoolGetDatum!(self).get() };
         Some(pg_sys::Datum::from(converted as usize))
@@ -144,6 +146,8 @@ impl IntoDatum for i8 {
             self as pg_sys::__pgrx_c_macros::CCharRepr,
         );
         // SAFETY: value has the selected target's native C char representation.
+        // On PG16+ this is a guarded native call: it must run on the backend thread,
+        // and the guard panics on any other thread.
         #[allow(unused_unsafe, reason = "pure C macro or inline function")]
         let converted = unsafe { pg_sys::CharGetDatum!(value).get() };
         Some(pg_sys::Datum::from(converted as usize))
@@ -159,6 +163,8 @@ impl IntoDatum for i16 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        // On PG16+ this is a guarded native call: it must run on the backend thread,
+        // and the guard panics on any other thread.
         #[allow(unused_unsafe, reason = "pure C macro or inline function")]
         let converted = unsafe { pg_sys::Int16GetDatum!(self).get() };
         Some(pg_sys::Datum::from(converted as usize))
@@ -178,6 +184,8 @@ impl IntoDatum for i32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        // On PG16+ this is a guarded native call: it must run on the backend thread,
+        // and the guard panics on any other thread.
         #[allow(unused_unsafe, reason = "pure C macro or inline function")]
         let converted = unsafe { pg_sys::Int32GetDatum!(self).get() };
         Some(pg_sys::Datum::from(converted as usize))
@@ -201,6 +209,8 @@ impl IntoDatum for i64 {
             pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::int64>::new(self as _);
         // SAFETY: value has the native PostgreSQL int64 representation; generation
         // selects the installation's actual by-value or by-reference conversion.
+        // Where Int64GetDatum is a function, it is a guarded native call: it must run on the
+        // backend thread, and the guard panics on any other thread.
         #[allow(unused_unsafe, reason = "pure C macro or inline function")]
         let converted = unsafe { pg_sys::Int64GetDatum!(value).get() };
         Some(pg_sys::Datum::from(converted as usize))
@@ -224,6 +234,8 @@ impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        // This guarded native call must run on the backend thread,
+        // and the guard panics on any other thread.
         Some(unsafe { pg_sys::Float4GetDatum(self) })
     }
 
@@ -237,6 +249,8 @@ impl IntoDatum for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // SAFETY: this scalar has the native PostgreSQL representation for the conversion.
+        // This guarded native call must run on the backend thread,
+        // and the guard panics on any other thread.
         Some(unsafe { pg_sys::Float8GetDatum(self) })
     }
 
