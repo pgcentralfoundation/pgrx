@@ -79,7 +79,7 @@ macro_rules! DatumGetTSQuery {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTSQuery from ts_type.h:250 (PostgreSQL 16–18), ts_type.h:251 (PostgreSQL 19)
+/// C inline function DatumGetTSQuery from ts_type.h:250 (PostgreSQL 16–18), ts_type.h:251 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TSQuery
@@ -90,7 +90,7 @@ macro_rules! DatumGetTSQuery {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -98,7 +98,7 @@ macro_rules! DatumGetTSQuery {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTSQuery {
     ($X:expr $(,)?) => {
@@ -738,8 +738,35 @@ macro_rules! TSQueryGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TSQueryGetDatum from ts_type.h:262 (PostgreSQL 16–18), ts_type.h:263 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function TSQueryGetDatum from ts_type.h:262 (PostgreSQL 16–18)
+///
+/// ```c
+/// static inline Datum
+/// TSQueryGetDatum(const TSQueryData *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TSQueryGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function TSQueryGetDatum from ts_type.h:263 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -786,8 +813,35 @@ macro_rules! TSVectorGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TSVectorGetDatum from ts_type.h:129 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function TSVectorGetDatum from ts_type.h:129 (PostgreSQL 16–18)
+///
+/// ```c
+/// static inline Datum
+/// TSVectorGetDatum(const TSVectorData *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TSVectorGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function TSVectorGetDatum from ts_type.h:129 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum

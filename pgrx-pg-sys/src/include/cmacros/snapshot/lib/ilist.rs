@@ -739,7 +739,7 @@ macro_rules! dlist_delete_thoroughly {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function dlist_has_next from ilist.h:420 (PostgreSQL 15)
+/// C inline function dlist_has_next from ilist.h:420 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -750,15 +750,11 @@ macro_rules! dlist_delete_thoroughly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_has_next {
     ($head:expr, $node:expr $(,)?) => {
@@ -766,7 +762,7 @@ macro_rules! dlist_has_next {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function dlist_has_next from ilist.h:502 (PostgreSQL 16–19)
+/// C inline function dlist_has_next from ilist.h:502 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline bool
@@ -777,15 +773,11 @@ macro_rules! dlist_has_next {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_has_next {
     ($head:expr, $node:expr $(,)?) => {
@@ -793,7 +785,7 @@ macro_rules! dlist_has_next {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function dlist_has_prev from ilist.h:430 (PostgreSQL 15)
+/// C inline function dlist_has_prev from ilist.h:430 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -804,15 +796,11 @@ macro_rules! dlist_has_next {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_has_prev {
     ($head:expr, $node:expr $(,)?) => {
@@ -820,7 +808,7 @@ macro_rules! dlist_has_prev {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function dlist_has_prev from ilist.h:512 (PostgreSQL 16–19)
+/// C inline function dlist_has_prev from ilist.h:512 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline bool
@@ -831,15 +819,11 @@ macro_rules! dlist_has_prev {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_has_prev {
     ($head:expr, $node:expr $(,)?) => {
@@ -873,7 +857,7 @@ macro_rules! dlist_head_element_off {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function dlist_head_node from ilist.h:467 (PostgreSQL 15), ilist.h:564 (PostgreSQL 16–19)
+/// C inline function dlist_head_node from ilist.h:467 (PostgreSQL 15), ilist.h:564 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline dlist_node *
@@ -884,7 +868,7 @@ macro_rules! dlist_head_element_off {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -892,7 +876,7 @@ macro_rules! dlist_head_element_off {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_head_node {
     ($head:expr $(,)?) => {
@@ -1365,7 +1349,7 @@ macro_rules! dlist_tail_element_off {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function dlist_tail_node from ilist.h:484 (PostgreSQL 15), ilist.h:581 (PostgreSQL 16–19)
+/// C inline function dlist_tail_node from ilist.h:484 (PostgreSQL 15), ilist.h:581 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline dlist_node *
@@ -1376,7 +1360,7 @@ macro_rules! dlist_tail_element_off {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1384,7 +1368,7 @@ macro_rules! dlist_tail_element_off {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! dlist_tail_node {
     ($head:expr $(,)?) => {
@@ -1533,7 +1517,7 @@ macro_rules! slist_head_element_off {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function slist_head_node from ilist.h:658 (PostgreSQL 15), ilist.h:1071 (PostgreSQL 16–19)
+/// C inline function slist_head_node from ilist.h:658 (PostgreSQL 15), ilist.h:1071 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline slist_node *
@@ -1544,7 +1528,7 @@ macro_rules! slist_head_element_off {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1552,7 +1536,7 @@ macro_rules! slist_head_element_off {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! slist_head_node {
     ($head:expr $(,)?) => {

@@ -37,9 +37,11 @@ PostgreSQL sometimes changes a macro into a static inline function. The
 generator keeps the `NAME!(...)` interface available in both cases, so callers
 do not need version checks or an extra pointer cast merely because the C name
 became a function. For example, `VARDATA_ANY!(ptr).get()` works across PG15–19.
-The adapter calls the original C function through the checked native binding;
-it does not translate or copy the function's body. Native wrappers are built
-even when the public `cshim` feature is disabled.
+When a value-returning function's body uses no C macros and only constructs the
+generator supports, the generated macro translates that body to Rust, as it
+would a macro's. Otherwise it calls the original C function through the checked
+native binding. Native wrappers are built even when the public `cshim` feature
+is disabled.
 
 The selected header still determines argument and result types. A size result
 can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
@@ -177,7 +179,7 @@ use pgrx::pg_sys;
 ///
 /// # Safety
 /// Call on the PostgreSQL backend thread with a valid int4 Datum.
-#[allow(unused_unsafe, reason = "older headers define this conversion as a pure macro")]
+#[allow(unused_unsafe, reason = "this conversion is pure wherever it is translated")]
 unsafe fn read_pass_by_value_int32(datum: pg_sys::Datum) -> i32 {
     // SAFETY: The caller supplies a Datum containing an initialized int32;
     // execute this within the PostgreSQL backend thread.
@@ -188,10 +190,10 @@ unsafe fn read_pass_by_value_int32(datum: pg_sys::Datum) -> i32 {
 The caller must know what the Datum contains. A Datum that carries a pointer is
 not an int32 just because its address can be converted to integer bits.
 For versions that define `DatumGetInt32` as a static inline function, the
-generated macro adapter calls that function. The ordinary function binding is
-also available when you want its exact native Rust signature.
-The narrow lint allowance keeps this shared call quiet when an older header's
-pure macro does not need the unsafe block required by the newer native function.
+generator translates its body, so the conversion stays pure Rust. The ordinary
+function binding is also available when you want its exact native Rust signature.
+An inline function the generator calls natively needs the unsafe block, so the
+narrow lint allowance keeps this shared call quiet where it is pure.
 
 ## Compose macros before extracting Rust values
 

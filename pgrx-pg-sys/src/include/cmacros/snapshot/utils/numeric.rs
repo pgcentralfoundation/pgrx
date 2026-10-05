@@ -118,8 +118,35 @@ macro_rules! NumericGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function NumericGetDatum from numeric.h:71 (PostgreSQL 16), numeric.h:72 (PostgreSQL 17–18), numeric.h:75 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function NumericGetDatum from numeric.h:71 (PostgreSQL 16), numeric.h:72 (PostgreSQL 17–18)
+///
+/// ```c
+/// static inline Datum
+/// NumericGetDatum(Numeric X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! NumericGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function NumericGetDatum from numeric.h:75 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum

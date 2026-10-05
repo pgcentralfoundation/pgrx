@@ -441,7 +441,7 @@ macro_rules! att_isnull {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function att_isnull from tupmacs.h:25 (PostgreSQL 16–18)
+/// C inline function att_isnull from tupmacs.h:25 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline bool
@@ -452,7 +452,7 @@ macro_rules! att_isnull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -460,7 +460,7 @@ macro_rules! att_isnull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
@@ -468,7 +468,7 @@ macro_rules! att_isnull {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function att_isnull from tupmacs.h:27 (PostgreSQL 19)
+/// C inline function att_isnull from tupmacs.h:27 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -479,7 +479,7 @@ macro_rules! att_isnull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -487,7 +487,7 @@ macro_rules! att_isnull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {

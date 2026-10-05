@@ -231,7 +231,7 @@ macro_rules! IsTLHistoryFileName {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IsTLHistoryFileName from xlog_internal.h:223 (PostgreSQL 16–18), xlog_internal.h:222 (PostgreSQL 19)
+/// C inline function IsTLHistoryFileName from xlog_internal.h:223 (PostgreSQL 16–18), xlog_internal.h:222 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -244,7 +244,7 @@ macro_rules! IsTLHistoryFileName {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+/// Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage. Calls inside the body keep the backend thread and PostgreSQL error contracts of their guarded bindings. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -252,7 +252,7 @@ macro_rules! IsTLHistoryFileName {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {

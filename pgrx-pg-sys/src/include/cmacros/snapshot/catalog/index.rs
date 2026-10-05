@@ -30,8 +30,8 @@ macro_rules! itemptr_decode {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function itemptr_encode from index.h:184 (PostgreSQL 15–16), index.h:188 (PostgreSQL 17), index.h:189 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function itemptr_encode from index.h:184 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline int64
@@ -69,8 +69,47 @@ macro_rules! itemptr_encode {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function itemptr_encode from index.h:184 (PostgreSQL 16), index.h:188 (PostgreSQL 17), index.h:189 (PostgreSQL 18)
+///
+/// ```c
+/// static inline int64
+/// itemptr_encode(ItemPointer itemptr)
+/// {
+/// 	BlockNumber block = ItemPointerGetBlockNumber(itemptr);
+/// 	OffsetNumber offset = ItemPointerGetOffsetNumber(itemptr);
+/// 	int64		encoded;
+///
+/// 	/*
+/// 	 * Use the 16 least significant bits for the offset.  32 adjacent bits are
+/// 	 * used for the block number.  Since remaining bits are unused, there
+/// 	 * cannot be negative encoded values (We assume a two's complement
+/// 	 * representation).
+/// 	 */
+/// 	encoded = ((uint64) block << 16) | (uint16) offset;
+///
+/// 	return encoded;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! itemptr_encode {
+    ($itemptr:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function itemptr_encode from index.h:196 (PostgreSQL 19)
+/// C inline function itemptr_encode from index.h:196 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int64
@@ -93,7 +132,7 @@ macro_rules! itemptr_encode {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -101,7 +140,7 @@ macro_rules! itemptr_encode {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! itemptr_encode {
     ($itemptr:expr $(,)?) => {

@@ -519,7 +519,7 @@ macro_rules! pg_clock_gettime_ns {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_current_timing_clock_source from instr_time.h:185 (PostgreSQL 19)
+/// C inline function pg_current_timing_clock_source from instr_time.h:185 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TimingClockSourceType
@@ -534,15 +534,11 @@ macro_rules! pg_clock_gettime_ns {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_current_timing_clock_source {
     () => {
@@ -550,7 +546,7 @@ macro_rules! pg_current_timing_clock_source {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_get_ticks from instr_time.h:409 (PostgreSQL 19)
+/// C inline function pg_get_ticks from instr_time.h:409 (PostgreSQL 19)
 ///
 /// ```c
 /// static pg_attribute_always_inline instr_time
@@ -561,7 +557,7 @@ macro_rules! pg_current_timing_clock_source {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -577,7 +573,7 @@ macro_rules! pg_get_ticks {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_get_ticks_fast from instr_time.h:415 (PostgreSQL 19)
+/// C inline function pg_get_ticks_fast from instr_time.h:415 (PostgreSQL 19)
 ///
 /// ```c
 /// static pg_attribute_always_inline instr_time
@@ -588,7 +584,7 @@ macro_rules! pg_get_ticks {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

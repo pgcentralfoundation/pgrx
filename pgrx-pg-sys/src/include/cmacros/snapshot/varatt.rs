@@ -941,7 +941,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:388 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:388 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -952,7 +952,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -989,7 +989,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:374 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:374 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1000,7 +1000,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1037,7 +1037,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:381 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:381 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1048,7 +1048,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1085,7 +1085,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:367 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:367 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1096,7 +1096,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1133,7 +1133,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:395 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:395 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1144,7 +1144,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1181,7 +1181,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:360 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:360 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1192,7 +1192,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2180,7 +2180,7 @@ macro_rules! VARTAG_IS_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 19)
+/// C inline function VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2191,15 +2191,11 @@ macro_rules! VARTAG_IS_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARTAG_IS_EXPANDED {
     ($tag:expr $(,)?) => {

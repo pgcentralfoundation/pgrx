@@ -766,7 +766,7 @@ macro_rules! pg_atomic_sub_fetch_u64 {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function pg_atomic_test_set_flag from atomics.h:184 (PostgreSQL 15), atomics.h:179 (PostgreSQL 16), atomics.h:177 (PostgreSQL 17), atomics.h:182 (PostgreSQL 18), atomics.h:180 (PostgreSQL 19)
+/// C inline function pg_atomic_test_set_flag from atomics.h:184 (PostgreSQL 15), atomics.h:179 (PostgreSQL 16), atomics.h:177 (PostgreSQL 17), atomics.h:182 (PostgreSQL 18), atomics.h:180 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -777,7 +777,7 @@ macro_rules! pg_atomic_sub_fetch_u64 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -792,7 +792,7 @@ macro_rules! pg_atomic_test_set_flag {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function pg_atomic_unlocked_test_flag from atomics.h:197 (PostgreSQL 15), atomics.h:192 (PostgreSQL 16), atomics.h:190 (PostgreSQL 17), atomics.h:195 (PostgreSQL 18), atomics.h:193 (PostgreSQL 19)
+/// C inline function pg_atomic_unlocked_test_flag from atomics.h:197 (PostgreSQL 15), atomics.h:192 (PostgreSQL 16), atomics.h:190 (PostgreSQL 17), atomics.h:195 (PostgreSQL 18), atomics.h:193 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -803,7 +803,7 @@ macro_rules! pg_atomic_test_set_flag {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

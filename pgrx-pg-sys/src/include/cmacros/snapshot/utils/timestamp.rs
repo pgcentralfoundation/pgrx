@@ -23,7 +23,7 @@ macro_rules! DatumGetIntervalP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetIntervalP from timestamp.h:39 (PostgreSQL 16–19)
+/// C inline function DatumGetIntervalP from timestamp.h:39 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Interval *
@@ -34,7 +34,7 @@ macro_rules! DatumGetIntervalP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -42,7 +42,7 @@ macro_rules! DatumGetIntervalP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetIntervalP {
     ($X:expr $(,)?) => {
@@ -71,7 +71,7 @@ macro_rules! DatumGetTimestamp {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTimestamp from timestamp.h:27 (PostgreSQL 16–19)
+/// C inline function DatumGetTimestamp from timestamp.h:27 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Timestamp
@@ -82,7 +82,7 @@ macro_rules! DatumGetTimestamp {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -90,7 +90,7 @@ macro_rules! DatumGetTimestamp {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTimestamp {
     ($X:expr $(,)?) => {
@@ -119,7 +119,7 @@ macro_rules! DatumGetTimestampTz {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTimestampTz from timestamp.h:33 (PostgreSQL 16–19)
+/// C inline function DatumGetTimestampTz from timestamp.h:33 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline TimestampTz
@@ -130,7 +130,7 @@ macro_rules! DatumGetTimestampTz {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -138,7 +138,7 @@ macro_rules! DatumGetTimestampTz {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTimestampTz {
     ($X:expr $(,)?) => {
@@ -242,8 +242,35 @@ macro_rules! IntervalPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 16–18)
+///
+/// ```c
+/// static inline Datum
+/// IntervalPGetDatum(const Interval *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! IntervalPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function IntervalPGetDatum from timestamp.h:57 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -584,7 +611,7 @@ macro_rules! TIMESTAMP_MASK {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TimestampDifferenceMicroseconds from timestamp.h:89 (PostgreSQL 18–19)
+/// C inline function TimestampDifferenceMicroseconds from timestamp.h:89 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline uint64
@@ -598,7 +625,7 @@ macro_rules! TIMESTAMP_MASK {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -606,7 +633,7 @@ macro_rules! TIMESTAMP_MASK {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TimestampDifferenceMicroseconds {
     ($start_time:expr, $stop_time:expr $(,)?) => {
@@ -635,7 +662,7 @@ macro_rules! TimestampGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TimestampGetDatum from timestamp.h:45 (PostgreSQL 16–19)
+/// C inline function TimestampGetDatum from timestamp.h:45 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -646,7 +673,7 @@ macro_rules! TimestampGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -683,7 +710,7 @@ macro_rules! TimestampTzGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TimestampTzGetDatum from timestamp.h:51 (PostgreSQL 16–19)
+/// C inline function TimestampTzGetDatum from timestamp.h:51 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -694,7 +721,7 @@ macro_rules! TimestampTzGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

@@ -650,7 +650,7 @@ macro_rules! table_finish_bulk_insert {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1787 (PostgreSQL 15), tableam.h:1812 (PostgreSQL 16), tableam.h:1815 (PostgreSQL 17), tableam.h:1774 (PostgreSQL 18)
+/// C inline function table_index_build_range_scan from tableam.h:1787 (PostgreSQL 15), tableam.h:1812 (PostgreSQL 16), tableam.h:1815 (PostgreSQL 17), tableam.h:1774 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline double
@@ -681,7 +681,7 @@ macro_rules! table_finish_bulk_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -697,7 +697,7 @@ macro_rules! table_index_build_range_scan {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1877 (PostgreSQL 19)
+/// C inline function table_index_build_range_scan from tableam.h:1877 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -728,7 +728,7 @@ macro_rules! table_index_build_range_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -831,7 +831,7 @@ macro_rules! table_index_build_scan {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
+/// C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -842,7 +842,7 @@ macro_rules! table_index_build_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -858,7 +858,7 @@ macro_rules! table_index_delete_tuples {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_fetch_begin from tableam.h:1168 (PostgreSQL 15), tableam.h:1192 (PostgreSQL 16), tableam.h:1197 (PostgreSQL 17), tableam.h:1156 (PostgreSQL 18)
+/// C inline function table_index_fetch_begin from tableam.h:1168 (PostgreSQL 15), tableam.h:1192 (PostgreSQL 16), tableam.h:1197 (PostgreSQL 17), tableam.h:1156 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline IndexFetchTableData *
@@ -869,7 +869,7 @@ macro_rules! table_index_delete_tuples {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1015,7 +1015,7 @@ macro_rules! table_index_fetch_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_fetch_tuple from tableam.h:1304 (PostgreSQL 19)
+/// C inline function table_index_fetch_tuple from tableam.h:1304 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1032,7 +1032,7 @@ macro_rules! table_index_fetch_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1428,7 +1428,7 @@ macro_rules! table_relation_fetch_toast_slice {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1946 (PostgreSQL 19)
+/// C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1946 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1439,7 +1439,7 @@ macro_rules! table_relation_fetch_toast_slice {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1545,7 +1545,7 @@ macro_rules! table_relation_set_new_filenode {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1937 (PostgreSQL 19)
+/// C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1937 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint64
@@ -1556,7 +1556,7 @@ macro_rules! table_relation_set_new_filenode {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1571,7 +1571,7 @@ macro_rules! table_relation_size {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1956 (PostgreSQL 19)
+/// C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1956 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Oid
@@ -1582,7 +1582,7 @@ macro_rules! table_relation_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1800,7 +1800,7 @@ macro_rules! table_rescan_tidrange {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1699 (PostgreSQL 15), tableam.h:1724 (PostgreSQL 16)
+/// C inline function table_scan_analyze_next_block from tableam.h:1699 (PostgreSQL 15), tableam.h:1724 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -1813,7 +1813,7 @@ macro_rules! table_rescan_tidrange {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1829,7 +1829,7 @@ macro_rules! table_scan_analyze_next_block {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1791 (PostgreSQL 19)
+/// C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1791 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1840,7 +1840,7 @@ macro_rules! table_scan_analyze_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1856,7 +1856,7 @@ macro_rules! table_scan_analyze_next_block {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1717 (PostgreSQL 15), tableam.h:1742 (PostgreSQL 16), tableam.h:1745 (PostgreSQL 17), tableam.h:1704 (PostgreSQL 18)
+/// C inline function table_scan_analyze_next_tuple from tableam.h:1717 (PostgreSQL 15), tableam.h:1742 (PostgreSQL 16), tableam.h:1745 (PostgreSQL 17), tableam.h:1704 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -1871,7 +1871,7 @@ macro_rules! table_scan_analyze_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1887,7 +1887,7 @@ macro_rules! table_scan_analyze_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1807 (PostgreSQL 19)
+/// C inline function table_scan_analyze_next_tuple from tableam.h:1807 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1902,7 +1902,7 @@ macro_rules! table_scan_analyze_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2037,7 +2037,7 @@ macro_rules! table_scan_bitmap_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:2034 (PostgreSQL 19)
+/// C inline function table_scan_bitmap_next_tuple from tableam.h:2034 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2056,7 +2056,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2288,7 +2288,7 @@ macro_rules! table_scan_sample_next_block {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:2057 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_block from tableam.h:2057 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2300,7 +2300,7 @@ macro_rules! table_scan_sample_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2353,7 +2353,7 @@ macro_rules! table_scan_sample_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2072 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_tuple from tableam.h:2072 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2367,7 +2367,7 @@ macro_rules! table_scan_sample_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2629,7 +2629,7 @@ macro_rules! table_tuple_insert_speculative {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1645 (PostgreSQL 19)
+/// C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1645 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -2645,7 +2645,7 @@ macro_rules! table_tuple_insert_speculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2660,7 +2660,7 @@ macro_rules! table_tuple_lock {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
+/// C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2672,7 +2672,7 @@ macro_rules! table_tuple_lock {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2687,7 +2687,7 @@ macro_rules! table_tuple_satisfies_snapshot {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
+/// C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2698,7 +2698,7 @@ macro_rules! table_tuple_satisfies_snapshot {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

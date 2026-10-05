@@ -155,6 +155,83 @@ fn source(
             .into_iter()
             .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
             .collect(),
+        body: source
+            .as_ref()
+            .and_then(|_| body_tokens(definition, &file, start.offset, end.offset)),
         source,
     })
+}
+
+/// Tokenize the statements the compiler parsed in a definition's body.
+///
+/// Tokenizing the whole body would also return tokens from inactive `#if` branches, so
+/// each active statement is tokenized from its own extent, followed by its terminating
+/// `;` when the extent omits it. A statement outside the definition's own text, for
+/// example one produced by a macro expansion, or one containing a directive, makes the
+/// body unavailable.
+fn body_tokens(
+    definition: Entity<'_>,
+    file: &clang::source::File<'_>,
+    start: u32,
+    end: u32,
+) -> Option<Vec<crate::Token>> {
+    let body = definition
+        .get_children()
+        .into_iter()
+        .find(|child| child.get_kind() == EntityKind::CompoundStmt)?;
+    let all = body.get_range()?.tokenize();
+    let offset = |token: &clang::token::Token<'_>| {
+        let location = token.get_location().get_spelling_location();
+        (location.file.as_ref() == Some(file)).then_some(location.offset)
+    };
+    let mut tokens = Vec::new();
+    // Statements are in source order, so each search resumes after the previous one.
+    let mut position = 0;
+    for statement in body.get_children() {
+        let range = statement.get_range()?;
+        let first = range.get_start().get_spelling_location();
+        let last = range.get_end().get_spelling_location();
+        if first.file.as_ref() != Some(file)
+            || last.file.as_ref() != Some(file)
+            || first.offset < start
+            || last.offset > end
+            || last.offset < first.offset
+        {
+            return None;
+        }
+        position += all[position..].iter().position(|token| offset(token) == Some(first.offset))?;
+        loop {
+            let token = all.get(position)?;
+            let token_offset = offset(token)?;
+            if token_offset > last.offset {
+                // Expression statements and returns end before their semicolon.
+                if token.get_spelling() == ";"
+                    && tokens.last().is_some_and(|last: &crate::Token| last.spelling != ";")
+                {
+                    tokens.push(crate::Token {
+                        kind: crate::TokenKind::Punctuation,
+                        spelling: ";".into(),
+                    });
+                }
+                break;
+            }
+            let kind = match token.get_kind() {
+                clang::token::TokenKind::Comment => {
+                    position += 1;
+                    continue;
+                }
+                clang::token::TokenKind::Identifier => crate::TokenKind::Identifier,
+                clang::token::TokenKind::Keyword => crate::TokenKind::Keyword,
+                clang::token::TokenKind::Literal => crate::TokenKind::Literal,
+                clang::token::TokenKind::Punctuation => crate::TokenKind::Punctuation,
+            };
+            let spelling = token.get_spelling();
+            if spelling == "#" {
+                return None;
+            }
+            tokens.push(crate::Token { kind, spelling });
+            position += 1;
+        }
+    }
+    Some(tokens)
 }

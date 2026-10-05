@@ -265,7 +265,7 @@ macro_rules! BufTableHashPartition {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufTagGetForkNum from buf_internals.h:107 (PostgreSQL 16), buf_internals.h:108 (PostgreSQL 17), buf_internals.h:121 (PostgreSQL 18), buf_internals.h:176 (PostgreSQL 19)
+/// C inline function BufTagGetForkNum from buf_internals.h:107 (PostgreSQL 16), buf_internals.h:108 (PostgreSQL 17), buf_internals.h:121 (PostgreSQL 18), buf_internals.h:176 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ForkNumber
@@ -276,15 +276,11 @@ macro_rules! BufTableHashPartition {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufTagGetForkNum {
     ($tag:expr $(,)?) => {
@@ -325,7 +321,7 @@ macro_rules! BufTagGetRelFileLocator {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufTagGetRelNumber from buf_internals.h:101 (PostgreSQL 16), buf_internals.h:102 (PostgreSQL 17), buf_internals.h:115 (PostgreSQL 18), buf_internals.h:170 (PostgreSQL 19)
+/// C inline function BufTagGetRelNumber from buf_internals.h:101 (PostgreSQL 16), buf_internals.h:102 (PostgreSQL 17), buf_internals.h:115 (PostgreSQL 18), buf_internals.h:170 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline RelFileNumber
@@ -336,15 +332,11 @@ macro_rules! BufTagGetRelFileLocator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufTagGetRelNumber {
     ($tag:expr $(,)?) => {
@@ -352,7 +344,7 @@ macro_rules! BufTagGetRelNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufTagMatchesRelFileLocator from buf_internals.h:162 (PostgreSQL 16), buf_internals.h:163 (PostgreSQL 17), buf_internals.h:176 (PostgreSQL 18), buf_internals.h:231 (PostgreSQL 19)
+/// C inline function BufTagMatchesRelFileLocator from buf_internals.h:162 (PostgreSQL 16), buf_internals.h:163 (PostgreSQL 17), buf_internals.h:176 (PostgreSQL 18), buf_internals.h:231 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -366,7 +358,7 @@ macro_rules! BufTagGetRelNumber {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -432,7 +424,7 @@ macro_rules! BufferDescriptorGetBuffer {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferDescriptorGetBuffer from buf_internals.h:329 (PostgreSQL 16), buf_internals.h:330 (PostgreSQL 17), buf_internals.h:345 (PostgreSQL 18), buf_internals.h:433 (PostgreSQL 19)
+/// C inline function BufferDescriptorGetBuffer from buf_internals.h:329 (PostgreSQL 16), buf_internals.h:330 (PostgreSQL 17), buf_internals.h:345 (PostgreSQL 18), buf_internals.h:433 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Buffer
@@ -443,7 +435,7 @@ macro_rules! BufferDescriptorGetBuffer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -451,7 +443,7 @@ macro_rules! BufferDescriptorGetBuffer {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
     ($bdesc:expr $(,)?) => {
@@ -480,7 +472,7 @@ macro_rules! BufferDescriptorGetContentLock {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function BufferDescriptorGetContentLock from buf_internals.h:341 (PostgreSQL 16), buf_internals.h:342 (PostgreSQL 17), buf_internals.h:357 (PostgreSQL 18)
+/// C inline function BufferDescriptorGetContentLock from buf_internals.h:341 (PostgreSQL 16), buf_internals.h:342 (PostgreSQL 17), buf_internals.h:357 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline LWLock *
@@ -491,7 +483,7 @@ macro_rules! BufferDescriptorGetContentLock {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -499,7 +491,7 @@ macro_rules! BufferDescriptorGetContentLock {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
     ($bdesc:expr $(,)?) => {
@@ -524,7 +516,7 @@ macro_rules! BufferDescriptorGetIOCV {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferDescriptorGetIOCV from buf_internals.h:335 (PostgreSQL 16), buf_internals.h:336 (PostgreSQL 17), buf_internals.h:351 (PostgreSQL 18), buf_internals.h:439 (PostgreSQL 19)
+/// C inline function BufferDescriptorGetIOCV from buf_internals.h:335 (PostgreSQL 16), buf_internals.h:336 (PostgreSQL 17), buf_internals.h:351 (PostgreSQL 18), buf_internals.h:439 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ConditionVariable *
@@ -535,15 +527,11 @@ macro_rules! BufferDescriptorGetIOCV {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
     ($bdesc:expr $(,)?) => {
@@ -551,7 +539,7 @@ macro_rules! BufferDescriptorGetIOCV {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferTagsEqual from buf_internals.h:152 (PostgreSQL 16), buf_internals.h:153 (PostgreSQL 17), buf_internals.h:166 (PostgreSQL 18), buf_internals.h:221 (PostgreSQL 19)
+/// C inline function BufferTagsEqual from buf_internals.h:152 (PostgreSQL 16), buf_internals.h:153 (PostgreSQL 17), buf_internals.h:166 (PostgreSQL 18), buf_internals.h:221 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -566,15 +554,11 @@ macro_rules! BufferDescriptorGetIOCV {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferTagsEqual {
     ($tag1:expr, $tag2:expr $(,)?) => {
@@ -646,7 +630,7 @@ macro_rules! GetBufferDescriptor {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GetBufferDescriptor from buf_internals.h:317 (PostgreSQL 16), buf_internals.h:318 (PostgreSQL 17), buf_internals.h:333 (PostgreSQL 18), buf_internals.h:421 (PostgreSQL 19)
+/// C inline function GetBufferDescriptor from buf_internals.h:317 (PostgreSQL 16), buf_internals.h:318 (PostgreSQL 17), buf_internals.h:333 (PostgreSQL 18), buf_internals.h:421 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BufferDesc *
@@ -657,15 +641,11 @@ macro_rules! GetBufferDescriptor {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetBufferDescriptor {
     ($id:expr $(,)?) => {
@@ -690,7 +670,7 @@ macro_rules! GetLocalBufferDescriptor {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GetLocalBufferDescriptor from buf_internals.h:323 (PostgreSQL 16), buf_internals.h:324 (PostgreSQL 17), buf_internals.h:339 (PostgreSQL 18), buf_internals.h:427 (PostgreSQL 19)
+/// C inline function GetLocalBufferDescriptor from buf_internals.h:323 (PostgreSQL 16), buf_internals.h:324 (PostgreSQL 17), buf_internals.h:339 (PostgreSQL 18), buf_internals.h:427 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BufferDesc *
@@ -701,15 +681,11 @@ macro_rules! GetLocalBufferDescriptor {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
     ($id:expr $(,)?) => {

@@ -365,7 +365,7 @@ macro_rules! PG_VALID_FE_ENCODING {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function is_utf16_surrogate_first from pg_wchar.h:544 (PostgreSQL 15–16), pg_wchar.h:540 (PostgreSQL 17–18)
+/// C inline function is_utf16_surrogate_first from pg_wchar.h:544 (PostgreSQL 15–16), pg_wchar.h:540 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline bool
@@ -376,15 +376,11 @@ macro_rules! PG_VALID_FE_ENCODING {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
@@ -392,7 +388,7 @@ macro_rules! is_utf16_surrogate_first {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function is_utf16_surrogate_first from pg_wchar.h:377 (PostgreSQL 19)
+/// C inline function is_utf16_surrogate_first from pg_wchar.h:377 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -403,15 +399,11 @@ macro_rules! is_utf16_surrogate_first {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
@@ -419,7 +411,7 @@ macro_rules! is_utf16_surrogate_first {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function is_utf16_surrogate_second from pg_wchar.h:550 (PostgreSQL 15–16), pg_wchar.h:546 (PostgreSQL 17–18)
+/// C inline function is_utf16_surrogate_second from pg_wchar.h:550 (PostgreSQL 15–16), pg_wchar.h:546 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline bool
@@ -430,15 +422,11 @@ macro_rules! is_utf16_surrogate_first {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
@@ -446,7 +434,7 @@ macro_rules! is_utf16_surrogate_second {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function is_utf16_surrogate_second from pg_wchar.h:383 (PostgreSQL 19)
+/// C inline function is_utf16_surrogate_second from pg_wchar.h:383 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -457,15 +445,11 @@ macro_rules! is_utf16_surrogate_second {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
@@ -473,7 +457,7 @@ macro_rules! is_utf16_surrogate_second {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function is_valid_unicode_codepoint from pg_wchar.h:538 (PostgreSQL 15–16), pg_wchar.h:534 (PostgreSQL 17–18)
+/// C inline function is_valid_unicode_codepoint from pg_wchar.h:538 (PostgreSQL 15–16), pg_wchar.h:534 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline bool
@@ -484,15 +468,11 @@ macro_rules! is_utf16_surrogate_second {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
@@ -500,7 +480,7 @@ macro_rules! is_valid_unicode_codepoint {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function is_valid_unicode_codepoint from pg_wchar.h:371 (PostgreSQL 19)
+/// C inline function is_valid_unicode_codepoint from pg_wchar.h:371 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -511,15 +491,11 @@ macro_rules! is_valid_unicode_codepoint {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
@@ -527,7 +503,7 @@ macro_rules! is_valid_unicode_codepoint {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function surrogate_pair_to_codepoint from pg_wchar.h:556 (PostgreSQL 15–16), pg_wchar.h:552 (PostgreSQL 17–18)
+/// C inline function surrogate_pair_to_codepoint from pg_wchar.h:556 (PostgreSQL 15–16), pg_wchar.h:552 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline pg_wchar
@@ -538,7 +514,7 @@ macro_rules! is_valid_unicode_codepoint {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -546,7 +522,7 @@ macro_rules! is_valid_unicode_codepoint {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! surrogate_pair_to_codepoint {
     ($first:expr, $second:expr $(,)?) => {
@@ -554,7 +530,7 @@ macro_rules! surrogate_pair_to_codepoint {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function surrogate_pair_to_codepoint from pg_wchar.h:389 (PostgreSQL 19)
+/// C inline function surrogate_pair_to_codepoint from pg_wchar.h:389 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char32_t
@@ -565,7 +541,7 @@ macro_rules! surrogate_pair_to_codepoint {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -573,7 +549,7 @@ macro_rules! surrogate_pair_to_codepoint {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! surrogate_pair_to_codepoint {
     ($first:expr, $second:expr $(,)?) => {
@@ -581,7 +557,7 @@ macro_rules! surrogate_pair_to_codepoint {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function unicode_to_utf8 from pg_wchar.h:427 (PostgreSQL 19)
+/// C inline function unicode_to_utf8 from pg_wchar.h:427 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline unsigned char *
@@ -615,7 +591,7 @@ macro_rules! surrogate_pair_to_codepoint {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -623,7 +599,7 @@ macro_rules! surrogate_pair_to_codepoint {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! unicode_to_utf8 {
     ($c:expr, $utf8string:expr $(,)?) => {
@@ -631,7 +607,7 @@ macro_rules! unicode_to_utf8 {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function unicode_utf8len from pg_wchar.h:622 (PostgreSQL 17–18)
+/// C inline function unicode_utf8len from pg_wchar.h:622 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline int
@@ -649,15 +625,11 @@ macro_rules! unicode_to_utf8 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! unicode_utf8len {
     ($c:expr $(,)?) => {
@@ -665,7 +637,7 @@ macro_rules! unicode_utf8len {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function unicode_utf8len from pg_wchar.h:459 (PostgreSQL 19)
+/// C inline function unicode_utf8len from pg_wchar.h:459 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -683,15 +655,11 @@ macro_rules! unicode_utf8len {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! unicode_utf8len {
     ($c:expr $(,)?) => {
@@ -699,7 +667,7 @@ macro_rules! unicode_utf8len {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function utf8_to_unicode from pg_wchar.h:401 (PostgreSQL 19)
+/// C inline function utf8_to_unicode from pg_wchar.h:401 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char32_t
@@ -726,7 +694,7 @@ macro_rules! unicode_utf8len {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -734,7 +702,7 @@ macro_rules! unicode_utf8len {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! utf8_to_unicode {
     ($c:expr $(,)?) => {

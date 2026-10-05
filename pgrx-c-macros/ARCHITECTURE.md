@@ -277,7 +277,9 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans, original formals and bounded definition text from that same
    parse. Header contents are copied once per physical source, rather than once
-   per function.
+   per function. The body's tokens are also retained, one active statement at a
+   time so that inactive `#if` text is excluded; a statement outside the
+   definition's own text or containing a directive leaves no body.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -396,6 +398,17 @@ C macro wins a name collision. A private immutable root map feeds protected
 outside the declared identifier namespace. Original formals and physical source
 are retained separately for reporting and documentation. No preprocessing of a
 synthetic definition or per-function translation unit is needed.
+
+A value-returning definition whose retained body names no macro, including one
+defined only before or after it, also yields a private statement root:
+`NAME(holes) do { T p = (hole); ...; body } while (0)`. Each parameter is a local
+initialized from its hole, so arguments are evaluated once and converted as in a
+call, and parameters share the body's outer scope as in C. When the analyzer
+admits that root with exactly the function's parameters and every path returns,
+the body is emitted as an expression whose `return` breaks out of a labeled
+block, converted to the result type. Rust hygiene keeps caller tokens from
+seeing the locals, so no local-name guard applies. A body the analyzer or
+renderer refuses falls back to the call root, which also covers void functions.
 
 The normal native capability path preserves prototype conversions, qualifiers,
 original C result identity and guard boundaries. Function operands evaluate once;

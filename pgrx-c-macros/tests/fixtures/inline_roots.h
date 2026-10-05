@@ -25,6 +25,11 @@ static inline int ROOT_VARIADIC(int value, ...) { return value; }
 static inline int ROOT_UNPROTOTYPED() { return 1; }
 static inline int ROOT_UNDEFINED(int value);
 static inline int __attribute__((preserve_most)) ROOT_ABI(int value) { return value; }
+#define ROOT_SHADOW 1
+static inline int ROOT_HIDDEN(int value) { return value + ROOT_SHADOW; }
+#undef ROOT_SHADOW
+enum { ROOT_SHADOW = 5 };
+static inline int ROOT_PARTIAL(int value) { if (value) return value; }
 #else
 #define ROOT_INT(value) ((value) + 3)
 #define ROOT_PRED(value) ((value) != 0)

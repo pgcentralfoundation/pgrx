@@ -722,6 +722,13 @@ pub struct InlineFunctionDefinition {
     pub parameters: Vec<Option<String>>,
     /// Original C definition text within the bounded retention budget, never a synthesized macro.
     pub source: Option<String>,
+    /// Tokens of the body's active statements in order, without the enclosing braces.
+    ///
+    /// Present only when every statement lies in the definition's own source text and contains
+    /// no preprocessing directive, so the tokens are exactly what the compiler parsed. Macro
+    /// invocations in the statements remain unexpanded.
+    #[serde(skip)]
+    pub body: Option<Vec<crate::Token>>,
 }
 
 /// C declaration linkage used to choose external calls or verified local-definition adapters.

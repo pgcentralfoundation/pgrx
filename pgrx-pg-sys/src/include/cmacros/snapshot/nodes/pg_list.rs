@@ -418,7 +418,7 @@ macro_rules! list_last_cell {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
+/// C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline int
@@ -429,15 +429,11 @@ macro_rules! list_last_cell {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_length {
     ($l:expr $(,)?) => {

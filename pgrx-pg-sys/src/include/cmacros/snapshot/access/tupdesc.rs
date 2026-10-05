@@ -122,8 +122,8 @@ macro_rules! TupleDescAttr {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TupleDescCompactAttr from tupdesc.h:174 (PostgreSQL 18), tupdesc.h:194 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function TupleDescCompactAttr from tupdesc.h:174 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline CompactAttribute *
@@ -142,7 +142,38 @@ macro_rules! TupleDescAttr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! TupleDescCompactAttr {
+    ($tupdesc:expr, $i:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function TupleDescCompactAttr from tupdesc.h:194 (PostgreSQL 19)
+///
+/// ```c
+/// static inline CompactAttribute *
+/// TupleDescCompactAttr(TupleDesc tupdesc, int i)
+/// {
+/// 	CompactAttribute *cattr = &tupdesc->compact_attrs[i];
+///
+/// #ifdef USE_ASSERT_CHECKING
+///
+/// 	/* Check that the CompactAttribute is correctly populated */
+/// 	verify_compact_attribute(tupdesc, i);
+/// #endif
+///
+/// 	return cattr;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

@@ -94,7 +94,7 @@ macro_rules! GinGetUseFastUpdate {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ginCompareAttEntries from gin_private.h:525 (PostgreSQL 19)
+/// C inline function ginCompareAttEntries from gin_private.h:525 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -112,7 +112,7 @@ macro_rules! GinGetUseFastUpdate {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -120,7 +120,7 @@ macro_rules! GinGetUseFastUpdate {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ginCompareAttEntries {
     ($ginstate:expr, $attnuma:expr, $a:expr, $categorya:expr, $attnumb:expr, $b:expr, $categoryb:expr $(,)?) => {
