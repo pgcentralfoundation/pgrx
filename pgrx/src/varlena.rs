@@ -27,8 +27,6 @@ pub unsafe fn text_to_rust_str<'a>(
     varlena: *const pg_sys::varlena,
 ) -> Result<&'a str, str::Utf8Error> {
     // SAFETY: the caller keeps this complete initialized varlena and its payload live and immutable.
-    // On PG19 these are guarded native calls: they must run on the backend thread, and the
-    // guard panics on any other thread.
     unsafe {
         let len = pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize;
         let data = pg_sys::VARDATA_ANY!(varlena).get();
@@ -50,8 +48,6 @@ pub unsafe fn text_to_rust_str<'a>(
 #[inline]
 pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) -> &'a str {
     // SAFETY: the caller keeps this complete initialized varlena and its payload live and immutable.
-    // On PG19 these are guarded native calls: they must run on the backend thread, and the
-    // guard panics on any other thread.
     unsafe {
         let len = pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize;
         let data = pg_sys::VARDATA_ANY!(varlena).get();
@@ -72,8 +68,6 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) ->
 #[inline]
 pub unsafe fn varlena_to_byte_slice<'a>(varlena: *const pg_sys::varlena) -> &'a [u8] {
     // SAFETY: the caller keeps this complete initialized varlena and its payload live and immutable.
-    // On PG19 these are guarded native calls: they must run on the backend thread, and the
-    // guard panics on any other thread.
     unsafe {
         let len = pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize;
         let data = pg_sys::VARDATA_ANY!(varlena).get();

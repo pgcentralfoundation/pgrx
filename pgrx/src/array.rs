@@ -283,9 +283,7 @@ impl RawArray {
     pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
         // len() bounds the element count by MaxArraySize, so C int conversion and
         // BITMAPLEN's addition fit. The C operation also handles the empty bitmap.
-        // SAFETY: BITMAPLEN reads no memory. On PG18+ it is a guarded native call: it must
-        // run on the backend thread, and the guard panics on any other thread.
-        let len = unsafe { pg_sys::BITMAPLEN!(self.len() as libc::c_int).get() } as usize;
+        let len = pg_sys::BITMAPLEN!(self.len() as libc::c_int).get() as usize;
 
         NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
