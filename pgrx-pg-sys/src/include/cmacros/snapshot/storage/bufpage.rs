@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! PageAddItem {
     ($page:expr, $item:expr, $size:expr, $offsetNumber:expr, $overwrite:expr, $is_heap:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -39,7 +39,7 @@ macro_rules! PageAddItem {
 #[macro_export]
 macro_rules! PageClearAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -66,7 +66,7 @@ macro_rules! PageClearAllVisible {
 #[macro_export]
 macro_rules! PageClearAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -87,7 +87,7 @@ macro_rules! PageClearAllVisible {
 #[macro_export]
 macro_rules! PageClearFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -114,7 +114,7 @@ macro_rules! PageClearFull {
 #[macro_export]
 macro_rules! PageClearFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -135,7 +135,7 @@ macro_rules! PageClearFull {
 #[macro_export]
 macro_rules! PageClearHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -162,7 +162,7 @@ macro_rules! PageClearHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageClearHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PageClearPrunable from bufpage.h:399 (PostgreSQL 15), bufpage.h:452 (PostgreSQL 16–17), bufpage.h:455 (PostgreSQL 18), bufpage.h:486 (PostgreSQL 19)
@@ -182,7 +182,7 @@ macro_rules! PageClearHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageClearPrunable {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -203,7 +203,7 @@ macro_rules! PageClearPrunable {
 #[macro_export]
 macro_rules! PageGetContents {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -230,7 +230,7 @@ macro_rules! PageGetContents {
 #[macro_export]
 macro_rules! PageGetContents {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -255,7 +255,7 @@ macro_rules! PageGetContents {
 #[macro_export]
 macro_rules! PageGetItem {
     ($page:expr, $itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -285,7 +285,7 @@ macro_rules! PageGetItem {
 #[macro_export]
 macro_rules! PageGetItem {
     ($page:expr, $itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -315,7 +315,7 @@ macro_rules! PageGetItem {
 #[macro_export]
 macro_rules! PageGetItem {
     ($page:expr, $itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -345,7 +345,7 @@ macro_rules! PageGetItem {
 #[macro_export]
 macro_rules! PageGetItem {
     ($page:expr, $itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -366,7 +366,7 @@ macro_rules! PageGetItem {
 #[macro_export]
 macro_rules! PageGetItemId {
     ($page:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -393,7 +393,7 @@ macro_rules! PageGetItemId {
 #[macro_export]
 macro_rules! PageGetItemId {
     ($page:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -414,7 +414,7 @@ macro_rules! PageGetItemId {
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -441,7 +441,7 @@ macro_rules! PageGetLSN {
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -468,7 +468,7 @@ macro_rules! PageGetLSN {
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -495,7 +495,7 @@ macro_rules! PageGetLSN {
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -516,7 +516,7 @@ macro_rules! PageGetLSN {
 #[macro_export]
 macro_rules! PageGetMaxOffsetNumber {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -548,7 +548,7 @@ macro_rules! PageGetMaxOffsetNumber {
 #[macro_export]
 macro_rules! PageGetMaxOffsetNumber {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -580,7 +580,7 @@ macro_rules! PageGetMaxOffsetNumber {
 #[macro_export]
 macro_rules! PageGetMaxOffsetNumber {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -601,7 +601,7 @@ macro_rules! PageGetMaxOffsetNumber {
 #[macro_export]
 macro_rules! PageGetPageLayoutVersion {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -628,7 +628,7 @@ macro_rules! PageGetPageLayoutVersion {
 #[macro_export]
 macro_rules! PageGetPageLayoutVersion {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -655,7 +655,7 @@ macro_rules! PageGetPageLayoutVersion {
 #[macro_export]
 macro_rules! PageGetPageLayoutVersion {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -676,7 +676,7 @@ macro_rules! PageGetPageLayoutVersion {
 #[macro_export]
 macro_rules! PageGetPageSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -703,7 +703,7 @@ macro_rules! PageGetPageSize {
 #[macro_export]
 macro_rules! PageGetPageSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -730,7 +730,7 @@ macro_rules! PageGetPageSize {
 #[macro_export]
 macro_rules! PageGetPageSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -757,7 +757,7 @@ macro_rules! PageGetPageSize {
 #[macro_export]
 macro_rules! PageGetPruneXid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -782,7 +782,7 @@ macro_rules! PageGetPruneXid {
 #[macro_export]
 macro_rules! PageGetSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -810,7 +810,7 @@ macro_rules! PageGetSpecialPointer {
 #[macro_export]
 macro_rules! PageGetSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -831,7 +831,7 @@ macro_rules! PageGetSpecialPointer {
 #[macro_export]
 macro_rules! PageGetSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -852,7 +852,7 @@ macro_rules! PageGetSpecialPointer {
 #[macro_export]
 macro_rules! PageGetSpecialSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -879,7 +879,7 @@ macro_rules! PageGetSpecialSize {
 #[macro_export]
 macro_rules! PageGetSpecialSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -906,7 +906,7 @@ macro_rules! PageGetSpecialSize {
 #[macro_export]
 macro_rules! PageGetSpecialSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -927,7 +927,7 @@ macro_rules! PageGetSpecialSize {
 #[macro_export]
 macro_rules! PageHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -954,7 +954,7 @@ macro_rules! PageHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -981,7 +981,7 @@ macro_rules! PageHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1002,7 +1002,7 @@ macro_rules! PageHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageIsAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1029,7 +1029,7 @@ macro_rules! PageIsAllVisible {
 #[macro_export]
 macro_rules! PageIsAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1056,7 +1056,7 @@ macro_rules! PageIsAllVisible {
 #[macro_export]
 macro_rules! PageIsAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1077,7 +1077,7 @@ macro_rules! PageIsAllVisible {
 #[macro_export]
 macro_rules! PageIsEmpty {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1104,7 +1104,7 @@ macro_rules! PageIsEmpty {
 #[macro_export]
 macro_rules! PageIsEmpty {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1131,7 +1131,7 @@ macro_rules! PageIsEmpty {
 #[macro_export]
 macro_rules! PageIsEmpty {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1152,7 +1152,7 @@ macro_rules! PageIsEmpty {
 #[macro_export]
 macro_rules! PageIsFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1179,7 +1179,7 @@ macro_rules! PageIsFull {
 #[macro_export]
 macro_rules! PageIsFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1206,7 +1206,7 @@ macro_rules! PageIsFull {
 #[macro_export]
 macro_rules! PageIsFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1227,7 +1227,7 @@ macro_rules! PageIsFull {
 #[macro_export]
 macro_rules! PageIsNew {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1254,7 +1254,7 @@ macro_rules! PageIsNew {
 #[macro_export]
 macro_rules! PageIsNew {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1281,7 +1281,7 @@ macro_rules! PageIsNew {
 #[macro_export]
 macro_rules! PageIsNew {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1302,7 +1302,7 @@ macro_rules! PageIsNew {
 #[macro_export]
 macro_rules! PageIsValid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1323,7 +1323,7 @@ macro_rules! PageIsValid {
 #[macro_export]
 macro_rules! PageIsVerified {
     ($page:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1344,7 +1344,7 @@ macro_rules! PageIsVerified {
 #[macro_export]
 macro_rules! PageSetAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1371,7 +1371,7 @@ macro_rules! PageSetAllVisible {
 #[macro_export]
 macro_rules! PageSetAllVisible {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1392,7 +1392,7 @@ macro_rules! PageSetAllVisible {
 #[macro_export]
 macro_rules! PageSetFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1419,7 +1419,7 @@ macro_rules! PageSetFull {
 #[macro_export]
 macro_rules! PageSetFull {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1440,7 +1440,7 @@ macro_rules! PageSetFull {
 #[macro_export]
 macro_rules! PageSetHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1467,7 +1467,7 @@ macro_rules! PageSetHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageSetHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1488,7 +1488,7 @@ macro_rules! PageSetHasFreeLinePointers {
 #[macro_export]
 macro_rules! PageSetLSN {
     ($page:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1515,7 +1515,7 @@ macro_rules! PageSetLSN {
 #[macro_export]
 macro_rules! PageSetLSN {
     ($page:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1542,7 +1542,7 @@ macro_rules! PageSetLSN {
 #[macro_export]
 macro_rules! PageSetLSN {
     ($page:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1567,7 +1567,7 @@ macro_rules! PageSetLSN {
 #[macro_export]
 macro_rules! PageSetPageSizeAndVersion {
     ($page:expr, $size:expr, $version:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1597,7 +1597,7 @@ macro_rules! PageSetPageSizeAndVersion {
 #[macro_export]
 macro_rules! PageSetPageSizeAndVersion {
     ($page:expr, $size:expr, $version:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -1624,7 +1624,7 @@ macro_rules! PageSetPageSizeAndVersion {
 #[macro_export]
 macro_rules! PageSetPrunable {
     ($page:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1647,7 +1647,7 @@ macro_rules! PageSetPrunable {
 #[macro_export]
 macro_rules! PageSetPrunable {
     ($page:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1664,7 +1664,7 @@ macro_rules! PageSetPrunable {
 #[macro_export]
 macro_rules! PageSizeIsValid {
     ($pageSize:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1695,7 +1695,7 @@ macro_rules! PageSizeIsValid {
 #[macro_export]
 macro_rules! PageValidateSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1724,7 +1724,7 @@ macro_rules! PageValidateSpecialPointer {
 #[macro_export]
 macro_rules! PageValidateSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1753,7 +1753,7 @@ macro_rules! PageValidateSpecialPointer {
 #[macro_export]
 macro_rules! PageValidateSpecialPointer {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1774,7 +1774,7 @@ macro_rules! PageValidateSpecialPointer {
 #[macro_export]
 macro_rules! PageXLogRecPtrGet {
     ($val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1801,7 +1801,7 @@ macro_rules! PageXLogRecPtrGet {
 #[macro_export]
 macro_rules! PageXLogRecPtrGet {
     ($val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1830,7 +1830,7 @@ macro_rules! PageXLogRecPtrGet {
 #[macro_export]
 macro_rules! PageXLogRecPtrGet {
     ($val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1851,7 +1851,7 @@ macro_rules! PageXLogRecPtrGet {
 #[macro_export]
 macro_rules! PageXLogRecPtrSet {
     ($ptr:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1878,7 +1878,7 @@ macro_rules! PageXLogRecPtrSet {
 #[macro_export]
 macro_rules! PageXLogRecPtrSet {
     ($ptr:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use PageAddItem;

@@ -234,6 +234,7 @@ pub(super) fn snapshot_files(versions: &[SnapshotVersion]) -> eyre::Result<Macro
         "// The generated C macros of every supported PostgreSQL version, reduced to their\n\
          // documentation. Each build generates the real macros from its own installation.\n",
     );
+    index.push_str(&pgrx_c_macros::documentation_shell_support());
     write_classifier(&mut index, versions, all);
     write_typedefs(&mut index, &merged.typedefs, all);
     write_callbacks(&mut index, &merged.callbacks, all);
@@ -448,10 +449,12 @@ mod tests {
                 .contains("#[cfg(any(feature = \"pg16\", feature = \"pg17\"))]\npub use CHANGED;")
         );
         assert!(header.contains("\npub use SAME;"));
-        assert!(header.contains("($x:expr $(,)?) => {"));
+        assert!(header.contains("($x:expr $(,)?) => { $crate::__pgrx_c_documentation_shell!() };"));
         assert!(!header.contains("$crate::__pgrx_c_macros"));
+        assert!(!header.contains("unimplemented"));
         let index = &files.sources[Path::new("mod.rs")];
         assert!(index.contains("mod utils;"));
+        assert_eq!(index.matches("macro_rules! __pgrx_c_documentation_shell").count(), 1);
         assert!(index.contains("(@if_available SAME { $($items:tt)* })"));
         assert!(index.contains("#[cfg(feature = \"pg15\")]\n/// Report the C macros"));
         assert!(index.contains(

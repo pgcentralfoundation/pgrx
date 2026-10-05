@@ -23,7 +23,7 @@
 #[macro_export]
 macro_rules! GinGetPendingListCleanupSize {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -44,7 +44,7 @@ macro_rules! GinGetPendingListCleanupSize {
 #[macro_export]
 macro_rules! GinGetPendingListCleanupSize {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -69,7 +69,7 @@ macro_rules! GinGetPendingListCleanupSize {
 #[macro_export]
 macro_rules! GinGetUseFastUpdate {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -90,7 +90,7 @@ macro_rules! GinGetUseFastUpdate {
 #[macro_export]
 macro_rules! GinGetUseFastUpdate {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -124,7 +124,7 @@ macro_rules! GinGetUseFastUpdate {
 #[macro_export]
 macro_rules! ginCompareAttEntries {
     ($ginstate:expr, $attnuma:expr, $a:expr, $categorya:expr, $attnumb:expr, $b:expr, $categoryb:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -164,7 +164,7 @@ macro_rules! ginCompareAttEntries {
 #[macro_export]
 macro_rules! ginCompareEntries {
     ($ginstate:expr, $attnum:expr, $a:expr, $categorya:expr, $b:expr, $categoryb:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -199,7 +199,7 @@ macro_rules! ginCompareEntries {
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -229,7 +229,7 @@ macro_rules! ginCompareItemPointers {
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -259,7 +259,7 @@ macro_rules! ginCompareItemPointers {
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GinGetPendingListCleanupSize;

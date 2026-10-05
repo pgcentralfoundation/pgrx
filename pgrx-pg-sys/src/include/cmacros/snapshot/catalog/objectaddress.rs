@@ -16,7 +16,7 @@
 #[macro_export]
 macro_rules! ObjectAddressSet {
     ($addr:expr, $class_id:expr, $object_id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ObjectAddressSubSet from objectaddress.h:33 (PostgreSQL 15–18), objectaddress.h:34 (PostgreSQL 19)
@@ -34,7 +34,7 @@ macro_rules! ObjectAddressSet {
 #[macro_export]
 macro_rules! ObjectAddressSubSet {
     ($addr:expr, $class_id:expr, $object_id:expr, $object_sub_id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ObjectAddressSet;

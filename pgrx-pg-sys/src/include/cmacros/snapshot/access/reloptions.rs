@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! GET_STRING_RELOPTION {
     ($optstruct:expr, $member:ident $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GET_STRING_RELOPTION;

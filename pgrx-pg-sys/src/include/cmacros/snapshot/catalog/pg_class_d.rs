@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! RELKIND_HAS_PARTITIONS {
     ($relkind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RELKIND_HAS_STORAGE from pg_class_d.h:97 (PostgreSQL 15–17), pg_class_d.h:102 (PostgreSQL 18), pg_class_d.h:103 (PostgreSQL 19)
@@ -30,7 +30,7 @@ macro_rules! RELKIND_HAS_PARTITIONS {
 #[macro_export]
 macro_rules! RELKIND_HAS_STORAGE {
     ($relkind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RELKIND_HAS_TABLESPACE from pg_class_d.h:115 (PostgreSQL 15–17), pg_class_d.h:120 (PostgreSQL 18), pg_class_d.h:121 (PostgreSQL 19)
@@ -46,7 +46,7 @@ macro_rules! RELKIND_HAS_STORAGE {
 #[macro_export]
 macro_rules! RELKIND_HAS_TABLESPACE {
     ($relkind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RELKIND_HAS_TABLE_AM from pg_class_d.h:124 (PostgreSQL 15–16), pg_class_d.h:126 (PostgreSQL 17), pg_class_d.h:131 (PostgreSQL 18), pg_class_d.h:132 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! RELKIND_HAS_TABLESPACE {
 #[macro_export]
 macro_rules! RELKIND_HAS_TABLE_AM {
     ($relkind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use RELKIND_HAS_PARTITIONS;

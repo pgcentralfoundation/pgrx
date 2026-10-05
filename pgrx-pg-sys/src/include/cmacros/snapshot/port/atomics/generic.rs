@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u32_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_add_fetch_u64_impl from generic.h:387 (PostgreSQL 15–16), generic.h:405 (PostgreSQL 17), generic.h:395 (PostgreSQL 18), generic.h:404 (PostgreSQL 19)
@@ -50,7 +50,7 @@ macro_rules! pg_atomic_add_fetch_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u64_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -81,7 +81,7 @@ macro_rules! pg_atomic_add_fetch_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u32_impl {
     ($ptr:expr, $xchg_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -112,7 +112,7 @@ macro_rules! pg_atomic_exchange_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u64_impl {
     ($ptr:expr, $xchg_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u32_impl from generic.h:160 (PostgreSQL 15–17), generic.h:150 (PostgreSQL 18–19)
@@ -138,7 +138,7 @@ macro_rules! pg_atomic_exchange_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_u32_impl {
     ($ptr:expr, $val_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u64_impl from generic.h:330 (PostgreSQL 15–16), generic.h:348 (PostgreSQL 17), generic.h:338 (PostgreSQL 18), generic.h:347 (PostgreSQL 19)
@@ -164,7 +164,7 @@ macro_rules! pg_atomic_init_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_u64_impl {
     ($ptr:expr, $val_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -191,7 +191,7 @@ macro_rules! pg_atomic_init_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u32_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -218,7 +218,7 @@ macro_rules! pg_atomic_read_membarrier_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u64_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u32_impl from generic.h:45 (PostgreSQL 15–19)
@@ -244,7 +244,7 @@ macro_rules! pg_atomic_read_membarrier_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_u32_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u64_impl from generic.h:298 (PostgreSQL 15–16), generic.h:316 (PostgreSQL 17), generic.h:306 (PostgreSQL 18), generic.h:315 (PostgreSQL 19)
@@ -274,7 +274,7 @@ macro_rules! pg_atomic_read_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_u64_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u32_impl from generic.h:239 (PostgreSQL 15–17), generic.h:229 (PostgreSQL 18–19)
@@ -300,7 +300,7 @@ macro_rules! pg_atomic_read_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u32_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u64_impl from generic.h:396 (PostgreSQL 15–16), generic.h:414 (PostgreSQL 17), generic.h:404 (PostgreSQL 18), generic.h:413 (PostgreSQL 19)
@@ -326,7 +326,7 @@ macro_rules! pg_atomic_sub_fetch_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u64_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_unlocked_write_u32_impl from generic.h:63 (PostgreSQL 15–19)
@@ -352,7 +352,7 @@ macro_rules! pg_atomic_sub_fetch_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -379,7 +379,7 @@ macro_rules! pg_atomic_unlocked_write_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -406,7 +406,7 @@ macro_rules! pg_atomic_unlocked_write_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -433,7 +433,7 @@ macro_rules! pg_atomic_write_membarrier_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u32_impl from generic.h:54 (PostgreSQL 15–19)
@@ -459,7 +459,7 @@ macro_rules! pg_atomic_write_membarrier_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u64_impl from generic.h:265 (PostgreSQL 15–16), generic.h:283 (PostgreSQL 17), generic.h:273 (PostgreSQL 18–19)
@@ -491,7 +491,7 @@ macro_rules! pg_atomic_write_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_spin_delay_impl from generic.h:33 (PostgreSQL 15–19)
@@ -511,7 +511,7 @@ macro_rules! pg_atomic_write_u64_impl {
 #[macro_export]
 macro_rules! pg_spin_delay_impl {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pg_atomic_add_fetch_u32_impl;

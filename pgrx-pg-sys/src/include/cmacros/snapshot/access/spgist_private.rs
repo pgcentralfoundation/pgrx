@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! GBUF_INNER_PARITY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GBUF_REQ_LEAF from spgist_private.h:488 (PostgreSQL 15–18), spgist_private.h:490 (PostgreSQL 19)
@@ -34,7 +34,7 @@ macro_rules! GBUF_INNER_PARITY {
 #[macro_export]
 macro_rules! GBUF_REQ_LEAF {
     ($flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GBUF_REQ_NULLS from spgist_private.h:489 (PostgreSQL 15–18), spgist_private.h:491 (PostgreSQL 19)
@@ -50,7 +50,7 @@ macro_rules! GBUF_REQ_LEAF {
 #[macro_export]
 macro_rules! GBUF_REQ_NULLS {
     ($flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGITDATAPTR from spgist_private.h:313 (PostgreSQL 15–18), spgist_private.h:315 (PostgreSQL 19)
@@ -70,7 +70,7 @@ macro_rules! GBUF_REQ_NULLS {
 #[macro_export]
 macro_rules! SGITDATAPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -91,7 +91,7 @@ macro_rules! SGITDATAPTR {
 #[macro_export]
 macro_rules! SGITDATUM {
     ($x:expr, $s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -112,7 +112,7 @@ macro_rules! SGITDATUM {
 #[macro_export]
 macro_rules! SGITDATUM {
     ($x:expr, $s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGITNODEPTR from spgist_private.h:319 (PostgreSQL 15–18), spgist_private.h:321 (PostgreSQL 19)
@@ -132,7 +132,7 @@ macro_rules! SGITDATUM {
 #[macro_export]
 macro_rules! SGITNODEPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLTDATAPTR from spgist_private.h:410 (PostgreSQL 15–18), spgist_private.h:412 (PostgreSQL 19)
@@ -152,7 +152,7 @@ macro_rules! SGITNODEPTR {
 #[macro_export]
 macro_rules! SGLTDATAPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -173,7 +173,7 @@ macro_rules! SGLTDATAPTR {
 #[macro_export]
 macro_rules! SGLTDATUM {
     ($x:expr, $s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLTHDRSZ from spgist_private.h:406 (PostgreSQL 15–18), spgist_private.h:408 (PostgreSQL 19)
@@ -193,7 +193,7 @@ macro_rules! SGLTDATUM {
 #[macro_export]
 macro_rules! SGLTHDRSZ {
     ($hasnulls:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLT_GET_HASNULLMASK from spgist_private.h:397 (PostgreSQL 15–18), spgist_private.h:399 (PostgreSQL 19)
@@ -209,7 +209,7 @@ macro_rules! SGLTHDRSZ {
 #[macro_export]
 macro_rules! SGLT_GET_HASNULLMASK {
     ($spgLeafTuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLT_GET_NEXTOFFSET from spgist_private.h:395 (PostgreSQL 15–18), spgist_private.h:397 (PostgreSQL 19)
@@ -225,7 +225,7 @@ macro_rules! SGLT_GET_HASNULLMASK {
 #[macro_export]
 macro_rules! SGLT_GET_NEXTOFFSET {
     ($spgLeafTuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLT_SET_HASNULLMASK from spgist_private.h:402 (PostgreSQL 15–18), spgist_private.h:404 (PostgreSQL 19)
@@ -241,7 +241,7 @@ macro_rules! SGLT_GET_NEXTOFFSET {
 #[macro_export]
 macro_rules! SGLT_SET_HASNULLMASK {
     ($spgLeafTuple:expr, $hasnulls:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGLT_SET_NEXTOFFSET from spgist_private.h:399 (PostgreSQL 15–18), spgist_private.h:401 (PostgreSQL 19)
@@ -257,7 +257,7 @@ macro_rules! SGLT_SET_HASNULLMASK {
 #[macro_export]
 macro_rules! SGLT_SET_NEXTOFFSET {
     ($spgLeafTuple:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SGNTDATAPTR from spgist_private.h:341 (PostgreSQL 15–18), spgist_private.h:343 (PostgreSQL 19)
@@ -277,7 +277,7 @@ macro_rules! SGLT_SET_NEXTOFFSET {
 #[macro_export]
 macro_rules! SGNTDATAPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -298,7 +298,7 @@ macro_rules! SGNTDATAPTR {
 #[macro_export]
 macro_rules! SGNTDATUM {
     ($x:expr, $s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -319,7 +319,7 @@ macro_rules! SGNTDATUM {
 #[macro_export]
 macro_rules! SGNTDATUM {
     ($x:expr, $s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -338,7 +338,7 @@ macro_rules! SGNTDATUM {
 #[macro_export]
 macro_rules! STORE_STATE {
     ($s:expr, $d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -357,7 +357,7 @@ macro_rules! STORE_STATE {
 #[macro_export]
 macro_rules! STORE_STATE {
     ($s:expr, $d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SizeOfSpGistSearchItem from spgist_private.h:183 (PostgreSQL 15–19)
@@ -377,7 +377,7 @@ macro_rules! STORE_STATE {
 #[macro_export]
 macro_rules! SizeOfSpGistSearchItem {
     ($n_distances:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SpGistBlockIsFixed from spgist_private.h:54 (PostgreSQL 15–19)
@@ -397,7 +397,7 @@ macro_rules! SizeOfSpGistSearchItem {
 #[macro_export]
 macro_rules! SpGistBlockIsFixed {
     ($blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SpGistBlockIsRoot from spgist_private.h:52 (PostgreSQL 15–19)
@@ -413,7 +413,7 @@ macro_rules! SpGistBlockIsFixed {
 #[macro_export]
 macro_rules! SpGistBlockIsRoot {
     ($blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -438,7 +438,7 @@ macro_rules! SpGistBlockIsRoot {
 #[macro_export]
 macro_rules! SpGistGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -459,7 +459,7 @@ macro_rules! SpGistGetFillFactor {
 #[macro_export]
 macro_rules! SpGistGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -484,7 +484,7 @@ macro_rules! SpGistGetFillFactor {
 #[macro_export]
 macro_rules! SpGistGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -505,7 +505,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! SpGistGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -530,7 +530,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! SpGistPageGetFreeSpace {
     ($p:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -551,7 +551,7 @@ macro_rules! SpGistPageGetFreeSpace {
 #[macro_export]
 macro_rules! SpGistPageGetFreeSpace {
     ($p:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -572,7 +572,7 @@ macro_rules! SpGistPageGetFreeSpace {
 #[macro_export]
 macro_rules! SpGistPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -593,7 +593,7 @@ macro_rules! SpGistPageGetMeta {
 #[macro_export]
 macro_rules! SpGistPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -618,7 +618,7 @@ macro_rules! SpGistPageGetMeta {
 #[macro_export]
 macro_rules! SpGistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -639,7 +639,7 @@ macro_rules! SpGistPageGetOpaque {
 #[macro_export]
 macro_rules! SpGistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -660,7 +660,7 @@ macro_rules! SpGistPageGetOpaque {
 #[macro_export]
 macro_rules! SpGistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -685,7 +685,7 @@ macro_rules! SpGistPageGetOpaque {
 #[macro_export]
 macro_rules! SpGistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -706,7 +706,7 @@ macro_rules! SpGistPageIsDeleted {
 #[macro_export]
 macro_rules! SpGistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -727,7 +727,7 @@ macro_rules! SpGistPageIsDeleted {
 #[macro_export]
 macro_rules! SpGistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -752,7 +752,7 @@ macro_rules! SpGistPageIsDeleted {
 #[macro_export]
 macro_rules! SpGistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -773,7 +773,7 @@ macro_rules! SpGistPageIsLeaf {
 #[macro_export]
 macro_rules! SpGistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -794,7 +794,7 @@ macro_rules! SpGistPageIsLeaf {
 #[macro_export]
 macro_rules! SpGistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -819,7 +819,7 @@ macro_rules! SpGistPageIsLeaf {
 #[macro_export]
 macro_rules! SpGistPageIsMeta {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -840,7 +840,7 @@ macro_rules! SpGistPageIsMeta {
 #[macro_export]
 macro_rules! SpGistPageIsMeta {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -861,7 +861,7 @@ macro_rules! SpGistPageIsMeta {
 #[macro_export]
 macro_rules! SpGistPageIsMeta {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -886,7 +886,7 @@ macro_rules! SpGistPageIsMeta {
 #[macro_export]
 macro_rules! SpGistPageStoresNulls {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -907,7 +907,7 @@ macro_rules! SpGistPageStoresNulls {
 #[macro_export]
 macro_rules! SpGistPageStoresNulls {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -928,7 +928,7 @@ macro_rules! SpGistPageStoresNulls {
 #[macro_export]
 macro_rules! SpGistPageStoresNulls {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro _SGITDATA from spgist_private.h:312 (PostgreSQL 15–18), spgist_private.h:314 (PostgreSQL 19)
@@ -948,7 +948,7 @@ macro_rules! SpGistPageStoresNulls {
 #[macro_export]
 macro_rules! _SGITDATA {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use _SGITDATA;

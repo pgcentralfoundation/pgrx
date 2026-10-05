@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! ReorderBufferTupleBufData {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_distr_inval_overflowed from reorderbuffer.h:238 (PostgreSQL 15), reorderbuffer.h:254 (PostgreSQL 16), reorderbuffer.h:236 (PostgreSQL 17), reorderbuffer.h:270 (PostgreSQL 18–19)
@@ -35,7 +35,7 @@ macro_rules! ReorderBufferTupleBufData {
 #[macro_export]
 macro_rules! rbtxn_distr_inval_overflowed {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -56,7 +56,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
 #[macro_export]
 macro_rules! rbtxn_get_toptxn {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_has_catalog_changes from reorderbuffer.h:182 (PostgreSQL 15), reorderbuffer.h:192 (PostgreSQL 16), reorderbuffer.h:174 (PostgreSQL 17), reorderbuffer.h:184 (PostgreSQL 18–19)
@@ -72,7 +72,7 @@ macro_rules! rbtxn_get_toptxn {
 #[macro_export]
 macro_rules! rbtxn_has_catalog_changes {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_has_partial_change from reorderbuffer.h:206 (PostgreSQL 15), reorderbuffer.h:216 (PostgreSQL 16), reorderbuffer.h:198 (PostgreSQL 17), reorderbuffer.h:208 (PostgreSQL 18–19)
@@ -88,7 +88,7 @@ macro_rules! rbtxn_has_catalog_changes {
 #[macro_export]
 macro_rules! rbtxn_has_partial_change {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -105,7 +105,7 @@ macro_rules! rbtxn_has_partial_change {
 #[macro_export]
 macro_rules! rbtxn_has_streamable_change {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -122,7 +122,7 @@ macro_rules! rbtxn_has_streamable_change {
 #[macro_export]
 macro_rules! rbtxn_is_aborted {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -139,7 +139,7 @@ macro_rules! rbtxn_is_aborted {
 #[macro_export]
 macro_rules! rbtxn_is_committed {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_is_known_subxact from reorderbuffer.h:188 (PostgreSQL 15), reorderbuffer.h:198 (PostgreSQL 16), reorderbuffer.h:180 (PostgreSQL 17), reorderbuffer.h:190 (PostgreSQL 18–19)
@@ -155,7 +155,7 @@ macro_rules! rbtxn_is_committed {
 #[macro_export]
 macro_rules! rbtxn_is_known_subxact {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -172,7 +172,7 @@ macro_rules! rbtxn_is_known_subxact {
 #[macro_export]
 macro_rules! rbtxn_is_prepared {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_is_serialized from reorderbuffer.h:194 (PostgreSQL 15), reorderbuffer.h:204 (PostgreSQL 16), reorderbuffer.h:186 (PostgreSQL 17), reorderbuffer.h:196 (PostgreSQL 18–19)
@@ -188,7 +188,7 @@ macro_rules! rbtxn_is_prepared {
 #[macro_export]
 macro_rules! rbtxn_is_serialized {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_is_serialized_clear from reorderbuffer.h:200 (PostgreSQL 15), reorderbuffer.h:210 (PostgreSQL 16), reorderbuffer.h:192 (PostgreSQL 17), reorderbuffer.h:202 (PostgreSQL 18–19)
@@ -204,7 +204,7 @@ macro_rules! rbtxn_is_serialized {
 #[macro_export]
 macro_rules! rbtxn_is_serialized_clear {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_is_streamed from reorderbuffer.h:220 (PostgreSQL 15), reorderbuffer.h:236 (PostgreSQL 16), reorderbuffer.h:218 (PostgreSQL 17), reorderbuffer.h:228 (PostgreSQL 18–19)
@@ -220,7 +220,7 @@ macro_rules! rbtxn_is_serialized_clear {
 #[macro_export]
 macro_rules! rbtxn_is_streamed {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -241,7 +241,7 @@ macro_rules! rbtxn_is_streamed {
 #[macro_export]
 macro_rules! rbtxn_is_subtxn {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -262,7 +262,7 @@ macro_rules! rbtxn_is_subtxn {
 #[macro_export]
 macro_rules! rbtxn_is_toptxn {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -279,7 +279,7 @@ macro_rules! rbtxn_is_toptxn {
 #[macro_export]
 macro_rules! rbtxn_prepared {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -296,7 +296,7 @@ macro_rules! rbtxn_prepared {
 #[macro_export]
 macro_rules! rbtxn_sent_prepare {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro rbtxn_skip_prepared from reorderbuffer.h:232 (PostgreSQL 15), reorderbuffer.h:248 (PostgreSQL 16), reorderbuffer.h:230 (PostgreSQL 17), reorderbuffer.h:264 (PostgreSQL 18–19)
@@ -312,7 +312,7 @@ macro_rules! rbtxn_sent_prepare {
 #[macro_export]
 macro_rules! rbtxn_skip_prepared {
     ($txn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

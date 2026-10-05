@@ -29,7 +29,7 @@
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -60,7 +60,7 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -92,7 +92,7 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -121,7 +121,7 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -151,7 +151,7 @@ macro_rules! table_beginscan_analyze {
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -181,7 +181,7 @@ macro_rules! table_beginscan_analyze {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg17")]
@@ -214,7 +214,7 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $need_tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -245,7 +245,7 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -276,7 +276,7 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -315,7 +315,7 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_sampling {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -355,7 +355,7 @@ macro_rules! table_beginscan_sampling {
 #[macro_export]
 macro_rules! table_beginscan_sampling {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -391,7 +391,7 @@ macro_rules! table_beginscan_sampling {
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -428,7 +428,7 @@ macro_rules! table_beginscan_strat {
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -457,7 +457,7 @@ macro_rules! table_beginscan_strat {
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -487,7 +487,7 @@ macro_rules! table_beginscan_tid {
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -524,7 +524,7 @@ macro_rules! table_beginscan_tid {
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -562,7 +562,7 @@ macro_rules! table_beginscan_tidrange {
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
@@ -588,7 +588,7 @@ macro_rules! table_beginscan_tidrange {
 #[macro_export]
 macro_rules! table_endscan {
     ($scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -617,7 +617,7 @@ macro_rules! table_endscan {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -646,7 +646,7 @@ macro_rules! table_finish_bulk_insert {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -693,7 +693,7 @@ macro_rules! table_finish_bulk_insert {
 #[macro_export]
 macro_rules! table_index_build_range_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $anyvisible:expr, $progress:expr, $start_blockno:expr, $numblocks:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -740,7 +740,7 @@ macro_rules! table_index_build_range_scan {
 #[macro_export]
 macro_rules! table_index_build_range_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $anyvisible:expr, $progress:expr, $start_blockno:expr, $numblocks:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -784,7 +784,7 @@ macro_rules! table_index_build_range_scan {
 #[macro_export]
 macro_rules! table_index_build_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -828,7 +828,7 @@ macro_rules! table_index_build_scan {
 #[macro_export]
 macro_rules! table_index_build_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
@@ -854,7 +854,7 @@ macro_rules! table_index_build_scan {
 #[macro_export]
 macro_rules! table_index_delete_tuples {
     ($rel:expr, $delstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -881,7 +881,7 @@ macro_rules! table_index_delete_tuples {
 #[macro_export]
 macro_rules! table_index_fetch_begin {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -918,7 +918,7 @@ macro_rules! table_index_fetch_begin {
 #[macro_export]
 macro_rules! table_index_fetch_begin {
     ($rel:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
@@ -944,7 +944,7 @@ macro_rules! table_index_fetch_begin {
 #[macro_export]
 macro_rules! table_index_fetch_end {
     ($scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
@@ -970,7 +970,7 @@ macro_rules! table_index_fetch_end {
 #[macro_export]
 macro_rules! table_index_fetch_reset {
     ($scan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1011,7 +1011,7 @@ macro_rules! table_index_fetch_reset {
 #[macro_export]
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1044,7 +1044,7 @@ macro_rules! table_index_fetch_tuple {
 #[macro_export]
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1079,7 +1079,7 @@ macro_rules! table_index_fetch_tuple {
 #[macro_export]
 macro_rules! table_index_validate_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $snapshot:expr, $state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1114,7 +1114,7 @@ macro_rules! table_index_validate_scan {
 #[macro_export]
 macro_rules! table_index_validate_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $snapshot:expr, $state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1143,7 +1143,7 @@ macro_rules! table_index_validate_scan {
 #[macro_export]
 macro_rules! table_multi_insert {
     ($rel:expr, $slots:expr, $nslots:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1172,7 +1172,7 @@ macro_rules! table_multi_insert {
 #[macro_export]
 macro_rules! table_multi_insert {
     ($rel:expr, $slots:expr, $nslots:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
@@ -1198,7 +1198,7 @@ macro_rules! table_multi_insert {
 #[macro_export]
 macro_rules! table_parallelscan_reinitialize {
     ($rel:expr, $pscan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1225,7 +1225,7 @@ macro_rules! table_parallelscan_reinitialize {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrnode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1252,7 +1252,7 @@ macro_rules! table_relation_copy_data {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrlocator:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1291,7 +1291,7 @@ macro_rules! table_relation_copy_data {
 #[macro_export]
 macro_rules! table_relation_copy_for_cluster {
     ($OldTable:expr, $NewTable:expr, $OldIndex:expr, $use_sort:expr, $OldestXmin:expr, $xid_cutoff:expr, $multi_cutoff:expr, $num_tuples:expr, $tups_vacuumed:expr, $tups_recently_dead:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1332,7 +1332,7 @@ macro_rules! table_relation_copy_for_cluster {
 #[macro_export]
 macro_rules! table_relation_copy_for_cluster {
     ($OldTable:expr, $NewTable:expr, $OldIndex:expr, $use_sort:expr, $OldestXmin:expr, $snapshot:expr, $xid_cutoff:expr, $multi_cutoff:expr, $num_tuples:expr, $tups_vacuumed:expr, $tups_recently_dead:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2006 (PostgreSQL 19)
@@ -1361,7 +1361,7 @@ macro_rules! table_relation_copy_for_cluster {
 #[macro_export]
 macro_rules! table_relation_estimate_size {
     ($rel:expr, $attr_widths:expr, $pages:expr, $tuples:expr, $allvisfrac:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1393,7 +1393,7 @@ macro_rules! table_relation_estimate_size {
 #[macro_export]
 macro_rules! table_relation_fetch_toast_slice {
     ($toastrel:expr, $valueid:expr, $attrsize:expr, $sliceoffset:expr, $slicelength:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1425,7 +1425,7 @@ macro_rules! table_relation_fetch_toast_slice {
 #[macro_export]
 macro_rules! table_relation_fetch_toast_slice {
     ($toastrel:expr, $valueid:expr, $attrsize:expr, $sliceoffset:expr, $slicelength:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1946 (PostgreSQL 19)
@@ -1451,7 +1451,7 @@ macro_rules! table_relation_fetch_toast_slice {
 #[macro_export]
 macro_rules! table_relation_needs_toast_table {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1704 (PostgreSQL 19)
@@ -1477,7 +1477,7 @@ macro_rules! table_relation_needs_toast_table {
 #[macro_export]
 macro_rules! table_relation_nontransactional_truncate {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1510,7 +1510,7 @@ macro_rules! table_relation_nontransactional_truncate {
 #[macro_export]
 macro_rules! table_relation_set_new_filelocator {
     ($rel:expr, $newrlocator:expr, $persistence:expr, $freezeXid:expr, $minmulti:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1542,7 +1542,7 @@ macro_rules! table_relation_set_new_filelocator {
 #[macro_export]
 macro_rules! table_relation_set_new_filenode {
     ($rel:expr, $newrnode:expr, $persistence:expr, $freezeXid:expr, $minmulti:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1937 (PostgreSQL 19)
@@ -1568,7 +1568,7 @@ macro_rules! table_relation_set_new_filenode {
 #[macro_export]
 macro_rules! table_relation_size {
     ($rel:expr, $forkNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1956 (PostgreSQL 19)
@@ -1594,7 +1594,7 @@ macro_rules! table_relation_size {
 #[macro_export]
 macro_rules! table_relation_toast_am {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1622,7 +1622,7 @@ macro_rules! table_relation_toast_am {
 #[macro_export]
 macro_rules! table_relation_vacuum {
     ($rel:expr, $params:expr, $bstrategy:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1650,7 +1650,7 @@ macro_rules! table_relation_vacuum {
 #[macro_export]
 macro_rules! table_relation_vacuum {
     ($rel:expr, $params:expr, $bstrategy:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1678,7 +1678,7 @@ macro_rules! table_relation_vacuum {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1705,7 +1705,7 @@ macro_rules! table_rescan {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1735,7 +1735,7 @@ macro_rules! table_rescan {
 #[macro_export]
 macro_rules! table_rescan_set_params {
     ($scan:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1765,7 +1765,7 @@ macro_rules! table_rescan_set_params {
 #[macro_export]
 macro_rules! table_rescan_set_params {
     ($scan:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_rescan_tidrange from tableam.h:1085 (PostgreSQL 15), tableam.h:1105 (PostgreSQL 16), tableam.h:1110 (PostgreSQL 17), tableam.h:1069 (PostgreSQL 18), tableam.h:1140 (PostgreSQL 19)
@@ -1796,7 +1796,7 @@ macro_rules! table_rescan_set_params {
 #[macro_export]
 macro_rules! table_rescan_tidrange {
     ($sscan:expr, $mintid:expr, $maxtid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -1825,7 +1825,7 @@ macro_rules! table_rescan_tidrange {
 #[macro_export]
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $blockno:expr, $bstrategy:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1852,7 +1852,7 @@ macro_rules! table_scan_analyze_next_block {
 #[macro_export]
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $stream:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1883,7 +1883,7 @@ macro_rules! table_scan_analyze_next_block {
 #[macro_export]
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $OldestXmin:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1914,7 +1914,7 @@ macro_rules! table_scan_analyze_next_tuple {
 #[macro_export]
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1951,7 +1951,7 @@ macro_rules! table_scan_analyze_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_block {
     ($scan:expr, $tbmres:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1990,7 +1990,7 @@ macro_rules! table_scan_bitmap_next_block {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $tbmres:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -2033,7 +2033,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2068,7 +2068,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2105,7 +2105,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2146,7 +2146,7 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2179,7 +2179,7 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2212,7 +2212,7 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2249,7 +2249,7 @@ macro_rules! table_scan_getnextslot_tidrange {
 #[macro_export]
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2284,7 +2284,7 @@ macro_rules! table_scan_getnextslot_tidrange {
 #[macro_export]
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2312,7 +2312,7 @@ macro_rules! table_scan_sample_next_block {
 #[macro_export]
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2349,7 +2349,7 @@ macro_rules! table_scan_sample_next_block {
 #[macro_export]
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2379,7 +2379,7 @@ macro_rules! table_scan_sample_next_tuple {
 #[macro_export]
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
@@ -2407,7 +2407,7 @@ macro_rules! table_scan_sample_next_tuple {
 #[macro_export]
 macro_rules! table_tuple_complete_speculative {
     ($rel:expr, $slot:expr, $specToken:expr, $succeeded:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2438,7 +2438,7 @@ macro_rules! table_tuple_complete_speculative {
 #[macro_export]
 macro_rules! table_tuple_delete {
     ($rel:expr, $tid:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $changingPart:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2469,7 +2469,7 @@ macro_rules! table_tuple_delete {
 #[macro_export]
 macro_rules! table_tuple_delete {
     ($rel:expr, $tid:expr, $cid:expr, $options:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_tuple_fetch_row_version from tableam.h:1264 (PostgreSQL 15), tableam.h:1288 (PostgreSQL 16), tableam.h:1293 (PostgreSQL 17), tableam.h:1252 (PostgreSQL 18), tableam.h:1343 (PostgreSQL 19)
@@ -2506,7 +2506,7 @@ macro_rules! table_tuple_delete {
 #[macro_export]
 macro_rules! table_tuple_fetch_row_version {
     ($rel:expr, $tid:expr, $snapshot:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2535,7 +2535,7 @@ macro_rules! table_tuple_fetch_row_version {
 #[macro_export]
 macro_rules! table_tuple_insert {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2564,7 +2564,7 @@ macro_rules! table_tuple_insert {
 #[macro_export]
 macro_rules! table_tuple_insert {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2595,7 +2595,7 @@ macro_rules! table_tuple_insert {
 #[macro_export]
 macro_rules! table_tuple_insert_speculative {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr, $specToken:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2626,7 +2626,7 @@ macro_rules! table_tuple_insert_speculative {
 #[macro_export]
 macro_rules! table_tuple_insert_speculative {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr, $specToken:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1645 (PostgreSQL 19)
@@ -2657,7 +2657,7 @@ macro_rules! table_tuple_insert_speculative {
 #[macro_export]
 macro_rules! table_tuple_lock {
     ($rel:expr, $tid:expr, $snapshot:expr, $slot:expr, $cid:expr, $mode:expr, $wait_policy:expr, $flags:expr, $tmfd:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
@@ -2684,7 +2684,7 @@ macro_rules! table_tuple_lock {
 #[macro_export]
 macro_rules! table_tuple_satisfies_snapshot {
     ($rel:expr, $slot:expr, $snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
@@ -2710,7 +2710,7 @@ macro_rules! table_tuple_satisfies_snapshot {
 #[macro_export]
 macro_rules! table_tuple_tid_valid {
     ($scan:expr, $tid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2743,7 +2743,7 @@ macro_rules! table_tuple_tid_valid {
 #[macro_export]
 macro_rules! table_tuple_update {
     ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2776,7 +2776,7 @@ macro_rules! table_tuple_update {
 #[macro_export]
 macro_rules! table_tuple_update {
     ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2810,7 +2810,7 @@ macro_rules! table_tuple_update {
 #[macro_export]
 macro_rules! table_tuple_update {
     ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $options:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use table_beginscan;

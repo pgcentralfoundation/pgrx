@@ -25,7 +25,7 @@
 #[macro_export]
 macro_rules! DatumGetItemPointer {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -50,7 +50,7 @@ macro_rules! DatumGetItemPointer {
 #[macro_export]
 macro_rules! ItemPointerCopy {
     ($fromPointer:expr, $toPointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -79,7 +79,7 @@ macro_rules! ItemPointerCopy {
 #[macro_export]
 macro_rules! ItemPointerCopy {
     ($fromPointer:expr, $toPointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -108,7 +108,7 @@ macro_rules! ItemPointerCopy {
 #[macro_export]
 macro_rules! ItemPointerCopy {
     ($fromPointer:expr, $toPointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -133,7 +133,7 @@ macro_rules! ItemPointerCopy {
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -161,7 +161,7 @@ macro_rules! ItemPointerGetBlockNumber {
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -182,7 +182,7 @@ macro_rules! ItemPointerGetBlockNumber {
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumberNoCheck {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -209,7 +209,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumberNoCheck {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -236,7 +236,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
 #[macro_export]
 macro_rules! ItemPointerGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -261,7 +261,7 @@ macro_rules! ItemPointerGetDatum {
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -289,7 +289,7 @@ macro_rules! ItemPointerGetOffsetNumber {
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -306,7 +306,7 @@ macro_rules! ItemPointerGetOffsetNumber {
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumberNoCheck {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -333,7 +333,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumberNoCheck {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -358,7 +358,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
 #[macro_export]
 macro_rules! ItemPointerIndicatesMovedPartitions {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -387,7 +387,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
 #[macro_export]
 macro_rules! ItemPointerIndicatesMovedPartitions {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -408,7 +408,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
 #[macro_export]
 macro_rules! ItemPointerIsValid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -435,7 +435,7 @@ macro_rules! ItemPointerIsValid {
 #[macro_export]
 macro_rules! ItemPointerIsValid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -462,7 +462,7 @@ macro_rules! ItemPointerIsValid {
 #[macro_export]
 macro_rules! ItemPointerIsValid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -487,7 +487,7 @@ macro_rules! ItemPointerIsValid {
 #[macro_export]
 macro_rules! ItemPointerSet {
     ($pointer:expr, $blockNumber:expr, $offNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -516,7 +516,7 @@ macro_rules! ItemPointerSet {
 #[macro_export]
 macro_rules! ItemPointerSet {
     ($pointer:expr, $blockNumber:expr, $offNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -545,7 +545,7 @@ macro_rules! ItemPointerSet {
 #[macro_export]
 macro_rules! ItemPointerSet {
     ($pointer:expr, $blockNumber:expr, $offNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -570,7 +570,7 @@ macro_rules! ItemPointerSet {
 #[macro_export]
 macro_rules! ItemPointerSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -598,7 +598,7 @@ macro_rules! ItemPointerSetBlockNumber {
 #[macro_export]
 macro_rules! ItemPointerSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -626,7 +626,7 @@ macro_rules! ItemPointerSetBlockNumber {
 #[macro_export]
 macro_rules! ItemPointerSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -651,7 +651,7 @@ macro_rules! ItemPointerSetBlockNumber {
 #[macro_export]
 macro_rules! ItemPointerSetInvalid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -680,7 +680,7 @@ macro_rules! ItemPointerSetInvalid {
 #[macro_export]
 macro_rules! ItemPointerSetInvalid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -709,7 +709,7 @@ macro_rules! ItemPointerSetInvalid {
 #[macro_export]
 macro_rules! ItemPointerSetInvalid {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -734,7 +734,7 @@ macro_rules! ItemPointerSetInvalid {
 #[macro_export]
 macro_rules! ItemPointerSetMovedPartitions {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -761,7 +761,7 @@ macro_rules! ItemPointerSetMovedPartitions {
 #[macro_export]
 macro_rules! ItemPointerSetMovedPartitions {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -786,7 +786,7 @@ macro_rules! ItemPointerSetMovedPartitions {
 #[macro_export]
 macro_rules! ItemPointerSetOffsetNumber {
     ($pointer:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -814,7 +814,7 @@ macro_rules! ItemPointerSetOffsetNumber {
 #[macro_export]
 macro_rules! ItemPointerSetOffsetNumber {
     ($pointer:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -842,7 +842,7 @@ macro_rules! ItemPointerSetOffsetNumber {
 #[macro_export]
 macro_rules! ItemPointerSetOffsetNumber {
     ($pointer:expr, $offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -865,7 +865,7 @@ macro_rules! ItemPointerSetOffsetNumber {
 #[macro_export]
 macro_rules! PG_GETARG_ITEMPOINTER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -888,10 +888,10 @@ macro_rules! PG_GETARG_ITEMPOINTER {
 #[macro_export]
 macro_rules! PG_RETURN_ITEMPOINTER {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

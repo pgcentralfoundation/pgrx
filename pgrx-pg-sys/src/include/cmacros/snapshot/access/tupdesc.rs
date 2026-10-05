@@ -20,7 +20,7 @@
 #[macro_export]
 macro_rules! PinTupleDesc {
     ($tupdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ReleaseTupleDesc from tupdesc.h:122 (PostgreSQL 15–17), tupdesc.h:219 (PostgreSQL 18), tupdesc.h:240 (PostgreSQL 19)
@@ -42,7 +42,7 @@ macro_rules! PinTupleDesc {
 #[macro_export]
 macro_rules! ReleaseTupleDesc {
     ($tupdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -59,7 +59,7 @@ macro_rules! ReleaseTupleDesc {
 #[macro_export]
 macro_rules! TupleDescAttr {
     ($tupdesc:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -88,7 +88,7 @@ macro_rules! TupleDescAttr {
 #[macro_export]
 macro_rules! TupleDescAttr {
     ($tupdesc:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -119,7 +119,7 @@ macro_rules! TupleDescAttr {
 #[macro_export]
 macro_rules! TupleDescAttr {
     ($tupdesc:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -154,7 +154,7 @@ macro_rules! TupleDescAttr {
 #[macro_export]
 macro_rules! TupleDescCompactAttr {
     ($tupdesc:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -175,7 +175,7 @@ macro_rules! TupleDescCompactAttr {
 #[macro_export]
 macro_rules! TupleDescSize {
     ($src:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -196,7 +196,7 @@ macro_rules! TupleDescSize {
 #[macro_export]
 macro_rules! TupleDescSize {
     ($src:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use PinTupleDesc;

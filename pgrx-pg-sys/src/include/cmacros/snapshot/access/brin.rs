@@ -23,7 +23,7 @@
 #[macro_export]
 macro_rules! BrinGetAutoSummarize {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -44,7 +44,7 @@ macro_rules! BrinGetAutoSummarize {
 #[macro_export]
 macro_rules! BrinGetAutoSummarize {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -69,7 +69,7 @@ macro_rules! BrinGetAutoSummarize {
 #[macro_export]
 macro_rules! BrinGetPagesPerRange {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -90,7 +90,7 @@ macro_rules! BrinGetPagesPerRange {
 #[macro_export]
 macro_rules! BrinGetPagesPerRange {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BrinGetAutoSummarize;

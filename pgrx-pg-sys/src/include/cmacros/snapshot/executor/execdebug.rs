@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! ENL1_printf {
     ($message:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ1_printf from execdebug.h:121 (PostgreSQL 15–19)
@@ -30,7 +30,7 @@ macro_rules! ENL1_printf {
 #[macro_export]
 macro_rules! MJ1_printf {
     ($s:expr, $p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ2_printf from execdebug.h:122 (PostgreSQL 15–19)
@@ -46,7 +46,7 @@ macro_rules! MJ1_printf {
 #[macro_export]
 macro_rules! MJ2_printf {
     ($s:expr, $p1:expr, $p2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_DEBUG_COMPARE from execdebug.h:125 (PostgreSQL 15–19)
@@ -62,7 +62,7 @@ macro_rules! MJ2_printf {
 #[macro_export]
 macro_rules! MJ_DEBUG_COMPARE {
     ($res:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_DEBUG_PROC_NODE from execdebug.h:127 (PostgreSQL 15–19)
@@ -78,7 +78,7 @@ macro_rules! MJ_DEBUG_COMPARE {
 #[macro_export]
 macro_rules! MJ_DEBUG_PROC_NODE {
     ($slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_DEBUG_QUAL from execdebug.h:126 (PostgreSQL 15–19)
@@ -94,7 +94,7 @@ macro_rules! MJ_DEBUG_PROC_NODE {
 #[macro_export]
 macro_rules! MJ_DEBUG_QUAL {
     ($clause:expr, $res:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_debugtup from execdebug.h:123 (PostgreSQL 15–19)
@@ -110,7 +110,7 @@ macro_rules! MJ_DEBUG_QUAL {
 #[macro_export]
 macro_rules! MJ_debugtup {
     ($slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_dump from execdebug.h:124 (PostgreSQL 15–19)
@@ -126,7 +126,7 @@ macro_rules! MJ_debugtup {
 #[macro_export]
 macro_rules! MJ_dump {
     ($state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_nodeDisplay from execdebug.h:119 (PostgreSQL 15–19)
@@ -142,7 +142,7 @@ macro_rules! MJ_dump {
 #[macro_export]
 macro_rules! MJ_nodeDisplay {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MJ_printf from execdebug.h:120 (PostgreSQL 15–19)
@@ -158,7 +158,7 @@ macro_rules! MJ_nodeDisplay {
 #[macro_export]
 macro_rules! MJ_printf {
     ($s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NL1_printf from execdebug.h:77 (PostgreSQL 15–19)
@@ -174,7 +174,7 @@ macro_rules! MJ_printf {
 #[macro_export]
 macro_rules! NL1_printf {
     ($s:expr, $a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NL_nodeDisplay from execdebug.h:75 (PostgreSQL 15–19)
@@ -190,7 +190,7 @@ macro_rules! NL1_printf {
 #[macro_export]
 macro_rules! NL_nodeDisplay {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NL_printf from execdebug.h:76 (PostgreSQL 15–19)
@@ -206,7 +206,7 @@ macro_rules! NL_nodeDisplay {
 #[macro_export]
 macro_rules! NL_printf {
     ($s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NULL_OR_TUPLE from execdebug.h:63 (PostgreSQL 15–19)
@@ -226,7 +226,7 @@ macro_rules! NL_printf {
 #[macro_export]
 macro_rules! NULL_OR_TUPLE {
     ($slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SO1_printf from execdebug.h:93 (PostgreSQL 15–19)
@@ -242,7 +242,7 @@ macro_rules! NULL_OR_TUPLE {
 #[macro_export]
 macro_rules! SO1_printf {
     ($s:expr, $p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SO2_printf from execdebug.h:94 (PostgreSQL 15–19)
@@ -258,7 +258,7 @@ macro_rules! SO1_printf {
 #[macro_export]
 macro_rules! SO2_printf {
     ($s:expr, $p1:expr, $p2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SO_nodeDisplay from execdebug.h:91 (PostgreSQL 15–19)
@@ -274,7 +274,7 @@ macro_rules! SO2_printf {
 #[macro_export]
 macro_rules! SO_nodeDisplay {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SO_printf from execdebug.h:92 (PostgreSQL 15–19)
@@ -290,7 +290,7 @@ macro_rules! SO_nodeDisplay {
 #[macro_export]
 macro_rules! SO_printf {
     ($s:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro T_OR_F from execdebug.h:62 (PostgreSQL 15–19)
@@ -306,7 +306,7 @@ macro_rules! SO_printf {
 #[macro_export]
 macro_rules! T_OR_F {
     ($b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ENL1_printf;

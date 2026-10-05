@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! SPI_pop {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -40,7 +40,7 @@ macro_rules! SPI_pop {
 #[macro_export]
 macro_rules! SPI_pop_conditional {
     ($pushed:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -61,7 +61,7 @@ macro_rules! SPI_pop_conditional {
 #[macro_export]
 macro_rules! SPI_push {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -78,7 +78,7 @@ macro_rules! SPI_push {
 #[macro_export]
 macro_rules! SPI_push_conditional {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -99,7 +99,7 @@ macro_rules! SPI_push_conditional {
 #[macro_export]
 macro_rules! SPI_restore_connection {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

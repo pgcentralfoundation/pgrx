@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumIsReadWriteExpandedObject {
     ($d:expr, $isnull:expr, $typlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -40,7 +40,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
 #[macro_export]
 macro_rules! DatumIsReadWriteExpandedObject {
     ($d:expr, $isnull:expr, $typlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -61,7 +61,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
 #[macro_export]
 macro_rules! DatumIsReadWriteExpandedObject {
     ($d:expr, $isnull:expr, $typlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -82,7 +82,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
 #[macro_export]
 macro_rules! EOHPGetRODatum {
     ($eohptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -109,7 +109,7 @@ macro_rules! EOHPGetRODatum {
 #[macro_export]
 macro_rules! EOHPGetRODatum {
     ($eohptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -130,7 +130,7 @@ macro_rules! EOHPGetRODatum {
 #[macro_export]
 macro_rules! EOHPGetRWDatum {
     ($eohptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -157,7 +157,7 @@ macro_rules! EOHPGetRWDatum {
 #[macro_export]
 macro_rules! EOHPGetRWDatum {
     ($eohptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MakeExpandedObjectReadOnly from expandeddatum.h:144 (PostgreSQL 15), expandeddatum.h:155 (PostgreSQL 16–19)
@@ -177,7 +177,7 @@ macro_rules! EOHPGetRWDatum {
 #[macro_export]
 macro_rules! MakeExpandedObjectReadOnly {
     ($d:expr, $isnull:expr, $typlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro VARATT_IS_EXPANDED_HEADER from expandeddatum.h:128 (PostgreSQL 15), expandeddatum.h:130 (PostgreSQL 16–19)
@@ -197,7 +197,7 @@ macro_rules! MakeExpandedObjectReadOnly {
 #[macro_export]
 macro_rules! VARATT_IS_EXPANDED_HEADER {
     ($PTR:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumIsReadWriteExpandedObject;

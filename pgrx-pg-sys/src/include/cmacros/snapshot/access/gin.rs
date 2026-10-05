@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumGetGinTernaryValue {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! DatumGetGinTernaryValue {
 #[macro_export]
 macro_rules! DatumGetGinTernaryValue {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +67,7 @@ macro_rules! DatumGetGinTernaryValue {
 #[macro_export]
 macro_rules! GinTernaryValueGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -94,7 +94,7 @@ macro_rules! GinTernaryValueGetDatum {
 #[macro_export]
 macro_rules! GinTernaryValueGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -117,10 +117,10 @@ macro_rules! GinTernaryValueGetDatum {
 #[macro_export]
 macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -143,10 +143,10 @@ macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
 #[macro_export]
 macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumGetGinTernaryValue;

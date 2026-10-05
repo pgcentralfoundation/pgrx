@@ -73,7 +73,7 @@
 #[macro_export]
 macro_rules! align_fetch_then_add {
     ($tupptr:expr, $off:expr, $attbyval:expr, $attlen:expr, $attalignby:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -98,7 +98,7 @@ macro_rules! align_fetch_then_add {
 #[macro_export]
 macro_rules! att_addlength_datum {
     ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -119,7 +119,7 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_datum {
     ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -144,7 +144,7 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_datum {
     ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -169,7 +169,7 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -190,7 +190,7 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -215,7 +215,7 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -240,7 +240,7 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_align_datum {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -261,7 +261,7 @@ macro_rules! att_align_datum {
 #[macro_export]
 macro_rules! att_align_datum {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -286,7 +286,7 @@ macro_rules! att_align_datum {
 #[macro_export]
 macro_rules! att_align_nominal {
     ($cur_offset:expr, $attalign:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -307,7 +307,7 @@ macro_rules! att_align_nominal {
 #[macro_export]
 macro_rules! att_align_nominal {
     ($cur_offset:expr, $attalign:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -328,7 +328,7 @@ macro_rules! att_align_nominal {
 #[macro_export]
 macro_rules! att_align_nominal {
     ($cur_offset:expr, $attalign:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -353,7 +353,7 @@ macro_rules! att_align_nominal {
 #[macro_export]
 macro_rules! att_align_pointer {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -374,7 +374,7 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_align_pointer {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -395,7 +395,7 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_align_pointer {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -416,7 +416,7 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_datum_alignby {
     ($cur_offset:expr, $attalignby:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -437,7 +437,7 @@ macro_rules! att_datum_alignby {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -464,7 +464,7 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -491,7 +491,7 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -512,7 +512,7 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_nominal_alignby {
     ($cur_offset:expr, $attalignby:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -533,7 +533,7 @@ macro_rules! att_nominal_alignby {
 #[macro_export]
 macro_rules! att_pointer_alignby {
     ($cur_offset:expr, $attalignby:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -558,7 +558,7 @@ macro_rules! att_pointer_alignby {
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -605,7 +605,7 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -650,7 +650,7 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -693,7 +693,7 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att_noerr {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -718,7 +718,7 @@ macro_rules! fetch_att_noerr {
 #[macro_export]
 macro_rules! fetchatt {
     ($A:expr, $T:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -739,7 +739,7 @@ macro_rules! fetchatt {
 #[macro_export]
 macro_rules! fetchatt {
     ($A:expr, $T:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -812,7 +812,7 @@ macro_rules! fetchatt {
 #[macro_export]
 macro_rules! first_null_attr {
     ($bits:expr, $natts:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -880,7 +880,7 @@ macro_rules! first_null_attr {
 #[macro_export]
 macro_rules! populate_isnull_array {
     ($bits:expr, $natts:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -925,7 +925,7 @@ macro_rules! populate_isnull_array {
 #[macro_export]
 macro_rules! store_att_byval {
     ($T:expr, $newdatum:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -968,7 +968,7 @@ macro_rules! store_att_byval {
 #[macro_export]
 macro_rules! store_att_byval {
     ($T:expr, $newdatum:expr, $attlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1021,7 +1021,7 @@ macro_rules! store_att_byval {
 #[macro_export]
 macro_rules! typalign_to_alignby {
     ($typalign:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]

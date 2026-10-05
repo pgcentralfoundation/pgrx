@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! CALLED_AS_EVENT_TRIGGER {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use CALLED_AS_EVENT_TRIGGER;

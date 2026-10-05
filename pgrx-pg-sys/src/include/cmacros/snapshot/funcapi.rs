@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! HeapTupleGetDatum {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! HeapTupleGetDatum {
 #[macro_export]
 macro_rules! HeapTupleGetDatum {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_FIRSTCALL_INIT from funcapi.h:307 (PostgreSQL 15–19)
@@ -68,7 +68,7 @@ macro_rules! HeapTupleGetDatum {
 #[macro_export]
 macro_rules! SRF_FIRSTCALL_INIT {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_IS_FIRSTCALL from funcapi.h:305 (PostgreSQL 15–19)
@@ -90,7 +90,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
 #[macro_export]
 macro_rules! SRF_IS_FIRSTCALL {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_PERCALL_SETUP from funcapi.h:309 (PostgreSQL 15–19)
@@ -112,7 +112,7 @@ macro_rules! SRF_IS_FIRSTCALL {
 #[macro_export]
 macro_rules! SRF_PERCALL_SETUP {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_RETURN_DONE from funcapi.h:329 (PostgreSQL 15–19)
@@ -136,10 +136,10 @@ macro_rules! SRF_PERCALL_SETUP {
 #[macro_export]
 macro_rules! SRF_RETURN_DONE {
     ($_funcctx:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $_funcctx:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_RETURN_NEXT from funcapi.h:311 (PostgreSQL 15–19)
@@ -163,10 +163,10 @@ macro_rules! SRF_RETURN_DONE {
 #[macro_export]
 macro_rules! SRF_RETURN_NEXT {
     ($_funcctx:expr, $_result:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $_funcctx:expr, $_result:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SRF_RETURN_NEXT_NULL from funcapi.h:320 (PostgreSQL 15–19)
@@ -190,10 +190,10 @@ macro_rules! SRF_RETURN_NEXT {
 #[macro_export]
 macro_rules! SRF_RETURN_NEXT_NULL {
     ($_funcctx:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $_funcctx:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TupleGetDatum from funcapi.h:222 (PostgreSQL 15), funcapi.h:236 (PostgreSQL 16–19)
@@ -213,7 +213,7 @@ macro_rules! SRF_RETURN_NEXT_NULL {
 #[macro_export]
 macro_rules! TupleGetDatum {
     ($_slot:expr, $_tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use HeapTupleGetDatum;

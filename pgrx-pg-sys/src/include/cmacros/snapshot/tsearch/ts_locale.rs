@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! TOUCHAR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro t_iseq from ts_locale.h:46 (PostgreSQL 15), ts_locale.h:38 (PostgreSQL 16–19)
@@ -38,7 +38,7 @@ macro_rules! TOUCHAR {
 #[macro_export]
 macro_rules! t_iseq {
     ($x:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ts_copychar_cstr from ts_locale.h:57 (PostgreSQL 15), ts_locale.h:49 (PostgreSQL 16–19)
@@ -64,7 +64,7 @@ macro_rules! t_iseq {
 #[macro_export]
 macro_rules! ts_copychar_cstr {
     ($dest:expr, $src:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ts_copychar_with_len from ts_locale.h:49 (PostgreSQL 15), ts_locale.h:41 (PostgreSQL 16–19)
@@ -91,7 +91,7 @@ macro_rules! ts_copychar_cstr {
 #[macro_export]
 macro_rules! ts_copychar_with_len {
     ($dest:expr, $src:expr, $length:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use TOUCHAR;

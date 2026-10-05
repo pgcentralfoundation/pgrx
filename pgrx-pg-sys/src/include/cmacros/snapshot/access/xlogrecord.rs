@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! BKPIMAGE_COMPRESSED {
     ($info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BKPIMAGE_COMPRESSED;

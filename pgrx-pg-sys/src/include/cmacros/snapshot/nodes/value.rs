@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! boolVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -40,7 +40,7 @@ macro_rules! boolVal {
 #[macro_export]
 macro_rules! boolVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro floatVal from value.h:70 (PostgreSQL 15), value.h:80 (PostgreSQL 16–19)
@@ -60,7 +60,7 @@ macro_rules! boolVal {
 #[macro_export]
 macro_rules! floatVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -81,7 +81,7 @@ macro_rules! floatVal {
 #[macro_export]
 macro_rules! intVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -102,7 +102,7 @@ macro_rules! intVal {
 #[macro_export]
 macro_rules! intVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -123,7 +123,7 @@ macro_rules! intVal {
 #[macro_export]
 macro_rules! strVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -144,7 +144,7 @@ macro_rules! strVal {
 #[macro_export]
 macro_rules! strVal {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use boolVal;

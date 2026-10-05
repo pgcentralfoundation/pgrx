@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! bms_is_empty {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! bms_is_empty {
 #[macro_export]
 macro_rules! bmw_leftmost_one_pos {
     ($w:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -61,7 +61,7 @@ macro_rules! bmw_leftmost_one_pos {
 #[macro_export]
 macro_rules! bmw_popcount {
     ($w:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -82,7 +82,7 @@ macro_rules! bmw_popcount {
 #[macro_export]
 macro_rules! bmw_rightmost_one_pos {
     ($w:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

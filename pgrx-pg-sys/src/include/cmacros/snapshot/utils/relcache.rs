@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! AssertCouldGetRelation {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -43,7 +43,7 @@ macro_rules! AssertCouldGetRelation {
 #[macro_export]
 macro_rules! AssertPendingSyncs_RelationCache {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]

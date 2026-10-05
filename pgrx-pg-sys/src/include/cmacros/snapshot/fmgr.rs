@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! DatumGetBpCharP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetBpCharPCopy from fmgr.h:299 (PostgreSQL 15–18), fmgr.h:300 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! DatumGetBpCharP {
 #[macro_export]
 macro_rules! DatumGetBpCharPCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetBpCharPP from fmgr.h:293 (PostgreSQL 15–18), fmgr.h:294 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! DatumGetBpCharPCopy {
 #[macro_export]
 macro_rules! DatumGetBpCharPP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetBpCharPSlice from fmgr.h:305 (PostgreSQL 15–18), fmgr.h:306 (PostgreSQL 19)
@@ -78,7 +78,7 @@ macro_rules! DatumGetBpCharPP {
 #[macro_export]
 macro_rules! DatumGetBpCharPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetByteaP from fmgr.h:331 (PostgreSQL 15–18), fmgr.h:332 (PostgreSQL 19)
@@ -98,7 +98,7 @@ macro_rules! DatumGetBpCharPSlice {
 #[macro_export]
 macro_rules! DatumGetByteaP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetByteaPCopy from fmgr.h:297 (PostgreSQL 15–18), fmgr.h:298 (PostgreSQL 19)
@@ -118,7 +118,7 @@ macro_rules! DatumGetByteaP {
 #[macro_export]
 macro_rules! DatumGetByteaPCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetByteaPP from fmgr.h:291 (PostgreSQL 15–18), fmgr.h:292 (PostgreSQL 19)
@@ -138,7 +138,7 @@ macro_rules! DatumGetByteaPCopy {
 #[macro_export]
 macro_rules! DatumGetByteaPP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetByteaPSlice from fmgr.h:303 (PostgreSQL 15–18), fmgr.h:304 (PostgreSQL 19)
@@ -158,7 +158,7 @@ macro_rules! DatumGetByteaPP {
 #[macro_export]
 macro_rules! DatumGetByteaPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetHeapTupleHeader from fmgr.h:295 (PostgreSQL 15–18), fmgr.h:296 (PostgreSQL 19)
@@ -178,7 +178,7 @@ macro_rules! DatumGetByteaPSlice {
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeader {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetHeapTupleHeaderCopy from fmgr.h:301 (PostgreSQL 15–18), fmgr.h:302 (PostgreSQL 19)
@@ -198,7 +198,7 @@ macro_rules! DatumGetHeapTupleHeader {
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeaderCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetTextP from fmgr.h:332 (PostgreSQL 15–18), fmgr.h:333 (PostgreSQL 19)
@@ -218,7 +218,7 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
 #[macro_export]
 macro_rules! DatumGetTextP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetTextPCopy from fmgr.h:298 (PostgreSQL 15–18), fmgr.h:299 (PostgreSQL 19)
@@ -238,7 +238,7 @@ macro_rules! DatumGetTextP {
 #[macro_export]
 macro_rules! DatumGetTextPCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetTextPP from fmgr.h:292 (PostgreSQL 15–18), fmgr.h:293 (PostgreSQL 19)
@@ -258,7 +258,7 @@ macro_rules! DatumGetTextPCopy {
 #[macro_export]
 macro_rules! DatumGetTextPP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetTextPSlice from fmgr.h:304 (PostgreSQL 15–18), fmgr.h:305 (PostgreSQL 19)
@@ -278,7 +278,7 @@ macro_rules! DatumGetTextPP {
 #[macro_export]
 macro_rules! DatumGetTextPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetVarCharP from fmgr.h:334 (PostgreSQL 15–18), fmgr.h:335 (PostgreSQL 19)
@@ -298,7 +298,7 @@ macro_rules! DatumGetTextPSlice {
 #[macro_export]
 macro_rules! DatumGetVarCharP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetVarCharPCopy from fmgr.h:300 (PostgreSQL 15–18), fmgr.h:301 (PostgreSQL 19)
@@ -318,7 +318,7 @@ macro_rules! DatumGetVarCharP {
 #[macro_export]
 macro_rules! DatumGetVarCharPCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetVarCharPP from fmgr.h:294 (PostgreSQL 15–18), fmgr.h:295 (PostgreSQL 19)
@@ -338,7 +338,7 @@ macro_rules! DatumGetVarCharPCopy {
 #[macro_export]
 macro_rules! DatumGetVarCharPP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetVarCharPSlice from fmgr.h:306 (PostgreSQL 15–18), fmgr.h:307 (PostgreSQL 19)
@@ -358,7 +358,7 @@ macro_rules! DatumGetVarCharPP {
 #[macro_export]
 macro_rules! DatumGetVarCharPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall1 from fmgr.h:631 (PostgreSQL 15), fmgr.h:642 (PostgreSQL 16–17), fmgr.h:682 (PostgreSQL 18), fmgr.h:688 (PostgreSQL 19)
@@ -378,7 +378,7 @@ macro_rules! DatumGetVarCharPSlice {
 #[macro_export]
 macro_rules! DirectFunctionCall1 {
     ($func:expr, $arg1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall2 from fmgr.h:633 (PostgreSQL 15), fmgr.h:644 (PostgreSQL 16–17), fmgr.h:684 (PostgreSQL 18), fmgr.h:690 (PostgreSQL 19)
@@ -398,7 +398,7 @@ macro_rules! DirectFunctionCall1 {
 #[macro_export]
 macro_rules! DirectFunctionCall2 {
     ($func:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall3 from fmgr.h:635 (PostgreSQL 15), fmgr.h:646 (PostgreSQL 16–17), fmgr.h:686 (PostgreSQL 18), fmgr.h:692 (PostgreSQL 19)
@@ -418,7 +418,7 @@ macro_rules! DirectFunctionCall2 {
 #[macro_export]
 macro_rules! DirectFunctionCall3 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall4 from fmgr.h:637 (PostgreSQL 15), fmgr.h:648 (PostgreSQL 16–17), fmgr.h:688 (PostgreSQL 18), fmgr.h:694 (PostgreSQL 19)
@@ -438,7 +438,7 @@ macro_rules! DirectFunctionCall3 {
 #[macro_export]
 macro_rules! DirectFunctionCall4 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall5 from fmgr.h:639 (PostgreSQL 15), fmgr.h:650 (PostgreSQL 16–17), fmgr.h:690 (PostgreSQL 18), fmgr.h:696 (PostgreSQL 19)
@@ -458,7 +458,7 @@ macro_rules! DirectFunctionCall4 {
 #[macro_export]
 macro_rules! DirectFunctionCall5 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall6 from fmgr.h:641 (PostgreSQL 15), fmgr.h:652 (PostgreSQL 16–17), fmgr.h:692 (PostgreSQL 18), fmgr.h:698 (PostgreSQL 19)
@@ -478,7 +478,7 @@ macro_rules! DirectFunctionCall5 {
 #[macro_export]
 macro_rules! DirectFunctionCall6 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall7 from fmgr.h:643 (PostgreSQL 15), fmgr.h:654 (PostgreSQL 16–17), fmgr.h:694 (PostgreSQL 18), fmgr.h:700 (PostgreSQL 19)
@@ -498,7 +498,7 @@ macro_rules! DirectFunctionCall6 {
 #[macro_export]
 macro_rules! DirectFunctionCall7 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall8 from fmgr.h:645 (PostgreSQL 15), fmgr.h:656 (PostgreSQL 16–17), fmgr.h:696 (PostgreSQL 18), fmgr.h:702 (PostgreSQL 19)
@@ -518,7 +518,7 @@ macro_rules! DirectFunctionCall7 {
 #[macro_export]
 macro_rules! DirectFunctionCall8 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DirectFunctionCall9 from fmgr.h:647 (PostgreSQL 15), fmgr.h:658 (PostgreSQL 16–17), fmgr.h:698 (PostgreSQL 18), fmgr.h:704 (PostgreSQL 19)
@@ -538,7 +538,7 @@ macro_rules! DirectFunctionCall8 {
 #[macro_export]
 macro_rules! DirectFunctionCall9 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FmgrHookIsNeeded from fmgr.h:778 (PostgreSQL 15), fmgr.h:797 (PostgreSQL 16–17), fmgr.h:848 (PostgreSQL 18), fmgr.h:854 (PostgreSQL 19)
@@ -558,7 +558,7 @@ macro_rules! DirectFunctionCall9 {
 #[macro_export]
 macro_rules! FmgrHookIsNeeded {
     ($fn_oid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall1 from fmgr.h:649 (PostgreSQL 15), fmgr.h:660 (PostgreSQL 16–17), fmgr.h:700 (PostgreSQL 18), fmgr.h:706 (PostgreSQL 19)
@@ -578,7 +578,7 @@ macro_rules! FmgrHookIsNeeded {
 #[macro_export]
 macro_rules! FunctionCall1 {
     ($flinfo:expr, $arg1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall2 from fmgr.h:651 (PostgreSQL 15), fmgr.h:662 (PostgreSQL 16–17), fmgr.h:702 (PostgreSQL 18), fmgr.h:708 (PostgreSQL 19)
@@ -598,7 +598,7 @@ macro_rules! FunctionCall1 {
 #[macro_export]
 macro_rules! FunctionCall2 {
     ($flinfo:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall3 from fmgr.h:653 (PostgreSQL 15), fmgr.h:664 (PostgreSQL 16–17), fmgr.h:704 (PostgreSQL 18), fmgr.h:710 (PostgreSQL 19)
@@ -618,7 +618,7 @@ macro_rules! FunctionCall2 {
 #[macro_export]
 macro_rules! FunctionCall3 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall4 from fmgr.h:655 (PostgreSQL 15), fmgr.h:666 (PostgreSQL 16–17), fmgr.h:706 (PostgreSQL 18), fmgr.h:712 (PostgreSQL 19)
@@ -638,7 +638,7 @@ macro_rules! FunctionCall3 {
 #[macro_export]
 macro_rules! FunctionCall4 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall5 from fmgr.h:657 (PostgreSQL 15), fmgr.h:668 (PostgreSQL 16–17), fmgr.h:708 (PostgreSQL 18), fmgr.h:714 (PostgreSQL 19)
@@ -658,7 +658,7 @@ macro_rules! FunctionCall4 {
 #[macro_export]
 macro_rules! FunctionCall5 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall6 from fmgr.h:659 (PostgreSQL 15), fmgr.h:670 (PostgreSQL 16–17), fmgr.h:710 (PostgreSQL 18), fmgr.h:716 (PostgreSQL 19)
@@ -678,7 +678,7 @@ macro_rules! FunctionCall5 {
 #[macro_export]
 macro_rules! FunctionCall6 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall7 from fmgr.h:661 (PostgreSQL 15), fmgr.h:672 (PostgreSQL 16–17), fmgr.h:712 (PostgreSQL 18), fmgr.h:718 (PostgreSQL 19)
@@ -698,7 +698,7 @@ macro_rules! FunctionCall6 {
 #[macro_export]
 macro_rules! FunctionCall7 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall8 from fmgr.h:663 (PostgreSQL 15), fmgr.h:674 (PostgreSQL 16–17), fmgr.h:714 (PostgreSQL 18), fmgr.h:720 (PostgreSQL 19)
@@ -718,7 +718,7 @@ macro_rules! FunctionCall7 {
 #[macro_export]
 macro_rules! FunctionCall8 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCall9 from fmgr.h:665 (PostgreSQL 15), fmgr.h:676 (PostgreSQL 16–17), fmgr.h:716 (PostgreSQL 18), fmgr.h:722 (PostgreSQL 19)
@@ -738,7 +738,7 @@ macro_rules! FunctionCall8 {
 #[macro_export]
 macro_rules! FunctionCall9 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FunctionCallInvoke from fmgr.h:172 (PostgreSQL 15–19)
@@ -758,7 +758,7 @@ macro_rules! FunctionCall9 {
 #[macro_export]
 macro_rules! FunctionCallInvoke {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InitFunctionCallInfoData from fmgr.h:150 (PostgreSQL 15–19)
@@ -776,7 +776,7 @@ macro_rules! FunctionCallInvoke {
 #[macro_export]
 macro_rules! InitFunctionCallInfoData {
     ($Fcinfo:expr, $Flinfo:expr, $Nargs:expr, $Collation:expr, $Context:expr, $Resultinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall0 from fmgr.h:667 (PostgreSQL 15), fmgr.h:678 (PostgreSQL 16–17), fmgr.h:718 (PostgreSQL 18), fmgr.h:724 (PostgreSQL 19)
@@ -796,7 +796,7 @@ macro_rules! InitFunctionCallInfoData {
 #[macro_export]
 macro_rules! OidFunctionCall0 {
     ($functionId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall1 from fmgr.h:669 (PostgreSQL 15), fmgr.h:680 (PostgreSQL 16–17), fmgr.h:720 (PostgreSQL 18), fmgr.h:726 (PostgreSQL 19)
@@ -816,7 +816,7 @@ macro_rules! OidFunctionCall0 {
 #[macro_export]
 macro_rules! OidFunctionCall1 {
     ($functionId:expr, $arg1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall2 from fmgr.h:671 (PostgreSQL 15), fmgr.h:682 (PostgreSQL 16–17), fmgr.h:722 (PostgreSQL 18), fmgr.h:728 (PostgreSQL 19)
@@ -836,7 +836,7 @@ macro_rules! OidFunctionCall1 {
 #[macro_export]
 macro_rules! OidFunctionCall2 {
     ($functionId:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall3 from fmgr.h:673 (PostgreSQL 15), fmgr.h:684 (PostgreSQL 16–17), fmgr.h:724 (PostgreSQL 18), fmgr.h:730 (PostgreSQL 19)
@@ -856,7 +856,7 @@ macro_rules! OidFunctionCall2 {
 #[macro_export]
 macro_rules! OidFunctionCall3 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall4 from fmgr.h:675 (PostgreSQL 15), fmgr.h:686 (PostgreSQL 16–17), fmgr.h:726 (PostgreSQL 18), fmgr.h:732 (PostgreSQL 19)
@@ -876,7 +876,7 @@ macro_rules! OidFunctionCall3 {
 #[macro_export]
 macro_rules! OidFunctionCall4 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall5 from fmgr.h:677 (PostgreSQL 15), fmgr.h:688 (PostgreSQL 16–17), fmgr.h:728 (PostgreSQL 18), fmgr.h:734 (PostgreSQL 19)
@@ -896,7 +896,7 @@ macro_rules! OidFunctionCall4 {
 #[macro_export]
 macro_rules! OidFunctionCall5 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall6 from fmgr.h:679 (PostgreSQL 15), fmgr.h:690 (PostgreSQL 16–17), fmgr.h:730 (PostgreSQL 18), fmgr.h:736 (PostgreSQL 19)
@@ -916,7 +916,7 @@ macro_rules! OidFunctionCall5 {
 #[macro_export]
 macro_rules! OidFunctionCall6 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall7 from fmgr.h:681 (PostgreSQL 15), fmgr.h:692 (PostgreSQL 16–17), fmgr.h:732 (PostgreSQL 18), fmgr.h:738 (PostgreSQL 19)
@@ -936,7 +936,7 @@ macro_rules! OidFunctionCall6 {
 #[macro_export]
 macro_rules! OidFunctionCall7 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall8 from fmgr.h:683 (PostgreSQL 15), fmgr.h:694 (PostgreSQL 16–17), fmgr.h:734 (PostgreSQL 18), fmgr.h:740 (PostgreSQL 19)
@@ -956,7 +956,7 @@ macro_rules! OidFunctionCall7 {
 #[macro_export]
 macro_rules! OidFunctionCall8 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidFunctionCall9 from fmgr.h:685 (PostgreSQL 15), fmgr.h:696 (PostgreSQL 16–17), fmgr.h:736 (PostgreSQL 18), fmgr.h:742 (PostgreSQL 19)
@@ -976,7 +976,7 @@ macro_rules! OidFunctionCall8 {
 #[macro_export]
 macro_rules! OidFunctionCall9 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_ARGISNULL from fmgr.h:209 (PostgreSQL 15–19)
@@ -994,7 +994,7 @@ macro_rules! OidFunctionCall9 {
 #[macro_export]
 macro_rules! PG_ARGISNULL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1015,7 +1015,7 @@ macro_rules! PG_ARGISNULL {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1036,7 +1036,7 @@ macro_rules! PG_DETOAST_DATUM {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1057,7 +1057,7 @@ macro_rules! PG_DETOAST_DATUM {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_COPY {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1078,7 +1078,7 @@ macro_rules! PG_DETOAST_DATUM_COPY {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_COPY {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1099,7 +1099,7 @@ macro_rules! PG_DETOAST_DATUM_COPY {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_PACKED {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1120,7 +1120,7 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_PACKED {
     ($datum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1141,7 +1141,7 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_SLICE {
     ($datum:expr, $f:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1162,7 +1162,7 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_SLICE {
     ($datum:expr, $f:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1187,7 +1187,7 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
 #[macro_export]
 macro_rules! PG_FREE_IF_COPY {
     ($ptr:expr, $n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1212,7 +1212,7 @@ macro_rules! PG_FREE_IF_COPY {
 #[macro_export]
 macro_rules! PG_FREE_IF_COPY {
     ($ptr:expr, $n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1235,7 +1235,7 @@ macro_rules! PG_FREE_IF_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1258,7 +1258,7 @@ macro_rules! PG_GETARG_BOOL {
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BPCHAR_P from fmgr.h:337 (PostgreSQL 15–18), fmgr.h:338 (PostgreSQL 19)
@@ -1280,7 +1280,7 @@ macro_rules! PG_GETARG_BOOL {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BPCHAR_PP from fmgr.h:310 (PostgreSQL 15–18), fmgr.h:311 (PostgreSQL 19)
@@ -1302,7 +1302,7 @@ macro_rules! PG_GETARG_BPCHAR_P {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BPCHAR_P_COPY from fmgr.h:316 (PostgreSQL 15–18), fmgr.h:317 (PostgreSQL 19)
@@ -1324,7 +1324,7 @@ macro_rules! PG_GETARG_BPCHAR_PP {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BPCHAR_P_SLICE from fmgr.h:322 (PostgreSQL 15–18), fmgr.h:323 (PostgreSQL 19)
@@ -1346,7 +1346,7 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BYTEA_P from fmgr.h:335 (PostgreSQL 15–18), fmgr.h:336 (PostgreSQL 19)
@@ -1368,7 +1368,7 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BYTEA_PP from fmgr.h:308 (PostgreSQL 15–18), fmgr.h:309 (PostgreSQL 19)
@@ -1390,7 +1390,7 @@ macro_rules! PG_GETARG_BYTEA_P {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BYTEA_P_COPY from fmgr.h:314 (PostgreSQL 15–18), fmgr.h:315 (PostgreSQL 19)
@@ -1412,7 +1412,7 @@ macro_rules! PG_GETARG_BYTEA_PP {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_BYTEA_P_SLICE from fmgr.h:320 (PostgreSQL 15–18), fmgr.h:321 (PostgreSQL 19)
@@ -1434,7 +1434,7 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1457,7 +1457,7 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1480,7 +1480,7 @@ macro_rules! PG_GETARG_CHAR {
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1503,7 +1503,7 @@ macro_rules! PG_GETARG_CHAR {
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1526,7 +1526,7 @@ macro_rules! PG_GETARG_CSTRING {
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_DATUM from fmgr.h:268 (PostgreSQL 15–19)
@@ -1544,7 +1544,7 @@ macro_rules! PG_GETARG_CSTRING {
 #[macro_export]
 macro_rules! PG_GETARG_DATUM {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_FLOAT4 from fmgr.h:281 (PostgreSQL 15–18), fmgr.h:282 (PostgreSQL 19)
@@ -1566,7 +1566,7 @@ macro_rules! PG_GETARG_DATUM {
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT4 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_FLOAT8 from fmgr.h:282 (PostgreSQL 15–18), fmgr.h:283 (PostgreSQL 19)
@@ -1588,7 +1588,7 @@ macro_rules! PG_GETARG_FLOAT4 {
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT8 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_HEAPTUPLEHEADER from fmgr.h:312 (PostgreSQL 15–18), fmgr.h:313 (PostgreSQL 19)
@@ -1610,7 +1610,7 @@ macro_rules! PG_GETARG_FLOAT8 {
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_HEAPTUPLEHEADER_COPY from fmgr.h:318 (PostgreSQL 15–18), fmgr.h:319 (PostgreSQL 19)
@@ -1632,7 +1632,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1655,7 +1655,7 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1678,7 +1678,7 @@ macro_rules! PG_GETARG_INT16 {
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1701,7 +1701,7 @@ macro_rules! PG_GETARG_INT16 {
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1724,7 +1724,7 @@ macro_rules! PG_GETARG_INT32 {
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1747,7 +1747,7 @@ macro_rules! PG_GETARG_INT32 {
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1770,7 +1770,7 @@ macro_rules! PG_GETARG_INT64 {
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1793,7 +1793,7 @@ macro_rules! PG_GETARG_INT64 {
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1816,7 +1816,7 @@ macro_rules! PG_GETARG_NAME {
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1839,7 +1839,7 @@ macro_rules! PG_GETARG_NAME {
 #[macro_export]
 macro_rules! PG_GETARG_OID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1862,7 +1862,7 @@ macro_rules! PG_GETARG_OID {
 #[macro_export]
 macro_rules! PG_GETARG_OID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1885,7 +1885,7 @@ macro_rules! PG_GETARG_OID {
 #[macro_export]
 macro_rules! PG_GETARG_OID8 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1908,7 +1908,7 @@ macro_rules! PG_GETARG_OID8 {
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1931,7 +1931,7 @@ macro_rules! PG_GETARG_POINTER {
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1954,7 +1954,7 @@ macro_rules! PG_GETARG_POINTER {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1977,7 +1977,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2000,7 +2000,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_TEXT_P from fmgr.h:336 (PostgreSQL 15–18), fmgr.h:337 (PostgreSQL 19)
@@ -2022,7 +2022,7 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_TEXT_PP from fmgr.h:309 (PostgreSQL 15–18), fmgr.h:310 (PostgreSQL 19)
@@ -2044,7 +2044,7 @@ macro_rules! PG_GETARG_TEXT_P {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_TEXT_P_COPY from fmgr.h:315 (PostgreSQL 15–18), fmgr.h:316 (PostgreSQL 19)
@@ -2066,7 +2066,7 @@ macro_rules! PG_GETARG_TEXT_PP {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_TEXT_P_SLICE from fmgr.h:321 (PostgreSQL 15–18), fmgr.h:322 (PostgreSQL 19)
@@ -2088,7 +2088,7 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2111,7 +2111,7 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2134,7 +2134,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2157,7 +2157,7 @@ macro_rules! PG_GETARG_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2180,7 +2180,7 @@ macro_rules! PG_GETARG_UINT16 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2203,7 +2203,7 @@ macro_rules! PG_GETARG_UINT16 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2226,7 +2226,7 @@ macro_rules! PG_GETARG_UINT32 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARCHAR_P from fmgr.h:338 (PostgreSQL 15–18), fmgr.h:339 (PostgreSQL 19)
@@ -2248,7 +2248,7 @@ macro_rules! PG_GETARG_UINT32 {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARCHAR_PP from fmgr.h:311 (PostgreSQL 15–18), fmgr.h:312 (PostgreSQL 19)
@@ -2270,7 +2270,7 @@ macro_rules! PG_GETARG_VARCHAR_P {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARCHAR_P_COPY from fmgr.h:317 (PostgreSQL 15–18), fmgr.h:318 (PostgreSQL 19)
@@ -2292,7 +2292,7 @@ macro_rules! PG_GETARG_VARCHAR_PP {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARCHAR_P_SLICE from fmgr.h:323 (PostgreSQL 15–18), fmgr.h:324 (PostgreSQL 19)
@@ -2314,7 +2314,7 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARLENA_P from fmgr.h:287 (PostgreSQL 15–18), fmgr.h:288 (PostgreSQL 19)
@@ -2336,7 +2336,7 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_VARLENA_PP from fmgr.h:289 (PostgreSQL 15–18), fmgr.h:290 (PostgreSQL 19)
@@ -2358,7 +2358,7 @@ macro_rules! PG_GETARG_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GET_COLLATION from fmgr.h:198 (PostgreSQL 15–19)
@@ -2376,7 +2376,7 @@ macro_rules! PG_GETARG_VARLENA_PP {
 #[macro_export]
 macro_rules! PG_GET_COLLATION {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GET_OPCLASS_OPTIONS from fmgr.h:342 (PostgreSQL 15–18), fmgr.h:343 (PostgreSQL 19)
@@ -2398,7 +2398,7 @@ macro_rules! PG_GET_COLLATION {
 #[macro_export]
 macro_rules! PG_GET_OPCLASS_OPTIONS {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_HAS_OPCLASS_OPTIONS from fmgr.h:341 (PostgreSQL 15–18), fmgr.h:342 (PostgreSQL 19)
@@ -2420,7 +2420,7 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
 #[macro_export]
 macro_rules! PG_HAS_OPCLASS_OPTIONS {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_NARGS from fmgr.h:203 (PostgreSQL 15–19)
@@ -2438,7 +2438,7 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
 #[macro_export]
 macro_rules! PG_NARGS {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2461,10 +2461,10 @@ macro_rules! PG_NARGS {
 #[macro_export]
 macro_rules! PG_RETURN_BOOL {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2487,10 +2487,10 @@ macro_rules! PG_RETURN_BOOL {
 #[macro_export]
 macro_rules! PG_RETURN_BOOL {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -2513,10 +2513,10 @@ macro_rules! PG_RETURN_BOOL {
 #[macro_export]
 macro_rules! PG_RETURN_BPCHAR_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2539,10 +2539,10 @@ macro_rules! PG_RETURN_BPCHAR_P {
 #[macro_export]
 macro_rules! PG_RETURN_BPCHAR_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -2565,10 +2565,10 @@ macro_rules! PG_RETURN_BPCHAR_P {
 #[macro_export]
 macro_rules! PG_RETURN_BYTEA_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2591,10 +2591,10 @@ macro_rules! PG_RETURN_BYTEA_P {
 #[macro_export]
 macro_rules! PG_RETURN_BYTEA_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2617,10 +2617,10 @@ macro_rules! PG_RETURN_BYTEA_P {
 #[macro_export]
 macro_rules! PG_RETURN_CHAR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2643,10 +2643,10 @@ macro_rules! PG_RETURN_CHAR {
 #[macro_export]
 macro_rules! PG_RETURN_CHAR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2669,10 +2669,10 @@ macro_rules! PG_RETURN_CHAR {
 #[macro_export]
 macro_rules! PG_RETURN_CSTRING {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2695,10 +2695,10 @@ macro_rules! PG_RETURN_CSTRING {
 #[macro_export]
 macro_rules! PG_RETURN_CSTRING {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_DATUM from fmgr.h:353 (PostgreSQL 15–18), fmgr.h:354 (PostgreSQL 19)
@@ -2716,10 +2716,10 @@ macro_rules! PG_RETURN_CSTRING {
 #[macro_export]
 macro_rules! PG_RETURN_DATUM {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_FLOAT4 from fmgr.h:366 (PostgreSQL 15–18), fmgr.h:368 (PostgreSQL 19)
@@ -2741,10 +2741,10 @@ macro_rules! PG_RETURN_DATUM {
 #[macro_export]
 macro_rules! PG_RETURN_FLOAT4 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_FLOAT8 from fmgr.h:367 (PostgreSQL 15–18), fmgr.h:369 (PostgreSQL 19)
@@ -2766,10 +2766,10 @@ macro_rules! PG_RETURN_FLOAT4 {
 #[macro_export]
 macro_rules! PG_RETURN_FLOAT8 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_HEAPTUPLEHEADER from fmgr.h:375 (PostgreSQL 15–18), fmgr.h:377 (PostgreSQL 19)
@@ -2791,10 +2791,10 @@ macro_rules! PG_RETURN_FLOAT8 {
 #[macro_export]
 macro_rules! PG_RETURN_HEAPTUPLEHEADER {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2817,10 +2817,10 @@ macro_rules! PG_RETURN_HEAPTUPLEHEADER {
 #[macro_export]
 macro_rules! PG_RETURN_INT16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2843,10 +2843,10 @@ macro_rules! PG_RETURN_INT16 {
 #[macro_export]
 macro_rules! PG_RETURN_INT16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2869,10 +2869,10 @@ macro_rules! PG_RETURN_INT16 {
 #[macro_export]
 macro_rules! PG_RETURN_INT32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2895,10 +2895,10 @@ macro_rules! PG_RETURN_INT32 {
 #[macro_export]
 macro_rules! PG_RETURN_INT32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2921,10 +2921,10 @@ macro_rules! PG_RETURN_INT32 {
 #[macro_export]
 macro_rules! PG_RETURN_INT64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2947,10 +2947,10 @@ macro_rules! PG_RETURN_INT64 {
 #[macro_export]
 macro_rules! PG_RETURN_INT64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2973,10 +2973,10 @@ macro_rules! PG_RETURN_INT64 {
 #[macro_export]
 macro_rules! PG_RETURN_NAME {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2999,10 +2999,10 @@ macro_rules! PG_RETURN_NAME {
 #[macro_export]
 macro_rules! PG_RETURN_NAME {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_NULL from fmgr.h:345 (PostgreSQL 15–18), fmgr.h:346 (PostgreSQL 19)
@@ -3026,10 +3026,10 @@ macro_rules! PG_RETURN_NAME {
 #[macro_export]
 macro_rules! PG_RETURN_NULL {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -3052,10 +3052,10 @@ macro_rules! PG_RETURN_NULL {
 #[macro_export]
 macro_rules! PG_RETURN_OID {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -3078,10 +3078,10 @@ macro_rules! PG_RETURN_OID {
 #[macro_export]
 macro_rules! PG_RETURN_OID {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -3104,10 +3104,10 @@ macro_rules! PG_RETURN_OID {
 #[macro_export]
 macro_rules! PG_RETURN_OID8 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -3130,10 +3130,10 @@ macro_rules! PG_RETURN_OID8 {
 #[macro_export]
 macro_rules! PG_RETURN_POINTER {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -3156,10 +3156,10 @@ macro_rules! PG_RETURN_POINTER {
 #[macro_export]
 macro_rules! PG_RETURN_POINTER {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -3182,10 +3182,10 @@ macro_rules! PG_RETURN_POINTER {
 #[macro_export]
 macro_rules! PG_RETURN_TEXT_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -3208,10 +3208,10 @@ macro_rules! PG_RETURN_TEXT_P {
 #[macro_export]
 macro_rules! PG_RETURN_TEXT_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -3234,10 +3234,10 @@ macro_rules! PG_RETURN_TEXT_P {
 #[macro_export]
 macro_rules! PG_RETURN_TRANSACTIONID {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -3260,10 +3260,10 @@ macro_rules! PG_RETURN_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_RETURN_TRANSACTIONID {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -3286,10 +3286,10 @@ macro_rules! PG_RETURN_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_RETURN_UINT16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -3312,10 +3312,10 @@ macro_rules! PG_RETURN_UINT16 {
 #[macro_export]
 macro_rules! PG_RETURN_UINT16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -3338,10 +3338,10 @@ macro_rules! PG_RETURN_UINT16 {
 #[macro_export]
 macro_rules! PG_RETURN_UINT32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -3364,10 +3364,10 @@ macro_rules! PG_RETURN_UINT32 {
 #[macro_export]
 macro_rules! PG_RETURN_UINT32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -3390,10 +3390,10 @@ macro_rules! PG_RETURN_UINT32 {
 #[macro_export]
 macro_rules! PG_RETURN_UINT64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -3416,10 +3416,10 @@ macro_rules! PG_RETURN_UINT64 {
 #[macro_export]
 macro_rules! PG_RETURN_UINT64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -3442,10 +3442,10 @@ macro_rules! PG_RETURN_UINT64 {
 #[macro_export]
 macro_rules! PG_RETURN_VARCHAR_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -3468,10 +3468,10 @@ macro_rules! PG_RETURN_VARCHAR_P {
 #[macro_export]
 macro_rules! PG_RETURN_VARCHAR_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RETURN_VOID from fmgr.h:349 (PostgreSQL 15–18), fmgr.h:350 (PostgreSQL 19)
@@ -3493,10 +3493,10 @@ macro_rules! PG_RETURN_VARCHAR_P {
 #[macro_export]
 macro_rules! PG_RETURN_VOID {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty];) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SizeForFunctionCallInfo from fmgr.h:102 (PostgreSQL 15–19)
@@ -3516,7 +3516,7 @@ macro_rules! PG_RETURN_VOID {
 #[macro_export]
 macro_rules! SizeForFunctionCallInfo {
     ($nargs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro fmgr_info_set_expr from fmgr.h:135 (PostgreSQL 15–19)
@@ -3532,7 +3532,7 @@ macro_rules! SizeForFunctionCallInfo {
 #[macro_export]
 macro_rules! fmgr_info_set_expr {
     ($expr:expr, $finfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumGetBpCharP;

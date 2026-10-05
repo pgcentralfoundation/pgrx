@@ -29,7 +29,7 @@
 #[macro_export]
 macro_rules! for_both_cell_setup {
     ($list1:expr, $initcell1:expr, $list2:expr, $initcell2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function for_each_cell_setup from pg_list.h:425 (PostgreSQL 15), pg_list.h:446 (PostgreSQL 16–18), pg_list.h:478 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! for_both_cell_setup {
 #[macro_export]
 macro_rules! for_each_cell_setup {
     ($lst:expr, $initcell:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function for_each_from_setup from pg_list.h:401 (PostgreSQL 15), pg_list.h:422 (PostgreSQL 16–18), pg_list.h:454 (PostgreSQL 19)
@@ -87,7 +87,7 @@ macro_rules! for_each_cell_setup {
 #[macro_export]
 macro_rules! for_each_from_setup {
     ($lst:expr, $N:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfirst from pg_list.h:169 (PostgreSQL 15), pg_list.h:172 (PostgreSQL 16–19)
@@ -103,7 +103,7 @@ macro_rules! for_each_from_setup {
 #[macro_export]
 macro_rules! lfirst {
     ($lc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfirst_int from pg_list.h:170 (PostgreSQL 15), pg_list.h:173 (PostgreSQL 16–19)
@@ -119,7 +119,7 @@ macro_rules! lfirst {
 #[macro_export]
 macro_rules! lfirst_int {
     ($lc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -140,7 +140,7 @@ macro_rules! lfirst_int {
 #[macro_export]
 macro_rules! lfirst_node {
     ($type:ty, $lc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfirst_oid from pg_list.h:171 (PostgreSQL 15), pg_list.h:174 (PostgreSQL 16–19)
@@ -156,7 +156,7 @@ macro_rules! lfirst_node {
 #[macro_export]
 macro_rules! lfirst_oid {
     ($lc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -173,7 +173,7 @@ macro_rules! lfirst_oid {
 #[macro_export]
 macro_rules! lfirst_xid {
     ($lc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfourth from pg_list.h:189 (PostgreSQL 15), pg_list.h:193 (PostgreSQL 16–19)
@@ -193,7 +193,7 @@ macro_rules! lfirst_xid {
 #[macro_export]
 macro_rules! lfourth {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfourth_int from pg_list.h:190 (PostgreSQL 15), pg_list.h:194 (PostgreSQL 16–19)
@@ -213,7 +213,7 @@ macro_rules! lfourth {
 #[macro_export]
 macro_rules! lfourth_int {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -234,7 +234,7 @@ macro_rules! lfourth_int {
 #[macro_export]
 macro_rules! lfourth_node {
     ($type:ty, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lfourth_oid from pg_list.h:191 (PostgreSQL 15), pg_list.h:195 (PostgreSQL 16–19)
@@ -254,7 +254,7 @@ macro_rules! lfourth_node {
 #[macro_export]
 macro_rules! lfourth_oid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro linitial from pg_list.h:174 (PostgreSQL 15), pg_list.h:178 (PostgreSQL 16–19)
@@ -274,7 +274,7 @@ macro_rules! lfourth_oid {
 #[macro_export]
 macro_rules! linitial {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro linitial_int from pg_list.h:175 (PostgreSQL 15), pg_list.h:179 (PostgreSQL 16–19)
@@ -294,7 +294,7 @@ macro_rules! linitial {
 #[macro_export]
 macro_rules! linitial_int {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -315,7 +315,7 @@ macro_rules! linitial_int {
 #[macro_export]
 macro_rules! linitial_node {
     ($type:ty, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro linitial_oid from pg_list.h:176 (PostgreSQL 15), pg_list.h:180 (PostgreSQL 16–19)
@@ -335,7 +335,7 @@ macro_rules! linitial_node {
 #[macro_export]
 macro_rules! linitial_oid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_cell_number from pg_list.h:311 (PostgreSQL 15), pg_list.h:332 (PostgreSQL 16–18), pg_list.h:364 (PostgreSQL 19)
@@ -362,7 +362,7 @@ macro_rules! linitial_oid {
 #[macro_export]
 macro_rules! list_cell_number {
     ($l:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_head from pg_list.h:124 (PostgreSQL 15), pg_list.h:127 (PostgreSQL 16–19)
@@ -388,7 +388,7 @@ macro_rules! list_cell_number {
 #[macro_export]
 macro_rules! list_head {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_last_cell from pg_list.h:266 (PostgreSQL 15), pg_list.h:287 (PostgreSQL 16–18), pg_list.h:319 (PostgreSQL 19)
@@ -415,7 +415,7 @@ macro_rules! list_head {
 #[macro_export]
 macro_rules! list_last_cell {
     ($list:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
@@ -441,7 +441,7 @@ macro_rules! list_last_cell {
 #[macro_export]
 macro_rules! list_length {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -462,7 +462,7 @@ macro_rules! list_length {
 #[macro_export]
 macro_rules! list_make1 {
     ($x1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -483,7 +483,7 @@ macro_rules! list_make1 {
 #[macro_export]
 macro_rules! list_make1_int {
     ($x1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -504,7 +504,7 @@ macro_rules! list_make1_int {
 #[macro_export]
 macro_rules! list_make1_oid {
     ($x1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -525,7 +525,7 @@ macro_rules! list_make1_oid {
 #[macro_export]
 macro_rules! list_make1_xid {
     ($x1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -546,7 +546,7 @@ macro_rules! list_make1_xid {
 #[macro_export]
 macro_rules! list_make2 {
     ($x1:expr, $x2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -567,7 +567,7 @@ macro_rules! list_make2 {
 #[macro_export]
 macro_rules! list_make2_int {
     ($x1:expr, $x2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -588,7 +588,7 @@ macro_rules! list_make2_int {
 #[macro_export]
 macro_rules! list_make2_oid {
     ($x1:expr, $x2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -609,7 +609,7 @@ macro_rules! list_make2_oid {
 #[macro_export]
 macro_rules! list_make2_xid {
     ($x1:expr, $x2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -630,7 +630,7 @@ macro_rules! list_make2_xid {
 #[macro_export]
 macro_rules! list_make3 {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -651,7 +651,7 @@ macro_rules! list_make3 {
 #[macro_export]
 macro_rules! list_make3_int {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -672,7 +672,7 @@ macro_rules! list_make3_int {
 #[macro_export]
 macro_rules! list_make3_oid {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -693,7 +693,7 @@ macro_rules! list_make3_oid {
 #[macro_export]
 macro_rules! list_make3_xid {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -714,7 +714,7 @@ macro_rules! list_make3_xid {
 #[macro_export]
 macro_rules! list_make4 {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -735,7 +735,7 @@ macro_rules! list_make4 {
 #[macro_export]
 macro_rules! list_make4_int {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -756,7 +756,7 @@ macro_rules! list_make4_int {
 #[macro_export]
 macro_rules! list_make4_oid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -777,7 +777,7 @@ macro_rules! list_make4_oid {
 #[macro_export]
 macro_rules! list_make4_xid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -798,7 +798,7 @@ macro_rules! list_make4_xid {
 #[macro_export]
 macro_rules! list_make5 {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -819,7 +819,7 @@ macro_rules! list_make5 {
 #[macro_export]
 macro_rules! list_make5_int {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -840,7 +840,7 @@ macro_rules! list_make5_int {
 #[macro_export]
 macro_rules! list_make5_oid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -861,7 +861,7 @@ macro_rules! list_make5_oid {
 #[macro_export]
 macro_rules! list_make5_xid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -891,7 +891,7 @@ macro_rules! list_make5_xid {
 #[macro_export]
 macro_rules! list_make_int_cell {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -921,7 +921,7 @@ macro_rules! list_make_int_cell {
 #[macro_export]
 macro_rules! list_make_oid_cell {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -951,7 +951,7 @@ macro_rules! list_make_oid_cell {
 #[macro_export]
 macro_rules! list_make_ptr_cell {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -981,7 +981,7 @@ macro_rules! list_make_ptr_cell {
 #[macro_export]
 macro_rules! list_make_xid_cell {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_nth from pg_list.h:277 (PostgreSQL 15), pg_list.h:298 (PostgreSQL 16–18), pg_list.h:330 (PostgreSQL 19)
@@ -1008,7 +1008,7 @@ macro_rules! list_make_xid_cell {
 #[macro_export]
 macro_rules! list_nth {
     ($list:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_nth_cell from pg_list.h:255 (PostgreSQL 15), pg_list.h:276 (PostgreSQL 16–18), pg_list.h:308 (PostgreSQL 19)
@@ -1036,7 +1036,7 @@ macro_rules! list_nth {
 #[macro_export]
 macro_rules! list_nth_cell {
     ($list:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_nth_int from pg_list.h:288 (PostgreSQL 15), pg_list.h:309 (PostgreSQL 16–18), pg_list.h:341 (PostgreSQL 19)
@@ -1063,7 +1063,7 @@ macro_rules! list_nth_cell {
 #[macro_export]
 macro_rules! list_nth_int {
     ($list:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1084,7 +1084,7 @@ macro_rules! list_nth_int {
 #[macro_export]
 macro_rules! list_nth_node {
     ($type:ty, $list:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_nth_oid from pg_list.h:299 (PostgreSQL 15), pg_list.h:320 (PostgreSQL 16–18), pg_list.h:352 (PostgreSQL 19)
@@ -1111,7 +1111,7 @@ macro_rules! list_nth_node {
 #[macro_export]
 macro_rules! list_nth_oid {
     ($list:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_second_cell from pg_list.h:138 (PostgreSQL 15), pg_list.h:141 (PostgreSQL 16–19)
@@ -1140,7 +1140,7 @@ macro_rules! list_nth_oid {
 #[macro_export]
 macro_rules! list_second_cell {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function list_tail from pg_list.h:131 (PostgreSQL 15), pg_list.h:134 (PostgreSQL 16–19)
@@ -1166,7 +1166,7 @@ macro_rules! list_second_cell {
 #[macro_export]
 macro_rules! list_tail {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro llast from pg_list.h:194 (PostgreSQL 15), pg_list.h:198 (PostgreSQL 16–19)
@@ -1186,7 +1186,7 @@ macro_rules! list_tail {
 #[macro_export]
 macro_rules! llast {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro llast_int from pg_list.h:195 (PostgreSQL 15), pg_list.h:199 (PostgreSQL 16–19)
@@ -1206,7 +1206,7 @@ macro_rules! llast {
 #[macro_export]
 macro_rules! llast_int {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1227,7 +1227,7 @@ macro_rules! llast_int {
 #[macro_export]
 macro_rules! llast_node {
     ($type:ty, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro llast_oid from pg_list.h:196 (PostgreSQL 15), pg_list.h:200 (PostgreSQL 16–19)
@@ -1247,7 +1247,7 @@ macro_rules! llast_node {
 #[macro_export]
 macro_rules! llast_oid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1268,7 +1268,7 @@ macro_rules! llast_oid {
 #[macro_export]
 macro_rules! llast_xid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function lnext from pg_list.h:321 (PostgreSQL 15), pg_list.h:342 (PostgreSQL 16–18), pg_list.h:374 (PostgreSQL 19)
@@ -1299,7 +1299,7 @@ macro_rules! llast_xid {
 #[macro_export]
 macro_rules! lnext {
     ($l:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lsecond from pg_list.h:179 (PostgreSQL 15), pg_list.h:183 (PostgreSQL 16–19)
@@ -1319,7 +1319,7 @@ macro_rules! lnext {
 #[macro_export]
 macro_rules! lsecond {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lsecond_int from pg_list.h:180 (PostgreSQL 15), pg_list.h:184 (PostgreSQL 16–19)
@@ -1339,7 +1339,7 @@ macro_rules! lsecond {
 #[macro_export]
 macro_rules! lsecond_int {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1360,7 +1360,7 @@ macro_rules! lsecond_int {
 #[macro_export]
 macro_rules! lsecond_node {
     ($type:ty, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lsecond_oid from pg_list.h:181 (PostgreSQL 15), pg_list.h:185 (PostgreSQL 16–19)
@@ -1380,7 +1380,7 @@ macro_rules! lsecond_node {
 #[macro_export]
 macro_rules! lsecond_oid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lthird from pg_list.h:184 (PostgreSQL 15), pg_list.h:188 (PostgreSQL 16–19)
@@ -1400,7 +1400,7 @@ macro_rules! lsecond_oid {
 #[macro_export]
 macro_rules! lthird {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lthird_int from pg_list.h:185 (PostgreSQL 15), pg_list.h:189 (PostgreSQL 16–19)
@@ -1420,7 +1420,7 @@ macro_rules! lthird {
 #[macro_export]
 macro_rules! lthird_int {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1441,7 +1441,7 @@ macro_rules! lthird_int {
 #[macro_export]
 macro_rules! lthird_node {
     ($type:ty, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro lthird_oid from pg_list.h:186 (PostgreSQL 15), pg_list.h:190 (PostgreSQL 16–19)
@@ -1461,7 +1461,7 @@ macro_rules! lthird_node {
 #[macro_export]
 macro_rules! lthird_oid {
     ($l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro multi_for_advance_cell from pg_list.h:453 (PostgreSQL 15), pg_list.h:474 (PostgreSQL 16), pg_list.h:525 (PostgreSQL 17–18), pg_list.h:557 (PostgreSQL 19)
@@ -1481,7 +1481,7 @@ macro_rules! lthird_oid {
 #[macro_export]
 macro_rules! multi_for_advance_cell {
     ($cell:expr, $state:expr, $l:ident, $i:ident $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use for_both_cell_setup;

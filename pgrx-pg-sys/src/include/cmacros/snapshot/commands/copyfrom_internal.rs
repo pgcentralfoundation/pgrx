@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! INPUT_BUF_BYTES {
     ($cstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RAW_BUF_BYTES from copyfrom_internal.h:164 (PostgreSQL 15), copyfrom_internal.h:173 (PostgreSQL 16), copyfrom_internal.h:178 (PostgreSQL 17), copyfrom_internal.h:181 (PostgreSQL 18), copyfrom_internal.h:189 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! INPUT_BUF_BYTES {
 #[macro_export]
 macro_rules! RAW_BUF_BYTES {
     ($cstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use INPUT_BUF_BYTES;

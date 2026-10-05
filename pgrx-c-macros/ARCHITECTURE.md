@@ -1424,7 +1424,8 @@ checked-in snapshot is not a platform input.
 snapshot covering every configured supported version. docs.rs builds have no
 PostgreSQL or Clang, so the snapshot keeps only what rustdoc shows. Each emitted
 macro becomes a shell with its generated documentation and one arm per accepted
-invocation form; every arm expands to `unimplemented!()`. The generated
+invocation form; every arm expands to one shared hidden macro that calls
+`unimplemented!()`. The generated
 implementation, native support and target guards are left out. The snapshot
 merges versions:
 

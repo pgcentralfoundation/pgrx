@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! INTERVAL_IS_NOBEGIN {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
 #[macro_export]
 macro_rules! INTERVAL_IS_NOEND {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -51,7 +51,7 @@ macro_rules! INTERVAL_IS_NOEND {
 #[macro_export]
 macro_rules! INTERVAL_NOBEGIN {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -70,7 +70,7 @@ macro_rules! INTERVAL_NOBEGIN {
 #[macro_export]
 macro_rules! INTERVAL_NOEND {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -87,7 +87,7 @@ macro_rules! INTERVAL_NOEND {
 #[macro_export]
 macro_rules! INTERVAL_NOT_FINITE {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_VALID_DATE from timestamp.h:229 (PostgreSQL 15), timestamp.h:236 (PostgreSQL 16), timestamp.h:262 (PostgreSQL 17–19)
@@ -107,7 +107,7 @@ macro_rules! INTERVAL_NOT_FINITE {
 #[macro_export]
 macro_rules! IS_VALID_DATE {
     ($d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_VALID_JULIAN from timestamp.h:194 (PostgreSQL 15), timestamp.h:201 (PostgreSQL 16), timestamp.h:227 (PostgreSQL 17–19)
@@ -123,7 +123,7 @@ macro_rules! IS_VALID_DATE {
 #[macro_export]
 macro_rules! IS_VALID_JULIAN {
     ($y:expr, $m:expr, $d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_VALID_TIMESTAMP from timestamp.h:234 (PostgreSQL 15), timestamp.h:241 (PostgreSQL 16), timestamp.h:267 (PostgreSQL 17–19)
@@ -139,7 +139,7 @@ macro_rules! IS_VALID_JULIAN {
 #[macro_export]
 macro_rules! IS_VALID_TIMESTAMP {
     ($t:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TIMESTAMP_IS_NOBEGIN from timestamp.h:154 (PostgreSQL 15), timestamp.h:161 (PostgreSQL 16), timestamp.h:162 (PostgreSQL 17–19)
@@ -155,7 +155,7 @@ macro_rules! IS_VALID_TIMESTAMP {
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOBEGIN {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TIMESTAMP_IS_NOEND from timestamp.h:159 (PostgreSQL 15), timestamp.h:166 (PostgreSQL 16), timestamp.h:167 (PostgreSQL 17–19)
@@ -171,7 +171,7 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOEND {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TIMESTAMP_NOBEGIN from timestamp.h:151 (PostgreSQL 15), timestamp.h:158 (PostgreSQL 16), timestamp.h:159 (PostgreSQL 17–19)
@@ -189,7 +189,7 @@ macro_rules! TIMESTAMP_IS_NOEND {
 #[macro_export]
 macro_rules! TIMESTAMP_NOBEGIN {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TIMESTAMP_NOEND from timestamp.h:156 (PostgreSQL 15), timestamp.h:163 (PostgreSQL 16), timestamp.h:164 (PostgreSQL 17–19)
@@ -207,7 +207,7 @@ macro_rules! TIMESTAMP_NOBEGIN {
 #[macro_export]
 macro_rules! TIMESTAMP_NOEND {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TIMESTAMP_NOT_FINITE from timestamp.h:161 (PostgreSQL 15), timestamp.h:168 (PostgreSQL 16), timestamp.h:169 (PostgreSQL 17–19)
@@ -223,7 +223,7 @@ macro_rules! TIMESTAMP_NOEND {
 #[macro_export]
 macro_rules! TIMESTAMP_NOT_FINITE {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

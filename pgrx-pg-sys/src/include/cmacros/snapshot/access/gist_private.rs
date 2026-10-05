@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! BUFFER_HALF_FILLED {
     ($nodeBuffer:expr, $gfbb:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BUFFER_OVERFLOWED from gist_private.h:332 (PostgreSQL 15–19)
@@ -34,7 +34,7 @@ macro_rules! BUFFER_HALF_FILLED {
 #[macro_export]
 macro_rules! BUFFER_OVERFLOWED {
     ($nodeBuffer:expr, $gfbb:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GISTSearchItemIsHeap from gist_private.h:145 (PostgreSQL 15–19)
@@ -50,7 +50,7 @@ macro_rules! BUFFER_OVERFLOWED {
 #[macro_export]
 macro_rules! GISTSearchItemIsHeap {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -75,7 +75,7 @@ macro_rules! GISTSearchItemIsHeap {
 #[macro_export]
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -96,7 +96,7 @@ macro_rules! GistTupleIsInvalid {
 #[macro_export]
 macro_rules! GistTupleIsInvalid {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -121,7 +121,7 @@ macro_rules! GistTupleIsInvalid {
 #[macro_export]
 macro_rules! GistTupleSetValid {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -142,7 +142,7 @@ macro_rules! GistTupleSetValid {
 #[macro_export]
 macro_rules! GistTupleSetValid {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LEVEL_HAS_BUFFERS from gist_private.h:319 (PostgreSQL 15–19)
@@ -162,7 +162,7 @@ macro_rules! GistTupleSetValid {
 #[macro_export]
 macro_rules! LEVEL_HAS_BUFFERS {
     ($nlevel:expr, $gfbb:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PAGE_FREE_SPACE from gist_private.h:55 (PostgreSQL 15–19)
@@ -178,7 +178,7 @@ macro_rules! LEVEL_HAS_BUFFERS {
 #[macro_export]
 macro_rules! PAGE_FREE_SPACE {
     ($nbp:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PAGE_IS_EMPTY from gist_private.h:57 (PostgreSQL 15–19)
@@ -198,7 +198,7 @@ macro_rules! PAGE_FREE_SPACE {
 #[macro_export]
 macro_rules! PAGE_IS_EMPTY {
     ($nbp:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -219,7 +219,7 @@ macro_rules! PAGE_IS_EMPTY {
 #[macro_export]
 macro_rules! PAGE_NO_SPACE {
     ($nbp:expr, $itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -240,7 +240,7 @@ macro_rules! PAGE_NO_SPACE {
 #[macro_export]
 macro_rules! PAGE_NO_SPACE {
     ($nbp:expr, $itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SizeOfGISTSearchItem from gist_private.h:147 (PostgreSQL 15–19)
@@ -260,7 +260,7 @@ macro_rules! PAGE_NO_SPACE {
 #[macro_export]
 macro_rules! SizeOfGISTSearchItem {
     ($n_distances:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BUFFER_HALF_FILLED;

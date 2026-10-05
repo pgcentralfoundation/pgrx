@@ -33,7 +33,7 @@
 #[macro_export]
 macro_rules! ReplicationSlotSetInactiveSince {
     ($s:expr, $ts:expr, $acquire_lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SlotIsLogical from slot.h:169 (PostgreSQL 15), slot.h:184 (PostgreSQL 16), slot.h:214 (PostgreSQL 17), slot.h:229 (PostgreSQL 18), slot.h:288 (PostgreSQL 19)
@@ -49,7 +49,7 @@ macro_rules! ReplicationSlotSetInactiveSince {
 #[macro_export]
 macro_rules! SlotIsLogical {
     ($slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SlotIsPhysical from slot.h:168 (PostgreSQL 15), slot.h:183 (PostgreSQL 16), slot.h:213 (PostgreSQL 17), slot.h:228 (PostgreSQL 18), slot.h:287 (PostgreSQL 19)
@@ -65,7 +65,7 @@ macro_rules! SlotIsLogical {
 #[macro_export]
 macro_rules! SlotIsPhysical {
     ($slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

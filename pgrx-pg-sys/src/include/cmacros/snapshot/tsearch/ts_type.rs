@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! ARRPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro CALCDATASIZE from ts_type.h:101 (PostgreSQL 15–19)
@@ -34,7 +34,7 @@ macro_rules! ARRPTR {
 #[macro_export]
 macro_rules! CALCDATASIZE {
     ($nentries:expr, $lenstr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro COMPUTESIZE from ts_type.h:219 (PostgreSQL 15), ts_type.h:234 (PostgreSQL 16–18), ts_type.h:235 (PostgreSQL 19)
@@ -54,7 +54,7 @@ macro_rules! CALCDATASIZE {
 #[macro_export]
 macro_rules! COMPUTESIZE {
     ($size:expr, $lenofoperand:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -75,7 +75,7 @@ macro_rules! COMPUTESIZE {
 #[macro_export]
 macro_rules! DatumGetTSQuery {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -102,7 +102,7 @@ macro_rules! DatumGetTSQuery {
 #[macro_export]
 macro_rules! DatumGetTSQuery {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -123,7 +123,7 @@ macro_rules! DatumGetTSQuery {
 #[macro_export]
 macro_rules! DatumGetTSQueryCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -150,7 +150,7 @@ macro_rules! DatumGetTSQueryCopy {
 #[macro_export]
 macro_rules! DatumGetTSQueryCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -171,7 +171,7 @@ macro_rules! DatumGetTSQueryCopy {
 #[macro_export]
 macro_rules! DatumGetTSVector {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -198,7 +198,7 @@ macro_rules! DatumGetTSVector {
 #[macro_export]
 macro_rules! DatumGetTSVector {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -219,7 +219,7 @@ macro_rules! DatumGetTSVector {
 #[macro_export]
 macro_rules! DatumGetTSVectorCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -246,7 +246,7 @@ macro_rules! DatumGetTSVectorCopy {
 #[macro_export]
 macro_rules! DatumGetTSVectorCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GETOPERAND from ts_type.h:227 (PostgreSQL 15), ts_type.h:242 (PostgreSQL 16–18), ts_type.h:243 (PostgreSQL 19)
@@ -266,7 +266,7 @@ macro_rules! DatumGetTSVectorCopy {
 #[macro_export]
 macro_rules! GETOPERAND {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GETQUERY from ts_type.h:224 (PostgreSQL 15), ts_type.h:239 (PostgreSQL 16–18), ts_type.h:240 (PostgreSQL 19)
@@ -286,7 +286,7 @@ macro_rules! GETOPERAND {
 #[macro_export]
 macro_rules! GETQUERY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LIMITPOS from ts_type.h:87 (PostgreSQL 15–19)
@@ -306,7 +306,7 @@ macro_rules! GETQUERY {
 #[macro_export]
 macro_rules! LIMITPOS {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OP_PRIORITY from ts_type.h:175 (PostgreSQL 15), ts_type.h:190 (PostgreSQL 16–19)
@@ -326,7 +326,7 @@ macro_rules! LIMITPOS {
 #[macro_export]
 macro_rules! OP_PRIORITY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -349,7 +349,7 @@ macro_rules! OP_PRIORITY {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -372,7 +372,7 @@ macro_rules! PG_GETARG_TSQUERY {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -395,7 +395,7 @@ macro_rules! PG_GETARG_TSQUERY {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -418,7 +418,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -441,7 +441,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -464,7 +464,7 @@ macro_rules! PG_GETARG_TSVECTOR {
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -487,7 +487,7 @@ macro_rules! PG_GETARG_TSVECTOR {
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -510,7 +510,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -533,10 +533,10 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
 #[macro_export]
 macro_rules! PG_RETURN_TSQUERY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -559,10 +559,10 @@ macro_rules! PG_RETURN_TSQUERY {
 #[macro_export]
 macro_rules! PG_RETURN_TSQUERY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -585,10 +585,10 @@ macro_rules! PG_RETURN_TSQUERY {
 #[macro_export]
 macro_rules! PG_RETURN_TSVECTOR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -611,10 +611,10 @@ macro_rules! PG_RETURN_TSVECTOR {
 #[macro_export]
 macro_rules! PG_RETURN_TSVECTOR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro POSDATALEN from ts_type.h:110 (PostgreSQL 15–19)
@@ -634,7 +634,7 @@ macro_rules! PG_RETURN_TSVECTOR {
 #[macro_export]
 macro_rules! POSDATALEN {
     ($x:expr, $e:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro POSDATAPTR from ts_type.h:111 (PostgreSQL 15–19)
@@ -654,7 +654,7 @@ macro_rules! POSDATALEN {
 #[macro_export]
 macro_rules! POSDATAPTR {
     ($x:expr, $e:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro QO_PRIORITY from ts_type.h:177 (PostgreSQL 15), ts_type.h:192 (PostgreSQL 16–19)
@@ -674,7 +674,7 @@ macro_rules! POSDATAPTR {
 #[macro_export]
 macro_rules! QO_PRIORITY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro STRPTR from ts_type.h:107 (PostgreSQL 15–19)
@@ -694,7 +694,7 @@ macro_rules! QO_PRIORITY {
 #[macro_export]
 macro_rules! STRPTR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TSQUERY_TOO_BIG from ts_type.h:220 (PostgreSQL 15), ts_type.h:235 (PostgreSQL 16–18), ts_type.h:236 (PostgreSQL 19)
@@ -714,7 +714,7 @@ macro_rules! STRPTR {
 #[macro_export]
 macro_rules! TSQUERY_TOO_BIG {
     ($size:expr, $lenofoperand:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -735,7 +735,7 @@ macro_rules! TSQUERY_TOO_BIG {
 #[macro_export]
 macro_rules! TSQueryGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -762,7 +762,7 @@ macro_rules! TSQueryGetDatum {
 #[macro_export]
 macro_rules! TSQueryGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -783,7 +783,7 @@ macro_rules! TSQueryGetDatum {
 #[macro_export]
 macro_rules! TSVectorGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -810,7 +810,7 @@ macro_rules! TSVectorGetDatum {
 #[macro_export]
 macro_rules! TSVectorGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WEP_GETPOS from ts_type.h:80 (PostgreSQL 15–19)
@@ -826,7 +826,7 @@ macro_rules! TSVectorGetDatum {
 #[macro_export]
 macro_rules! WEP_GETPOS {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WEP_GETWEIGHT from ts_type.h:79 (PostgreSQL 15–19)
@@ -846,7 +846,7 @@ macro_rules! WEP_GETPOS {
 #[macro_export]
 macro_rules! WEP_GETWEIGHT {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WEP_SETPOS from ts_type.h:83 (PostgreSQL 15–19)
@@ -862,7 +862,7 @@ macro_rules! WEP_GETWEIGHT {
 #[macro_export]
 macro_rules! WEP_SETPOS {
     ($x:expr, $v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WEP_SETWEIGHT from ts_type.h:82 (PostgreSQL 15–19)
@@ -882,7 +882,7 @@ macro_rules! WEP_SETPOS {
 #[macro_export]
 macro_rules! WEP_SETWEIGHT {
     ($x:expr, $v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro _POSVECPTR from ts_type.h:109 (PostgreSQL 15–19)
@@ -902,7 +902,7 @@ macro_rules! WEP_SETWEIGHT {
 #[macro_export]
 macro_rules! _POSVECPTR {
     ($x:expr, $e:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use _POSVECPTR;

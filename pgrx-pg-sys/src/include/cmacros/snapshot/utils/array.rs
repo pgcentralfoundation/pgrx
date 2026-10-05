@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! AARR_DIMS {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AARR_ELEMTYPE from array.h:335 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! AARR_DIMS {
 #[macro_export]
 macro_rules! AARR_ELEMTYPE {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AARR_HASNULL from array.h:331 (PostgreSQL 15–19)
@@ -58,7 +58,7 @@ macro_rules! AARR_ELEMTYPE {
 #[macro_export]
 macro_rules! AARR_HASNULL {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AARR_LBOUND from array.h:341 (PostgreSQL 15–19)
@@ -78,7 +78,7 @@ macro_rules! AARR_HASNULL {
 #[macro_export]
 macro_rules! AARR_LBOUND {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AARR_NDIM from array.h:328 (PostgreSQL 15–19)
@@ -98,7 +98,7 @@ macro_rules! AARR_LBOUND {
 #[macro_export]
 macro_rules! AARR_NDIM {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_DATA_OFFSET from array.h:316 (PostgreSQL 15–19)
@@ -118,7 +118,7 @@ macro_rules! AARR_NDIM {
 #[macro_export]
 macro_rules! ARR_DATA_OFFSET {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_DATA_PTR from array.h:322 (PostgreSQL 15–19)
@@ -138,7 +138,7 @@ macro_rules! ARR_DATA_OFFSET {
 #[macro_export]
 macro_rules! ARR_DATA_PTR {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_DIMS from array.h:294 (PostgreSQL 15–19)
@@ -158,7 +158,7 @@ macro_rules! ARR_DATA_PTR {
 #[macro_export]
 macro_rules! ARR_DIMS {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_ELEMTYPE from array.h:292 (PostgreSQL 15–19)
@@ -174,7 +174,7 @@ macro_rules! ARR_DIMS {
 #[macro_export]
 macro_rules! ARR_ELEMTYPE {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_HASNULL from array.h:291 (PostgreSQL 15–19)
@@ -190,7 +190,7 @@ macro_rules! ARR_ELEMTYPE {
 #[macro_export]
 macro_rules! ARR_HASNULL {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_LBOUND from array.h:296 (PostgreSQL 15–19)
@@ -210,7 +210,7 @@ macro_rules! ARR_HASNULL {
 #[macro_export]
 macro_rules! ARR_LBOUND {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_NDIM from array.h:290 (PostgreSQL 15–19)
@@ -226,7 +226,7 @@ macro_rules! ARR_LBOUND {
 #[macro_export]
 macro_rules! ARR_NDIM {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -247,7 +247,7 @@ macro_rules! ARR_NDIM {
 #[macro_export]
 macro_rules! ARR_NULLBITMAP {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -268,7 +268,7 @@ macro_rules! ARR_NULLBITMAP {
 #[macro_export]
 macro_rules! ARR_NULLBITMAP {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_OVERHEAD_NONULLS from array.h:310 (PostgreSQL 15–19)
@@ -288,7 +288,7 @@ macro_rules! ARR_NULLBITMAP {
 #[macro_export]
 macro_rules! ARR_OVERHEAD_NONULLS {
     ($ndims:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ARR_OVERHEAD_WITHNULLS from array.h:312 (PostgreSQL 15–19)
@@ -308,7 +308,7 @@ macro_rules! ARR_OVERHEAD_NONULLS {
 #[macro_export]
 macro_rules! ARR_OVERHEAD_WITHNULLS {
     ($ndims:expr, $nitems:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -329,7 +329,7 @@ macro_rules! ARR_OVERHEAD_WITHNULLS {
 #[macro_export]
 macro_rules! ARR_SIZE {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -350,7 +350,7 @@ macro_rules! ARR_SIZE {
 #[macro_export]
 macro_rules! ARR_SIZE {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetArrayTypeP from array.h:261 (PostgreSQL 15–19)
@@ -370,7 +370,7 @@ macro_rules! ARR_SIZE {
 #[macro_export]
 macro_rules! DatumGetArrayTypeP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetArrayTypePCopy from array.h:262 (PostgreSQL 15–19)
@@ -390,7 +390,7 @@ macro_rules! DatumGetArrayTypeP {
 #[macro_export]
 macro_rules! DatumGetArrayTypePCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_ANY_ARRAY_P from array.h:274 (PostgreSQL 15–19)
@@ -412,7 +412,7 @@ macro_rules! DatumGetArrayTypePCopy {
 #[macro_export]
 macro_rules! PG_GETARG_ANY_ARRAY_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_ARRAYTYPE_P from array.h:263 (PostgreSQL 15–19)
@@ -434,7 +434,7 @@ macro_rules! PG_GETARG_ANY_ARRAY_P {
 #[macro_export]
 macro_rules! PG_GETARG_ARRAYTYPE_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_ARRAYTYPE_P_COPY from array.h:264 (PostgreSQL 15–19)
@@ -456,7 +456,7 @@ macro_rules! PG_GETARG_ARRAYTYPE_P {
 #[macro_export]
 macro_rules! PG_GETARG_ARRAYTYPE_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_EXPANDED_ARRAY from array.h:268 (PostgreSQL 15–19)
@@ -478,7 +478,7 @@ macro_rules! PG_GETARG_ARRAYTYPE_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_EXPANDED_ARRAY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_EXPANDED_ARRAYX from array.h:269 (PostgreSQL 15–19)
@@ -500,7 +500,7 @@ macro_rules! PG_GETARG_EXPANDED_ARRAY {
 #[macro_export]
 macro_rules! PG_GETARG_EXPANDED_ARRAYX {
     ($n:expr, $metacache:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -523,10 +523,10 @@ macro_rules! PG_GETARG_EXPANDED_ARRAYX {
 #[macro_export]
 macro_rules! PG_RETURN_ARRAYTYPE_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -549,10 +549,10 @@ macro_rules! PG_RETURN_ARRAYTYPE_P {
 #[macro_export]
 macro_rules! PG_RETURN_ARRAYTYPE_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -575,10 +575,10 @@ macro_rules! PG_RETURN_ARRAYTYPE_P {
 #[macro_export]
 macro_rules! PG_RETURN_EXPANDED_ARRAY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -601,10 +601,10 @@ macro_rules! PG_RETURN_EXPANDED_ARRAY {
 #[macro_export]
 macro_rules! PG_RETURN_EXPANDED_ARRAY {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AARR_DIMS;

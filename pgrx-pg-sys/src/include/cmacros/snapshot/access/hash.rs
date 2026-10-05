@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! BMPGSZ_BIT {
     ($metap:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BMPGSZ_BYTE from hash.h:311 (PostgreSQL 15–19)
@@ -34,7 +34,7 @@ macro_rules! BMPGSZ_BIT {
 #[macro_export]
 macro_rules! BMPGSZ_BYTE {
     ($metap:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BMPG_MASK from hash.h:314 (PostgreSQL 15–19)
@@ -54,7 +54,7 @@ macro_rules! BMPGSZ_BYTE {
 #[macro_export]
 macro_rules! BMPG_MASK {
     ($metap:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BMPG_SHIFT from hash.h:313 (PostgreSQL 15–19)
@@ -70,7 +70,7 @@ macro_rules! BMPG_MASK {
 #[macro_export]
 macro_rules! BMPG_SHIFT {
     ($metap:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BUCKET_TO_BLKNO from hash.h:39 (PostgreSQL 15–19)
@@ -90,7 +90,7 @@ macro_rules! BMPG_SHIFT {
 #[macro_export]
 macro_rules! BUCKET_TO_BLKNO {
     ($metap:expr, $B:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro CLRBIT from hash.h:332 (PostgreSQL 15–19)
@@ -110,7 +110,7 @@ macro_rules! BUCKET_TO_BLKNO {
 #[macro_export]
 macro_rules! CLRBIT {
     ($A:expr, $N:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro H_BUCKET_BEING_POPULATED from hash.h:92 (PostgreSQL 15–19)
@@ -126,7 +126,7 @@ macro_rules! CLRBIT {
 #[macro_export]
 macro_rules! H_BUCKET_BEING_POPULATED {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro H_BUCKET_BEING_SPLIT from hash.h:91 (PostgreSQL 15–19)
@@ -142,7 +142,7 @@ macro_rules! H_BUCKET_BEING_POPULATED {
 #[macro_export]
 macro_rules! H_BUCKET_BEING_SPLIT {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro H_HAS_DEAD_TUPLES from hash.h:93 (PostgreSQL 15–19)
@@ -158,7 +158,7 @@ macro_rules! H_BUCKET_BEING_SPLIT {
 #[macro_export]
 macro_rules! H_HAS_DEAD_TUPLES {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro H_NEEDS_SPLIT_CLEANUP from hash.h:90 (PostgreSQL 15–19)
@@ -174,7 +174,7 @@ macro_rules! H_HAS_DEAD_TUPLES {
 #[macro_export]
 macro_rules! H_NEEDS_SPLIT_CLEANUP {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -199,7 +199,7 @@ macro_rules! H_NEEDS_SPLIT_CLEANUP {
 #[macro_export]
 macro_rules! HashGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -220,7 +220,7 @@ macro_rules! HashGetFillFactor {
 #[macro_export]
 macro_rules! HashGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -241,7 +241,7 @@ macro_rules! HashGetFillFactor {
 #[macro_export]
 macro_rules! HashGetMaxBitmapSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -262,7 +262,7 @@ macro_rules! HashGetMaxBitmapSize {
 #[macro_export]
 macro_rules! HashGetMaxBitmapSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -287,7 +287,7 @@ macro_rules! HashGetMaxBitmapSize {
 #[macro_export]
 macro_rules! HashGetTargetPageUsage {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -308,7 +308,7 @@ macro_rules! HashGetTargetPageUsage {
 #[macro_export]
 macro_rules! HashGetTargetPageUsage {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -329,7 +329,7 @@ macro_rules! HashGetTargetPageUsage {
 #[macro_export]
 macro_rules! HashMaxItemSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -350,7 +350,7 @@ macro_rules! HashMaxItemSize {
 #[macro_export]
 macro_rules! HashMaxItemSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -371,7 +371,7 @@ macro_rules! HashMaxItemSize {
 #[macro_export]
 macro_rules! HashPageGetBitmap {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -392,7 +392,7 @@ macro_rules! HashPageGetBitmap {
 #[macro_export]
 macro_rules! HashPageGetBitmap {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -413,7 +413,7 @@ macro_rules! HashPageGetBitmap {
 #[macro_export]
 macro_rules! HashPageGetMeta {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -434,7 +434,7 @@ macro_rules! HashPageGetMeta {
 #[macro_export]
 macro_rules! HashPageGetMeta {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -459,7 +459,7 @@ macro_rules! HashPageGetMeta {
 #[macro_export]
 macro_rules! HashPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -480,7 +480,7 @@ macro_rules! HashPageGetOpaque {
 #[macro_export]
 macro_rules! HashPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -501,7 +501,7 @@ macro_rules! HashPageGetOpaque {
 #[macro_export]
 macro_rules! HashPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HashScanPosInvalidate from hash.h:144 (PostgreSQL 15–19)
@@ -519,7 +519,7 @@ macro_rules! HashPageGetOpaque {
 #[macro_export]
 macro_rules! HashScanPosInvalidate {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -544,7 +544,7 @@ macro_rules! HashScanPosInvalidate {
 #[macro_export]
 macro_rules! HashScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -569,7 +569,7 @@ macro_rules! HashScanPosIsPinned {
 #[macro_export]
 macro_rules! HashScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -590,7 +590,7 @@ macro_rules! HashScanPosIsPinned {
 #[macro_export]
 macro_rules! HashScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -615,7 +615,7 @@ macro_rules! HashScanPosIsPinned {
 #[macro_export]
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -640,7 +640,7 @@ macro_rules! HashScanPosIsValid {
 #[macro_export]
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -661,7 +661,7 @@ macro_rules! HashScanPosIsValid {
 #[macro_export]
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ISSET from hash.h:334 (PostgreSQL 15–19)
@@ -681,7 +681,7 @@ macro_rules! HashScanPosIsValid {
 #[macro_export]
 macro_rules! ISSET {
     ($A:expr, $N:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SETBIT from hash.h:333 (PostgreSQL 15–19)
@@ -701,7 +701,7 @@ macro_rules! ISSET {
 #[macro_export]
 macro_rules! SETBIT {
     ($A:expr, $N:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BMPG_MASK;

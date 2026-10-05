@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! DsaPointerIsValid {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro dsa_allocate from dsa.h:84 (PostgreSQL 15–16), dsa.h:109 (PostgreSQL 17–19)
@@ -34,7 +34,7 @@ macro_rules! DsaPointerIsValid {
 #[macro_export]
 macro_rules! dsa_allocate {
     ($area:expr, $size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro dsa_allocate0 from dsa.h:88 (PostgreSQL 15–16), dsa.h:113 (PostgreSQL 17–19)
@@ -54,7 +54,7 @@ macro_rules! dsa_allocate {
 #[macro_export]
 macro_rules! dsa_allocate0 {
     ($area:expr, $size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -75,7 +75,7 @@ macro_rules! dsa_allocate0 {
 #[macro_export]
 macro_rules! dsa_create {
     ($tranch_id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -96,7 +96,7 @@ macro_rules! dsa_create {
 #[macro_export]
 macro_rules! dsa_create {
     ($tranche_id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -117,7 +117,7 @@ macro_rules! dsa_create {
 #[macro_export]
 macro_rules! dsa_create_in_place {
     ($place:expr, $size:expr, $tranch_id:expr, $segment:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -138,7 +138,7 @@ macro_rules! dsa_create_in_place {
 #[macro_export]
 macro_rules! dsa_create_in_place {
     ($place:expr, $size:expr, $tranche_id:expr, $segment:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DsaPointerIsValid;

@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumGetJsonbP {
     ($d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! DatumGetJsonbP {
 #[macro_export]
 macro_rules! DatumGetJsonbP {
     ($d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +67,7 @@ macro_rules! DatumGetJsonbP {
 #[macro_export]
 macro_rules! DatumGetJsonbPCopy {
     ($d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -94,7 +94,7 @@ macro_rules! DatumGetJsonbPCopy {
 #[macro_export]
 macro_rules! DatumGetJsonbPCopy {
     ($d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsAJsonbScalar from jsonb.h:305 (PostgreSQL 15), jsonb.h:297 (PostgreSQL 16–18), jsonb.h:299 (PostgreSQL 19)
@@ -110,7 +110,7 @@ macro_rules! DatumGetJsonbPCopy {
 #[macro_export]
 macro_rules! IsAJsonbScalar {
     ($jsonbval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ADVANCE_OFFSET from jsonb.h:170 (PostgreSQL 15), jsonb.h:162 (PostgreSQL 16–18), jsonb.h:164 (PostgreSQL 19)
@@ -132,7 +132,7 @@ macro_rules! IsAJsonbScalar {
 #[macro_export]
 macro_rules! JBE_ADVANCE_OFFSET {
     ($offset:expr, $je:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_HAS_OFF from jsonb.h:160 (PostgreSQL 15), jsonb.h:152 (PostgreSQL 16–18), jsonb.h:154 (PostgreSQL 19)
@@ -148,7 +148,7 @@ macro_rules! JBE_ADVANCE_OFFSET {
 #[macro_export]
 macro_rules! JBE_HAS_OFF {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISBOOL from jsonb.h:167 (PostgreSQL 15), jsonb.h:159 (PostgreSQL 16–18), jsonb.h:161 (PostgreSQL 19)
@@ -164,7 +164,7 @@ macro_rules! JBE_HAS_OFF {
 #[macro_export]
 macro_rules! JBE_ISBOOL {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISBOOL_FALSE from jsonb.h:166 (PostgreSQL 15), jsonb.h:158 (PostgreSQL 16–18), jsonb.h:160 (PostgreSQL 19)
@@ -180,7 +180,7 @@ macro_rules! JBE_ISBOOL {
 #[macro_export]
 macro_rules! JBE_ISBOOL_FALSE {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISBOOL_TRUE from jsonb.h:165 (PostgreSQL 15), jsonb.h:157 (PostgreSQL 16–18), jsonb.h:159 (PostgreSQL 19)
@@ -196,7 +196,7 @@ macro_rules! JBE_ISBOOL_FALSE {
 #[macro_export]
 macro_rules! JBE_ISBOOL_TRUE {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISCONTAINER from jsonb.h:163 (PostgreSQL 15), jsonb.h:155 (PostgreSQL 16–18), jsonb.h:157 (PostgreSQL 19)
@@ -212,7 +212,7 @@ macro_rules! JBE_ISBOOL_TRUE {
 #[macro_export]
 macro_rules! JBE_ISCONTAINER {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISNULL from jsonb.h:164 (PostgreSQL 15), jsonb.h:156 (PostgreSQL 16–18), jsonb.h:158 (PostgreSQL 19)
@@ -228,7 +228,7 @@ macro_rules! JBE_ISCONTAINER {
 #[macro_export]
 macro_rules! JBE_ISNULL {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISNUMERIC from jsonb.h:162 (PostgreSQL 15), jsonb.h:154 (PostgreSQL 16–18), jsonb.h:156 (PostgreSQL 19)
@@ -244,7 +244,7 @@ macro_rules! JBE_ISNULL {
 #[macro_export]
 macro_rules! JBE_ISNUMERIC {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_ISSTRING from jsonb.h:161 (PostgreSQL 15), jsonb.h:153 (PostgreSQL 16–18), jsonb.h:155 (PostgreSQL 19)
@@ -260,7 +260,7 @@ macro_rules! JBE_ISNUMERIC {
 #[macro_export]
 macro_rules! JBE_ISSTRING {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JBE_OFFLENFLD from jsonb.h:159 (PostgreSQL 15), jsonb.h:151 (PostgreSQL 16–18), jsonb.h:153 (PostgreSQL 19)
@@ -276,7 +276,7 @@ macro_rules! JBE_ISSTRING {
 #[macro_export]
 macro_rules! JBE_OFFLENFLD {
     ($je_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -297,7 +297,7 @@ macro_rules! JBE_OFFLENFLD {
 #[macro_export]
 macro_rules! JB_ROOT_COUNT {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -318,7 +318,7 @@ macro_rules! JB_ROOT_COUNT {
 #[macro_export]
 macro_rules! JB_ROOT_COUNT {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -339,7 +339,7 @@ macro_rules! JB_ROOT_COUNT {
 #[macro_export]
 macro_rules! JB_ROOT_IS_ARRAY {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -360,7 +360,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
 #[macro_export]
 macro_rules! JB_ROOT_IS_ARRAY {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -381,7 +381,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
 #[macro_export]
 macro_rules! JB_ROOT_IS_OBJECT {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -402,7 +402,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
 #[macro_export]
 macro_rules! JB_ROOT_IS_OBJECT {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -423,7 +423,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
 #[macro_export]
 macro_rules! JB_ROOT_IS_SCALAR {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -444,7 +444,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
 #[macro_export]
 macro_rules! JB_ROOT_IS_SCALAR {
     ($jbp_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JsonContainerIsArray from jsonb.h:217 (PostgreSQL 15), jsonb.h:209 (PostgreSQL 16–18), jsonb.h:211 (PostgreSQL 19)
@@ -460,7 +460,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
 #[macro_export]
 macro_rules! JsonContainerIsArray {
     ($jc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JsonContainerIsObject from jsonb.h:216 (PostgreSQL 15), jsonb.h:208 (PostgreSQL 16–18), jsonb.h:210 (PostgreSQL 19)
@@ -476,7 +476,7 @@ macro_rules! JsonContainerIsArray {
 #[macro_export]
 macro_rules! JsonContainerIsObject {
     ($jc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JsonContainerIsScalar from jsonb.h:215 (PostgreSQL 15), jsonb.h:207 (PostgreSQL 16–18), jsonb.h:209 (PostgreSQL 19)
@@ -492,7 +492,7 @@ macro_rules! JsonContainerIsObject {
 #[macro_export]
 macro_rules! JsonContainerIsScalar {
     ($jc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro JsonContainerSize from jsonb.h:214 (PostgreSQL 15), jsonb.h:206 (PostgreSQL 16–18), jsonb.h:208 (PostgreSQL 19)
@@ -508,7 +508,7 @@ macro_rules! JsonContainerIsScalar {
 #[macro_export]
 macro_rules! JsonContainerSize {
     ($jc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -529,7 +529,7 @@ macro_rules! JsonContainerSize {
 #[macro_export]
 macro_rules! JsonbPGetDatum {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -556,7 +556,7 @@ macro_rules! JsonbPGetDatum {
 #[macro_export]
 macro_rules! JsonbPGetDatum {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -579,7 +579,7 @@ macro_rules! JsonbPGetDatum {
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P {
     ($x:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -602,7 +602,7 @@ macro_rules! PG_GETARG_JSONB_P {
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P {
     ($x:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -625,7 +625,7 @@ macro_rules! PG_GETARG_JSONB_P {
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P_COPY {
     ($x:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -648,7 +648,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P_COPY {
     ($x:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -671,10 +671,10 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
 #[macro_export]
 macro_rules! PG_RETURN_JSONB_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -697,10 +697,10 @@ macro_rules! PG_RETURN_JSONB_P {
 #[macro_export]
 macro_rules! PG_RETURN_JSONB_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumGetJsonbP;

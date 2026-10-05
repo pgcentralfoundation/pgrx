@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! FILE_POSSIBLY_DELETED {
     ($err:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -47,7 +47,7 @@ macro_rules! FILE_POSSIBLY_DELETED {
 #[macro_export]
 macro_rules! FileRead {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -80,7 +80,7 @@ macro_rules! FileRead {
 #[macro_export]
 macro_rules! FileRead {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -113,7 +113,7 @@ macro_rules! FileRead {
 #[macro_export]
 macro_rules! FileWrite {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -146,7 +146,7 @@ macro_rules! FileWrite {
 #[macro_export]
 macro_rules! FileWrite {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use FILE_POSSIBLY_DELETED;

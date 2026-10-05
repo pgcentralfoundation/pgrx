@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! pq_sendbyte {
     ($buf:expr, $byt:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pq_sendint from pqformat.h:171 (PostgreSQL 15–16), pqformat.h:170 (PostgreSQL 17–19)
@@ -64,7 +64,7 @@ macro_rules! pq_sendbyte {
 #[macro_export]
 macro_rules! pq_sendint {
     ($buf:expr, $i:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pq_sendint16 from pqformat.h:136 (PostgreSQL 15–16), pqformat.h:135 (PostgreSQL 17–19)
@@ -91,7 +91,7 @@ macro_rules! pq_sendint {
 #[macro_export]
 macro_rules! pq_sendint16 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pq_sendint32 from pqformat.h:144 (PostgreSQL 15–16), pqformat.h:143 (PostgreSQL 17–19)
@@ -118,7 +118,7 @@ macro_rules! pq_sendint16 {
 #[macro_export]
 macro_rules! pq_sendint32 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pq_sendint64 from pqformat.h:152 (PostgreSQL 15–16), pqformat.h:151 (PostgreSQL 17–19)
@@ -145,7 +145,7 @@ macro_rules! pq_sendint32 {
 #[macro_export]
 macro_rules! pq_sendint64 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pq_sendint8 from pqformat.h:128 (PostgreSQL 15–16), pqformat.h:127 (PostgreSQL 17–19)
@@ -172,7 +172,7 @@ macro_rules! pq_sendint64 {
 #[macro_export]
 macro_rules! pq_sendint8 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -203,7 +203,7 @@ macro_rules! pq_sendint8 {
 #[macro_export]
 macro_rules! pq_writeint16 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -234,7 +234,7 @@ macro_rules! pq_writeint16 {
 #[macro_export]
 macro_rules! pq_writeint16 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -265,7 +265,7 @@ macro_rules! pq_writeint16 {
 #[macro_export]
 macro_rules! pq_writeint32 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -296,7 +296,7 @@ macro_rules! pq_writeint32 {
 #[macro_export]
 macro_rules! pq_writeint32 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -327,7 +327,7 @@ macro_rules! pq_writeint32 {
 #[macro_export]
 macro_rules! pq_writeint64 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -358,7 +358,7 @@ macro_rules! pq_writeint64 {
 #[macro_export]
 macro_rules! pq_writeint64 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -389,7 +389,7 @@ macro_rules! pq_writeint64 {
 #[macro_export]
 macro_rules! pq_writeint8 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -420,7 +420,7 @@ macro_rules! pq_writeint8 {
 #[macro_export]
 macro_rules! pq_writeint8 {
     ($buf:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -460,7 +460,7 @@ macro_rules! pq_writeint8 {
 #[macro_export]
 macro_rules! pq_writestring {
     ($buf:expr, $str:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -500,7 +500,7 @@ macro_rules! pq_writestring {
 #[macro_export]
 macro_rules! pq_writestring {
     ($buf:expr, $str:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pq_sendbyte;

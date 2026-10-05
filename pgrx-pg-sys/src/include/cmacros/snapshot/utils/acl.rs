@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! ACLITEM_GET_GOPTIONS {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! ACLITEM_GET_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_GET_GOPTIONS {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -57,7 +57,7 @@ macro_rules! ACLITEM_GET_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_GET_PRIVS {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -74,7 +74,7 @@ macro_rules! ACLITEM_GET_PRIVS {
 #[macro_export]
 macro_rules! ACLITEM_GET_PRIVS {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ACLITEM_GET_RIGHTS from acl.h:68 (PostgreSQL 15–19)
@@ -90,7 +90,7 @@ macro_rules! ACLITEM_GET_PRIVS {
 #[macro_export]
 macro_rules! ACLITEM_GET_RIGHTS {
     ($item:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -111,7 +111,7 @@ macro_rules! ACLITEM_GET_RIGHTS {
 #[macro_export]
 macro_rules! ACLITEM_SET_GOPTIONS {
     ($item:expr, $goptions:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -132,7 +132,7 @@ macro_rules! ACLITEM_SET_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_GOPTIONS {
     ($item:expr, $goptions:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -153,7 +153,7 @@ macro_rules! ACLITEM_SET_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS {
     ($item:expr, $privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -174,7 +174,7 @@ macro_rules! ACLITEM_SET_PRIVS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS {
     ($item:expr, $privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -195,7 +195,7 @@ macro_rules! ACLITEM_SET_PRIVS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
     ($item:expr, $privs:expr, $goptions:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -216,7 +216,7 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
     ($item:expr, $privs:expr, $goptions:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ACLITEM_SET_RIGHTS from acl.h:79 (PostgreSQL 15–19)
@@ -236,7 +236,7 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_RIGHTS {
     ($item:expr, $rights:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ACL_DAT from acl.h:109 (PostgreSQL 15–19)
@@ -256,7 +256,7 @@ macro_rules! ACLITEM_SET_RIGHTS {
 #[macro_export]
 macro_rules! ACL_DAT {
     ($ACL:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -277,7 +277,7 @@ macro_rules! ACL_DAT {
 #[macro_export]
 macro_rules! ACL_GRANT_OPTION_FOR {
     ($privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -298,7 +298,7 @@ macro_rules! ACL_GRANT_OPTION_FOR {
 #[macro_export]
 macro_rules! ACL_GRANT_OPTION_FOR {
     ($privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ACL_NUM from acl.h:108 (PostgreSQL 15–19)
@@ -318,7 +318,7 @@ macro_rules! ACL_GRANT_OPTION_FOR {
 #[macro_export]
 macro_rules! ACL_NUM {
     ($ACL:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ACL_N_SIZE from acl.h:110 (PostgreSQL 15–19)
@@ -338,7 +338,7 @@ macro_rules! ACL_NUM {
 #[macro_export]
 macro_rules! ACL_N_SIZE {
     ($N:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -359,7 +359,7 @@ macro_rules! ACL_N_SIZE {
 #[macro_export]
 macro_rules! ACL_OPTION_TO_PRIVS {
     ($privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -380,7 +380,7 @@ macro_rules! ACL_OPTION_TO_PRIVS {
 #[macro_export]
 macro_rules! ACL_OPTION_TO_PRIVS {
     ($privs:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -401,7 +401,7 @@ macro_rules! ACL_OPTION_TO_PRIVS {
 #[macro_export]
 macro_rules! ACL_SIZE {
     ($ACL:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -422,7 +422,7 @@ macro_rules! ACL_SIZE {
 #[macro_export]
 macro_rules! ACL_SIZE {
     ($ACL:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -443,7 +443,7 @@ macro_rules! ACL_SIZE {
 #[macro_export]
 macro_rules! DatumGetAclItemP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -464,7 +464,7 @@ macro_rules! DatumGetAclItemP {
 #[macro_export]
 macro_rules! DatumGetAclItemP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetAclP from acl.h:120 (PostgreSQL 15–19)
@@ -484,7 +484,7 @@ macro_rules! DatumGetAclItemP {
 #[macro_export]
 macro_rules! DatumGetAclP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DatumGetAclPCopy from acl.h:121 (PostgreSQL 15–19)
@@ -504,7 +504,7 @@ macro_rules! DatumGetAclP {
 #[macro_export]
 macro_rules! DatumGetAclPCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -527,7 +527,7 @@ macro_rules! DatumGetAclPCopy {
 #[macro_export]
 macro_rules! PG_GETARG_ACLITEM_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -550,7 +550,7 @@ macro_rules! PG_GETARG_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACLITEM_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_ACL_P from acl.h:122 (PostgreSQL 15–19)
@@ -572,7 +572,7 @@ macro_rules! PG_GETARG_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACL_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_ACL_P_COPY from acl.h:123 (PostgreSQL 15–19)
@@ -594,7 +594,7 @@ macro_rules! PG_GETARG_ACL_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACL_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -617,10 +617,10 @@ macro_rules! PG_GETARG_ACL_P_COPY {
 #[macro_export]
 macro_rules! PG_RETURN_ACLITEM_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -643,10 +643,10 @@ macro_rules! PG_RETURN_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_RETURN_ACLITEM_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]
@@ -669,10 +669,10 @@ macro_rules! PG_RETURN_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_RETURN_ACL_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -695,10 +695,10 @@ macro_rules! PG_RETURN_ACL_P {
 #[macro_export]
 macro_rules! PG_RETURN_ACL_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ACL_DAT;

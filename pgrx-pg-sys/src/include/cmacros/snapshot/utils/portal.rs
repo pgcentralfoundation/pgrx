@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! PortalIsValid {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -40,7 +40,7 @@ macro_rules! PortalIsValid {
 #[macro_export]
 macro_rules! PortalIsValid {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use PortalIsValid;

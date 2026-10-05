@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! IsBooleanOpfamily {
     ($opfamily:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! IsBooleanOpfamily {
 #[macro_export]
 macro_rules! IsBuiltinBooleanOpfamily {
     ($opfamily:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]

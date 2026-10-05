@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! expression_tree_mutator {
     ($n:expr, $m:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! expression_tree_mutator {
 #[macro_export]
 macro_rules! expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function get_leftop from nodeFuncs.h:72 (PostgreSQL 15), nodeFuncs.h:82 (PostgreSQL 16–17), nodeFuncs.h:84 (PostgreSQL 18–19)
@@ -71,7 +71,7 @@ macro_rules! expression_tree_walker {
 #[macro_export]
 macro_rules! get_leftop {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function get_notclausearg from nodeFuncs.h:123 (PostgreSQL 15), nodeFuncs.h:133 (PostgreSQL 16–17), nodeFuncs.h:135 (PostgreSQL 18–19)
@@ -97,7 +97,7 @@ macro_rules! get_leftop {
 #[macro_export]
 macro_rules! get_notclausearg {
     ($notclause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function get_rightop from nodeFuncs.h:84 (PostgreSQL 15), nodeFuncs.h:94 (PostgreSQL 16–17), nodeFuncs.h:96 (PostgreSQL 18–19)
@@ -128,7 +128,7 @@ macro_rules! get_notclausearg {
 #[macro_export]
 macro_rules! get_rightop {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_andclause from nodeFuncs.h:96 (PostgreSQL 15), nodeFuncs.h:106 (PostgreSQL 16–17), nodeFuncs.h:108 (PostgreSQL 18–19)
@@ -156,7 +156,7 @@ macro_rules! get_rightop {
 #[macro_export]
 macro_rules! is_andclause {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_funcclause from nodeFuncs.h:58 (PostgreSQL 15), nodeFuncs.h:68 (PostgreSQL 16–17), nodeFuncs.h:70 (PostgreSQL 18–19)
@@ -182,7 +182,7 @@ macro_rules! is_andclause {
 #[macro_export]
 macro_rules! is_funcclause {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_notclause from nodeFuncs.h:114 (PostgreSQL 15), nodeFuncs.h:124 (PostgreSQL 16–17), nodeFuncs.h:126 (PostgreSQL 18–19)
@@ -210,7 +210,7 @@ macro_rules! is_funcclause {
 #[macro_export]
 macro_rules! is_notclause {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_opclause from nodeFuncs.h:65 (PostgreSQL 15), nodeFuncs.h:75 (PostgreSQL 16–17), nodeFuncs.h:77 (PostgreSQL 18–19)
@@ -236,7 +236,7 @@ macro_rules! is_notclause {
 #[macro_export]
 macro_rules! is_opclause {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_orclause from nodeFuncs.h:105 (PostgreSQL 15), nodeFuncs.h:115 (PostgreSQL 16–17), nodeFuncs.h:117 (PostgreSQL 18–19)
@@ -264,7 +264,7 @@ macro_rules! is_opclause {
 #[macro_export]
 macro_rules! is_orclause {
     ($clause:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -285,7 +285,7 @@ macro_rules! is_orclause {
 #[macro_export]
 macro_rules! planstate_tree_walker {
     ($ps:expr, $w:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -306,7 +306,7 @@ macro_rules! planstate_tree_walker {
 #[macro_export]
 macro_rules! query_or_expression_tree_mutator {
     ($n:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -327,7 +327,7 @@ macro_rules! query_or_expression_tree_mutator {
 #[macro_export]
 macro_rules! query_or_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -348,7 +348,7 @@ macro_rules! query_or_expression_tree_walker {
 #[macro_export]
 macro_rules! query_tree_mutator {
     ($q:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -369,7 +369,7 @@ macro_rules! query_tree_mutator {
 #[macro_export]
 macro_rules! query_tree_walker {
     ($q:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -390,7 +390,7 @@ macro_rules! query_tree_walker {
 #[macro_export]
 macro_rules! range_table_entry_walker {
     ($r:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -411,7 +411,7 @@ macro_rules! range_table_entry_walker {
 #[macro_export]
 macro_rules! range_table_mutator {
     ($rt:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -432,7 +432,7 @@ macro_rules! range_table_mutator {
 #[macro_export]
 macro_rules! range_table_walker {
     ($rt:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -453,7 +453,7 @@ macro_rules! range_table_walker {
 #[macro_export]
 macro_rules! raw_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! ERRCODE_IS_CATEGORY {
     ($ec:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ERRCODE_TO_CATEGORY from elog.h:69 (PostgreSQL 15), elog.h:75 (PostgreSQL 16–18), elog.h:77 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! ERRCODE_IS_CATEGORY {
 #[macro_export]
 macro_rules! ERRCODE_TO_CATEGORY {
     ($ec:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MAKE_SQLSTATE from elog.h:64 (PostgreSQL 15), elog.h:70 (PostgreSQL 16–18), elog.h:72 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! ERRCODE_TO_CATEGORY {
 #[macro_export]
 macro_rules! MAKE_SQLSTATE {
     ($ch1:expr, $ch2:expr, $ch3:expr, $ch4:expr, $ch5:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PGSIXBIT from elog.h:61 (PostgreSQL 15), elog.h:67 (PostgreSQL 16–18), elog.h:69 (PostgreSQL 19)
@@ -78,7 +78,7 @@ macro_rules! MAKE_SQLSTATE {
 #[macro_export]
 macro_rules! PGSIXBIT {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PGUNSIXBIT from elog.h:62 (PostgreSQL 15), elog.h:68 (PostgreSQL 16–18), elog.h:70 (PostgreSQL 19)
@@ -98,7 +98,7 @@ macro_rules! PGSIXBIT {
 #[macro_export]
 macro_rules! PGUNSIXBIT {
     ($val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_RE_THROW from elog.h:351 (PostgreSQL 15), elog.h:423 (PostgreSQL 16–17), elog.h:418 (PostgreSQL 18), elog.h:421 (PostgreSQL 19)
@@ -118,7 +118,7 @@ macro_rules! PGUNSIXBIT {
 #[macro_export]
 macro_rules! PG_RE_THROW {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ERRCODE_IS_CATEGORY;

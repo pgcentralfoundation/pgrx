@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! BTCommuteStrategyNumber {
     ($strat:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -43,7 +43,7 @@ macro_rules! BTCommuteStrategyNumber {
 #[macro_export]
 macro_rules! BTGetDeduplicateItems {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -64,7 +64,7 @@ macro_rules! BTGetDeduplicateItems {
 #[macro_export]
 macro_rules! BTGetDeduplicateItems {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -89,7 +89,7 @@ macro_rules! BTGetDeduplicateItems {
 #[macro_export]
 macro_rules! BTGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -110,7 +110,7 @@ macro_rules! BTGetFillFactor {
 #[macro_export]
 macro_rules! BTGetFillFactor {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -135,7 +135,7 @@ macro_rules! BTGetFillFactor {
 #[macro_export]
 macro_rules! BTGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -156,7 +156,7 @@ macro_rules! BTGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! BTGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -177,7 +177,7 @@ macro_rules! BTGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! BTMaxItemSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -198,7 +198,7 @@ macro_rules! BTMaxItemSize {
 #[macro_export]
 macro_rules! BTMaxItemSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -219,7 +219,7 @@ macro_rules! BTMaxItemSize {
 #[macro_export]
 macro_rules! BTMaxItemSizeNoHeapTid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -240,7 +240,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
 #[macro_export]
 macro_rules! BTMaxItemSizeNoHeapTid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -281,7 +281,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
 #[macro_export]
 macro_rules! BTPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -322,7 +322,7 @@ macro_rules! BTPageGetDeleteXid {
 #[macro_export]
 macro_rules! BTPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -343,7 +343,7 @@ macro_rules! BTPageGetDeleteXid {
 #[macro_export]
 macro_rules! BTPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -364,7 +364,7 @@ macro_rules! BTPageGetMeta {
 #[macro_export]
 macro_rules! BTPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -389,7 +389,7 @@ macro_rules! BTPageGetMeta {
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -410,7 +410,7 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -431,7 +431,7 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -483,7 +483,7 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -534,7 +534,7 @@ macro_rules! BTPageIsRecyclable {
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr, $heaprel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTPageSetDeleted from nbtree.h:239 (PostgreSQL 15, 18–19), nbtree.h:238 (PostgreSQL 16–17)
@@ -575,7 +575,7 @@ macro_rules! BTPageIsRecyclable {
 #[macro_export]
 macro_rules! BTPageSetDeleted {
     ($page:expr, $safexid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -594,7 +594,7 @@ macro_rules! BTPageSetDeleted {
 #[macro_export]
 macro_rules! BTScanPosInvalidate {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -613,7 +613,7 @@ macro_rules! BTScanPosInvalidate {
 #[macro_export]
 macro_rules! BTScanPosInvalidate {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -638,7 +638,7 @@ macro_rules! BTScanPosInvalidate {
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -663,7 +663,7 @@ macro_rules! BTScanPosIsPinned {
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -684,7 +684,7 @@ macro_rules! BTScanPosIsPinned {
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -709,7 +709,7 @@ macro_rules! BTScanPosIsPinned {
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -734,7 +734,7 @@ macro_rules! BTScanPosIsValid {
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -755,7 +755,7 @@ macro_rules! BTScanPosIsValid {
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BTScanPosUnpin from nbtree.h:996 (PostgreSQL 15), nbtree.h:1001 (PostgreSQL 16), nbtree.h:1005 (PostgreSQL 17), nbtree.h:1010 (PostgreSQL 18–19)
@@ -777,7 +777,7 @@ macro_rules! BTScanPosIsValid {
 #[macro_export]
 macro_rules! BTScanPosUnpin {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -804,7 +804,7 @@ macro_rules! BTScanPosUnpin {
 #[macro_export]
 macro_rules! BTScanPosUnpinIfPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -831,7 +831,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 #[macro_export]
 macro_rules! BTScanPosUnpinIfPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -854,7 +854,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 #[macro_export]
 macro_rules! BTScanPosUnpinIfPinned {
     ($scanpos:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15), nbtree.h:555 (PostgreSQL 16–17), nbtree.h:556 (PostgreSQL 18–19)
@@ -880,7 +880,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 #[macro_export]
 macro_rules! BTreeTupleGetDownLink {
     ($pivot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
@@ -920,7 +920,7 @@ macro_rules! BTreeTupleGetDownLink {
 #[macro_export]
 macro_rules! BTreeTupleGetHeapTID {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 18–19)
@@ -955,7 +955,7 @@ macro_rules! BTreeTupleGetHeapTID {
 #[macro_export]
 macro_rules! BTreeTupleGetMaxHeapTID {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BTreeTupleGetNAtts from nbtree.h:572 (PostgreSQL 15), nbtree.h:577 (PostgreSQL 16–17), nbtree.h:578 (PostgreSQL 18–19)
@@ -975,7 +975,7 @@ macro_rules! BTreeTupleGetMaxHeapTID {
 #[macro_export]
 macro_rules! BTreeTupleGetNAtts {
     ($itup:expr, $rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 18–19)
@@ -1006,7 +1006,7 @@ macro_rules! BTreeTupleGetNAtts {
 #[macro_export]
 macro_rules! BTreeTupleGetNPosting {
     ($posting:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPosting from nbtree.h:531 (PostgreSQL 15), nbtree.h:536 (PostgreSQL 16–17), nbtree.h:537 (PostgreSQL 18–19)
@@ -1033,7 +1033,7 @@ macro_rules! BTreeTupleGetNPosting {
 #[macro_export]
 macro_rules! BTreeTupleGetPosting {
     ($posting:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingN from nbtree.h:538 (PostgreSQL 15), nbtree.h:543 (PostgreSQL 16–17), nbtree.h:544 (PostgreSQL 18–19)
@@ -1059,7 +1059,7 @@ macro_rules! BTreeTupleGetPosting {
 #[macro_export]
 macro_rules! BTreeTupleGetPostingN {
     ($posting:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 18–19)
@@ -1087,7 +1087,7 @@ macro_rules! BTreeTupleGetPostingN {
 #[macro_export]
 macro_rules! BTreeTupleGetPostingOffset {
     ($posting:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15), nbtree.h:619 (PostgreSQL 16–17), nbtree.h:620 (PostgreSQL 18–19)
@@ -1113,7 +1113,7 @@ macro_rules! BTreeTupleGetPostingOffset {
 #[macro_export]
 macro_rules! BTreeTupleGetTopParent {
     ($leafhikey:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15), nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
@@ -1145,7 +1145,7 @@ macro_rules! BTreeTupleGetTopParent {
 #[macro_export]
 macro_rules! BTreeTupleIsPivot {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15), nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
@@ -1177,7 +1177,7 @@ macro_rules! BTreeTupleIsPivot {
 #[macro_export]
 macro_rules! BTreeTupleIsPosting {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15), nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
@@ -1203,7 +1203,7 @@ macro_rules! BTreeTupleIsPosting {
 #[macro_export]
 macro_rules! BTreeTupleSetDownLink {
     ($pivot:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18–19)
@@ -1241,7 +1241,7 @@ macro_rules! BTreeTupleSetDownLink {
 #[macro_export]
 macro_rules! BTreeTupleSetNAtts {
     ($itup:expr, $nkeyatts:expr, $heaptid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 18–19)
@@ -1275,7 +1275,7 @@ macro_rules! BTreeTupleSetNAtts {
 #[macro_export]
 macro_rules! BTreeTupleSetPosting {
     ($itup:expr, $nhtids:expr, $postingoffset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15), nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
@@ -1302,7 +1302,7 @@ macro_rules! BTreeTupleSetPosting {
 #[macro_export]
 macro_rules! BTreeTupleSetTopParent {
     ($leafhikey:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_FIRSTDATAKEY from nbtree.h:371 (PostgreSQL 15), nbtree.h:369 (PostgreSQL 16–17), nbtree.h:370 (PostgreSQL 18–19)
@@ -1318,7 +1318,7 @@ macro_rules! BTreeTupleSetTopParent {
 #[macro_export]
 macro_rules! P_FIRSTDATAKEY {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_HAS_FULLXID from nbtree.h:229 (PostgreSQL 15, 18–19), nbtree.h:228 (PostgreSQL 16–17)
@@ -1334,7 +1334,7 @@ macro_rules! P_FIRSTDATAKEY {
 #[macro_export]
 macro_rules! P_HAS_FULLXID {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_HAS_GARBAGE from nbtree.h:227 (PostgreSQL 15, 18–19), nbtree.h:226 (PostgreSQL 16–17)
@@ -1350,7 +1350,7 @@ macro_rules! P_HAS_FULLXID {
 #[macro_export]
 macro_rules! P_HAS_GARBAGE {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_IGNORE from nbtree.h:226 (PostgreSQL 15, 18–19), nbtree.h:225 (PostgreSQL 16–17)
@@ -1366,7 +1366,7 @@ macro_rules! P_HAS_GARBAGE {
 #[macro_export]
 macro_rules! P_IGNORE {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_INCOMPLETE_SPLIT from nbtree.h:228 (PostgreSQL 15, 18–19), nbtree.h:227 (PostgreSQL 16–17)
@@ -1382,7 +1382,7 @@ macro_rules! P_IGNORE {
 #[macro_export]
 macro_rules! P_INCOMPLETE_SPLIT {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_ISDELETED from nbtree.h:223 (PostgreSQL 15, 18–19), nbtree.h:222 (PostgreSQL 16–17)
@@ -1398,7 +1398,7 @@ macro_rules! P_INCOMPLETE_SPLIT {
 #[macro_export]
 macro_rules! P_ISDELETED {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_ISHALFDEAD from nbtree.h:225 (PostgreSQL 15, 18–19), nbtree.h:224 (PostgreSQL 16–17)
@@ -1414,7 +1414,7 @@ macro_rules! P_ISDELETED {
 #[macro_export]
 macro_rules! P_ISHALFDEAD {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_ISLEAF from nbtree.h:221 (PostgreSQL 15, 18–19), nbtree.h:220 (PostgreSQL 16–17)
@@ -1430,7 +1430,7 @@ macro_rules! P_ISHALFDEAD {
 #[macro_export]
 macro_rules! P_ISLEAF {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_ISMETA from nbtree.h:224 (PostgreSQL 15, 18–19), nbtree.h:223 (PostgreSQL 16–17)
@@ -1446,7 +1446,7 @@ macro_rules! P_ISLEAF {
 #[macro_export]
 macro_rules! P_ISMETA {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_ISROOT from nbtree.h:222 (PostgreSQL 15, 18–19), nbtree.h:221 (PostgreSQL 16–17)
@@ -1462,7 +1462,7 @@ macro_rules! P_ISMETA {
 #[macro_export]
 macro_rules! P_ISROOT {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_LEFTMOST from nbtree.h:219 (PostgreSQL 15, 18–19), nbtree.h:218 (PostgreSQL 16–17)
@@ -1478,7 +1478,7 @@ macro_rules! P_ISROOT {
 #[macro_export]
 macro_rules! P_LEFTMOST {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro P_RIGHTMOST from nbtree.h:220 (PostgreSQL 15, 18–19), nbtree.h:219 (PostgreSQL 16–17)
@@ -1494,7 +1494,7 @@ macro_rules! P_LEFTMOST {
 #[macro_export]
 macro_rules! P_RIGHTMOST {
     ($opaque:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BTCommuteStrategyNumber;

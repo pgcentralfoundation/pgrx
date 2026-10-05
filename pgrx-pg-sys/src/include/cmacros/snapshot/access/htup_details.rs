@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! BITMAPLEN {
     ($NATTS:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! BITMAPLEN {
 #[macro_export]
 macro_rules! BITMAPLEN {
     ($NATTS:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -67,7 +67,7 @@ macro_rules! BITMAPLEN {
 #[macro_export]
 macro_rules! GETSTRUCT {
     ($TUP:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -94,7 +94,7 @@ macro_rules! GETSTRUCT {
 #[macro_export]
 macro_rules! GETSTRUCT {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -111,7 +111,7 @@ macro_rules! GETSTRUCT {
 #[macro_export]
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -141,7 +141,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 #[macro_export]
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -158,7 +158,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -185,7 +185,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -212,7 +212,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -229,7 +229,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -256,7 +256,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -283,7 +283,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -300,7 +300,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -328,7 +328,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -345,7 +345,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -372,7 +372,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -399,7 +399,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -416,7 +416,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 #[macro_export]
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -443,7 +443,7 @@ macro_rules! HeapTupleAllFixed {
 #[macro_export]
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -460,7 +460,7 @@ macro_rules! HeapTupleAllFixed {
 #[macro_export]
 macro_rules! HeapTupleClearHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -487,7 +487,7 @@ macro_rules! HeapTupleClearHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleClearHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -504,7 +504,7 @@ macro_rules! HeapTupleClearHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleClearHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -531,7 +531,7 @@ macro_rules! HeapTupleClearHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleClearHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -548,7 +548,7 @@ macro_rules! HeapTupleClearHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -575,7 +575,7 @@ macro_rules! HeapTupleHasExternal {
 #[macro_export]
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -592,7 +592,7 @@ macro_rules! HeapTupleHasExternal {
 #[macro_export]
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -619,7 +619,7 @@ macro_rules! HeapTupleHasNulls {
 #[macro_export]
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -636,7 +636,7 @@ macro_rules! HeapTupleHasNulls {
 #[macro_export]
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -663,7 +663,7 @@ macro_rules! HeapTupleHasVarWidth {
 #[macro_export]
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -680,7 +680,7 @@ macro_rules! HeapTupleHasVarWidth {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -707,7 +707,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -724,7 +724,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -751,7 +751,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -768,7 +768,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -795,7 +795,7 @@ macro_rules! HeapTupleHeaderClearMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderClearMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -816,7 +816,7 @@ macro_rules! HeapTupleHeaderClearMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetDatumLength {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -843,7 +843,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetDatumLength {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HeapTupleHeaderGetNatts from htup_details.h:530 (PostgreSQL 15), htup_details.h:534 (PostgreSQL 16–17), htup_details.h:582 (PostgreSQL 18), htup_details.h:568 (PostgreSQL 19)
@@ -859,7 +859,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetNatts {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -876,7 +876,7 @@ macro_rules! HeapTupleHeaderGetNatts {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawCommandId {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -903,7 +903,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawCommandId {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -920,7 +920,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmax {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -947,7 +947,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmax {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -964,7 +964,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmin {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -991,7 +991,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmin {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1016,7 +1016,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetSpeculativeToken {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1041,7 +1041,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetSpeculativeToken {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1069,7 +1069,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetSpeculativeToken {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1086,7 +1086,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypMod {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1113,7 +1113,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypMod {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1130,7 +1130,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypeId {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1157,7 +1157,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypeId {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1178,7 +1178,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetUpdateXid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1210,7 +1210,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetUpdateXid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1227,7 +1227,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXmin {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1255,7 +1255,7 @@ macro_rules! HeapTupleHeaderGetXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXmin {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1272,7 +1272,7 @@ macro_rules! HeapTupleHeaderGetXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXvac {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1302,7 +1302,7 @@ macro_rules! HeapTupleHeaderGetXvac {
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXvac {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HeapTupleHeaderHasExternal from htup_details.h:538 (PostgreSQL 15), htup_details.h:542 (PostgreSQL 16–17), htup_details.h:590 (PostgreSQL 18), htup_details.h:576 (PostgreSQL 19)
@@ -1318,7 +1318,7 @@ macro_rules! HeapTupleHeaderGetXvac {
 #[macro_export]
 macro_rules! HeapTupleHeaderHasExternal {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1335,7 +1335,7 @@ macro_rules! HeapTupleHeaderHasExternal {
 #[macro_export]
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1362,7 +1362,7 @@ macro_rules! HeapTupleHeaderHasMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1387,7 +1387,7 @@ macro_rules! HeapTupleHeaderHasMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1408,7 +1408,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1435,7 +1435,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1452,7 +1452,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1479,7 +1479,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1496,7 +1496,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1526,7 +1526,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1543,7 +1543,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1564,7 +1564,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1591,7 +1591,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1618,7 +1618,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetCmax {
     ($tup:expr, $cid:expr, $iscombo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1650,7 +1650,7 @@ macro_rules! HeapTupleHeaderSetCmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetCmax {
     ($tup:expr, $cid:expr, $iscombo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1677,7 +1677,7 @@ macro_rules! HeapTupleHeaderSetCmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetCmin {
     ($tup:expr, $cid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1706,7 +1706,7 @@ macro_rules! HeapTupleHeaderSetCmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetCmin {
     ($tup:expr, $cid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1727,7 +1727,7 @@ macro_rules! HeapTupleHeaderSetCmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetDatumLength {
     ($tup:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1754,7 +1754,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetDatumLength {
     ($tup:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1771,7 +1771,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1798,7 +1798,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHeapOnly {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1815,7 +1815,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1842,7 +1842,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHotUpdated {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1859,7 +1859,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1886,7 +1886,7 @@ macro_rules! HeapTupleHeaderSetMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMatch {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1911,7 +1911,7 @@ macro_rules! HeapTupleHeaderSetMatch {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1932,7 +1932,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1959,7 +1959,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMovedPartitions {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HeapTupleHeaderSetNatts from htup_details.h:533 (PostgreSQL 15), htup_details.h:537 (PostgreSQL 16–17), htup_details.h:585 (PostgreSQL 18), htup_details.h:571 (PostgreSQL 19)
@@ -1975,7 +1975,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetNatts {
     ($tup:expr, $natts:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2000,7 +2000,7 @@ macro_rules! HeapTupleHeaderSetNatts {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetSpeculativeToken {
     ($tup:expr, $token:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -2021,7 +2021,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetSpeculativeToken {
     ($tup:expr, $token:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2048,7 +2048,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetSpeculativeToken {
     ($tup:expr, $token:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2065,7 +2065,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypMod {
     ($tup:expr, $typmod:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2092,7 +2092,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypMod {
     ($tup:expr, $typmod:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2109,7 +2109,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypeId {
     ($tup:expr, $typeid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2136,7 +2136,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypeId {
     ($tup:expr, $datum_typeid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2153,7 +2153,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmax {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2180,7 +2180,7 @@ macro_rules! HeapTupleHeaderSetXmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmax {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2197,7 +2197,7 @@ macro_rules! HeapTupleHeaderSetXmax {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmin {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2224,7 +2224,7 @@ macro_rules! HeapTupleHeaderSetXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmin {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2249,7 +2249,7 @@ macro_rules! HeapTupleHeaderSetXmin {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminCommitted {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -2277,7 +2277,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminCommitted {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2302,7 +2302,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminFrozen {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2330,7 +2330,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminFrozen {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2355,7 +2355,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminInvalid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -2383,7 +2383,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXminInvalid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2410,7 +2410,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXvac {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2438,7 +2438,7 @@ macro_rules! HeapTupleHeaderSetXvac {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXvac {
     ($tup:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2455,7 +2455,7 @@ macro_rules! HeapTupleHeaderSetXvac {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2482,7 +2482,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2499,7 +2499,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2526,7 +2526,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2543,7 +2543,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2571,7 +2571,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
 #[macro_export]
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2588,7 +2588,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
 #[macro_export]
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2615,7 +2615,7 @@ macro_rules! HeapTupleIsHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2632,7 +2632,7 @@ macro_rules! HeapTupleIsHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2659,7 +2659,7 @@ macro_rules! HeapTupleIsHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2676,7 +2676,7 @@ macro_rules! HeapTupleIsHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2703,7 +2703,7 @@ macro_rules! HeapTupleNoNulls {
 #[macro_export]
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2720,7 +2720,7 @@ macro_rules! HeapTupleNoNulls {
 #[macro_export]
 macro_rules! HeapTupleSetHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2747,7 +2747,7 @@ macro_rules! HeapTupleSetHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleSetHeapOnly {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2764,7 +2764,7 @@ macro_rules! HeapTupleSetHeapOnly {
 #[macro_export]
 macro_rules! HeapTupleSetHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2791,7 +2791,7 @@ macro_rules! HeapTupleSetHotUpdated {
 #[macro_export]
 macro_rules! HeapTupleSetHotUpdated {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -2841,7 +2841,7 @@ macro_rules! HeapTupleSetHotUpdated {
 #[macro_export]
 macro_rules! fastgetattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -2891,7 +2891,7 @@ macro_rules! fastgetattr {
 #[macro_export]
 macro_rules! fastgetattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -2941,7 +2941,7 @@ macro_rules! fastgetattr {
 #[macro_export]
 macro_rules! fastgetattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function heap_getattr from htup_details.h:792 (PostgreSQL 15), htup_details.h:796 (PostgreSQL 16–17), htup_details.h:908 (PostgreSQL 18), htup_details.h:894 (PostgreSQL 19)
@@ -2975,7 +2975,7 @@ macro_rules! fastgetattr {
 #[macro_export]
 macro_rules! heap_getattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BITMAPLEN;

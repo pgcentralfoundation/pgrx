@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! EstimateParallelHashJoinBatch {
     ($hashtable:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HASH_CHUNK_DATA from hashjoin.h:141 (PostgreSQL 15), hashjoin.h:152 (PostgreSQL 16–18), hashjoin.h:163 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! EstimateParallelHashJoinBatch {
 #[macro_export]
 macro_rules! HASH_CHUNK_DATA {
     ($hc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HJTUPLE_MINTUPLE from hashjoin.h:80 (PostgreSQL 15), hashjoin.h:91 (PostgreSQL 16–18), hashjoin.h:102 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! HASH_CHUNK_DATA {
 #[macro_export]
 macro_rules! HJTUPLE_MINTUPLE {
     ($hjtup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NthParallelHashJoinBatch from hashjoin.h:186 (PostgreSQL 15), hashjoin.h:198 (PostgreSQL 16–18), hashjoin.h:209 (PostgreSQL 19)
@@ -80,7 +80,7 @@ macro_rules! HJTUPLE_MINTUPLE {
 #[macro_export]
 macro_rules! NthParallelHashJoinBatch {
     ($base:expr, $n:expr, $hashtable:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PHJ_GROW_BATCHES_PHASE from hashjoin.h:277 (PostgreSQL 15), hashjoin.h:290 (PostgreSQL 16–18), hashjoin.h:301 (PostgreSQL 19)
@@ -100,7 +100,7 @@ macro_rules! NthParallelHashJoinBatch {
 #[macro_export]
 macro_rules! PHJ_GROW_BATCHES_PHASE {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PHJ_GROW_BUCKETS_PHASE from hashjoin.h:283 (PostgreSQL 15), hashjoin.h:296 (PostgreSQL 16–18), hashjoin.h:307 (PostgreSQL 19)
@@ -120,7 +120,7 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
 #[macro_export]
 macro_rules! PHJ_GROW_BUCKETS_PHASE {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ParallelHashJoinBatchInner from hashjoin.h:170 (PostgreSQL 15), hashjoin.h:182 (PostgreSQL 16–18), hashjoin.h:193 (PostgreSQL 19)
@@ -140,7 +140,7 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
 #[macro_export]
 macro_rules! ParallelHashJoinBatchInner {
     ($batch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ParallelHashJoinBatchOuter from hashjoin.h:175 (PostgreSQL 15), hashjoin.h:187 (PostgreSQL 16–18), hashjoin.h:198 (PostgreSQL 19)
@@ -160,7 +160,7 @@ macro_rules! ParallelHashJoinBatchInner {
 #[macro_export]
 macro_rules! ParallelHashJoinBatchOuter {
     ($batch:expr, $nparticipants:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use EstimateParallelHashJoinBatch;

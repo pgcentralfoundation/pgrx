@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumGetRangeTypeP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! DatumGetRangeTypeP {
 #[macro_export]
 macro_rules! DatumGetRangeTypeP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +67,7 @@ macro_rules! DatumGetRangeTypeP {
 #[macro_export]
 macro_rules! DatumGetRangeTypePCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -94,7 +94,7 @@ macro_rules! DatumGetRangeTypePCopy {
 #[macro_export]
 macro_rules! DatumGetRangeTypePCopy {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -117,7 +117,7 @@ macro_rules! DatumGetRangeTypePCopy {
 #[macro_export]
 macro_rules! PG_GETARG_RANGE_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -140,7 +140,7 @@ macro_rules! PG_GETARG_RANGE_P {
 #[macro_export]
 macro_rules! PG_GETARG_RANGE_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -163,7 +163,7 @@ macro_rules! PG_GETARG_RANGE_P {
 #[macro_export]
 macro_rules! PG_GETARG_RANGE_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -186,7 +186,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_RANGE_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -209,10 +209,10 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
 #[macro_export]
 macro_rules! PG_RETURN_RANGE_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -235,10 +235,10 @@ macro_rules! PG_RETURN_RANGE_P {
 #[macro_export]
 macro_rules! PG_RETURN_RANGE_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RANGE_HAS_LBOUND from rangetypes.h:48 (PostgreSQL 15–19)
@@ -254,7 +254,7 @@ macro_rules! PG_RETURN_RANGE_P {
 #[macro_export]
 macro_rules! RANGE_HAS_LBOUND {
     ($flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RANGE_HAS_UBOUND from rangetypes.h:52 (PostgreSQL 15–19)
@@ -270,7 +270,7 @@ macro_rules! RANGE_HAS_LBOUND {
 #[macro_export]
 macro_rules! RANGE_HAS_UBOUND {
     ($flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RangeIsEmpty from rangetypes.h:56 (PostgreSQL 15–19)
@@ -290,7 +290,7 @@ macro_rules! RANGE_HAS_UBOUND {
 #[macro_export]
 macro_rules! RangeIsEmpty {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RangeIsOrContainsEmpty from rangetypes.h:57 (PostgreSQL 15–19)
@@ -310,7 +310,7 @@ macro_rules! RangeIsEmpty {
 #[macro_export]
 macro_rules! RangeIsOrContainsEmpty {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RangeTypeGetOid from rangetypes.h:35 (PostgreSQL 15–19)
@@ -326,7 +326,7 @@ macro_rules! RangeIsOrContainsEmpty {
 #[macro_export]
 macro_rules! RangeTypeGetOid {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -347,7 +347,7 @@ macro_rules! RangeTypeGetOid {
 #[macro_export]
 macro_rules! RangeTypePGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -374,7 +374,7 @@ macro_rules! RangeTypePGetDatum {
 #[macro_export]
 macro_rules! RangeTypePGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumGetRangeTypeP;

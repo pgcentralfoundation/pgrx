@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! VM_ALL_FROZEN {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro VM_ALL_VISIBLE from visibilitymap.h:24 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! VM_ALL_FROZEN {
 #[macro_export]
 macro_rules! VM_ALL_VISIBLE {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use VM_ALL_FROZEN;

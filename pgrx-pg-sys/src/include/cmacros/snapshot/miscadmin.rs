@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! AmArchiverProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! AmArchiverProcess {
 #[macro_export]
 macro_rules! AmArchiverProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -49,7 +49,7 @@ macro_rules! AmArchiverProcess {
 #[macro_export]
 macro_rules! AmAutoVacuumLauncherProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -66,7 +66,7 @@ macro_rules! AmAutoVacuumLauncherProcess {
 #[macro_export]
 macro_rules! AmAutoVacuumWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -83,7 +83,7 @@ macro_rules! AmAutoVacuumWorkerProcess {
 #[macro_export]
 macro_rules! AmBackgroundWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -100,7 +100,7 @@ macro_rules! AmBackgroundWorkerProcess {
 #[macro_export]
 macro_rules! AmBackgroundWriterProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -117,7 +117,7 @@ macro_rules! AmBackgroundWriterProcess {
 #[macro_export]
 macro_rules! AmBackgroundWriterProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -134,7 +134,7 @@ macro_rules! AmBackgroundWriterProcess {
 #[macro_export]
 macro_rules! AmCheckpointerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -151,7 +151,7 @@ macro_rules! AmCheckpointerProcess {
 #[macro_export]
 macro_rules! AmCheckpointerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -168,7 +168,7 @@ macro_rules! AmCheckpointerProcess {
 #[macro_export]
 macro_rules! AmDataChecksumsWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -185,7 +185,7 @@ macro_rules! AmDataChecksumsWorkerProcess {
 #[macro_export]
 macro_rules! AmIoWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -202,7 +202,7 @@ macro_rules! AmIoWorkerProcess {
 #[macro_export]
 macro_rules! AmLogicalSlotSyncWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AmRegularBackendProcess from miscadmin.h:344 (PostgreSQL 15), miscadmin.h:349 (PostgreSQL 16), miscadmin.h:376 (PostgreSQL 17), miscadmin.h:381 (PostgreSQL 18), miscadmin.h:387 (PostgreSQL 19)
@@ -218,7 +218,7 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
 #[macro_export]
 macro_rules! AmRegularBackendProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -235,7 +235,7 @@ macro_rules! AmRegularBackendProcess {
 #[macro_export]
 macro_rules! AmSpecialWorkerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -252,7 +252,7 @@ macro_rules! AmSpecialWorkerProcess {
 #[macro_export]
 macro_rules! AmStartupProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -269,7 +269,7 @@ macro_rules! AmStartupProcess {
 #[macro_export]
 macro_rules! AmStartupProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -286,7 +286,7 @@ macro_rules! AmStartupProcess {
 #[macro_export]
 macro_rules! AmWalReceiverProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -303,7 +303,7 @@ macro_rules! AmWalReceiverProcess {
 #[macro_export]
 macro_rules! AmWalReceiverProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -320,7 +320,7 @@ macro_rules! AmWalReceiverProcess {
 #[macro_export]
 macro_rules! AmWalSenderProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -337,7 +337,7 @@ macro_rules! AmWalSenderProcess {
 #[macro_export]
 macro_rules! AmWalSummarizerProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -354,7 +354,7 @@ macro_rules! AmWalSummarizerProcess {
 #[macro_export]
 macro_rules! AmWalWriterProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -371,7 +371,7 @@ macro_rules! AmWalWriterProcess {
 #[macro_export]
 macro_rules! AmWalWriterProcess {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro CHECK_FOR_INTERRUPTS from miscadmin.h:122 (PostgreSQL 15–16), miscadmin.h:123 (PostgreSQL 17–18), miscadmin.h:125 (PostgreSQL 19)
@@ -393,7 +393,7 @@ macro_rules! AmWalWriterProcess {
 #[macro_export]
 macro_rules! CHECK_FOR_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -418,7 +418,7 @@ macro_rules! CHECK_FOR_INTERRUPTS {
 #[macro_export]
 macro_rules! END_CRIT_SECTION {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -441,7 +441,7 @@ macro_rules! END_CRIT_SECTION {
 #[macro_export]
 macro_rules! END_CRIT_SECTION {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetProcessingMode from miscadmin.h:416 (PostgreSQL 15), miscadmin.h:424 (PostgreSQL 16), miscadmin.h:467 (PostgreSQL 17), miscadmin.h:481 (PostgreSQL 18), miscadmin.h:490 (PostgreSQL 19)
@@ -457,7 +457,7 @@ macro_rules! END_CRIT_SECTION {
 #[macro_export]
 macro_rules! GetProcessingMode {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HOLD_CANCEL_INTERRUPTS from miscadmin.h:141 (PostgreSQL 15–16), miscadmin.h:142 (PostgreSQL 17–18), miscadmin.h:144 (PostgreSQL 19)
@@ -477,7 +477,7 @@ macro_rules! GetProcessingMode {
 #[macro_export]
 macro_rules! HOLD_CANCEL_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro HOLD_INTERRUPTS from miscadmin.h:133 (PostgreSQL 15–16), miscadmin.h:134 (PostgreSQL 17–18), miscadmin.h:136 (PostgreSQL 19)
@@ -497,7 +497,7 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
 #[macro_export]
 macro_rules! HOLD_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro INTERRUPTS_CAN_BE_PROCESSED from miscadmin.h:129 (PostgreSQL 15–16), miscadmin.h:130 (PostgreSQL 17–18), miscadmin.h:132 (PostgreSQL 19)
@@ -513,7 +513,7 @@ macro_rules! HOLD_INTERRUPTS {
 #[macro_export]
 macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro INTERRUPTS_PENDING_CONDITION from miscadmin.h:112 (PostgreSQL 15–16), miscadmin.h:113 (PostgreSQL 17–18), miscadmin.h:115 (PostgreSQL 19)
@@ -533,7 +533,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
 #[macro_export]
 macro_rules! INTERRUPTS_PENDING_CONDITION {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsBootstrapProcessingMode from miscadmin.h:412 (PostgreSQL 15), miscadmin.h:420 (PostgreSQL 16), miscadmin.h:463 (PostgreSQL 17), miscadmin.h:477 (PostgreSQL 18), miscadmin.h:486 (PostgreSQL 19)
@@ -549,7 +549,7 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
 #[macro_export]
 macro_rules! IsBootstrapProcessingMode {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -566,7 +566,7 @@ macro_rules! IsBootstrapProcessingMode {
 #[macro_export]
 macro_rules! IsExternalConnectionBackend {
     ($backend_type:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsInitProcessingMode from miscadmin.h:413 (PostgreSQL 15), miscadmin.h:421 (PostgreSQL 16), miscadmin.h:464 (PostgreSQL 17), miscadmin.h:478 (PostgreSQL 18), miscadmin.h:487 (PostgreSQL 19)
@@ -582,7 +582,7 @@ macro_rules! IsExternalConnectionBackend {
 #[macro_export]
 macro_rules! IsInitProcessingMode {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsNormalProcessingMode from miscadmin.h:414 (PostgreSQL 15), miscadmin.h:422 (PostgreSQL 16), miscadmin.h:465 (PostgreSQL 17), miscadmin.h:479 (PostgreSQL 18), miscadmin.h:488 (PostgreSQL 19)
@@ -598,7 +598,7 @@ macro_rules! IsInitProcessingMode {
 #[macro_export]
 macro_rules! IsNormalProcessingMode {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -623,7 +623,7 @@ macro_rules! IsNormalProcessingMode {
 #[macro_export]
 macro_rules! RESUME_CANCEL_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -646,7 +646,7 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 #[macro_export]
 macro_rules! RESUME_CANCEL_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -671,7 +671,7 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 #[macro_export]
 macro_rules! RESUME_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -694,7 +694,7 @@ macro_rules! RESUME_INTERRUPTS {
 #[macro_export]
 macro_rules! RESUME_INTERRUPTS {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro START_CRIT_SECTION from miscadmin.h:149 (PostgreSQL 15–16), miscadmin.h:150 (PostgreSQL 17–18), miscadmin.h:152 (PostgreSQL 19)
@@ -714,7 +714,7 @@ macro_rules! RESUME_INTERRUPTS {
 #[macro_export]
 macro_rules! START_CRIT_SECTION {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -741,7 +741,7 @@ macro_rules! START_CRIT_SECTION {
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -768,7 +768,7 @@ macro_rules! SetProcessingMode {
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -791,7 +791,7 @@ macro_rules! SetProcessingMode {
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AmArchiverProcess;

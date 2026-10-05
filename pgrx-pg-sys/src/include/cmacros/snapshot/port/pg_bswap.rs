@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumBigEndianToNative {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -40,7 +40,7 @@ macro_rules! DatumBigEndianToNative {
 #[macro_export]
 macro_rules! DatumBigEndianToNative {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_bswap16 from pg_bswap.h:33 (PostgreSQL 15–19)
@@ -60,7 +60,7 @@ macro_rules! DatumBigEndianToNative {
 #[macro_export]
 macro_rules! pg_bswap16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_bswap32 from pg_bswap.h:55 (PostgreSQL 15–19)
@@ -80,7 +80,7 @@ macro_rules! pg_bswap16 {
 #[macro_export]
 macro_rules! pg_bswap32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_bswap64 from pg_bswap.h:79 (PostgreSQL 15–19)
@@ -100,7 +100,7 @@ macro_rules! pg_bswap32 {
 #[macro_export]
 macro_rules! pg_bswap64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_hton16 from pg_bswap.h:120 (PostgreSQL 15–19)
@@ -120,7 +120,7 @@ macro_rules! pg_bswap64 {
 #[macro_export]
 macro_rules! pg_hton16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_hton32 from pg_bswap.h:121 (PostgreSQL 15–19)
@@ -140,7 +140,7 @@ macro_rules! pg_hton16 {
 #[macro_export]
 macro_rules! pg_hton32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_hton64 from pg_bswap.h:122 (PostgreSQL 15–19)
@@ -160,7 +160,7 @@ macro_rules! pg_hton32 {
 #[macro_export]
 macro_rules! pg_hton64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_ntoh16 from pg_bswap.h:124 (PostgreSQL 15–19)
@@ -180,7 +180,7 @@ macro_rules! pg_hton64 {
 #[macro_export]
 macro_rules! pg_ntoh16 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_ntoh32 from pg_bswap.h:125 (PostgreSQL 15–19)
@@ -200,7 +200,7 @@ macro_rules! pg_ntoh16 {
 #[macro_export]
 macro_rules! pg_ntoh32 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_ntoh64 from pg_bswap.h:126 (PostgreSQL 15–19)
@@ -220,7 +220,7 @@ macro_rules! pg_ntoh32 {
 #[macro_export]
 macro_rules! pg_ntoh64 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumBigEndianToNative;

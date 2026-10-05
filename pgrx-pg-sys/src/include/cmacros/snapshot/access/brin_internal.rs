@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! BRIN_elog {
     ($args:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SizeofBrinOpcInfo from brin_internal.h:41 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! BRIN_elog {
 #[macro_export]
 macro_rules! SizeofBrinOpcInfo {
     ($ncols:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BRIN_elog;

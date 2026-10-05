@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! BufferIsInvalid {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BufferIsLocal from buf.h:37 (PostgreSQL 15–19)
@@ -30,7 +30,7 @@ macro_rules! BufferIsInvalid {
 #[macro_export]
 macro_rules! BufferIsLocal {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BufferIsInvalid;

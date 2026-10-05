@@ -27,7 +27,7 @@
 #[macro_export]
 macro_rules! itemptr_decode {
     ($itemptr:expr, $encoded:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -66,7 +66,7 @@ macro_rules! itemptr_decode {
 #[macro_export]
 macro_rules! itemptr_encode {
     ($itemptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -105,7 +105,7 @@ macro_rules! itemptr_encode {
 #[macro_export]
 macro_rules! itemptr_encode {
     ($itemptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use itemptr_decode;

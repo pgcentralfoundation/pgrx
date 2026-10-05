@@ -702,7 +702,8 @@ fn main() {
     assert_eq!(shipped_comments, generated_comments, "snapshot keeps original C definitions");
     assert!(shipped_source.contains("/// C macro SNAPSHOT_ADD from server.h:"));
     assert!(shipped_source.contains("(PostgreSQL 18)"));
-    assert!(shipped_source.contains("::core::unimplemented!("));
+    assert_eq!(shipped_source.matches("::core::unimplemented!(").count(), 1);
+    assert!(shipped_source.contains("$crate::__pgrx_c_documentation_shell!()"));
     assert!(shipped_source.contains("macro_rules! __pgrx_c_classify"));
     assert!(shipped_source.contains("pub mod __pgrx_c_callbacks"));
     for implementation in ["$crate::__pgrx_c_macros", "__pgrx_c_generated", "compile_error!"] {

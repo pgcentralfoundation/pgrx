@@ -20,7 +20,7 @@
 #[macro_export]
 macro_rules! CHECKSUM_COMP {
     ($checksum:expr, $value:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use CHECKSUM_COMP;

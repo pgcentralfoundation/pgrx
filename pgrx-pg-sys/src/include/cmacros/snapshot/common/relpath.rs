@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! RelFileNumberIsValid {
     ($relnumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -40,7 +40,7 @@ macro_rules! RelFileNumberIsValid {
 #[macro_export]
 macro_rules! relpath {
     ($rnode:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -61,7 +61,7 @@ macro_rules! relpath {
 #[macro_export]
 macro_rules! relpath {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -82,7 +82,7 @@ macro_rules! relpath {
 #[macro_export]
 macro_rules! relpathbackend {
     ($rnode:expr, $backend:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -103,7 +103,7 @@ macro_rules! relpathbackend {
 #[macro_export]
 macro_rules! relpathbackend {
     ($rlocator:expr, $backend:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -124,7 +124,7 @@ macro_rules! relpathbackend {
 #[macro_export]
 macro_rules! relpathperm {
     ($rnode:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -145,7 +145,7 @@ macro_rules! relpathperm {
 #[macro_export]
 macro_rules! relpathperm {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -166,7 +166,7 @@ macro_rules! relpathperm {
 #[macro_export]
 macro_rules! relpathperm {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

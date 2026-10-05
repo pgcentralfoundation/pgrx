@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! MemoryContextIsValid {
     ($context:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! MemoryContextIsValid {
 #[macro_export]
 macro_rules! MemoryContextIsValid {
     ($context:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use MemoryContextIsValid;

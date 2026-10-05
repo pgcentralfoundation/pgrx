@@ -25,7 +25,7 @@
 #[macro_export]
 macro_rules! CopyQueryCompletion {
     ($dst:expr, $src:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function SetQueryCompletion from cmdtag.h:35 (PostgreSQL 15), cmdtag.h:37 (PostgreSQL 16), cmdtag.h:36 (PostgreSQL 17–19)
@@ -53,7 +53,7 @@ macro_rules! CopyQueryCompletion {
 #[macro_export]
 macro_rules! SetQueryCompletion {
     ($qc:expr, $commandTag:expr, $nprocessed:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use CopyQueryCompletion;

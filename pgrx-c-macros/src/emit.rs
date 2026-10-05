@@ -1233,8 +1233,25 @@ pub struct MacroDocumentation {
     pub hidden: bool,
 }
 
-/// Body of every documentation-shell arm. Rustdoc shows arm bodies as `{ ... }`.
-const DOCUMENTATION_SHELL_BODY: &str = "::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")";
+/// Shared expansion of every documentation-shell arm, defined by
+/// [`documentation_shell_support`]. Rustdoc shows arm bodies as `{ ... }`.
+const DOCUMENTATION_SHELL_BODY: &str = "$crate::__pgrx_c_documentation_shell!()";
+
+/// Define the macro that every documentation shell expands to.
+///
+/// Include this once in the crate that defines the shells rendered by
+/// [`MacroDocumentation::render_shell`].
+pub fn documentation_shell_support() -> String {
+    "/// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.\n\
+     #[doc(hidden)]\n\
+     #[macro_export]\n\
+     macro_rules! __pgrx_c_documentation_shell {\n    \
+         () => {\n        \
+             ::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")\n    \
+         };\n\
+     }\n"
+        .into()
+}
 
 /// Render documentation comments and shell macros for snapshots.
 impl MacroDocumentation {
@@ -1248,9 +1265,10 @@ impl MacroDocumentation {
 
     /// Render a documentation-only macro that shows the supported invocation forms.
     ///
-    /// Each arm expands to `unimplemented!()`, so a documentation build of a crate
-    /// that calls the macro inside a function body still succeeds. `attributes` is
-    /// written before the doc comment, for example a `#[cfg(...)]` line.
+    /// Each arm expands to the defining crate's [`documentation_shell_support`] macro,
+    /// which calls `unimplemented!()`, so a documentation build of a crate that calls
+    /// the macro inside a function body still succeeds. `attributes` is written before
+    /// the doc comment, for example a `#[cfg(...)]` line.
     pub fn render_shell(&self, location: Option<&str>, attributes: &str) -> Option<String> {
         let mut rust = String::from(attributes);
         write_doc_comments(&mut rust, &self.comment(location))?;
@@ -1260,7 +1278,7 @@ impl MacroDocumentation {
         writeln!(rust, "#[macro_export]\nmacro_rules! {} {{", self.identifier)
             .expect("String output");
         for form in &self.forms {
-            writeln!(rust, "    ({form}) => {{\n        {DOCUMENTATION_SHELL_BODY}\n    }};")
+            writeln!(rust, "    ({form}) => {{ {DOCUMENTATION_SHELL_BODY} }};")
                 .expect("String output");
         }
         rust.push_str("}\n");

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! SPIN_DELAY {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -35,7 +35,7 @@ macro_rules! SPIN_DELAY {
 #[macro_export]
 macro_rules! S_LOCK_FREE {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TAS from s_lock.h:328 (PostgreSQL 15), s_lock.h:263 (PostgreSQL 16–17), s_lock.h:254 (PostgreSQL 18–19)
@@ -55,7 +55,7 @@ macro_rules! S_LOCK_FREE {
 #[macro_export]
 macro_rules! TAS {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -76,7 +76,7 @@ macro_rules! TAS {
 #[macro_export]
 macro_rules! TAS_SPIN {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -97,7 +97,7 @@ macro_rules! TAS_SPIN {
 #[macro_export]
 macro_rules! TAS_SPIN {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function init_spin_delay from s_lock.h:1094 (PostgreSQL 15), s_lock.h:851 (PostgreSQL 16), s_lock.h:831 (PostgreSQL 17), s_lock.h:739 (PostgreSQL 18), s_lock.h:737 (PostgreSQL 19)
@@ -129,7 +129,7 @@ macro_rules! TAS_SPIN {
 #[macro_export]
 macro_rules! init_spin_delay {
     ($status:expr, $file:expr, $line:expr, $func:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -157,7 +157,7 @@ macro_rules! init_spin_delay {
 #[macro_export]
 macro_rules! spin_delay {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -190,7 +190,7 @@ macro_rules! spin_delay {
 #[macro_export]
 macro_rules! spin_delay {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -223,7 +223,7 @@ macro_rules! spin_delay {
 #[macro_export]
 macro_rules! spin_delay {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -250,7 +250,7 @@ macro_rules! spin_delay {
 #[macro_export]
 macro_rules! tas {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -277,7 +277,7 @@ macro_rules! tas {
 #[macro_export]
 macro_rules! tas {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

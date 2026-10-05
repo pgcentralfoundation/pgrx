@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! ISUPDATE_from_mxstatus {
     ($status:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MultiXactIdIsValid from multixact.h:28 (PostgreSQL 15–18), multixact.h:29 (PostgreSQL 19)
@@ -30,7 +30,7 @@ macro_rules! ISUPDATE_from_mxstatus {
 #[macro_export]
 macro_rules! MultiXactIdIsValid {
     ($multi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ISUPDATE_from_mxstatus;

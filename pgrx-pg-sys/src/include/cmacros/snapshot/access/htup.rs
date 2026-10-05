@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! HeapTupleIsValid {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -40,7 +40,7 @@ macro_rules! HeapTupleIsValid {
 #[macro_export]
 macro_rules! HeapTupleIsValid {
     ($tuple:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use HeapTupleIsValid;

@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! pg_atomic_clear_flag_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_compare_exchange_u32_impl from generic-gcc.h:162 (PostgreSQL 15–17), generic-gcc.h:160 (PostgreSQL 18), generic-gcc.h:159 (PostgreSQL 19)
@@ -53,7 +53,7 @@ macro_rules! pg_atomic_clear_flag_impl {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u32_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -82,7 +82,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u64_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -112,7 +112,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u64_impl {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -139,7 +139,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u32_impl {
     ($ptr:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -166,7 +166,7 @@ macro_rules! pg_atomic_exchange_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u64_impl {
     ($ptr:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u32_impl from generic-gcc.h:191 (PostgreSQL 15–16), generic-gcc.h:208 (PostgreSQL 17), generic-gcc.h:206 (PostgreSQL 18), generic-gcc.h:205 (PostgreSQL 19)
@@ -192,7 +192,7 @@ macro_rules! pg_atomic_exchange_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_add_u32_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u64_impl from generic-gcc.h:258 (PostgreSQL 15–16), generic-gcc.h:295 (PostgreSQL 17), generic-gcc.h:293 (PostgreSQL 18), generic-gcc.h:292 (PostgreSQL 19)
@@ -218,7 +218,7 @@ macro_rules! pg_atomic_fetch_add_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_add_u64_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_and_u32_impl from generic-gcc.h:209 (PostgreSQL 15–16), generic-gcc.h:226 (PostgreSQL 17), generic-gcc.h:224 (PostgreSQL 18), generic-gcc.h:223 (PostgreSQL 19)
@@ -244,7 +244,7 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_and_u32_impl {
     ($ptr:expr, $and_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_and_u64_impl from generic-gcc.h:276 (PostgreSQL 15–16), generic-gcc.h:313 (PostgreSQL 17), generic-gcc.h:311 (PostgreSQL 18), generic-gcc.h:310 (PostgreSQL 19)
@@ -270,7 +270,7 @@ macro_rules! pg_atomic_fetch_and_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_and_u64_impl {
     ($ptr:expr, $and_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_or_u32_impl from generic-gcc.h:218 (PostgreSQL 15–16), generic-gcc.h:235 (PostgreSQL 17), generic-gcc.h:233 (PostgreSQL 18), generic-gcc.h:232 (PostgreSQL 19)
@@ -296,7 +296,7 @@ macro_rules! pg_atomic_fetch_and_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_or_u32_impl {
     ($ptr:expr, $or_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_or_u64_impl from generic-gcc.h:285 (PostgreSQL 15–16), generic-gcc.h:322 (PostgreSQL 17), generic-gcc.h:320 (PostgreSQL 18), generic-gcc.h:319 (PostgreSQL 19)
@@ -322,7 +322,7 @@ macro_rules! pg_atomic_fetch_or_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_or_u64_impl {
     ($ptr:expr, $or_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_sub_u32_impl from generic-gcc.h:200 (PostgreSQL 15–16), generic-gcc.h:217 (PostgreSQL 17), generic-gcc.h:215 (PostgreSQL 18), generic-gcc.h:214 (PostgreSQL 19)
@@ -348,7 +348,7 @@ macro_rules! pg_atomic_fetch_or_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_sub_u32_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_sub_u64_impl from generic-gcc.h:267 (PostgreSQL 15–16), generic-gcc.h:304 (PostgreSQL 17), generic-gcc.h:302 (PostgreSQL 18), generic-gcc.h:301 (PostgreSQL 19)
@@ -374,7 +374,7 @@ macro_rules! pg_atomic_fetch_sub_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_fetch_sub_u64_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_flag_impl from generic-gcc.h:150 (PostgreSQL 15–17), generic-gcc.h:148 (PostgreSQL 18), generic-gcc.h:147 (PostgreSQL 19)
@@ -400,7 +400,7 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_flag_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_test_set_flag_impl from generic-gcc.h:119 (PostgreSQL 15–17), generic-gcc.h:117 (PostgreSQL 18), generic-gcc.h:116 (PostgreSQL 19)
@@ -428,7 +428,7 @@ macro_rules! pg_atomic_init_flag_impl {
 #[macro_export]
 macro_rules! pg_atomic_test_set_flag_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_unlocked_test_flag_impl from generic-gcc.h:132 (PostgreSQL 15–17), generic-gcc.h:130 (PostgreSQL 18), generic-gcc.h:129 (PostgreSQL 19)
@@ -454,7 +454,7 @@ macro_rules! pg_atomic_test_set_flag_impl {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_test_flag_impl {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pg_atomic_clear_flag_impl;

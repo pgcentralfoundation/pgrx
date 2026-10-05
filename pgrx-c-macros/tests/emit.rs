@@ -23,8 +23,8 @@ mod oracle;
 
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, EmissionStatus,
-    InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
-    emit_support_with_bindings, inspect,
+    InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode,
+    documentation_shell_support, emit, emit_support_with_bindings, inspect,
 };
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
@@ -184,7 +184,7 @@ fn documentation_shells_show_invocation_forms() {
         inspect(&scanner, &fixture("documentation_shells.h"), &["-fwrapv".into()], None).unwrap();
     let names = ["SHELL_ADD", "SHELL_UNGROUPED", "SHELL_CAPTURE", "SHELL_RETURN"];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-    let mut shells = String::new();
+    let mut shells = documentation_shell_support();
     let mut forms = Vec::new();
     for name in names {
         let emission = emit(&session, name);
@@ -204,7 +204,12 @@ fn documentation_shells_show_invocation_forms() {
                 .collect::<Vec<_>>()
         };
         assert_eq!(docs(&shell), docs(rust), "{name}");
-        assert!(!shell.contains("$crate"), "{name}: shells contain no implementation");
+        assert!(!shell.contains("__pgrx_c_macros"), "{name}: shells contain no implementation");
+        assert_eq!(
+            shell.matches("=> { $crate::__pgrx_c_documentation_shell!() };").count(),
+            documentation.forms.len(),
+            "{name}: every arm uses the shared expansion"
+        );
         forms.push(documentation.forms.clone());
         shells.push_str(&shell);
     }
