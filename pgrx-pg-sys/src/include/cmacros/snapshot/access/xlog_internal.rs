@@ -28,7 +28,7 @@
 #[macro_export]
 macro_rules! BackupHistoryFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $startpoint:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -58,7 +58,7 @@ macro_rules! BackupHistoryFileName {
 #[macro_export]
 macro_rules! BackupHistoryFilePath {
     ($path:expr, $tli:expr, $logSegNo:expr, $startpoint:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function GetRmgr from xlog_internal.h:336 (PostgreSQL 15), xlog_internal.h:374 (PostgreSQL 16), xlog_internal.h:375 (PostgreSQL 17–18), xlog_internal.h:377 (PostgreSQL 19)
@@ -86,7 +86,7 @@ macro_rules! BackupHistoryFilePath {
 #[macro_export]
 macro_rules! GetRmgr {
     ($rmid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -107,7 +107,7 @@ macro_rules! GetRmgr {
 #[macro_export]
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -136,7 +136,7 @@ macro_rules! IsBackupHistoryFileName {
 #[macro_export]
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -157,7 +157,7 @@ macro_rules! IsBackupHistoryFileName {
 #[macro_export]
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -186,7 +186,7 @@ macro_rules! IsPartialXLogFileName {
 #[macro_export]
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsPowerOf2 from xlog_internal.h:95 (PostgreSQL 15–18), xlog_internal.h:94 (PostgreSQL 19)
@@ -206,7 +206,7 @@ macro_rules! IsPartialXLogFileName {
 #[macro_export]
 macro_rules! IsPowerOf2 {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -227,7 +227,7 @@ macro_rules! IsPowerOf2 {
 #[macro_export]
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -256,7 +256,7 @@ macro_rules! IsTLHistoryFileName {
 #[macro_export]
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsValidWalSegSize from xlog_internal.h:96 (PostgreSQL 15–18), xlog_internal.h:95 (PostgreSQL 19)
@@ -276,7 +276,7 @@ macro_rules! IsTLHistoryFileName {
 #[macro_export]
 macro_rules! IsValidWalSegSize {
     ($size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -297,7 +297,7 @@ macro_rules! IsValidWalSegSize {
 #[macro_export]
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -325,7 +325,7 @@ macro_rules! IsXLogFileName {
 #[macro_export]
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function RmgrIdExists from xlog_internal.h:330 (PostgreSQL 15), xlog_internal.h:368 (PostgreSQL 16), xlog_internal.h:369 (PostgreSQL 17–18), xlog_internal.h:371 (PostgreSQL 19)
@@ -351,7 +351,7 @@ macro_rules! IsXLogFileName {
 #[macro_export]
 macro_rules! RmgrIdExists {
     ($rmid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -378,7 +378,7 @@ macro_rules! RmgrIdExists {
 #[macro_export]
 macro_rules! StatusFilePath {
     ($path:expr, $xlog:expr, $suffix:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -405,7 +405,7 @@ macro_rules! StatusFilePath {
 #[macro_export]
 macro_rules! TLHistoryFileName {
     ($fname:expr, $tli:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -432,7 +432,7 @@ macro_rules! TLHistoryFileName {
 #[macro_export]
 macro_rules! TLHistoryFilePath {
     ($path:expr, $tli:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLByteInPrevSeg from xlog_internal.h:139 (PostgreSQL 15–18), xlog_internal.h:138 (PostgreSQL 19)
@@ -452,7 +452,7 @@ macro_rules! TLHistoryFilePath {
 #[macro_export]
 macro_rules! XLByteInPrevSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLByteInSeg from xlog_internal.h:136 (PostgreSQL 15–18), xlog_internal.h:135 (PostgreSQL 19)
@@ -472,7 +472,7 @@ macro_rules! XLByteInPrevSeg {
 #[macro_export]
 macro_rules! XLByteInSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLByteToPrevSeg from xlog_internal.h:120 (PostgreSQL 15–18), xlog_internal.h:119 (PostgreSQL 19)
@@ -494,7 +494,7 @@ macro_rules! XLByteInSeg {
 #[macro_export]
 macro_rules! XLByteToPrevSeg {
     (@__pgrx_c_expression; $xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLByteToSeg from xlog_internal.h:117 (PostgreSQL 15–18), xlog_internal.h:116 (PostgreSQL 19)
@@ -516,7 +516,7 @@ macro_rules! XLByteToPrevSeg {
 #[macro_export]
 macro_rules! XLByteToSeg {
     (@__pgrx_c_expression; $xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -545,7 +545,7 @@ macro_rules! XLByteToSeg {
 #[macro_export]
 macro_rules! XLogFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -572,7 +572,7 @@ macro_rules! XLogFileName {
 #[macro_export]
 macro_rules! XLogFileNameById {
     ($fname:expr, $tli:expr, $log:expr, $seg:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -601,7 +601,7 @@ macro_rules! XLogFileNameById {
 #[macro_export]
 macro_rules! XLogFilePath {
     ($path:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -632,7 +632,7 @@ macro_rules! XLogFilePath {
 #[macro_export]
 macro_rules! XLogFromFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogMBVarToSegs from xlog_internal.h:127 (PostgreSQL 15–18), xlog_internal.h:126 (PostgreSQL 19)
@@ -652,7 +652,7 @@ macro_rules! XLogFromFileName {
 #[macro_export]
 macro_rules! XLogMBVarToSegs {
     ($mbvar:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogPageHeaderSize from xlog_internal.h:84 (PostgreSQL 15–18), xlog_internal.h:83 (PostgreSQL 19)
@@ -672,7 +672,7 @@ macro_rules! XLogMBVarToSegs {
 #[macro_export]
 macro_rules! XLogPageHeaderSize {
     ($hdr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogSegNoOffsetToRecPtr from xlog_internal.h:103 (PostgreSQL 15–18), xlog_internal.h:102 (PostgreSQL 19)
@@ -694,7 +694,7 @@ macro_rules! XLogPageHeaderSize {
 #[macro_export]
 macro_rules! XLogSegNoOffsetToRecPtr {
     (@__pgrx_c_expression; $segno:expr, $offset:expr, $wal_segsz_bytes:expr, $dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogSegmentOffset from xlog_internal.h:106 (PostgreSQL 15–18), xlog_internal.h:105 (PostgreSQL 19)
@@ -714,7 +714,7 @@ macro_rules! XLogSegNoOffsetToRecPtr {
 #[macro_export]
 macro_rules! XLogSegmentOffset {
     ($xlogptr:expr, $wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogSegmentsPerXLogId from xlog_internal.h:100 (PostgreSQL 15–18), xlog_internal.h:99 (PostgreSQL 19)
@@ -734,7 +734,7 @@ macro_rules! XLogSegmentOffset {
 #[macro_export]
 macro_rules! XLogSegmentsPerXLogId {
     ($wal_segsz_bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XRecOffIsValid from xlog_internal.h:143 (PostgreSQL 15–18), xlog_internal.h:142 (PostgreSQL 19)
@@ -754,7 +754,7 @@ macro_rules! XLogSegmentsPerXLogId {
 #[macro_export]
 macro_rules! XRecOffIsValid {
     ($xlrp:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

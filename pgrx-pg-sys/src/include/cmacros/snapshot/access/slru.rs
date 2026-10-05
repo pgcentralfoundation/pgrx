@@ -28,7 +28,7 @@
 #[macro_export]
 macro_rules! SimpleLruGetBankLock {
     ($ctl:expr, $pageno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -59,7 +59,7 @@ macro_rules! SimpleLruGetBankLock {
 #[macro_export]
 macro_rules! SimpleLruGetBankLock {
     ($ctl:expr, $pageno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -78,7 +78,7 @@ macro_rules! SimpleLruGetBankLock {
 #[macro_export]
 macro_rules! SlruPagePrecedesUnitTests {
     ($ctl:expr, $per_page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

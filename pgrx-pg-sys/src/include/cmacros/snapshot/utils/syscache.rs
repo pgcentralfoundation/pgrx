@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! GetSysCacheHashValue1 {
     ($cacheId:expr, $key1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheHashValue2 from syscache.h:215 (PostgreSQL 15), syscache.h:218 (PostgreSQL 16), syscache.h:120 (PostgreSQL 17–19)
@@ -38,7 +38,7 @@ macro_rules! GetSysCacheHashValue1 {
 #[macro_export]
 macro_rules! GetSysCacheHashValue2 {
     ($cacheId:expr, $key1:expr, $key2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheHashValue3 from syscache.h:217 (PostgreSQL 15), syscache.h:220 (PostgreSQL 16), syscache.h:122 (PostgreSQL 17–19)
@@ -58,7 +58,7 @@ macro_rules! GetSysCacheHashValue2 {
 #[macro_export]
 macro_rules! GetSysCacheHashValue3 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheHashValue4 from syscache.h:219 (PostgreSQL 15), syscache.h:222 (PostgreSQL 16), syscache.h:124 (PostgreSQL 17–19)
@@ -78,7 +78,7 @@ macro_rules! GetSysCacheHashValue3 {
 #[macro_export]
 macro_rules! GetSysCacheHashValue4 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr, $key4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheOid1 from syscache.h:204 (PostgreSQL 15), syscache.h:207 (PostgreSQL 16), syscache.h:109 (PostgreSQL 17–19)
@@ -98,7 +98,7 @@ macro_rules! GetSysCacheHashValue4 {
 #[macro_export]
 macro_rules! GetSysCacheOid1 {
     ($cacheId:expr, $oidcol:expr, $key1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheOid2 from syscache.h:206 (PostgreSQL 15), syscache.h:209 (PostgreSQL 16), syscache.h:111 (PostgreSQL 17–19)
@@ -118,7 +118,7 @@ macro_rules! GetSysCacheOid1 {
 #[macro_export]
 macro_rules! GetSysCacheOid2 {
     ($cacheId:expr, $oidcol:expr, $key1:expr, $key2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheOid3 from syscache.h:208 (PostgreSQL 15), syscache.h:211 (PostgreSQL 16), syscache.h:113 (PostgreSQL 17–19)
@@ -138,7 +138,7 @@ macro_rules! GetSysCacheOid2 {
 #[macro_export]
 macro_rules! GetSysCacheOid3 {
     ($cacheId:expr, $oidcol:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetSysCacheOid4 from syscache.h:210 (PostgreSQL 15), syscache.h:213 (PostgreSQL 16), syscache.h:115 (PostgreSQL 17–19)
@@ -158,7 +158,7 @@ macro_rules! GetSysCacheOid3 {
 #[macro_export]
 macro_rules! GetSysCacheOid4 {
     ($cacheId:expr, $oidcol:expr, $key1:expr, $key2:expr, $key3:expr, $key4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ReleaseSysCacheList from syscache.h:229 (PostgreSQL 15), syscache.h:232 (PostgreSQL 16), syscache.h:134 (PostgreSQL 17–19)
@@ -178,7 +178,7 @@ macro_rules! GetSysCacheOid4 {
 #[macro_export]
 macro_rules! ReleaseSysCacheList {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheCopy1 from syscache.h:186 (PostgreSQL 15), syscache.h:189 (PostgreSQL 16), syscache.h:91 (PostgreSQL 17–19)
@@ -198,7 +198,7 @@ macro_rules! ReleaseSysCacheList {
 #[macro_export]
 macro_rules! SearchSysCacheCopy1 {
     ($cacheId:expr, $key1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheCopy2 from syscache.h:188 (PostgreSQL 15), syscache.h:191 (PostgreSQL 16), syscache.h:93 (PostgreSQL 17–19)
@@ -218,7 +218,7 @@ macro_rules! SearchSysCacheCopy1 {
 #[macro_export]
 macro_rules! SearchSysCacheCopy2 {
     ($cacheId:expr, $key1:expr, $key2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheCopy3 from syscache.h:190 (PostgreSQL 15), syscache.h:193 (PostgreSQL 16), syscache.h:95 (PostgreSQL 17–19)
@@ -238,7 +238,7 @@ macro_rules! SearchSysCacheCopy2 {
 #[macro_export]
 macro_rules! SearchSysCacheCopy3 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheCopy4 from syscache.h:192 (PostgreSQL 15), syscache.h:195 (PostgreSQL 16), syscache.h:97 (PostgreSQL 17–19)
@@ -258,7 +258,7 @@ macro_rules! SearchSysCacheCopy3 {
 #[macro_export]
 macro_rules! SearchSysCacheCopy4 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr, $key4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheExists1 from syscache.h:195 (PostgreSQL 15), syscache.h:198 (PostgreSQL 16), syscache.h:100 (PostgreSQL 17–19)
@@ -278,7 +278,7 @@ macro_rules! SearchSysCacheCopy4 {
 #[macro_export]
 macro_rules! SearchSysCacheExists1 {
     ($cacheId:expr, $key1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheExists2 from syscache.h:197 (PostgreSQL 15), syscache.h:200 (PostgreSQL 16), syscache.h:102 (PostgreSQL 17–19)
@@ -298,7 +298,7 @@ macro_rules! SearchSysCacheExists1 {
 #[macro_export]
 macro_rules! SearchSysCacheExists2 {
     ($cacheId:expr, $key1:expr, $key2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheExists3 from syscache.h:199 (PostgreSQL 15), syscache.h:202 (PostgreSQL 16), syscache.h:104 (PostgreSQL 17–19)
@@ -318,7 +318,7 @@ macro_rules! SearchSysCacheExists2 {
 #[macro_export]
 macro_rules! SearchSysCacheExists3 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheExists4 from syscache.h:201 (PostgreSQL 15), syscache.h:204 (PostgreSQL 16), syscache.h:106 (PostgreSQL 17–19)
@@ -338,7 +338,7 @@ macro_rules! SearchSysCacheExists3 {
 #[macro_export]
 macro_rules! SearchSysCacheExists4 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr, $key4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheList1 from syscache.h:222 (PostgreSQL 15), syscache.h:225 (PostgreSQL 16), syscache.h:127 (PostgreSQL 17–19)
@@ -358,7 +358,7 @@ macro_rules! SearchSysCacheExists4 {
 #[macro_export]
 macro_rules! SearchSysCacheList1 {
     ($cacheId:expr, $key1:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheList2 from syscache.h:224 (PostgreSQL 15), syscache.h:227 (PostgreSQL 16), syscache.h:129 (PostgreSQL 17–19)
@@ -378,7 +378,7 @@ macro_rules! SearchSysCacheList1 {
 #[macro_export]
 macro_rules! SearchSysCacheList2 {
     ($cacheId:expr, $key1:expr, $key2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SearchSysCacheList3 from syscache.h:226 (PostgreSQL 15), syscache.h:229 (PostgreSQL 16), syscache.h:131 (PostgreSQL 17–19)
@@ -398,7 +398,7 @@ macro_rules! SearchSysCacheList2 {
 #[macro_export]
 macro_rules! SearchSysCacheList3 {
     ($cacheId:expr, $key1:expr, $key2:expr, $key3:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GetSysCacheHashValue1;

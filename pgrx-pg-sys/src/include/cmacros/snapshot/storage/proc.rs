@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
 #[macro_export]
 macro_rules! FastPathLockSlotsPerBackend {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -61,7 +61,7 @@ macro_rules! FastPathLockSlotsPerBackend {
 #[macro_export]
 macro_rules! GetNumberFromPGProc {
     ($proc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetPGProcByNumber from proc.h:408 (PostgreSQL 15), proc.h:414 (PostgreSQL 16), proc.h:421 (PostgreSQL 17), proc.h:438 (PostgreSQL 18), proc.h:510 (PostgreSQL 19)
@@ -77,7 +77,7 @@ macro_rules! GetNumberFromPGProc {
 #[macro_export]
 macro_rules! GetPGProcByNumber {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

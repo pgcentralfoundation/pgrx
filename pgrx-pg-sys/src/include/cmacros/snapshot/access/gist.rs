@@ -23,7 +23,7 @@
 #[macro_export]
 macro_rules! GIST_LEAF {
     ($entry:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -44,7 +44,7 @@ macro_rules! GIST_LEAF {
 #[macro_export]
 macro_rules! GIST_LEAF {
     ($entry:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -65,7 +65,7 @@ macro_rules! GIST_LEAF {
 #[macro_export]
 macro_rules! GIST_LEAF {
     ($entry:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -90,7 +90,7 @@ macro_rules! GIST_LEAF {
 #[macro_export]
 macro_rules! GistClearFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -111,7 +111,7 @@ macro_rules! GistClearFollowRight {
 #[macro_export]
 macro_rules! GistClearFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -132,7 +132,7 @@ macro_rules! GistClearFollowRight {
 #[macro_export]
 macro_rules! GistClearFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -157,7 +157,7 @@ macro_rules! GistClearFollowRight {
 #[macro_export]
 macro_rules! GistClearPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -178,7 +178,7 @@ macro_rules! GistClearPageHasGarbage {
 #[macro_export]
 macro_rules! GistClearPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -199,7 +199,7 @@ macro_rules! GistClearPageHasGarbage {
 #[macro_export]
 macro_rules! GistClearPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -224,7 +224,7 @@ macro_rules! GistClearPageHasGarbage {
 #[macro_export]
 macro_rules! GistClearTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -245,7 +245,7 @@ macro_rules! GistClearTuplesDeleted {
 #[macro_export]
 macro_rules! GistClearTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -266,7 +266,7 @@ macro_rules! GistClearTuplesDeleted {
 #[macro_export]
 macro_rules! GistClearTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -291,7 +291,7 @@ macro_rules! GistClearTuplesDeleted {
 #[macro_export]
 macro_rules! GistFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -312,7 +312,7 @@ macro_rules! GistFollowRight {
 #[macro_export]
 macro_rules! GistFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -333,7 +333,7 @@ macro_rules! GistFollowRight {
 #[macro_export]
 macro_rules! GistFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -358,7 +358,7 @@ macro_rules! GistFollowRight {
 #[macro_export]
 macro_rules! GistMarkFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -379,7 +379,7 @@ macro_rules! GistMarkFollowRight {
 #[macro_export]
 macro_rules! GistMarkFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -400,7 +400,7 @@ macro_rules! GistMarkFollowRight {
 #[macro_export]
 macro_rules! GistMarkFollowRight {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -425,7 +425,7 @@ macro_rules! GistMarkFollowRight {
 #[macro_export]
 macro_rules! GistMarkPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -446,7 +446,7 @@ macro_rules! GistMarkPageHasGarbage {
 #[macro_export]
 macro_rules! GistMarkPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -467,7 +467,7 @@ macro_rules! GistMarkPageHasGarbage {
 #[macro_export]
 macro_rules! GistMarkPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -492,7 +492,7 @@ macro_rules! GistMarkPageHasGarbage {
 #[macro_export]
 macro_rules! GistMarkTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -513,7 +513,7 @@ macro_rules! GistMarkTuplesDeleted {
 #[macro_export]
 macro_rules! GistMarkTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -534,7 +534,7 @@ macro_rules! GistMarkTuplesDeleted {
 #[macro_export]
 macro_rules! GistMarkTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function GistPageGetDeleteXid from gist.h:214 (PostgreSQL 15–17), gist.h:217 (PostgreSQL 18–19)
@@ -569,7 +569,7 @@ macro_rules! GistMarkTuplesDeleted {
 #[macro_export]
 macro_rules! GistPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -594,7 +594,7 @@ macro_rules! GistPageGetDeleteXid {
 #[macro_export]
 macro_rules! GistPageGetNSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -615,7 +615,7 @@ macro_rules! GistPageGetNSN {
 #[macro_export]
 macro_rules! GistPageGetNSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -636,7 +636,7 @@ macro_rules! GistPageGetNSN {
 #[macro_export]
 macro_rules! GistPageGetNSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -657,7 +657,7 @@ macro_rules! GistPageGetNSN {
 #[macro_export]
 macro_rules! GistPageGetNSN {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -682,7 +682,7 @@ macro_rules! GistPageGetNSN {
 #[macro_export]
 macro_rules! GistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -703,7 +703,7 @@ macro_rules! GistPageGetOpaque {
 #[macro_export]
 macro_rules! GistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -724,7 +724,7 @@ macro_rules! GistPageGetOpaque {
 #[macro_export]
 macro_rules! GistPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -749,7 +749,7 @@ macro_rules! GistPageGetOpaque {
 #[macro_export]
 macro_rules! GistPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -770,7 +770,7 @@ macro_rules! GistPageHasGarbage {
 #[macro_export]
 macro_rules! GistPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -791,7 +791,7 @@ macro_rules! GistPageHasGarbage {
 #[macro_export]
 macro_rules! GistPageHasGarbage {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -816,7 +816,7 @@ macro_rules! GistPageHasGarbage {
 #[macro_export]
 macro_rules! GistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -837,7 +837,7 @@ macro_rules! GistPageIsDeleted {
 #[macro_export]
 macro_rules! GistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -858,7 +858,7 @@ macro_rules! GistPageIsDeleted {
 #[macro_export]
 macro_rules! GistPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -883,7 +883,7 @@ macro_rules! GistPageIsDeleted {
 #[macro_export]
 macro_rules! GistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -904,7 +904,7 @@ macro_rules! GistPageIsLeaf {
 #[macro_export]
 macro_rules! GistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -925,7 +925,7 @@ macro_rules! GistPageIsLeaf {
 #[macro_export]
 macro_rules! GistPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function GistPageSetDeleted from gist.h:203 (PostgreSQL 15–17), gist.h:206 (PostgreSQL 18–19)
@@ -956,7 +956,7 @@ macro_rules! GistPageIsLeaf {
 #[macro_export]
 macro_rules! GistPageSetDeleted {
     ($page:expr, $deletexid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -981,7 +981,7 @@ macro_rules! GistPageSetDeleted {
 #[macro_export]
 macro_rules! GistPageSetNSN {
     ($page:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1002,7 +1002,7 @@ macro_rules! GistPageSetNSN {
 #[macro_export]
 macro_rules! GistPageSetNSN {
     ($page:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -1023,7 +1023,7 @@ macro_rules! GistPageSetNSN {
 #[macro_export]
 macro_rules! GistPageSetNSN {
     ($page:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1044,7 +1044,7 @@ macro_rules! GistPageSetNSN {
 #[macro_export]
 macro_rules! GistPageSetNSN {
     ($page:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1069,7 +1069,7 @@ macro_rules! GistPageSetNSN {
 #[macro_export]
 macro_rules! GistTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1090,7 +1090,7 @@ macro_rules! GistTuplesDeleted {
 #[macro_export]
 macro_rules! GistTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1111,7 +1111,7 @@ macro_rules! GistTuplesDeleted {
 #[macro_export]
 macro_rules! GistTuplesDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro gistentryinit from gist.h:244 (PostgreSQL 15–17), gist.h:247 (PostgreSQL 18–19)
@@ -1129,7 +1129,7 @@ macro_rules! GistTuplesDeleted {
 #[macro_export]
 macro_rules! gistentryinit {
     ($e:expr, $k:expr, $r:expr, $pg:expr, $o:expr, $l:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GIST_LEAF;

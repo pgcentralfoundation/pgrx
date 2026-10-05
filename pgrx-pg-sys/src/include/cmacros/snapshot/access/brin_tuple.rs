@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! BrinTupleDataOffset {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BrinTupleHasNulls from brin_tuple.h:91 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! BrinTupleDataOffset {
 #[macro_export]
 macro_rules! BrinTupleHasNulls {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BrinTupleIsEmptyRange from brin_tuple.h:93 (PostgreSQL 15–19)
@@ -58,7 +58,7 @@ macro_rules! BrinTupleHasNulls {
 #[macro_export]
 macro_rules! BrinTupleIsEmptyRange {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BrinTupleIsPlaceholder from brin_tuple.h:92 (PostgreSQL 15–19)
@@ -78,7 +78,7 @@ macro_rules! BrinTupleIsEmptyRange {
 #[macro_export]
 macro_rules! BrinTupleIsPlaceholder {
     ($tup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BrinTupleDataOffset;

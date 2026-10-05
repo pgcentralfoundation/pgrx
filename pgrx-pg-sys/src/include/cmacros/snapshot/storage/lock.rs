@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! GET_VXID_FROM_PGPROC {
     ($vxid:expr, $proc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! GET_VXID_FROM_PGPROC {
 #[macro_export]
 macro_rules! GET_VXID_FROM_PGPROC {
     ($vxid_dst:expr, $proc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCALLOCK_LOCKMETHOD from lock.h:435 (PostgreSQL 15), lock.h:443 (PostgreSQL 16–17), lock.h:444 (PostgreSQL 18), lock.h:274 (PostgreSQL 19)
@@ -48,7 +48,7 @@ macro_rules! GET_VXID_FROM_PGPROC {
 #[macro_export]
 macro_rules! LOCALLOCK_LOCKMETHOD {
     ($llock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCALLOCK_LOCKTAG from lock.h:436 (PostgreSQL 15), lock.h:444 (PostgreSQL 16–17), lock.h:445 (PostgreSQL 18), lock.h:275 (PostgreSQL 19)
@@ -68,7 +68,7 @@ macro_rules! LOCALLOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! LOCALLOCK_LOCKTAG {
     ($llock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCKBIT_OFF from lock.h:90 (PostgreSQL 15), lock.h:85 (PostgreSQL 16–17), lock.h:86 (PostgreSQL 18), lock.h:88 (PostgreSQL 19)
@@ -88,7 +88,7 @@ macro_rules! LOCALLOCK_LOCKTAG {
 #[macro_export]
 macro_rules! LOCKBIT_OFF {
     ($lockmode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCKBIT_ON from lock.h:89 (PostgreSQL 15), lock.h:84 (PostgreSQL 16–17), lock.h:85 (PostgreSQL 18), lock.h:87 (PostgreSQL 19)
@@ -108,7 +108,7 @@ macro_rules! LOCKBIT_OFF {
 #[macro_export]
 macro_rules! LOCKBIT_ON {
     ($lockmode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCK_LOCKMETHOD from lock.h:316 (PostgreSQL 15), lock.h:324 (PostgreSQL 16–17), lock.h:325 (PostgreSQL 18), lock.h:155 (PostgreSQL 19)
@@ -128,7 +128,7 @@ macro_rules! LOCKBIT_ON {
 #[macro_export]
 macro_rules! LOCK_LOCKMETHOD {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LOCK_LOCKTAG from lock.h:317 (PostgreSQL 15), lock.h:325 (PostgreSQL 16–17), lock.h:326 (PostgreSQL 18), lock.h:156 (PostgreSQL 19)
@@ -148,7 +148,7 @@ macro_rules! LOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! LOCK_LOCKTAG {
     ($lock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LocalTransactionIdIsValid from lock.h:71 (PostgreSQL 15), lock.h:66 (PostgreSQL 16–17), lock.h:67 (PostgreSQL 18), lock.h:69 (PostgreSQL 19)
@@ -164,7 +164,7 @@ macro_rules! LOCK_LOCKTAG {
 #[macro_export]
 macro_rules! LocalTransactionIdIsValid {
     ($lxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LockHashPartition from lock.h:517 (PostgreSQL 15), lock.h:525 (PostgreSQL 16, 18), lock.h:524 (PostgreSQL 17), lock.h:355 (PostgreSQL 19)
@@ -184,7 +184,7 @@ macro_rules! LocalTransactionIdIsValid {
 #[macro_export]
 macro_rules! LockHashPartition {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LockHashPartitionLock from lock.h:519 (PostgreSQL 15), lock.h:527 (PostgreSQL 16, 18), lock.h:526 (PostgreSQL 17), lock.h:357 (PostgreSQL 19)
@@ -204,7 +204,7 @@ macro_rules! LockHashPartition {
 #[macro_export]
 macro_rules! LockHashPartitionLock {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LockHashPartitionLockByIndex from lock.h:522 (PostgreSQL 15), lock.h:530 (PostgreSQL 16, 18), lock.h:529 (PostgreSQL 17), lock.h:360 (PostgreSQL 19)
@@ -224,7 +224,7 @@ macro_rules! LockHashPartitionLock {
 #[macro_export]
 macro_rules! LockHashPartitionLockByIndex {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -245,7 +245,7 @@ macro_rules! LockHashPartitionLockByIndex {
 #[macro_export]
 macro_rules! LockHashPartitionLockByProc {
     ($leader_pgproc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -266,7 +266,7 @@ macro_rules! LockHashPartitionLockByProc {
 #[macro_export]
 macro_rules! LockHashPartitionLockByProc {
     ($leader_pgproc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PROCLOCK_LOCKMETHOD from lock.h:374 (PostgreSQL 15), lock.h:382 (PostgreSQL 16–17), lock.h:383 (PostgreSQL 18), lock.h:213 (PostgreSQL 19)
@@ -286,7 +286,7 @@ macro_rules! LockHashPartitionLockByProc {
 #[macro_export]
 macro_rules! PROCLOCK_LOCKMETHOD {
     ($proclock:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -303,7 +303,7 @@ macro_rules! PROCLOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! SET_LOCKTAG_ADVISORY {
     ($locktag:expr, $id1:expr, $id2:expr, $id3:expr, $id4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -320,7 +320,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
 #[macro_export]
 macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
     ($locktag:expr, $dboid:expr, $suboid:expr, $xid:expr, $objid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -337,7 +337,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
     ($locktag:expr, $dboid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -354,7 +354,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
 #[macro_export]
 macro_rules! SET_LOCKTAG_OBJECT {
     ($locktag:expr, $dboid:expr, $classoid:expr, $objoid:expr, $objsubid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -371,7 +371,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
 #[macro_export]
 macro_rules! SET_LOCKTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -388,7 +388,7 @@ macro_rules! SET_LOCKTAG_PAGE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -405,7 +405,7 @@ macro_rules! SET_LOCKTAG_RELATION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION_EXTEND {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -422,7 +422,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
 #[macro_export]
 macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
     ($locktag:expr, $xid:expr, $token:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -439,7 +439,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TRANSACTION {
     ($locktag:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -456,7 +456,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -473,7 +473,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -490,7 +490,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -507,7 +507,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
 #[macro_export]
 macro_rules! SetInvalidVirtualTransactionId {
     ($vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -524,7 +524,7 @@ macro_rules! SetInvalidVirtualTransactionId {
 #[macro_export]
 macro_rules! SetInvalidVirtualTransactionId {
     ($vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -541,7 +541,7 @@ macro_rules! SetInvalidVirtualTransactionId {
 #[macro_export]
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -558,7 +558,7 @@ macro_rules! VirtualTransactionIdEquals {
 #[macro_export]
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -575,7 +575,7 @@ macro_rules! VirtualTransactionIdEquals {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -592,7 +592,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro VirtualTransactionIdIsValid from lock.h:72 (PostgreSQL 15), lock.h:67 (PostgreSQL 16–17), lock.h:68 (PostgreSQL 18), lock.h:70 (PostgreSQL 19)
@@ -608,7 +608,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsValid {
     ($vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GET_VXID_FROM_PGPROC;

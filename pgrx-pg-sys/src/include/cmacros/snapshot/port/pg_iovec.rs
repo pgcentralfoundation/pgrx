@@ -54,7 +54,7 @@
 #[macro_export]
 macro_rules! pg_preadv {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -110,7 +110,7 @@ macro_rules! pg_preadv {
 #[macro_export]
 macro_rules! pg_preadv {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -166,7 +166,7 @@ macro_rules! pg_preadv {
 #[macro_export]
 macro_rules! pg_pwritev {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -222,7 +222,7 @@ macro_rules! pg_pwritev {
 #[macro_export]
 macro_rules! pg_pwritev {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

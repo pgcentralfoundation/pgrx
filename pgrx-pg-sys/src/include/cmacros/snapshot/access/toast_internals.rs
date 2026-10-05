@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! TOAST_COMPRESS_EXTSIZE {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TOAST_COMPRESS_METHOD from toast_internals.h:36 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
 #[macro_export]
 macro_rules! TOAST_COMPRESS_METHOD {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -65,7 +65,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
 #[macro_export]
 macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
     ($ptr:expr, $len:expr, $cm_method:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -88,7 +88,7 @@ macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
 #[macro_export]
 macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
     ($ptr:expr, $len:expr, $cm_method:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use TOAST_COMPRESS_EXTSIZE;

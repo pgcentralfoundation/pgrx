@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! IS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_NONWINDOWS_DIR_SEP from port.h:83 (PostgreSQL 15–19)
@@ -30,7 +30,7 @@ macro_rules! IS_DIR_SEP {
 #[macro_export]
 macro_rules! IS_NONWINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_WINDOWS_DIR_SEP from port.h:89 (PostgreSQL 15–19)
@@ -46,7 +46,7 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
 #[macro_export]
 macro_rules! IS_WINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro is_absolute_path from port.h:105 (PostgreSQL 15–19)
@@ -62,7 +62,7 @@ macro_rules! IS_WINDOWS_DIR_SEP {
 #[macro_export]
 macro_rules! is_absolute_path {
     ($filename:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro is_nonwindows_absolute_path from port.h:84 (PostgreSQL 15–19)
@@ -78,7 +78,7 @@ macro_rules! is_absolute_path {
 #[macro_export]
 macro_rules! is_nonwindows_absolute_path {
     ($filename:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro is_windows_absolute_path from port.h:91 (PostgreSQL 15–19)
@@ -98,7 +98,7 @@ macro_rules! is_nonwindows_absolute_path {
 #[macro_export]
 macro_rules! is_windows_absolute_path {
     ($filename:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -127,7 +127,7 @@ macro_rules! is_windows_absolute_path {
 #[macro_export]
 macro_rules! pg_ascii_tolower {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -156,7 +156,7 @@ macro_rules! pg_ascii_tolower {
 #[macro_export]
 macro_rules! pg_ascii_toupper {
     ($ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro qsort from port.h:531 (PostgreSQL 15), port.h:477 (PostgreSQL 16), port.h:481 (PostgreSQL 17), port.h:479 (PostgreSQL 18), port.h:496 (PostgreSQL 19)
@@ -176,7 +176,7 @@ macro_rules! pg_ascii_toupper {
 #[macro_export]
 macro_rules! qsort {
     ($a:expr, $b:expr, $c:expr, $d:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use IS_DIR_SEP;

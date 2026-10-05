@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! create_pathtarget {
     ($root:expr, $tlist:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use create_pathtarget;

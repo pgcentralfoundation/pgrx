@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! CreateCommandName {
     ($parsetree:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use CreateCommandName;

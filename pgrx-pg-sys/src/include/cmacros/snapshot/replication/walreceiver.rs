@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! AllowCascadeReplication {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg17")]
@@ -35,7 +35,7 @@ macro_rules! AllowCascadeReplication {
 #[macro_export]
 macro_rules! walrcv_alter_slot {
     ($conn:expr, $slotname:expr, $failover:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -56,7 +56,7 @@ macro_rules! walrcv_alter_slot {
 #[macro_export]
 macro_rules! walrcv_alter_slot {
     ($conn:expr, $slotname:expr, $failover:expr, $two_phase:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -77,7 +77,7 @@ macro_rules! walrcv_alter_slot {
 #[macro_export]
 macro_rules! walrcv_check_conninfo {
     ($conninfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -98,7 +98,7 @@ macro_rules! walrcv_check_conninfo {
 #[macro_export]
 macro_rules! walrcv_check_conninfo {
     ($conninfo:expr, $must_use_password:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:435 (PostgreSQL 15), walreceiver.h:441 (PostgreSQL 16), walreceiver.h:467 (PostgreSQL 17), walreceiver.h:470 (PostgreSQL 18), walreceiver.h:471 (PostgreSQL 19)
@@ -136,7 +136,7 @@ macro_rules! walrcv_check_conninfo {
 #[macro_export]
 macro_rules! walrcv_clear_result {
     ($walres:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -157,7 +157,7 @@ macro_rules! walrcv_clear_result {
 #[macro_export]
 macro_rules! walrcv_connect {
     ($conninfo:expr, $logical:expr, $appname:expr, $err:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -178,7 +178,7 @@ macro_rules! walrcv_connect {
 #[macro_export]
 macro_rules! walrcv_connect {
     ($conninfo:expr, $logical:expr, $must_use_password:expr, $appname:expr, $err:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -199,7 +199,7 @@ macro_rules! walrcv_connect {
 #[macro_export]
 macro_rules! walrcv_connect {
     ($conninfo:expr, $replication:expr, $logical:expr, $must_use_password:expr, $appname:expr, $err:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -220,7 +220,7 @@ macro_rules! walrcv_connect {
 #[macro_export]
 macro_rules! walrcv_create_slot {
     ($conn:expr, $slotname:expr, $temporary:expr, $two_phase:expr, $snapshot_action:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -241,7 +241,7 @@ macro_rules! walrcv_create_slot {
 #[macro_export]
 macro_rules! walrcv_create_slot {
     ($conn:expr, $slotname:expr, $temporary:expr, $two_phase:expr, $failover:expr, $snapshot_action:expr, $lsn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_disconnect from walreceiver.h:432 (PostgreSQL 15), walreceiver.h:438 (PostgreSQL 16), walreceiver.h:464 (PostgreSQL 17), walreceiver.h:467 (PostgreSQL 18), walreceiver.h:468 (PostgreSQL 19)
@@ -261,7 +261,7 @@ macro_rules! walrcv_create_slot {
 #[macro_export]
 macro_rules! walrcv_disconnect {
     ($conn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_endstreaming from walreceiver.h:420 (PostgreSQL 15), walreceiver.h:426 (PostgreSQL 16), walreceiver.h:450 (PostgreSQL 17), walreceiver.h:453 (PostgreSQL 18), walreceiver.h:454 (PostgreSQL 19)
@@ -281,7 +281,7 @@ macro_rules! walrcv_disconnect {
 #[macro_export]
 macro_rules! walrcv_endstreaming {
     ($conn:expr, $next_tli:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_exec from walreceiver.h:430 (PostgreSQL 15), walreceiver.h:436 (PostgreSQL 16), walreceiver.h:462 (PostgreSQL 17), walreceiver.h:465 (PostgreSQL 18), walreceiver.h:466 (PostgreSQL 19)
@@ -301,7 +301,7 @@ macro_rules! walrcv_endstreaming {
 #[macro_export]
 macro_rules! walrcv_exec {
     ($conn:expr, $exec:expr, $nRetTypes:expr, $retTypes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_get_backend_pid from walreceiver.h:428 (PostgreSQL 15), walreceiver.h:434 (PostgreSQL 16), walreceiver.h:460 (PostgreSQL 17), walreceiver.h:463 (PostgreSQL 18), walreceiver.h:464 (PostgreSQL 19)
@@ -321,7 +321,7 @@ macro_rules! walrcv_exec {
 #[macro_export]
 macro_rules! walrcv_get_backend_pid {
     ($conn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_get_conninfo from walreceiver.h:408 (PostgreSQL 15), walreceiver.h:414 (PostgreSQL 16), walreceiver.h:436 (PostgreSQL 17), walreceiver.h:439 (PostgreSQL 18), walreceiver.h:440 (PostgreSQL 19)
@@ -341,7 +341,7 @@ macro_rules! walrcv_get_backend_pid {
 #[macro_export]
 macro_rules! walrcv_get_conninfo {
     ($conn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -362,7 +362,7 @@ macro_rules! walrcv_get_conninfo {
 #[macro_export]
 macro_rules! walrcv_get_dbname_from_conninfo {
     ($conninfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_get_senderinfo from walreceiver.h:410 (PostgreSQL 15), walreceiver.h:416 (PostgreSQL 16), walreceiver.h:438 (PostgreSQL 17), walreceiver.h:441 (PostgreSQL 18), walreceiver.h:442 (PostgreSQL 19)
@@ -382,7 +382,7 @@ macro_rules! walrcv_get_dbname_from_conninfo {
 #[macro_export]
 macro_rules! walrcv_get_senderinfo {
     ($conn:expr, $sender_host:expr, $sender_port:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_identify_system from walreceiver.h:412 (PostgreSQL 15), walreceiver.h:418 (PostgreSQL 16), walreceiver.h:440 (PostgreSQL 17), walreceiver.h:443 (PostgreSQL 18), walreceiver.h:444 (PostgreSQL 19)
@@ -402,7 +402,7 @@ macro_rules! walrcv_get_senderinfo {
 #[macro_export]
 macro_rules! walrcv_identify_system {
     ($conn:expr, $primary_tli:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_readtimelinehistoryfile from walreceiver.h:416 (PostgreSQL 15), walreceiver.h:422 (PostgreSQL 16), walreceiver.h:446 (PostgreSQL 17), walreceiver.h:449 (PostgreSQL 18), walreceiver.h:450 (PostgreSQL 19)
@@ -422,7 +422,7 @@ macro_rules! walrcv_identify_system {
 #[macro_export]
 macro_rules! walrcv_readtimelinehistoryfile {
     ($conn:expr, $tli:expr, $filename:expr, $content:expr, $size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_receive from walreceiver.h:422 (PostgreSQL 15), walreceiver.h:428 (PostgreSQL 16), walreceiver.h:452 (PostgreSQL 17), walreceiver.h:455 (PostgreSQL 18), walreceiver.h:456 (PostgreSQL 19)
@@ -442,7 +442,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
 #[macro_export]
 macro_rules! walrcv_receive {
     ($conn:expr, $buffer:expr, $wait_fd:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_send from walreceiver.h:424 (PostgreSQL 15), walreceiver.h:430 (PostgreSQL 16), walreceiver.h:454 (PostgreSQL 17), walreceiver.h:457 (PostgreSQL 18), walreceiver.h:458 (PostgreSQL 19)
@@ -462,7 +462,7 @@ macro_rules! walrcv_receive {
 #[macro_export]
 macro_rules! walrcv_send {
     ($conn:expr, $buffer:expr, $nbytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_server_version from walreceiver.h:414 (PostgreSQL 15), walreceiver.h:420 (PostgreSQL 16), walreceiver.h:444 (PostgreSQL 17), walreceiver.h:447 (PostgreSQL 18), walreceiver.h:448 (PostgreSQL 19)
@@ -482,7 +482,7 @@ macro_rules! walrcv_send {
 #[macro_export]
 macro_rules! walrcv_server_version {
     ($conn:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro walrcv_startstreaming from walreceiver.h:418 (PostgreSQL 15), walreceiver.h:424 (PostgreSQL 16), walreceiver.h:448 (PostgreSQL 17), walreceiver.h:451 (PostgreSQL 18), walreceiver.h:452 (PostgreSQL 19)
@@ -502,7 +502,7 @@ macro_rules! walrcv_server_version {
 #[macro_export]
 macro_rules! walrcv_startstreaming {
     ($conn:expr, $options:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AllowCascadeReplication;

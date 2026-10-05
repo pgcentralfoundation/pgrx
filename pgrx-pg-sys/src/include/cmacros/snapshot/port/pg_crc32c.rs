@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! COMP_CRC32C {
     ($crc:expr, $data:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro EQ_CRC32C from pg_crc32c.h:42 (PostgreSQL 15–19)
@@ -35,7 +35,7 @@ macro_rules! COMP_CRC32C {
 #[macro_export]
 macro_rules! EQ_CRC32C {
     ($c1:expr, $c2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FIN_CRC32C from pg_crc32c.h:57 (PostgreSQL 15–17), pg_crc32c.h:122 (PostgreSQL 18), pg_crc32c.h:135 (PostgreSQL 19)
@@ -51,7 +51,7 @@ macro_rules! EQ_CRC32C {
 #[macro_export]
 macro_rules! FIN_CRC32C {
     ($crc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro INIT_CRC32C from pg_crc32c.h:41 (PostgreSQL 15–19)
@@ -67,7 +67,7 @@ macro_rules! FIN_CRC32C {
 #[macro_export]
 macro_rules! INIT_CRC32C {
     ($crc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

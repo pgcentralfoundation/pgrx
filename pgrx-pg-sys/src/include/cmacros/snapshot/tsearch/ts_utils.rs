@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! DatumGetTSQuerySign {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! DatumGetTSQuerySign {
 #[macro_export]
 macro_rules! DatumGetTSQuerySign {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ISOPERATOR from ts_utils.h:41 (PostgreSQL 15), ts_utils.h:43 (PostgreSQL 16–19)
@@ -62,7 +62,7 @@ macro_rules! DatumGetTSQuerySign {
 #[macro_export]
 macro_rules! ISOPERATOR {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -85,7 +85,7 @@ macro_rules! ISOPERATOR {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERYSIGN {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -108,7 +108,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERYSIGN {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -131,10 +131,10 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
 #[macro_export]
 macro_rules! PG_RETURN_TSQUERYSIGN {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -157,10 +157,10 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
 #[macro_export]
 macro_rules! PG_RETURN_TSQUERYSIGN {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -181,7 +181,7 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
 #[macro_export]
 macro_rules! TSQuerySignGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -208,7 +208,7 @@ macro_rules! TSQuerySignGetDatum {
 #[macro_export]
 macro_rules! TSQuerySignGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DatumGetTSQuerySign;

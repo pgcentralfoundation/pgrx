@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! AGGKIND_IS_ORDERED_SET {
     ($kind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AGGKIND_IS_ORDERED_SET;

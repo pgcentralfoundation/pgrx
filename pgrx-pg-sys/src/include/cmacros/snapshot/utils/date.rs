@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! DATE_IS_NOBEGIN {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DATE_IS_NOEND from date.h:42 (PostgreSQL 15–18), date.h:48 (PostgreSQL 19)
@@ -30,7 +30,7 @@ macro_rules! DATE_IS_NOBEGIN {
 #[macro_export]
 macro_rules! DATE_IS_NOEND {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DATE_NOBEGIN from date.h:39 (PostgreSQL 15–18), date.h:45 (PostgreSQL 19)
@@ -46,7 +46,7 @@ macro_rules! DATE_IS_NOEND {
 #[macro_export]
 macro_rules! DATE_NOBEGIN {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DATE_NOEND from date.h:41 (PostgreSQL 15–18), date.h:47 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! DATE_NOBEGIN {
 #[macro_export]
 macro_rules! DATE_NOEND {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DATE_NOT_FINITE from date.h:43 (PostgreSQL 15–18), date.h:49 (PostgreSQL 19)
@@ -78,7 +78,7 @@ macro_rules! DATE_NOEND {
 #[macro_export]
 macro_rules! DATE_NOT_FINITE {
     ($j:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -99,7 +99,7 @@ macro_rules! DATE_NOT_FINITE {
 #[macro_export]
 macro_rules! DateADTGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -126,7 +126,7 @@ macro_rules! DateADTGetDatum {
 #[macro_export]
 macro_rules! DateADTGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -147,7 +147,7 @@ macro_rules! DateADTGetDatum {
 #[macro_export]
 macro_rules! DatumGetDateADT {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -174,7 +174,7 @@ macro_rules! DatumGetDateADT {
 #[macro_export]
 macro_rules! DatumGetDateADT {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -195,7 +195,7 @@ macro_rules! DatumGetDateADT {
 #[macro_export]
 macro_rules! DatumGetTimeADT {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -222,7 +222,7 @@ macro_rules! DatumGetTimeADT {
 #[macro_export]
 macro_rules! DatumGetTimeADT {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -243,7 +243,7 @@ macro_rules! DatumGetTimeADT {
 #[macro_export]
 macro_rules! DatumGetTimeTzADTP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -270,7 +270,7 @@ macro_rules! DatumGetTimeTzADTP {
 #[macro_export]
 macro_rules! DatumGetTimeTzADTP {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -293,7 +293,7 @@ macro_rules! DatumGetTimeTzADTP {
 #[macro_export]
 macro_rules! PG_GETARG_DATEADT {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -316,7 +316,7 @@ macro_rules! PG_GETARG_DATEADT {
 #[macro_export]
 macro_rules! PG_GETARG_DATEADT {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -339,7 +339,7 @@ macro_rules! PG_GETARG_DATEADT {
 #[macro_export]
 macro_rules! PG_GETARG_TIMEADT {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -362,7 +362,7 @@ macro_rules! PG_GETARG_TIMEADT {
 #[macro_export]
 macro_rules! PG_GETARG_TIMEADT {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -385,7 +385,7 @@ macro_rules! PG_GETARG_TIMEADT {
 #[macro_export]
 macro_rules! PG_GETARG_TIMETZADT_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -408,7 +408,7 @@ macro_rules! PG_GETARG_TIMETZADT_P {
 #[macro_export]
 macro_rules! PG_GETARG_TIMETZADT_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -431,10 +431,10 @@ macro_rules! PG_GETARG_TIMETZADT_P {
 #[macro_export]
 macro_rules! PG_RETURN_DATEADT {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -457,10 +457,10 @@ macro_rules! PG_RETURN_DATEADT {
 #[macro_export]
 macro_rules! PG_RETURN_DATEADT {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -483,10 +483,10 @@ macro_rules! PG_RETURN_DATEADT {
 #[macro_export]
 macro_rules! PG_RETURN_TIMEADT {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -509,10 +509,10 @@ macro_rules! PG_RETURN_TIMEADT {
 #[macro_export]
 macro_rules! PG_RETURN_TIMEADT {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -535,10 +535,10 @@ macro_rules! PG_RETURN_TIMEADT {
 #[macro_export]
 macro_rules! PG_RETURN_TIMETZADT_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -561,10 +561,10 @@ macro_rules! PG_RETURN_TIMETZADT_P {
 #[macro_export]
 macro_rules! PG_RETURN_TIMETZADT_P {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -585,7 +585,7 @@ macro_rules! PG_RETURN_TIMETZADT_P {
 #[macro_export]
 macro_rules! TimeADTGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -612,7 +612,7 @@ macro_rules! TimeADTGetDatum {
 #[macro_export]
 macro_rules! TimeADTGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -633,7 +633,7 @@ macro_rules! TimeADTGetDatum {
 #[macro_export]
 macro_rules! TimeTzADTPGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -660,7 +660,7 @@ macro_rules! TimeTzADTPGetDatum {
 #[macro_export]
 macro_rules! TimeTzADTPGetDatum {
     ($X:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DATE_IS_NOBEGIN;

@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! EvalPlanQualSetSlot {
     ($epqstate:expr, $slot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecEvalExpr from executor.h:324 (PostgreSQL 15), executor.h:335 (PostgreSQL 16), executor.h:336 (PostgreSQL 17), executor.h:388 (PostgreSQL 18), executor.h:402 (PostgreSQL 19)
@@ -42,7 +42,7 @@ macro_rules! EvalPlanQualSetSlot {
 #[macro_export]
 macro_rules! ExecEvalExpr {
     ($state:expr, $econtext:expr, $isNull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -74,7 +74,7 @@ macro_rules! ExecEvalExpr {
 #[macro_export]
 macro_rules! ExecEvalExprNoReturn {
     ($state:expr, $econtext:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -106,7 +106,7 @@ macro_rules! ExecEvalExprNoReturn {
 #[macro_export]
 macro_rules! ExecEvalExprNoReturnSwitchContext {
     ($state:expr, $econtext:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecEvalExprSwitchContext from executor.h:339 (PostgreSQL 15), executor.h:350 (PostgreSQL 16), executor.h:351 (PostgreSQL 17), executor.h:431 (PostgreSQL 18), executor.h:445 (PostgreSQL 19)
@@ -140,7 +140,7 @@ macro_rules! ExecEvalExprNoReturnSwitchContext {
 #[macro_export]
 macro_rules! ExecEvalExprSwitchContext {
     ($state:expr, $econtext:expr, $isNull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecGetJunkAttribute from executor.h:177 (PostgreSQL 15), executor.h:189 (PostgreSQL 16–17), executor.h:220 (PostgreSQL 18), executor.h:225 (PostgreSQL 19)
@@ -167,7 +167,7 @@ macro_rules! ExecEvalExprSwitchContext {
 #[macro_export]
 macro_rules! ExecGetJunkAttribute {
     ($slot:expr, $attno:expr, $isNull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecProcNode from executor.h:260 (PostgreSQL 15), executor.h:271 (PostgreSQL 16), executor.h:272 (PostgreSQL 17), executor.h:309 (PostgreSQL 18), executor.h:321 (PostgreSQL 19)
@@ -196,7 +196,7 @@ macro_rules! ExecGetJunkAttribute {
 #[macro_export]
 macro_rules! ExecProcNode {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -244,7 +244,7 @@ macro_rules! ExecProcNode {
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -291,7 +291,7 @@ macro_rules! ExecProject {
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecQual from executor.h:404 (PostgreSQL 15), executor.h:415 (PostgreSQL 16), executor.h:416 (PostgreSQL 17), executor.h:514 (PostgreSQL 18), executor.h:528 (PostgreSQL 19)
@@ -332,7 +332,7 @@ macro_rules! ExecProject {
 #[macro_export]
 macro_rules! ExecQual {
     ($state:expr, $econtext:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:555 (PostgreSQL 19)
@@ -362,7 +362,7 @@ macro_rules! ExecQual {
 #[macro_export]
 macro_rules! ExecQualAndReset {
     ($state:expr, $econtext:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetPerTupleExprContext from executor.h:542 (PostgreSQL 15), executor.h:553 (PostgreSQL 16), executor.h:554 (PostgreSQL 17), executor.h:652 (PostgreSQL 18), executor.h:667 (PostgreSQL 19)
@@ -382,7 +382,7 @@ macro_rules! ExecQualAndReset {
 #[macro_export]
 macro_rules! GetPerTupleExprContext {
     ($estate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GetPerTupleMemoryContext from executor.h:547 (PostgreSQL 15), executor.h:558 (PostgreSQL 16), executor.h:559 (PostgreSQL 17), executor.h:657 (PostgreSQL 18), executor.h:672 (PostgreSQL 19)
@@ -402,7 +402,7 @@ macro_rules! GetPerTupleExprContext {
 #[macro_export]
 macro_rules! GetPerTupleMemoryContext {
     ($estate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ResetExprContext from executor.h:536 (PostgreSQL 15), executor.h:547 (PostgreSQL 16), executor.h:548 (PostgreSQL 17), executor.h:646 (PostgreSQL 18), executor.h:661 (PostgreSQL 19)
@@ -422,7 +422,7 @@ macro_rules! GetPerTupleMemoryContext {
 #[macro_export]
 macro_rules! ResetExprContext {
     ($econtext:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ResetPerTupleExprContext from executor.h:551 (PostgreSQL 15), executor.h:562 (PostgreSQL 16), executor.h:563 (PostgreSQL 17), executor.h:661 (PostgreSQL 18), executor.h:676 (PostgreSQL 19)
@@ -444,7 +444,7 @@ macro_rules! ResetExprContext {
 #[macro_export]
 macro_rules! ResetPerTupleExprContext {
     ($estate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -474,7 +474,7 @@ macro_rules! ResetPerTupleExprContext {
 #[macro_export]
 macro_rules! TupleHashEntryGetAdditional {
     ($hashtable:expr, $entry:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -501,7 +501,7 @@ macro_rules! TupleHashEntryGetAdditional {
 #[macro_export]
 macro_rules! TupleHashEntryGetTuple {
     ($entry:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -528,7 +528,7 @@ macro_rules! TupleHashEntryGetTuple {
 #[macro_export]
 macro_rules! TupleHashEntrySize {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:709 (PostgreSQL 19)
@@ -554,7 +554,7 @@ macro_rules! TupleHashEntrySize {
 #[macro_export]
 macro_rules! exec_rt_fetch {
     ($rti:expr, $estate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use EvalPlanQualSetSlot;

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! shm_toc_estimate_chunk {
     ($e:expr, $sz:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro shm_toc_estimate_keys from shm_toc.h:53 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! shm_toc_estimate_chunk {
 #[macro_export]
 macro_rules! shm_toc_estimate_keys {
     ($e:expr, $cnt:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro shm_toc_initialize_estimator from shm_toc.h:49 (PostgreSQL 15–19)
@@ -54,7 +54,7 @@ macro_rules! shm_toc_estimate_keys {
 #[macro_export]
 macro_rules! shm_toc_initialize_estimator {
     ($e:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use shm_toc_estimate_chunk;

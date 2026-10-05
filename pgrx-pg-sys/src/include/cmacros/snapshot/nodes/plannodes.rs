@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! RowMarkRequiresRowShareLock {
     ($marktype:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro exec_subplan_get_plan from plannodes.h:95 (PostgreSQL 15), plannodes.h:104 (PostgreSQL 16), plannodes.h:103 (PostgreSQL 17), plannodes.h:142 (PostgreSQL 18), plannodes.h:175 (PostgreSQL 19)
@@ -34,7 +34,7 @@ macro_rules! RowMarkRequiresRowShareLock {
 #[macro_export]
 macro_rules! exec_subplan_get_plan {
     ($plannedstmt:expr, $subplan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro innerPlan from plannodes.h:171 (PostgreSQL 15), plannodes.h:182 (PostgreSQL 16), plannodes.h:181 (PostgreSQL 17), plannodes.h:233 (PostgreSQL 18), plannodes.h:266 (PostgreSQL 19)
@@ -54,7 +54,7 @@ macro_rules! exec_subplan_get_plan {
 #[macro_export]
 macro_rules! innerPlan {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro outerPlan from plannodes.h:172 (PostgreSQL 15), plannodes.h:183 (PostgreSQL 16), plannodes.h:182 (PostgreSQL 17), plannodes.h:234 (PostgreSQL 18), plannodes.h:267 (PostgreSQL 19)
@@ -74,7 +74,7 @@ macro_rules! innerPlan {
 #[macro_export]
 macro_rules! outerPlan {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use RowMarkRequiresRowShareLock;

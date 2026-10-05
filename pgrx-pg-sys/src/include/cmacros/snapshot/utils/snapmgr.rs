@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! EarlyPruningEnabled {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InitDirtySnapshot from snapmgr.h:74 (PostgreSQL 15–16), snapmgr.h:40 (PostgreSQL 17), snapmgr.h:42 (PostgreSQL 18–19)
@@ -35,7 +35,7 @@ macro_rules! EarlyPruningEnabled {
 #[macro_export]
 macro_rules! InitDirtySnapshot {
     ($snapshotdata:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InitNonVacuumableSnapshot from snapmgr.h:82 (PostgreSQL 15–16), snapmgr.h:48 (PostgreSQL 17), snapmgr.h:50 (PostgreSQL 18–19)
@@ -51,7 +51,7 @@ macro_rules! InitDirtySnapshot {
 #[macro_export]
 macro_rules! InitNonVacuumableSnapshot {
     ($snapshotdata:expr, $vistestp:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -68,7 +68,7 @@ macro_rules! InitNonVacuumableSnapshot {
 #[macro_export]
 macro_rules! InitToastSnapshot {
     ($snapshotdata:expr, $l:expr, $w:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -85,7 +85,7 @@ macro_rules! InitToastSnapshot {
 #[macro_export]
 macro_rules! IsHistoricMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -102,7 +102,7 @@ macro_rules! IsHistoricMVCCSnapshot {
 #[macro_export]
 macro_rules! IsMVCCLikeSnapshot {
     ($snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -119,7 +119,7 @@ macro_rules! IsMVCCLikeSnapshot {
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -136,7 +136,7 @@ macro_rules! IsMVCCSnapshot {
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -157,7 +157,7 @@ macro_rules! IsMVCCSnapshot {
 #[macro_export]
 macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -184,7 +184,7 @@ macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
 #[macro_export]
 macro_rules! OldSnapshotThresholdActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -205,7 +205,7 @@ macro_rules! OldSnapshotThresholdActive {
 #[macro_export]
 macro_rules! RelationAllowsEarlyPruning {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SnapshotAny from snapmgr.h:67 (PostgreSQL 15–16), snapmgr.h:33 (PostgreSQL 17–19)
@@ -221,7 +221,7 @@ macro_rules! RelationAllowsEarlyPruning {
 #[macro_export]
 macro_rules! SnapshotAny {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SnapshotSelf from snapmgr.h:66 (PostgreSQL 15–16), snapmgr.h:32 (PostgreSQL 17–19)
@@ -237,7 +237,7 @@ macro_rules! SnapshotAny {
 #[macro_export]
 macro_rules! SnapshotSelf {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! OffsetNumberIsValid {
     ($offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OffsetNumberNext from off.h:52 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! OffsetNumberIsValid {
 #[macro_export]
 macro_rules! OffsetNumberNext {
     ($offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OffsetNumberPrev from off.h:54 (PostgreSQL 15–19)
@@ -58,7 +58,7 @@ macro_rules! OffsetNumberNext {
 #[macro_export]
 macro_rules! OffsetNumberPrev {
     ($offsetNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use OffsetNumberIsValid;

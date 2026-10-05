@@ -23,7 +23,7 @@
 #[macro_export]
 macro_rules! AttrNumberGetAttrOffset {
     ($attNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -44,7 +44,7 @@ macro_rules! AttrNumberGetAttrOffset {
 #[macro_export]
 macro_rules! AttrNumberGetAttrOffset {
     ($attNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AttrNumberIsForUserDefinedAttr from attnum.h:41 (PostgreSQL 15–19)
@@ -64,7 +64,7 @@ macro_rules! AttrNumberGetAttrOffset {
 #[macro_export]
 macro_rules! AttrNumberIsForUserDefinedAttr {
     ($attributeNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AttrOffsetGetAttrNumber from attnum.h:61 (PostgreSQL 15–19)
@@ -84,7 +84,7 @@ macro_rules! AttrNumberIsForUserDefinedAttr {
 #[macro_export]
 macro_rules! AttrOffsetGetAttrNumber {
     ($attributeOffset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AttributeNumberIsValid from attnum.h:34 (PostgreSQL 15–19)
@@ -104,7 +104,7 @@ macro_rules! AttrOffsetGetAttrNumber {
 #[macro_export]
 macro_rules! AttributeNumberIsValid {
     ($attributeNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AttrNumberGetAttrOffset;

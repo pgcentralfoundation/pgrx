@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! ItemIdGetFlags {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdGetLength from itemid.h:59 (PostgreSQL 15–19)
@@ -30,7 +30,7 @@ macro_rules! ItemIdGetFlags {
 #[macro_export]
 macro_rules! ItemIdGetLength {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdGetOffset from itemid.h:65 (PostgreSQL 15–19)
@@ -46,7 +46,7 @@ macro_rules! ItemIdGetLength {
 #[macro_export]
 macro_rules! ItemIdGetOffset {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdGetRedirect from itemid.h:78 (PostgreSQL 15–19)
@@ -62,7 +62,7 @@ macro_rules! ItemIdGetOffset {
 #[macro_export]
 macro_rules! ItemIdGetRedirect {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdHasStorage from itemid.h:120 (PostgreSQL 15–19)
@@ -78,7 +78,7 @@ macro_rules! ItemIdGetRedirect {
 #[macro_export]
 macro_rules! ItemIdHasStorage {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdIsDead from itemid.h:113 (PostgreSQL 15–19)
@@ -94,7 +94,7 @@ macro_rules! ItemIdHasStorage {
 #[macro_export]
 macro_rules! ItemIdIsDead {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdIsNormal from itemid.h:99 (PostgreSQL 15–19)
@@ -110,7 +110,7 @@ macro_rules! ItemIdIsDead {
 #[macro_export]
 macro_rules! ItemIdIsNormal {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdIsRedirected from itemid.h:106 (PostgreSQL 15–19)
@@ -126,7 +126,7 @@ macro_rules! ItemIdIsNormal {
 #[macro_export]
 macro_rules! ItemIdIsRedirected {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdIsUsed from itemid.h:92 (PostgreSQL 15–19)
@@ -142,7 +142,7 @@ macro_rules! ItemIdIsRedirected {
 #[macro_export]
 macro_rules! ItemIdIsUsed {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -163,7 +163,7 @@ macro_rules! ItemIdIsUsed {
 #[macro_export]
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -184,7 +184,7 @@ macro_rules! ItemIdIsValid {
 #[macro_export]
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdMarkDead from itemid.h:179 (PostgreSQL 15–19)
@@ -200,7 +200,7 @@ macro_rules! ItemIdIsValid {
 #[macro_export]
 macro_rules! ItemIdMarkDead {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdSetDead from itemid.h:164 (PostgreSQL 15–19)
@@ -216,7 +216,7 @@ macro_rules! ItemIdMarkDead {
 #[macro_export]
 macro_rules! ItemIdSetDead {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdSetNormal from itemid.h:140 (PostgreSQL 15–19)
@@ -232,7 +232,7 @@ macro_rules! ItemIdSetDead {
 #[macro_export]
 macro_rules! ItemIdSetNormal {
     ($itemId:expr, $off:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdSetRedirect from itemid.h:152 (PostgreSQL 15–19)
@@ -248,7 +248,7 @@ macro_rules! ItemIdSetNormal {
 #[macro_export]
 macro_rules! ItemIdSetRedirect {
     ($itemId:expr, $link:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ItemIdSetUnused from itemid.h:128 (PostgreSQL 15–19)
@@ -264,7 +264,7 @@ macro_rules! ItemIdSetRedirect {
 #[macro_export]
 macro_rules! ItemIdSetUnused {
     ($itemId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ItemIdGetFlags;

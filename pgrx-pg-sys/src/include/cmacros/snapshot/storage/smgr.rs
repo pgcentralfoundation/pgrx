@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! SmgrIsTemp {
 #[macro_export]
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -60,7 +60,7 @@ macro_rules! SmgrIsTemp {
 #[macro_export]
 macro_rules! smgrread {
     ($reln:expr, $forknum:expr, $blocknum:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -88,7 +88,7 @@ macro_rules! smgrread {
 #[macro_export]
 macro_rules! smgrwrite {
     ($reln:expr, $forknum:expr, $blocknum:expr, $buffer:expr, $skipFsync:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use SmgrIsTemp;

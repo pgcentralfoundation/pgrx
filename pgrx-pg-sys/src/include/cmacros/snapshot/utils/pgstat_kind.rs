@@ -25,7 +25,7 @@
 #[macro_export]
 macro_rules! pgstat_is_kind_builtin {
     ($kind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -52,7 +52,7 @@ macro_rules! pgstat_is_kind_builtin {
 #[macro_export]
 macro_rules! pgstat_is_kind_custom {
     ($kind:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

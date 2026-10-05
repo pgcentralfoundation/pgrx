@@ -25,7 +25,7 @@
 #[macro_export]
 macro_rules! pgstat_report_wait_end {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pgstat_report_wait_start from wait_event.h:266 (PostgreSQL 15), wait_event.h:271 (PostgreSQL 16), wait_event.h:84 (PostgreSQL 17), wait_event.h:68 (PostgreSQL 18), wait_event.h:66 (PostgreSQL 19)
@@ -55,7 +55,7 @@ macro_rules! pgstat_report_wait_end {
 #[macro_export]
 macro_rules! pgstat_report_wait_start {
     ($wait_event_info:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pgstat_report_wait_end;

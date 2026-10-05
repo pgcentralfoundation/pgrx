@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! rt_fetch {
     ($rangetable_index:expr, $rangetable:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use rt_fetch;

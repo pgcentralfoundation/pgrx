@@ -25,7 +25,7 @@
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u32 {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_add_fetch_u64 from atomics.h:503 (PostgreSQL 15), atomics.h:498 (PostgreSQL 16), atomics.h:553 (PostgreSQL 17), atomics.h:558 (PostgreSQL 18), atomics.h:568 (PostgreSQL 19)
@@ -54,7 +54,7 @@ macro_rules! pg_atomic_add_fetch_u32 {
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u64 {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_clear_flag from atomics.h:208 (PostgreSQL 15), atomics.h:203 (PostgreSQL 16), atomics.h:201 (PostgreSQL 17), atomics.h:206 (PostgreSQL 18), atomics.h:204 (PostgreSQL 19)
@@ -80,7 +80,7 @@ macro_rules! pg_atomic_add_fetch_u64 {
 #[macro_export]
 macro_rules! pg_atomic_clear_flag {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_compare_exchange_u32 from atomics.h:310 (PostgreSQL 15), atomics.h:305 (PostgreSQL 16), atomics.h:343 (PostgreSQL 17), atomics.h:348 (PostgreSQL 18–19)
@@ -110,7 +110,7 @@ macro_rules! pg_atomic_clear_flag {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u32 {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -142,7 +142,7 @@ macro_rules! pg_atomic_compare_exchange_u32 {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u64 {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -173,7 +173,7 @@ macro_rules! pg_atomic_compare_exchange_u64 {
 #[macro_export]
 macro_rules! pg_atomic_compare_exchange_u64 {
     ($ptr:expr, $expected:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_exchange_u32 from atomics.h:291 (PostgreSQL 15), atomics.h:286 (PostgreSQL 16), atomics.h:324 (PostgreSQL 17), atomics.h:329 (PostgreSQL 18–19)
@@ -201,7 +201,7 @@ macro_rules! pg_atomic_compare_exchange_u64 {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u32 {
     ($ptr:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_exchange_u64 from atomics.h:446 (PostgreSQL 15), atomics.h:441 (PostgreSQL 16), atomics.h:497 (PostgreSQL 17), atomics.h:502 (PostgreSQL 18), atomics.h:512 (PostgreSQL 19)
@@ -230,7 +230,7 @@ macro_rules! pg_atomic_exchange_u32 {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u64 {
     ($ptr:expr, $newval:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u32 from atomics.h:327 (PostgreSQL 15), atomics.h:322 (PostgreSQL 16), atomics.h:360 (PostgreSQL 17), atomics.h:365 (PostgreSQL 18–19)
@@ -257,7 +257,7 @@ macro_rules! pg_atomic_exchange_u64 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_add_u32 {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u64 from atomics.h:466 (PostgreSQL 15), atomics.h:461 (PostgreSQL 16), atomics.h:516 (PostgreSQL 17), atomics.h:521 (PostgreSQL 18), atomics.h:531 (PostgreSQL 19)
@@ -286,7 +286,7 @@ macro_rules! pg_atomic_fetch_add_u32 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_add_u64 {
     ($ptr:expr, $add_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_and_u32 from atomics.h:357 (PostgreSQL 15), atomics.h:352 (PostgreSQL 16), atomics.h:390 (PostgreSQL 17), atomics.h:395 (PostgreSQL 18–19)
@@ -313,7 +313,7 @@ macro_rules! pg_atomic_fetch_add_u64 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_and_u32 {
     ($ptr:expr, $and_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_and_u64 from atomics.h:485 (PostgreSQL 15), atomics.h:480 (PostgreSQL 16), atomics.h:535 (PostgreSQL 17), atomics.h:540 (PostgreSQL 18), atomics.h:550 (PostgreSQL 19)
@@ -342,7 +342,7 @@ macro_rules! pg_atomic_fetch_and_u32 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_and_u64 {
     ($ptr:expr, $and_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_or_u32 from atomics.h:371 (PostgreSQL 15), atomics.h:366 (PostgreSQL 16), atomics.h:404 (PostgreSQL 17), atomics.h:409 (PostgreSQL 18–19)
@@ -369,7 +369,7 @@ macro_rules! pg_atomic_fetch_and_u64 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_or_u32 {
     ($ptr:expr, $or_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_or_u64 from atomics.h:494 (PostgreSQL 15), atomics.h:489 (PostgreSQL 16), atomics.h:544 (PostgreSQL 17), atomics.h:549 (PostgreSQL 18), atomics.h:559 (PostgreSQL 19)
@@ -398,7 +398,7 @@ macro_rules! pg_atomic_fetch_or_u32 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_or_u64 {
     ($ptr:expr, $or_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_sub_u32 from atomics.h:342 (PostgreSQL 15), atomics.h:337 (PostgreSQL 16), atomics.h:375 (PostgreSQL 17), atomics.h:380 (PostgreSQL 18–19)
@@ -426,7 +426,7 @@ macro_rules! pg_atomic_fetch_or_u64 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_sub_u32 {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_sub_u64 from atomics.h:475 (PostgreSQL 15), atomics.h:470 (PostgreSQL 16), atomics.h:525 (PostgreSQL 17), atomics.h:530 (PostgreSQL 18), atomics.h:540 (PostgreSQL 19)
@@ -456,7 +456,7 @@ macro_rules! pg_atomic_fetch_sub_u32 {
 #[macro_export]
 macro_rules! pg_atomic_fetch_sub_u64 {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_flag from atomics.h:171 (PostgreSQL 15), atomics.h:166 (PostgreSQL 16), atomics.h:164 (PostgreSQL 17), atomics.h:169 (PostgreSQL 18), atomics.h:167 (PostgreSQL 19)
@@ -482,7 +482,7 @@ macro_rules! pg_atomic_fetch_sub_u64 {
 #[macro_export]
 macro_rules! pg_atomic_init_flag {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u32 from atomics.h:222 (PostgreSQL 15), atomics.h:217 (PostgreSQL 16), atomics.h:215 (PostgreSQL 17), atomics.h:220 (PostgreSQL 18), atomics.h:218 (PostgreSQL 19)
@@ -510,7 +510,7 @@ macro_rules! pg_atomic_init_flag {
 #[macro_export]
 macro_rules! pg_atomic_init_u32 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u64 from atomics.h:414 (PostgreSQL 15), atomics.h:409 (PostgreSQL 16), atomics.h:447 (PostgreSQL 17), atomics.h:452 (PostgreSQL 18–19)
@@ -544,7 +544,7 @@ macro_rules! pg_atomic_init_u32 {
 #[macro_export]
 macro_rules! pg_atomic_init_u64 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -590,7 +590,7 @@ macro_rules! pg_atomic_init_u64 {
 #[macro_export]
 macro_rules! pg_atomic_monotonic_advance_u64 {
     ($ptr:expr, $target:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -619,7 +619,7 @@ macro_rules! pg_atomic_monotonic_advance_u64 {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u32 {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -649,7 +649,7 @@ macro_rules! pg_atomic_read_membarrier_u32 {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u64 {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u32 from atomics.h:240 (PostgreSQL 15), atomics.h:235 (PostgreSQL 16), atomics.h:233 (PostgreSQL 17), atomics.h:238 (PostgreSQL 18), atomics.h:236 (PostgreSQL 19)
@@ -676,7 +676,7 @@ macro_rules! pg_atomic_read_membarrier_u64 {
 #[macro_export]
 macro_rules! pg_atomic_read_u32 {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u64 from atomics.h:428 (PostgreSQL 15), atomics.h:423 (PostgreSQL 16), atomics.h:461 (PostgreSQL 17), atomics.h:466 (PostgreSQL 18–19)
@@ -705,7 +705,7 @@ macro_rules! pg_atomic_read_u32 {
 #[macro_export]
 macro_rules! pg_atomic_read_u64 {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u32 from atomics.h:400 (PostgreSQL 15), atomics.h:395 (PostgreSQL 16), atomics.h:433 (PostgreSQL 17), atomics.h:438 (PostgreSQL 18–19)
@@ -733,7 +733,7 @@ macro_rules! pg_atomic_read_u64 {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u32 {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u64 from atomics.h:512 (PostgreSQL 15), atomics.h:507 (PostgreSQL 16), atomics.h:562 (PostgreSQL 17), atomics.h:567 (PostgreSQL 18), atomics.h:577 (PostgreSQL 19)
@@ -763,7 +763,7 @@ macro_rules! pg_atomic_sub_fetch_u32 {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u64 {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_test_set_flag from atomics.h:184 (PostgreSQL 15), atomics.h:179 (PostgreSQL 16), atomics.h:177 (PostgreSQL 17), atomics.h:182 (PostgreSQL 18), atomics.h:180 (PostgreSQL 19)
@@ -789,7 +789,7 @@ macro_rules! pg_atomic_sub_fetch_u64 {
 #[macro_export]
 macro_rules! pg_atomic_test_set_flag {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_unlocked_test_flag from atomics.h:197 (PostgreSQL 15), atomics.h:192 (PostgreSQL 16), atomics.h:190 (PostgreSQL 17), atomics.h:195 (PostgreSQL 18), atomics.h:193 (PostgreSQL 19)
@@ -815,7 +815,7 @@ macro_rules! pg_atomic_test_set_flag {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_test_flag {
     ($ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_unlocked_write_u32 from atomics.h:276 (PostgreSQL 15), atomics.h:271 (PostgreSQL 16), atomics.h:289 (PostgreSQL 17), atomics.h:294 (PostgreSQL 18–19)
@@ -843,7 +843,7 @@ macro_rules! pg_atomic_unlocked_test_flag {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u32 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -874,7 +874,7 @@ macro_rules! pg_atomic_unlocked_write_u32 {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u64 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -903,7 +903,7 @@ macro_rules! pg_atomic_unlocked_write_u64 {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u32 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -933,7 +933,7 @@ macro_rules! pg_atomic_write_membarrier_u32 {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u64 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u32 from atomics.h:257 (PostgreSQL 15), atomics.h:252 (PostgreSQL 16), atomics.h:270 (PostgreSQL 17), atomics.h:275 (PostgreSQL 18), atomics.h:273 (PostgreSQL 19)
@@ -961,7 +961,7 @@ macro_rules! pg_atomic_write_membarrier_u64 {
 #[macro_export]
 macro_rules! pg_atomic_write_u32 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u64 from atomics.h:437 (PostgreSQL 15), atomics.h:432 (PostgreSQL 16), atomics.h:479 (PostgreSQL 17), atomics.h:484 (PostgreSQL 18–19)
@@ -990,7 +990,7 @@ macro_rules! pg_atomic_write_u32 {
 #[macro_export]
 macro_rules! pg_atomic_write_u64 {
     ($ptr:expr, $val:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pg_spin_delay from atomics.h:164 (PostgreSQL 15), atomics.h:159 (PostgreSQL 16), atomics.h:157 (PostgreSQL 17), atomics.h:162 (PostgreSQL 18), atomics.h:160 (PostgreSQL 19)
@@ -1010,7 +1010,7 @@ macro_rules! pg_atomic_write_u64 {
 #[macro_export]
 macro_rules! pg_spin_delay {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pg_atomic_add_fetch_u32;

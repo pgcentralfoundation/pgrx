@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! partition_bound_accepts_nulls {
     ($bi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro partition_bound_has_default from partbounds.h:99 (PostgreSQL 15–19)
@@ -38,7 +38,7 @@ macro_rules! partition_bound_accepts_nulls {
 #[macro_export]
 macro_rules! partition_bound_has_default {
     ($bi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use partition_bound_accepts_nulls;

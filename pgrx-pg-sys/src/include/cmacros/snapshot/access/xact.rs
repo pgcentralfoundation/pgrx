@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! IsolationIsSerializable {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IsolationUsesXactSnapshot from xact.h:51 (PostgreSQL 15–18), xact.h:52 (PostgreSQL 19)
@@ -30,7 +30,7 @@ macro_rules! IsolationIsSerializable {
 #[macro_export]
 macro_rules! IsolationUsesXactSnapshot {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XactCompletionApplyFeedback from xact.h:211 (PostgreSQL 15–18), xact.h:212 (PostgreSQL 19)
@@ -46,7 +46,7 @@ macro_rules! IsolationUsesXactSnapshot {
 #[macro_export]
 macro_rules! XactCompletionApplyFeedback {
     ($xinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XactCompletionForceSyncCommit from xact.h:215 (PostgreSQL 15–18), xact.h:216 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! XactCompletionApplyFeedback {
 #[macro_export]
 macro_rules! XactCompletionForceSyncCommit {
     ($xinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XactCompletionRelcacheInitFileInval from xact.h:213 (PostgreSQL 15–18), xact.h:214 (PostgreSQL 19)
@@ -78,7 +78,7 @@ macro_rules! XactCompletionForceSyncCommit {
 #[macro_export]
 macro_rules! XactCompletionRelcacheInitFileInval {
     ($xinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use IsolationIsSerializable;

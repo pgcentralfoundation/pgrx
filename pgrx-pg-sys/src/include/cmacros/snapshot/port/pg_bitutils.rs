@@ -27,7 +27,7 @@
 #[macro_export]
 macro_rules! pg_ceil_log2_32 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_ceil_log2_64 from pg_bitutils.h:241 (PostgreSQL 15), pg_bitutils.h:266 (PostgreSQL 16), pg_bitutils.h:270 (PostgreSQL 17–19)
@@ -56,7 +56,7 @@ macro_rules! pg_ceil_log2_32 {
 #[macro_export]
 macro_rules! pg_ceil_log2_64 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -96,7 +96,7 @@ macro_rules! pg_ceil_log2_64 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -143,7 +143,7 @@ macro_rules! pg_leftmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -191,7 +191,7 @@ macro_rules! pg_leftmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -237,7 +237,7 @@ macro_rules! pg_leftmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -291,7 +291,7 @@ macro_rules! pg_leftmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg17")]
@@ -346,7 +346,7 @@ macro_rules! pg_leftmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -401,7 +401,7 @@ macro_rules! pg_leftmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_leftmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_nextpower2_32 from pg_bitutils.h:139 (PostgreSQL 15), pg_bitutils.h:184 (PostgreSQL 16), pg_bitutils.h:188 (PostgreSQL 17–19)
@@ -437,7 +437,7 @@ macro_rules! pg_leftmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_nextpower2_32 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_nextpower2_64 from pg_bitutils.h:162 (PostgreSQL 15), pg_bitutils.h:207 (PostgreSQL 16), pg_bitutils.h:211 (PostgreSQL 17–19)
@@ -473,7 +473,7 @@ macro_rules! pg_nextpower2_32 {
 #[macro_export]
 macro_rules! pg_nextpower2_64 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -494,7 +494,7 @@ macro_rules! pg_nextpower2_64 {
 #[macro_export]
 macro_rules! pg_nextpower2_size_t {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -540,7 +540,7 @@ macro_rules! pg_nextpower2_size_t {
 #[macro_export]
 macro_rules! pg_popcount {
     ($buf:expr, $bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -580,7 +580,7 @@ macro_rules! pg_popcount {
 #[macro_export]
 macro_rules! pg_popcount {
     ($buf:expr, $bytes:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -609,7 +609,7 @@ macro_rules! pg_popcount {
 #[macro_export]
 macro_rules! pg_popcount32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -640,7 +640,7 @@ macro_rules! pg_popcount32 {
 #[macro_export]
 macro_rules! pg_popcount64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -686,7 +686,7 @@ macro_rules! pg_popcount64 {
 #[macro_export]
 macro_rules! pg_popcount_masked {
     ($buf:expr, $bytes:expr, $mask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -726,7 +726,7 @@ macro_rules! pg_popcount_masked {
 #[macro_export]
 macro_rules! pg_popcount_masked {
     ($buf:expr, $bytes:expr, $mask:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_prevpower2_32 from pg_bitutils.h:195 (PostgreSQL 15), pg_bitutils.h:230 (PostgreSQL 16), pg_bitutils.h:234 (PostgreSQL 17–19)
@@ -752,7 +752,7 @@ macro_rules! pg_popcount_masked {
 #[macro_export]
 macro_rules! pg_prevpower2_32 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_prevpower2_64 from pg_bitutils.h:208 (PostgreSQL 15), pg_bitutils.h:243 (PostgreSQL 16), pg_bitutils.h:247 (PostgreSQL 17–19)
@@ -778,7 +778,7 @@ macro_rules! pg_prevpower2_32 {
 #[macro_export]
 macro_rules! pg_prevpower2_64 {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -799,7 +799,7 @@ macro_rules! pg_prevpower2_64 {
 #[macro_export]
 macro_rules! pg_prevpower2_size_t {
     ($num:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -842,7 +842,7 @@ macro_rules! pg_prevpower2_size_t {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -892,7 +892,7 @@ macro_rules! pg_rightmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -943,7 +943,7 @@ macro_rules! pg_rightmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos32 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -992,7 +992,7 @@ macro_rules! pg_rightmost_one_pos32 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -1049,7 +1049,7 @@ macro_rules! pg_rightmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg17")]
@@ -1107,7 +1107,7 @@ macro_rules! pg_rightmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1165,7 +1165,7 @@ macro_rules! pg_rightmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_rightmost_one_pos64 {
     ($word:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_rotate_left32 from pg_bitutils.h:296 (PostgreSQL 15), pg_bitutils.h:321 (PostgreSQL 16), pg_bitutils.h:403 (PostgreSQL 17), pg_bitutils.h:427 (PostgreSQL 18), pg_bitutils.h:399 (PostgreSQL 19)
@@ -1191,7 +1191,7 @@ macro_rules! pg_rightmost_one_pos64 {
 #[macro_export]
 macro_rules! pg_rotate_left32 {
     ($word:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function pg_rotate_right32 from pg_bitutils.h:290 (PostgreSQL 15), pg_bitutils.h:315 (PostgreSQL 16), pg_bitutils.h:397 (PostgreSQL 17), pg_bitutils.h:421 (PostgreSQL 18), pg_bitutils.h:393 (PostgreSQL 19)
@@ -1217,7 +1217,7 @@ macro_rules! pg_rotate_left32 {
 #[macro_export]
 macro_rules! pg_rotate_right32 {
     ($word:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pg_ceil_log2_32;

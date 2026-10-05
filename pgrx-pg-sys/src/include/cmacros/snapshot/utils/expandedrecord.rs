@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! ExpandedRecordGetDatum {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +46,7 @@ macro_rules! ExpandedRecordGetDatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetDatum {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +67,7 @@ macro_rules! ExpandedRecordGetDatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetRODatum {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -94,7 +94,7 @@ macro_rules! ExpandedRecordGetRODatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetRODatum {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ExpandedRecordIsDomain from expandedrecord.h:150 (PostgreSQL 15), expandedrecord.h:160 (PostgreSQL 16–19)
@@ -110,7 +110,7 @@ macro_rules! ExpandedRecordGetRODatum {
 #[macro_export]
 macro_rules! ExpandedRecordIsDomain {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ExpandedRecordIsEmpty from expandedrecord.h:148 (PostgreSQL 15), expandedrecord.h:158 (PostgreSQL 16–19)
@@ -126,7 +126,7 @@ macro_rules! ExpandedRecordIsDomain {
 #[macro_export]
 macro_rules! ExpandedRecordIsEmpty {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_GETARG_EXPANDED_RECORD from expandedrecord.h:142 (PostgreSQL 15), expandedrecord.h:154 (PostgreSQL 16–19)
@@ -148,7 +148,7 @@ macro_rules! ExpandedRecordIsEmpty {
 #[macro_export]
 macro_rules! PG_GETARG_EXPANDED_RECORD {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -171,10 +171,10 @@ macro_rules! PG_GETARG_EXPANDED_RECORD {
 #[macro_export]
 macro_rules! PG_RETURN_EXPANDED_RECORD {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -197,10 +197,10 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
 #[macro_export]
 macro_rules! PG_RETURN_EXPANDED_RECORD {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
     (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransferExpandedRecord from expandedrecord.h:154 (PostgreSQL 15), expandedrecord.h:164 (PostgreSQL 16–19)
@@ -220,7 +220,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
 #[macro_export]
 macro_rules! TransferExpandedRecord {
     ($erh:expr, $cxt:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_field from expandedrecord.h:217 (PostgreSQL 15), expandedrecord.h:227 (PostgreSQL 16–19)
@@ -254,7 +254,7 @@ macro_rules! TransferExpandedRecord {
 #[macro_export]
 macro_rules! expanded_record_get_field {
     ($erh:expr, $fnumber:expr, $isnull:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_tupdesc from expandedrecord.h:207 (PostgreSQL 15), expandedrecord.h:217 (PostgreSQL 16–19)
@@ -283,7 +283,7 @@ macro_rules! expanded_record_get_field {
 #[macro_export]
 macro_rules! expanded_record_get_tupdesc {
     ($erh:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro expanded_record_set_field from expandedrecord.h:198 (PostgreSQL 15), expandedrecord.h:208 (PostgreSQL 16–19)
@@ -303,7 +303,7 @@ macro_rules! expanded_record_get_tupdesc {
 #[macro_export]
 macro_rules! expanded_record_set_field {
     ($erh:expr, $fnumber:expr, $newValue:expr, $isnull:expr, $expand_external:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ExpandedRecordGetDatum;

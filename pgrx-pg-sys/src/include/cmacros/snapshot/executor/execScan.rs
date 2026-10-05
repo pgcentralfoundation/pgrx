@@ -114,7 +114,7 @@
 #[macro_export]
 macro_rules! ExecScanExtended {
     ($node:expr, $accessMtd:expr, $recheckMtd:expr, $epqstate:expr, $qual:expr, $projInfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -241,7 +241,7 @@ macro_rules! ExecScanExtended {
 #[macro_export]
 macro_rules! ExecScanFetch {
     ($node:expr, $epqstate:expr, $accessMtd:expr, $recheckMtd:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! CALLED_AS_TRIGGER {
     ($fcinfo:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_AFTER from trigger.h:133 (PostgreSQL 15–19)
@@ -34,7 +34,7 @@ macro_rules! CALLED_AS_TRIGGER {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_AFTER {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_BEFORE from trigger.h:130 (PostgreSQL 15–19)
@@ -50,7 +50,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BEFORE {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_BY_DELETE from trigger.h:115 (PostgreSQL 15–19)
@@ -66,7 +66,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_DELETE {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_BY_INSERT from trigger.h:112 (PostgreSQL 15–19)
@@ -82,7 +82,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_INSERT {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_BY_TRUNCATE from trigger.h:121 (PostgreSQL 15–19)
@@ -98,7 +98,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_BY_UPDATE from trigger.h:118 (PostgreSQL 15–19)
@@ -114,7 +114,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_UPDATE {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_FOR_ROW from trigger.h:124 (PostgreSQL 15–19)
@@ -130,7 +130,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_ROW {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_FOR_STATEMENT from trigger.h:127 (PostgreSQL 15–19)
@@ -146,7 +146,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TRIGGER_FIRED_INSTEAD from trigger.h:136 (PostgreSQL 15–19)
@@ -162,7 +162,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_INSTEAD {
     ($event:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use CALLED_AS_TRIGGER;

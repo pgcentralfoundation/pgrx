@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! DO_AGGSPLIT_COMBINE {
     ($as:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DO_AGGSPLIT_DESERIALIZE from nodes.h:813 (PostgreSQL 15), nodes.h:398 (PostgreSQL 16, 19), nodes.h:387 (PostgreSQL 17), nodes.h:394 (PostgreSQL 18)
@@ -30,7 +30,7 @@ macro_rules! DO_AGGSPLIT_COMBINE {
 #[macro_export]
 macro_rules! DO_AGGSPLIT_DESERIALIZE {
     ($as:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DO_AGGSPLIT_SERIALIZE from nodes.h:812 (PostgreSQL 15), nodes.h:397 (PostgreSQL 16, 19), nodes.h:386 (PostgreSQL 17), nodes.h:393 (PostgreSQL 18)
@@ -46,7 +46,7 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
 #[macro_export]
 macro_rules! DO_AGGSPLIT_SERIALIZE {
     ($as:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DO_AGGSPLIT_SKIPFINAL from nodes.h:811 (PostgreSQL 15), nodes.h:396 (PostgreSQL 16, 19), nodes.h:385 (PostgreSQL 17), nodes.h:392 (PostgreSQL 18)
@@ -62,7 +62,7 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
 #[macro_export]
 macro_rules! DO_AGGSPLIT_SKIPFINAL {
     ($as:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -83,7 +83,7 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
 #[macro_export]
 macro_rules! IS_OUTER_JOIN {
     ($jointype:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -104,7 +104,7 @@ macro_rules! IS_OUTER_JOIN {
 #[macro_export]
 macro_rules! IS_OUTER_JOIN {
     ($jointype:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NodeSetTag from nodes.h:594 (PostgreSQL 15), nodes.h:177 (PostgreSQL 16), nodes.h:156 (PostgreSQL 17), nodes.h:162 (PostgreSQL 18–19)
@@ -124,7 +124,7 @@ macro_rules! IS_OUTER_JOIN {
 #[macro_export]
 macro_rules! NodeSetTag {
     ($nodeptr:expr, $t:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -145,7 +145,7 @@ macro_rules! NodeSetTag {
 #[macro_export]
 macro_rules! castNode {
     ($_type_:ty, $nodeptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -173,7 +173,7 @@ macro_rules! castNode {
 #[macro_export]
 macro_rules! castNodeImpl {
     ($type:expr, $ptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -206,7 +206,7 @@ macro_rules! castNodeImpl {
 #[macro_export]
 macro_rules! newNode {
     ($size:expr, $tag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro nodeTag from nodes.h:550 (PostgreSQL 15), nodes.h:133 (PostgreSQL 16–17), nodes.h:139 (PostgreSQL 18–19)
@@ -226,7 +226,7 @@ macro_rules! newNode {
 #[macro_export]
 macro_rules! nodeTag {
     ($nodeptr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DO_AGGSPLIT_COMBINE;

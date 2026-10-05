@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! PGLZ_MAX_OUTPUT {
     ($_dlen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use PGLZ_MAX_OUTPUT;

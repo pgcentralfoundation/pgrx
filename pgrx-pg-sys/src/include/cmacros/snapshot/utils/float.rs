@@ -39,7 +39,7 @@
 #[macro_export]
 macro_rules! get_float4_infinity {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -67,7 +67,7 @@ macro_rules! get_float4_infinity {
 #[macro_export]
 macro_rules! get_float4_infinity {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -100,7 +100,7 @@ macro_rules! get_float4_infinity {
 #[macro_export]
 macro_rules! get_float4_nan {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -128,7 +128,7 @@ macro_rules! get_float4_nan {
 #[macro_export]
 macro_rules! get_float4_nan {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -166,7 +166,7 @@ macro_rules! get_float4_nan {
 #[macro_export]
 macro_rules! get_float8_infinity {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -194,7 +194,7 @@ macro_rules! get_float8_infinity {
 #[macro_export]
 macro_rules! get_float8_infinity {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -228,7 +228,7 @@ macro_rules! get_float8_infinity {
 #[macro_export]
 macro_rules! get_float8_nan {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -256,7 +256,7 @@ macro_rules! get_float8_nan {
 #[macro_export]
 macro_rules! get_float8_nan {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use get_float4_infinity;

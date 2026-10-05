@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! DTK_M {
     ($t:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FMODULO from datetime.h:238 (PostgreSQL 15, 19), datetime.h:237 (PostgreSQL 16–18)
@@ -40,7 +40,7 @@ macro_rules! DTK_M {
 #[macro_export]
 macro_rules! FMODULO {
     ($t:expr, $q:expr, $u:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TMODULO from datetime.h:249 (PostgreSQL 15), datetime.h:248 (PostgreSQL 16–18), datetime.h:250 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! FMODULO {
 #[macro_export]
 macro_rules! TMODULO {
     ($t:expr, $q:expr, $u:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro isleap from datetime.h:272 (PostgreSQL 15), datetime.h:271 (PostgreSQL 16–18), datetime.h:273 (PostgreSQL 19)
@@ -82,7 +82,7 @@ macro_rules! TMODULO {
 #[macro_export]
 macro_rules! isleap {
     ($y:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use DTK_M;

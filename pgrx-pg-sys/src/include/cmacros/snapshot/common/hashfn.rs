@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! ROTATE_HIGH_AND_LOW_32BITS {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_any from hashfn.h:30 (PostgreSQL 15–19)
@@ -44,7 +44,7 @@ macro_rules! ROTATE_HIGH_AND_LOW_32BITS {
 #[macro_export]
 macro_rules! hash_any {
     ($k:expr, $keylen:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_any_extended from hashfn.h:36 (PostgreSQL 15–19)
@@ -70,7 +70,7 @@ macro_rules! hash_any {
 #[macro_export]
 macro_rules! hash_any_extended {
     ($k:expr, $keylen:expr, $seed:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_combine from hashfn.h:67 (PostgreSQL 15–19)
@@ -97,7 +97,7 @@ macro_rules! hash_any_extended {
 #[macro_export]
 macro_rules! hash_combine {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_combine64 from hashfn.h:79 (PostgreSQL 15–19)
@@ -125,7 +125,7 @@ macro_rules! hash_combine {
 #[macro_export]
 macro_rules! hash_combine64 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_uint32 from hashfn.h:42 (PostgreSQL 15–19)
@@ -151,7 +151,7 @@ macro_rules! hash_combine64 {
 #[macro_export]
 macro_rules! hash_uint32 {
     ($k:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function hash_uint32_extended from hashfn.h:48 (PostgreSQL 15–19)
@@ -177,7 +177,7 @@ macro_rules! hash_uint32 {
 #[macro_export]
 macro_rules! hash_uint32_extended {
     ($k:expr, $seed:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function murmurhash32 from hashfn.h:91 (PostgreSQL 15–19)
@@ -210,7 +210,7 @@ macro_rules! hash_uint32_extended {
 #[macro_export]
 macro_rules! murmurhash32 {
     ($data:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -245,7 +245,7 @@ macro_rules! murmurhash32 {
 #[macro_export]
 macro_rules! murmurhash64 {
     ($data:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use ROTATE_HIGH_AND_LOW_32BITS;

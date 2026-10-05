@@ -21,7 +21,7 @@
 #[macro_export]
 macro_rules! pgstat_count_buffer_hit {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -44,7 +44,7 @@ macro_rules! pgstat_count_buffer_hit {
 #[macro_export]
 macro_rules! pgstat_count_buffer_hit {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +67,7 @@ macro_rules! pgstat_count_buffer_hit {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -90,7 +90,7 @@ macro_rules! pgstat_count_buffer_read {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pgstat_count_buffer_read_time from pgstat.h:474 (PostgreSQL 15), pgstat.h:550 (PostgreSQL 16), pgstat.h:552 (PostgreSQL 17), pgstat.h:621 (PostgreSQL 18), pgstat.h:658 (PostgreSQL 19)
@@ -110,7 +110,7 @@ macro_rules! pgstat_count_buffer_read {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read_time {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pgstat_count_buffer_write_time from pgstat.h:476 (PostgreSQL 15), pgstat.h:552 (PostgreSQL 16), pgstat.h:554 (PostgreSQL 17), pgstat.h:623 (PostgreSQL 18), pgstat.h:660 (PostgreSQL 19)
@@ -130,7 +130,7 @@ macro_rules! pgstat_count_buffer_read_time {
 #[macro_export]
 macro_rules! pgstat_count_buffer_write_time {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pgstat_count_conn_active_time from pgstat.h:478 (PostgreSQL 15), pgstat.h:554 (PostgreSQL 16), pgstat.h:556 (PostgreSQL 17), pgstat.h:625 (PostgreSQL 18), pgstat.h:662 (PostgreSQL 19)
@@ -150,7 +150,7 @@ macro_rules! pgstat_count_buffer_write_time {
 #[macro_export]
 macro_rules! pgstat_count_conn_active_time {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pgstat_count_conn_txn_idle_time from pgstat.h:480 (PostgreSQL 15), pgstat.h:556 (PostgreSQL 16), pgstat.h:558 (PostgreSQL 17), pgstat.h:627 (PostgreSQL 18), pgstat.h:664 (PostgreSQL 19)
@@ -170,7 +170,7 @@ macro_rules! pgstat_count_conn_active_time {
 #[macro_export]
 macro_rules! pgstat_count_conn_txn_idle_time {
     ($n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -193,7 +193,7 @@ macro_rules! pgstat_count_conn_txn_idle_time {
 #[macro_export]
 macro_rules! pgstat_count_heap_fetch {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -216,7 +216,7 @@ macro_rules! pgstat_count_heap_fetch {
 #[macro_export]
 macro_rules! pgstat_count_heap_fetch {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -239,7 +239,7 @@ macro_rules! pgstat_count_heap_fetch {
 #[macro_export]
 macro_rules! pgstat_count_heap_getnext {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -262,7 +262,7 @@ macro_rules! pgstat_count_heap_getnext {
 #[macro_export]
 macro_rules! pgstat_count_heap_getnext {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -285,7 +285,7 @@ macro_rules! pgstat_count_heap_getnext {
 #[macro_export]
 macro_rules! pgstat_count_heap_scan {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -308,7 +308,7 @@ macro_rules! pgstat_count_heap_scan {
 #[macro_export]
 macro_rules! pgstat_count_heap_scan {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -331,7 +331,7 @@ macro_rules! pgstat_count_heap_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_scan {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -354,7 +354,7 @@ macro_rules! pgstat_count_index_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_scan {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -377,7 +377,7 @@ macro_rules! pgstat_count_index_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_tuples {
     ($rel:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -400,7 +400,7 @@ macro_rules! pgstat_count_index_tuples {
 #[macro_export]
 macro_rules! pgstat_count_index_tuples {
     ($rel:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -421,7 +421,7 @@ macro_rules! pgstat_count_index_tuples {
 #[macro_export]
 macro_rules! pgstat_is_ioop_tracked_in_bytes {
     ($io_op:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pgstat_should_count_relation from pgstat.h:525 (PostgreSQL 15), pgstat.h:602 (PostgreSQL 16), pgstat.h:604 (PostgreSQL 17), pgstat.h:674 (PostgreSQL 18), pgstat.h:711 (PostgreSQL 19)
@@ -441,7 +441,7 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
 #[macro_export]
 macro_rules! pgstat_should_count_relation {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pgstat_count_buffer_hit;

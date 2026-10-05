@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! BUFFERTAGS_EQUAL {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -36,7 +36,7 @@ macro_rules! BUFFERTAGS_EQUAL {
 #[macro_export]
 macro_rules! BUF_DEFINE_FLAG {
     ($flagno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -53,7 +53,7 @@ macro_rules! BUF_DEFINE_FLAG {
 #[macro_export]
 macro_rules! BUF_STATE_GET_REFCOUNT {
     ($state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -74,7 +74,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_REFCOUNT {
     ($state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -95,7 +95,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_USAGECOUNT {
     ($state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -116,7 +116,7 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_USAGECOUNT {
     ($state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -137,7 +137,7 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -165,7 +165,7 @@ macro_rules! BufMappingPartitionLock {
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -186,7 +186,7 @@ macro_rules! BufMappingPartitionLock {
 #[macro_export]
 macro_rules! BufMappingPartitionLockByIndex {
     ($i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -213,7 +213,7 @@ macro_rules! BufMappingPartitionLockByIndex {
 #[macro_export]
 macro_rules! BufMappingPartitionLockByIndex {
     ($index:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -234,7 +234,7 @@ macro_rules! BufMappingPartitionLockByIndex {
 #[macro_export]
 macro_rules! BufTableHashPartition {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -261,7 +261,7 @@ macro_rules! BufTableHashPartition {
 #[macro_export]
 macro_rules! BufTableHashPartition {
     ($hashcode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -288,7 +288,7 @@ macro_rules! BufTableHashPartition {
 #[macro_export]
 macro_rules! BufTagGetForkNum {
     ($tag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -321,7 +321,7 @@ macro_rules! BufTagGetForkNum {
 #[macro_export]
 macro_rules! BufTagGetRelFileLocator {
     ($tag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -348,7 +348,7 @@ macro_rules! BufTagGetRelFileLocator {
 #[macro_export]
 macro_rules! BufTagGetRelNumber {
     ($tag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -378,7 +378,7 @@ macro_rules! BufTagGetRelNumber {
 #[macro_export]
 macro_rules! BufTagMatchesRelFileLocator {
     ($tag:expr, $rlocator:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -407,7 +407,7 @@ macro_rules! BufTagMatchesRelFileLocator {
 #[macro_export]
 macro_rules! BufTagSetRelForkDetails {
     ($tag:expr, $relnumber:expr, $forknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -428,7 +428,7 @@ macro_rules! BufTagSetRelForkDetails {
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -455,7 +455,7 @@ macro_rules! BufferDescriptorGetBuffer {
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -476,7 +476,7 @@ macro_rules! BufferDescriptorGetBuffer {
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -503,7 +503,7 @@ macro_rules! BufferDescriptorGetContentLock {
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -520,7 +520,7 @@ macro_rules! BufferDescriptorGetContentLock {
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -547,7 +547,7 @@ macro_rules! BufferDescriptorGetIOCV {
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
     ($bdesc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -578,7 +578,7 @@ macro_rules! BufferDescriptorGetIOCV {
 #[macro_export]
 macro_rules! BufferTagsEqual {
     ($tag1:expr, $tag2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -595,7 +595,7 @@ macro_rules! BufferTagsEqual {
 #[macro_export]
 macro_rules! CLEAR_BUFFERTAG {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -625,7 +625,7 @@ macro_rules! CLEAR_BUFFERTAG {
 #[macro_export]
 macro_rules! ClearBufferTag {
     ($tag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -642,7 +642,7 @@ macro_rules! ClearBufferTag {
 #[macro_export]
 macro_rules! GetBufferDescriptor {
     ($id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -669,7 +669,7 @@ macro_rules! GetBufferDescriptor {
 #[macro_export]
 macro_rules! GetBufferDescriptor {
     ($id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -686,7 +686,7 @@ macro_rules! GetBufferDescriptor {
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
     ($id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -713,7 +713,7 @@ macro_rules! GetLocalBufferDescriptor {
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
     ($id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -730,7 +730,7 @@ macro_rules! GetLocalBufferDescriptor {
 #[macro_export]
 macro_rules! INIT_BUFFERTAG {
     ($a:expr, $xx_rnode:expr, $xx_forkNum:expr, $xx_blockNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -761,7 +761,7 @@ macro_rules! INIT_BUFFERTAG {
 #[macro_export]
 macro_rules! InitBufferTag {
     ($tag:expr, $rlocator:expr, $forkNum:expr, $blockNum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -788,7 +788,7 @@ macro_rules! InitBufferTag {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -815,7 +815,7 @@ macro_rules! ResourceOwnerForgetBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -842,7 +842,7 @@ macro_rules! ResourceOwnerForgetBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBufferIO {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -869,7 +869,7 @@ macro_rules! ResourceOwnerForgetBufferIO {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -896,7 +896,7 @@ macro_rules! ResourceOwnerRememberBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -923,7 +923,7 @@ macro_rules! ResourceOwnerRememberBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBufferIO {
     ($owner:expr, $buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -951,7 +951,7 @@ macro_rules! ResourceOwnerRememberBufferIO {
 #[macro_export]
 macro_rules! UnlockBufHdr {
     ($desc:expr, $buf_state:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -980,7 +980,7 @@ macro_rules! UnlockBufHdr {
 #[macro_export]
 macro_rules! UnlockBufHdr {
     ($desc:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -1027,7 +1027,7 @@ macro_rules! UnlockBufHdr {
 #[macro_export]
 macro_rules! UnlockBufHdrExt {
     ($desc:expr, $old_buf_state:expr, $set_bits:expr, $unset_bits:expr, $refcount_change:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]

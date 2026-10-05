@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! GinCategoryOffset {
     ($itup:expr, $ginstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +40,7 @@ macro_rules! GinCategoryOffset {
 #[macro_export]
 macro_rules! GinCategoryOffset {
     ($itup:expr, $ginstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GinDataLeafPageGetFreeSpace from ginblock.h:287 (PostgreSQL 15–19)
@@ -60,7 +60,7 @@ macro_rules! GinCategoryOffset {
 #[macro_export]
 macro_rules! GinDataLeafPageGetFreeSpace {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -83,7 +83,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingList {
     (@__pgrx_c_expression; $page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -106,7 +106,7 @@ macro_rules! GinDataLeafPageGetPostingList {
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingList {
     (@__pgrx_c_expression; $page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GinDataLeafPageGetPostingListSize from ginblock.h:281 (PostgreSQL 15–19)
@@ -126,7 +126,7 @@ macro_rules! GinDataLeafPageGetPostingList {
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingListSize {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -151,7 +151,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
 #[macro_export]
 macro_rules! GinDataLeafPageIsEmpty {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -172,7 +172,7 @@ macro_rules! GinDataLeafPageIsEmpty {
 #[macro_export]
 macro_rules! GinDataLeafPageIsEmpty {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -193,7 +193,7 @@ macro_rules! GinDataLeafPageIsEmpty {
 #[macro_export]
 macro_rules! GinDataPageGetData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -214,7 +214,7 @@ macro_rules! GinDataPageGetData {
 #[macro_export]
 macro_rules! GinDataPageGetData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -235,7 +235,7 @@ macro_rules! GinDataPageGetData {
 #[macro_export]
 macro_rules! GinDataPageGetPostingItem {
     ($page:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -256,7 +256,7 @@ macro_rules! GinDataPageGetPostingItem {
 #[macro_export]
 macro_rules! GinDataPageGetPostingItem {
     ($page:expr, $i:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -277,7 +277,7 @@ macro_rules! GinDataPageGetPostingItem {
 #[macro_export]
 macro_rules! GinDataPageGetRightBound {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -298,7 +298,7 @@ macro_rules! GinDataPageGetRightBound {
 #[macro_export]
 macro_rules! GinDataPageGetRightBound {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -325,7 +325,7 @@ macro_rules! GinDataPageGetRightBound {
 #[macro_export]
 macro_rules! GinDataPageSetDataSize {
     ($page:expr, $size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -348,7 +348,7 @@ macro_rules! GinDataPageSetDataSize {
 #[macro_export]
 macro_rules! GinDataPageSetDataSize {
     ($page:expr, $size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -369,7 +369,7 @@ macro_rules! GinDataPageSetDataSize {
 #[macro_export]
 macro_rules! GinGetDownlink {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -390,7 +390,7 @@ macro_rules! GinGetDownlink {
 #[macro_export]
 macro_rules! GinGetDownlink {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -407,7 +407,7 @@ macro_rules! GinGetDownlink {
 #[macro_export]
 macro_rules! GinGetNPosting {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -428,7 +428,7 @@ macro_rules! GinGetNPosting {
 #[macro_export]
 macro_rules! GinGetNPosting {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -449,7 +449,7 @@ macro_rules! GinGetNPosting {
 #[macro_export]
 macro_rules! GinGetNullCategory {
     ($itup:expr, $ginstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -470,7 +470,7 @@ macro_rules! GinGetNullCategory {
 #[macro_export]
 macro_rules! GinGetNullCategory {
     ($itup:expr, $ginstate:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -491,7 +491,7 @@ macro_rules! GinGetNullCategory {
 #[macro_export]
 macro_rules! GinGetPosting {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -512,7 +512,7 @@ macro_rules! GinGetPosting {
 #[macro_export]
 macro_rules! GinGetPosting {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -533,7 +533,7 @@ macro_rules! GinGetPosting {
 #[macro_export]
 macro_rules! GinGetPostingOffset {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -554,7 +554,7 @@ macro_rules! GinGetPostingOffset {
 #[macro_export]
 macro_rules! GinGetPostingOffset {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -575,7 +575,7 @@ macro_rules! GinGetPostingOffset {
 #[macro_export]
 macro_rules! GinGetPostingTree {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -596,7 +596,7 @@ macro_rules! GinGetPostingTree {
 #[macro_export]
 macro_rules! GinGetPostingTree {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -613,7 +613,7 @@ macro_rules! GinGetPostingTree {
 #[macro_export]
 macro_rules! GinIsPostingTree {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -634,7 +634,7 @@ macro_rules! GinIsPostingTree {
 #[macro_export]
 macro_rules! GinIsPostingTree {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -655,7 +655,7 @@ macro_rules! GinIsPostingTree {
 #[macro_export]
 macro_rules! GinItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -676,7 +676,7 @@ macro_rules! GinItemPointerGetBlockNumber {
 #[macro_export]
 macro_rules! GinItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -693,7 +693,7 @@ macro_rules! GinItemPointerGetBlockNumber {
 #[macro_export]
 macro_rules! GinItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -714,7 +714,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
 #[macro_export]
 macro_rules! GinItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -739,7 +739,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
 #[macro_export]
 macro_rules! GinItemPointerSetBlockNumber {
     ($pointer:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -760,7 +760,7 @@ macro_rules! GinItemPointerSetBlockNumber {
 #[macro_export]
 macro_rules! GinItemPointerSetBlockNumber {
     ($pointer:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -785,7 +785,7 @@ macro_rules! GinItemPointerSetBlockNumber {
 #[macro_export]
 macro_rules! GinItemPointerSetOffsetNumber {
     ($pointer:expr, $offnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -806,7 +806,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
 #[macro_export]
 macro_rules! GinItemPointerSetOffsetNumber {
     ($pointer:expr, $offnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -827,7 +827,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
 #[macro_export]
 macro_rules! GinItupIsCompressed {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -848,7 +848,7 @@ macro_rules! GinItupIsCompressed {
 #[macro_export]
 macro_rules! GinItupIsCompressed {
     ($itup:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GinNextPostingListSegment from ginblock.h:344 (PostgreSQL 15–19)
@@ -868,7 +868,7 @@ macro_rules! GinItupIsCompressed {
 #[macro_export]
 macro_rules! GinNextPostingListSegment {
     ($cur:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -893,7 +893,7 @@ macro_rules! GinNextPostingListSegment {
 #[macro_export]
 macro_rules! GinNonLeafDataPageGetFreeSpace {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -914,7 +914,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
 #[macro_export]
 macro_rules! GinNonLeafDataPageGetFreeSpace {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GinPageGetDeleteXid from ginblock.h:136 (PostgreSQL 15–19)
@@ -934,7 +934,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
 #[macro_export]
 macro_rules! GinPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -955,7 +955,7 @@ macro_rules! GinPageGetDeleteXid {
 #[macro_export]
 macro_rules! GinPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -976,7 +976,7 @@ macro_rules! GinPageGetMeta {
 #[macro_export]
 macro_rules! GinPageGetMeta {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1001,7 +1001,7 @@ macro_rules! GinPageGetMeta {
 #[macro_export]
 macro_rules! GinPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1022,7 +1022,7 @@ macro_rules! GinPageGetOpaque {
 #[macro_export]
 macro_rules! GinPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1043,7 +1043,7 @@ macro_rules! GinPageGetOpaque {
 #[macro_export]
 macro_rules! GinPageGetOpaque {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1068,7 +1068,7 @@ macro_rules! GinPageGetOpaque {
 #[macro_export]
 macro_rules! GinPageHasFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1089,7 +1089,7 @@ macro_rules! GinPageHasFullRow {
 #[macro_export]
 macro_rules! GinPageHasFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1110,7 +1110,7 @@ macro_rules! GinPageHasFullRow {
 #[macro_export]
 macro_rules! GinPageHasFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1135,7 +1135,7 @@ macro_rules! GinPageHasFullRow {
 #[macro_export]
 macro_rules! GinPageIsCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1156,7 +1156,7 @@ macro_rules! GinPageIsCompressed {
 #[macro_export]
 macro_rules! GinPageIsCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1177,7 +1177,7 @@ macro_rules! GinPageIsCompressed {
 #[macro_export]
 macro_rules! GinPageIsCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1202,7 +1202,7 @@ macro_rules! GinPageIsCompressed {
 #[macro_export]
 macro_rules! GinPageIsData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1223,7 +1223,7 @@ macro_rules! GinPageIsData {
 #[macro_export]
 macro_rules! GinPageIsData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1244,7 +1244,7 @@ macro_rules! GinPageIsData {
 #[macro_export]
 macro_rules! GinPageIsData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1269,7 +1269,7 @@ macro_rules! GinPageIsData {
 #[macro_export]
 macro_rules! GinPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1290,7 +1290,7 @@ macro_rules! GinPageIsDeleted {
 #[macro_export]
 macro_rules! GinPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1311,7 +1311,7 @@ macro_rules! GinPageIsDeleted {
 #[macro_export]
 macro_rules! GinPageIsDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1336,7 +1336,7 @@ macro_rules! GinPageIsDeleted {
 #[macro_export]
 macro_rules! GinPageIsIncompleteSplit {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1357,7 +1357,7 @@ macro_rules! GinPageIsIncompleteSplit {
 #[macro_export]
 macro_rules! GinPageIsIncompleteSplit {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1378,7 +1378,7 @@ macro_rules! GinPageIsIncompleteSplit {
 #[macro_export]
 macro_rules! GinPageIsIncompleteSplit {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1403,7 +1403,7 @@ macro_rules! GinPageIsIncompleteSplit {
 #[macro_export]
 macro_rules! GinPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1424,7 +1424,7 @@ macro_rules! GinPageIsLeaf {
 #[macro_export]
 macro_rules! GinPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1445,7 +1445,7 @@ macro_rules! GinPageIsLeaf {
 #[macro_export]
 macro_rules! GinPageIsLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1470,7 +1470,7 @@ macro_rules! GinPageIsLeaf {
 #[macro_export]
 macro_rules! GinPageIsList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1491,7 +1491,7 @@ macro_rules! GinPageIsList {
 #[macro_export]
 macro_rules! GinPageIsList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1512,7 +1512,7 @@ macro_rules! GinPageIsList {
 #[macro_export]
 macro_rules! GinPageIsList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1537,7 +1537,7 @@ macro_rules! GinPageIsList {
 #[macro_export]
 macro_rules! GinPageRightMost {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1558,7 +1558,7 @@ macro_rules! GinPageRightMost {
 #[macro_export]
 macro_rules! GinPageRightMost {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1579,7 +1579,7 @@ macro_rules! GinPageRightMost {
 #[macro_export]
 macro_rules! GinPageRightMost {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1604,7 +1604,7 @@ macro_rules! GinPageRightMost {
 #[macro_export]
 macro_rules! GinPageSetCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1625,7 +1625,7 @@ macro_rules! GinPageSetCompressed {
 #[macro_export]
 macro_rules! GinPageSetCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1646,7 +1646,7 @@ macro_rules! GinPageSetCompressed {
 #[macro_export]
 macro_rules! GinPageSetCompressed {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1671,7 +1671,7 @@ macro_rules! GinPageSetCompressed {
 #[macro_export]
 macro_rules! GinPageSetData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1692,7 +1692,7 @@ macro_rules! GinPageSetData {
 #[macro_export]
 macro_rules! GinPageSetData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1713,7 +1713,7 @@ macro_rules! GinPageSetData {
 #[macro_export]
 macro_rules! GinPageSetData {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GinPageSetDeleteXid from ginblock.h:137 (PostgreSQL 15–19)
@@ -1733,7 +1733,7 @@ macro_rules! GinPageSetData {
 #[macro_export]
 macro_rules! GinPageSetDeleteXid {
     ($page:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1758,7 +1758,7 @@ macro_rules! GinPageSetDeleteXid {
 #[macro_export]
 macro_rules! GinPageSetDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1779,7 +1779,7 @@ macro_rules! GinPageSetDeleted {
 #[macro_export]
 macro_rules! GinPageSetDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1800,7 +1800,7 @@ macro_rules! GinPageSetDeleted {
 #[macro_export]
 macro_rules! GinPageSetDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1825,7 +1825,7 @@ macro_rules! GinPageSetDeleted {
 #[macro_export]
 macro_rules! GinPageSetFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1846,7 +1846,7 @@ macro_rules! GinPageSetFullRow {
 #[macro_export]
 macro_rules! GinPageSetFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1867,7 +1867,7 @@ macro_rules! GinPageSetFullRow {
 #[macro_export]
 macro_rules! GinPageSetFullRow {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1892,7 +1892,7 @@ macro_rules! GinPageSetFullRow {
 #[macro_export]
 macro_rules! GinPageSetLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1913,7 +1913,7 @@ macro_rules! GinPageSetLeaf {
 #[macro_export]
 macro_rules! GinPageSetLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1934,7 +1934,7 @@ macro_rules! GinPageSetLeaf {
 #[macro_export]
 macro_rules! GinPageSetLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1959,7 +1959,7 @@ macro_rules! GinPageSetLeaf {
 #[macro_export]
 macro_rules! GinPageSetList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -1980,7 +1980,7 @@ macro_rules! GinPageSetList {
 #[macro_export]
 macro_rules! GinPageSetList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2001,7 +2001,7 @@ macro_rules! GinPageSetList {
 #[macro_export]
 macro_rules! GinPageSetList {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2026,7 +2026,7 @@ macro_rules! GinPageSetList {
 #[macro_export]
 macro_rules! GinPageSetNonDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -2047,7 +2047,7 @@ macro_rules! GinPageSetNonDeleted {
 #[macro_export]
 macro_rules! GinPageSetNonDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2068,7 +2068,7 @@ macro_rules! GinPageSetNonDeleted {
 #[macro_export]
 macro_rules! GinPageSetNonDeleted {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2093,7 +2093,7 @@ macro_rules! GinPageSetNonDeleted {
 #[macro_export]
 macro_rules! GinPageSetNonLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -2114,7 +2114,7 @@ macro_rules! GinPageSetNonLeaf {
 #[macro_export]
 macro_rules! GinPageSetNonLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -2135,7 +2135,7 @@ macro_rules! GinPageSetNonLeaf {
 #[macro_export]
 macro_rules! GinPageSetNonLeaf {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2160,7 +2160,7 @@ macro_rules! GinPageSetNonLeaf {
 #[macro_export]
 macro_rules! GinSetDownlink {
     ($itup:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2181,7 +2181,7 @@ macro_rules! GinSetDownlink {
 #[macro_export]
 macro_rules! GinSetDownlink {
     ($itup:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2206,7 +2206,7 @@ macro_rules! GinSetDownlink {
 #[macro_export]
 macro_rules! GinSetNPosting {
     ($itup:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2227,7 +2227,7 @@ macro_rules! GinSetNPosting {
 #[macro_export]
 macro_rules! GinSetNPosting {
     ($itup:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2248,7 +2248,7 @@ macro_rules! GinSetNPosting {
 #[macro_export]
 macro_rules! GinSetNullCategory {
     ($itup:expr, $ginstate:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2269,7 +2269,7 @@ macro_rules! GinSetNullCategory {
 #[macro_export]
 macro_rules! GinSetNullCategory {
     ($itup:expr, $ginstate:expr, $c:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2294,7 +2294,7 @@ macro_rules! GinSetNullCategory {
 #[macro_export]
 macro_rules! GinSetPostingOffset {
     ($itup:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2315,7 +2315,7 @@ macro_rules! GinSetPostingOffset {
 #[macro_export]
 macro_rules! GinSetPostingOffset {
     ($itup:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2340,7 +2340,7 @@ macro_rules! GinSetPostingOffset {
 #[macro_export]
 macro_rules! GinSetPostingTree {
     ($itup:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2361,7 +2361,7 @@ macro_rules! GinSetPostingTree {
 #[macro_export]
 macro_rules! GinSetPostingTree {
     ($itup:expr, $blkno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2382,7 +2382,7 @@ macro_rules! GinSetPostingTree {
 #[macro_export]
 macro_rules! ItemPointerIsLossyPage {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2403,7 +2403,7 @@ macro_rules! ItemPointerIsLossyPage {
 #[macro_export]
 macro_rules! ItemPointerIsLossyPage {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2424,7 +2424,7 @@ macro_rules! ItemPointerIsLossyPage {
 #[macro_export]
 macro_rules! ItemPointerIsMin {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2445,7 +2445,7 @@ macro_rules! ItemPointerIsMin {
 #[macro_export]
 macro_rules! ItemPointerIsMin {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2470,7 +2470,7 @@ macro_rules! ItemPointerIsMin {
 #[macro_export]
 macro_rules! ItemPointerSetLossyPage {
     ($p:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2491,7 +2491,7 @@ macro_rules! ItemPointerSetLossyPage {
 #[macro_export]
 macro_rules! ItemPointerSetLossyPage {
     ($p:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2516,7 +2516,7 @@ macro_rules! ItemPointerSetLossyPage {
 #[macro_export]
 macro_rules! ItemPointerSetMax {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2537,7 +2537,7 @@ macro_rules! ItemPointerSetMax {
 #[macro_export]
 macro_rules! ItemPointerSetMax {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2562,7 +2562,7 @@ macro_rules! ItemPointerSetMax {
 #[macro_export]
 macro_rules! ItemPointerSetMin {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2583,7 +2583,7 @@ macro_rules! ItemPointerSetMin {
 #[macro_export]
 macro_rules! ItemPointerSetMin {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2604,7 +2604,7 @@ macro_rules! ItemPointerSetMin {
 #[macro_export]
 macro_rules! PostingItemGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2625,7 +2625,7 @@ macro_rules! PostingItemGetBlockNumber {
 #[macro_export]
 macro_rules! PostingItemGetBlockNumber {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -2646,7 +2646,7 @@ macro_rules! PostingItemGetBlockNumber {
 #[macro_export]
 macro_rules! PostingItemSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2667,7 +2667,7 @@ macro_rules! PostingItemSetBlockNumber {
 #[macro_export]
 macro_rules! PostingItemSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SizeOfGinPostingList from ginblock.h:343 (PostgreSQL 15–19)
@@ -2687,7 +2687,7 @@ macro_rules! PostingItemSetBlockNumber {
 #[macro_export]
 macro_rules! SizeOfGinPostingList {
     ($plist:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GinCategoryOffset;

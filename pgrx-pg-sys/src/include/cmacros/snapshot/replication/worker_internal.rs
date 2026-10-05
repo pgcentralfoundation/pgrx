@@ -26,7 +26,7 @@
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -54,7 +54,7 @@ macro_rules! am_leader_apply_worker {
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -81,7 +81,7 @@ macro_rules! am_leader_apply_worker {
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -109,7 +109,7 @@ macro_rules! am_parallel_apply_worker {
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -136,7 +136,7 @@ macro_rules! am_parallel_apply_worker {
 #[macro_export]
 macro_rules! am_sequencesync_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -163,7 +163,7 @@ macro_rules! am_sequencesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -190,7 +190,7 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -217,7 +217,7 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -245,7 +245,7 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! get_logical_worker_type {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -262,7 +262,7 @@ macro_rules! get_logical_worker_type {
 #[macro_export]
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -279,7 +279,7 @@ macro_rules! isParallelApplyWorker {
 #[macro_export]
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -296,7 +296,7 @@ macro_rules! isParallelApplyWorker {
 #[macro_export]
 macro_rules! isSequenceSyncWorker {
     ($worker:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -313,7 +313,7 @@ macro_rules! isSequenceSyncWorker {
 #[macro_export]
 macro_rules! isTableSyncWorker {
     ($worker:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -330,7 +330,7 @@ macro_rules! isTableSyncWorker {
 #[macro_export]
 macro_rules! isTablesyncWorker {
     ($worker:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

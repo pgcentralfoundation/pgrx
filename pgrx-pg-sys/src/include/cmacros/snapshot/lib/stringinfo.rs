@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! appendStringInfoCharMacro {
     ($str:expr, $ch:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -48,7 +48,7 @@ macro_rules! appendStringInfoCharMacro {
 #[macro_export]
 macro_rules! initReadOnlyStringInfo {
     ($str:expr, $data:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -80,7 +80,7 @@ macro_rules! initReadOnlyStringInfo {
 #[macro_export]
 macro_rules! initStringInfoFromString {
     ($str:expr, $data:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use appendStringInfoCharMacro;

@@ -23,7 +23,7 @@
 #[macro_export]
 macro_rules! BRIN_IS_META_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -44,7 +44,7 @@ macro_rules! BRIN_IS_META_PAGE {
 #[macro_export]
 macro_rules! BRIN_IS_META_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -69,7 +69,7 @@ macro_rules! BRIN_IS_META_PAGE {
 #[macro_export]
 macro_rules! BRIN_IS_REGULAR_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -90,7 +90,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 #[macro_export]
 macro_rules! BRIN_IS_REGULAR_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -115,7 +115,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
 #[macro_export]
 macro_rules! BRIN_IS_REVMAP_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -136,7 +136,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
 #[macro_export]
 macro_rules! BRIN_IS_REVMAP_PAGE {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -161,7 +161,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
 #[macro_export]
 macro_rules! BrinPageFlags {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -182,7 +182,7 @@ macro_rules! BrinPageFlags {
 #[macro_export]
 macro_rules! BrinPageFlags {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -207,7 +207,7 @@ macro_rules! BrinPageFlags {
 #[macro_export]
 macro_rules! BrinPageType {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -228,7 +228,7 @@ macro_rules! BrinPageType {
 #[macro_export]
 macro_rules! BrinPageType {
     ($page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BRIN_IS_META_PAGE;

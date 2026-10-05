@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! BKI_ARRAY_DEFAULT {
     ($value:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BKI_DEFAULT from genbki.h:35 (PostgreSQL 15–18), genbki.h:54 (PostgreSQL 19)
@@ -30,7 +30,7 @@ macro_rules! BKI_ARRAY_DEFAULT {
 #[macro_export]
 macro_rules! BKI_DEFAULT {
     ($value:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BKI_LOOKUP from genbki.h:46 (PostgreSQL 15–18), genbki.h:65 (PostgreSQL 19)
@@ -46,7 +46,7 @@ macro_rules! BKI_DEFAULT {
 #[macro_export]
 macro_rules! BKI_LOOKUP {
     ($catalog:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BKI_LOOKUP_OPT from genbki.h:47 (PostgreSQL 15–18), genbki.h:66 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! BKI_LOOKUP {
 #[macro_export]
 macro_rules! BKI_LOOKUP_OPT {
     ($catalog:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BKI_ROWTYPE_OID from genbki.h:28 (PostgreSQL 15–18), genbki.h:47 (PostgreSQL 19)
@@ -78,7 +78,7 @@ macro_rules! BKI_LOOKUP_OPT {
 #[macro_export]
 macro_rules! BKI_ROWTYPE_OID {
     ($oid:expr, $oidmacro:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use BKI_ARRAY_DEFAULT;

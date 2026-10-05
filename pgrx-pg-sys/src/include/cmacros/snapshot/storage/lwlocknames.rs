@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! AddinShmemInitLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -31,7 +31,7 @@ macro_rules! AddinShmemInitLock {
 #[macro_export]
 macro_rules! AioWorkerControlLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -48,7 +48,7 @@ macro_rules! AioWorkerControlLock {
 #[macro_export]
 macro_rules! AioWorkerSubmissionQueueLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AutoFileLock from lwlocknames.h:37 (PostgreSQL 15–16), lwlocknames.h:31 (PostgreSQL 17–18), lwlocknames.h:30 (PostgreSQL 19)
@@ -64,7 +64,7 @@ macro_rules! AioWorkerSubmissionQueueLock {
 #[macro_export]
 macro_rules! AutoFileLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AutovacuumLock from lwlocknames.h:24 (PostgreSQL 15–16), lwlocknames.h:20 (PostgreSQL 17–18), lwlocknames.h:19 (PostgreSQL 19)
@@ -80,7 +80,7 @@ macro_rules! AutoFileLock {
 #[macro_export]
 macro_rules! AutovacuumLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro AutovacuumScheduleLock from lwlocknames.h:25 (PostgreSQL 15–16), lwlocknames.h:21 (PostgreSQL 17–18), lwlocknames.h:20 (PostgreSQL 19)
@@ -96,7 +96,7 @@ macro_rules! AutovacuumLock {
 #[macro_export]
 macro_rules! AutovacuumScheduleLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BackgroundWorkerLock from lwlocknames.h:35 (PostgreSQL 15–16), lwlocknames.h:29 (PostgreSQL 17–18), lwlocknames.h:28 (PostgreSQL 19)
@@ -112,7 +112,7 @@ macro_rules! AutovacuumScheduleLock {
 #[macro_export]
 macro_rules! BackgroundWorkerLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro BtreeVacuumLock from lwlocknames.h:22 (PostgreSQL 15–16), lwlocknames.h:18 (PostgreSQL 17–18), lwlocknames.h:17 (PostgreSQL 19)
@@ -128,7 +128,7 @@ macro_rules! BackgroundWorkerLock {
 #[macro_export]
 macro_rules! BtreeVacuumLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro CheckpointerCommLock from lwlocknames.h:19 (PostgreSQL 15–16), lwlocknames.h:15 (PostgreSQL 17–18), lwlocknames.h:14 (PostgreSQL 19)
@@ -144,7 +144,7 @@ macro_rules! BtreeVacuumLock {
 #[macro_export]
 macro_rules! CheckpointerCommLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro CommitTsLock from lwlocknames.h:41 (PostgreSQL 15–16), lwlocknames.h:34 (PostgreSQL 17–18), lwlocknames.h:33 (PostgreSQL 19)
@@ -160,7 +160,7 @@ macro_rules! CheckpointerCommLock {
 #[macro_export]
 macro_rules! CommitTsLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -177,7 +177,7 @@ macro_rules! CommitTsLock {
 #[macro_export]
 macro_rules! CommitTsSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ControlFileLock from lwlocknames.h:12 (PostgreSQL 15–18), lwlocknames.h:11 (PostgreSQL 19)
@@ -193,7 +193,7 @@ macro_rules! CommitTsSLRULock {
 #[macro_export]
 macro_rules! ControlFileLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -210,7 +210,7 @@ macro_rules! ControlFileLock {
 #[macro_export]
 macro_rules! DSMRegistryLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -227,7 +227,7 @@ macro_rules! DSMRegistryLock {
 #[macro_export]
 macro_rules! DataChecksumsWorkerLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro DynamicSharedMemoryControlLock from lwlocknames.h:36 (PostgreSQL 15–16), lwlocknames.h:30 (PostgreSQL 17–18), lwlocknames.h:29 (PostgreSQL 19)
@@ -243,7 +243,7 @@ macro_rules! DataChecksumsWorkerLock {
 #[macro_export]
 macro_rules! DynamicSharedMemoryControlLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -260,7 +260,7 @@ macro_rules! DynamicSharedMemoryControlLock {
 #[macro_export]
 macro_rules! InjectionPointLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -277,7 +277,7 @@ macro_rules! InjectionPointLock {
 #[macro_export]
 macro_rules! LogicalDecodingControlLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro LogicalRepWorkerLock from lwlocknames.h:45 (PostgreSQL 15–16), lwlocknames.h:37 (PostgreSQL 17–18), lwlocknames.h:36 (PostgreSQL 19)
@@ -293,7 +293,7 @@ macro_rules! LogicalDecodingControlLock {
 #[macro_export]
 macro_rules! LogicalRepWorkerLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MultiXactGenLock from lwlocknames.h:15 (PostgreSQL 15–16), lwlocknames.h:13 (PostgreSQL 17–18), lwlocknames.h:12 (PostgreSQL 19)
@@ -309,7 +309,7 @@ macro_rules! LogicalRepWorkerLock {
 #[macro_export]
 macro_rules! MultiXactGenLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -326,7 +326,7 @@ macro_rules! MultiXactGenLock {
 #[macro_export]
 macro_rules! MultiXactMemberSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -343,7 +343,7 @@ macro_rules! MultiXactMemberSLRULock {
 #[macro_export]
 macro_rules! MultiXactOffsetSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MultiXactTruncationLock from lwlocknames.h:43 (PostgreSQL 15–16), lwlocknames.h:36 (PostgreSQL 17–18), lwlocknames.h:35 (PostgreSQL 19)
@@ -359,7 +359,7 @@ macro_rules! MultiXactOffsetSLRULock {
 #[macro_export]
 macro_rules! MultiXactTruncationLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NotifyQueueLock from lwlocknames.h:29 (PostgreSQL 15–16), lwlocknames.h:24 (PostgreSQL 17–18), lwlocknames.h:23 (PostgreSQL 19)
@@ -375,7 +375,7 @@ macro_rules! MultiXactTruncationLock {
 #[macro_export]
 macro_rules! NotifyQueueLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro NotifyQueueTailLock from lwlocknames.h:48 (PostgreSQL 15–16), lwlocknames.h:40 (PostgreSQL 17–18), lwlocknames.h:39 (PostgreSQL 19)
@@ -391,7 +391,7 @@ macro_rules! NotifyQueueLock {
 #[macro_export]
 macro_rules! NotifyQueueTailLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -408,7 +408,7 @@ macro_rules! NotifyQueueTailLock {
 #[macro_export]
 macro_rules! NotifySLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro OidGenLock from lwlocknames.h:5 (PostgreSQL 15–18), lwlocknames.h:4 (PostgreSQL 19)
@@ -424,7 +424,7 @@ macro_rules! NotifySLRULock {
 #[macro_export]
 macro_rules! OidGenLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -441,7 +441,7 @@ macro_rules! OidGenLock {
 #[macro_export]
 macro_rules! OldSnapshotTimeMapLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ProcArrayLock from lwlocknames.h:7 (PostgreSQL 15–18), lwlocknames.h:6 (PostgreSQL 19)
@@ -457,7 +457,7 @@ macro_rules! OldSnapshotTimeMapLock {
 #[macro_export]
 macro_rules! ProcArrayLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RelCacheInitLock from lwlocknames.h:18 (PostgreSQL 15–16), lwlocknames.h:14 (PostgreSQL 17–18), lwlocknames.h:13 (PostgreSQL 19)
@@ -473,7 +473,7 @@ macro_rules! ProcArrayLock {
 #[macro_export]
 macro_rules! RelCacheInitLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RelationMappingLock from lwlocknames.h:27 (PostgreSQL 15–16), lwlocknames.h:23 (PostgreSQL 17–18), lwlocknames.h:22 (PostgreSQL 19)
@@ -489,7 +489,7 @@ macro_rules! RelCacheInitLock {
 #[macro_export]
 macro_rules! RelationMappingLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ReplicationOriginLock from lwlocknames.h:42 (PostgreSQL 15–16), lwlocknames.h:35 (PostgreSQL 17–18), lwlocknames.h:34 (PostgreSQL 19)
@@ -505,7 +505,7 @@ macro_rules! RelationMappingLock {
 #[macro_export]
 macro_rules! ReplicationOriginLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ReplicationSlotAllocationLock from lwlocknames.h:38 (PostgreSQL 15–16), lwlocknames.h:32 (PostgreSQL 17–18), lwlocknames.h:31 (PostgreSQL 19)
@@ -521,7 +521,7 @@ macro_rules! ReplicationOriginLock {
 #[macro_export]
 macro_rules! ReplicationSlotAllocationLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ReplicationSlotControlLock from lwlocknames.h:39 (PostgreSQL 15–16), lwlocknames.h:33 (PostgreSQL 17–18), lwlocknames.h:32 (PostgreSQL 19)
@@ -537,7 +537,7 @@ macro_rules! ReplicationSlotAllocationLock {
 #[macro_export]
 macro_rules! ReplicationSlotControlLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SInvalReadLock from lwlocknames.h:8 (PostgreSQL 15–18), lwlocknames.h:7 (PostgreSQL 19)
@@ -553,7 +553,7 @@ macro_rules! ReplicationSlotControlLock {
 #[macro_export]
 macro_rules! SInvalReadLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SInvalWriteLock from lwlocknames.h:9 (PostgreSQL 15–18), lwlocknames.h:8 (PostgreSQL 19)
@@ -569,7 +569,7 @@ macro_rules! SInvalReadLock {
 #[macro_export]
 macro_rules! SInvalWriteLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -586,7 +586,7 @@ macro_rules! SInvalWriteLock {
 #[macro_export]
 macro_rules! SerialControlLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -603,7 +603,7 @@ macro_rules! SerialControlLock {
 #[macro_export]
 macro_rules! SerialSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SerializableFinishedListLock from lwlocknames.h:31 (PostgreSQL 15–16), lwlocknames.h:26 (PostgreSQL 17–18), lwlocknames.h:25 (PostgreSQL 19)
@@ -619,7 +619,7 @@ macro_rules! SerialSLRULock {
 #[macro_export]
 macro_rules! SerializableFinishedListLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SerializablePredicateListLock from lwlocknames.h:32 (PostgreSQL 15–16), lwlocknames.h:27 (PostgreSQL 17–18), lwlocknames.h:26 (PostgreSQL 19)
@@ -635,7 +635,7 @@ macro_rules! SerializableFinishedListLock {
 #[macro_export]
 macro_rules! SerializablePredicateListLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SerializableXactHashLock from lwlocknames.h:30 (PostgreSQL 15–16), lwlocknames.h:25 (PostgreSQL 17–18), lwlocknames.h:24 (PostgreSQL 19)
@@ -651,7 +651,7 @@ macro_rules! SerializablePredicateListLock {
 #[macro_export]
 macro_rules! SerializableXactHashLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -668,7 +668,7 @@ macro_rules! SerializableXactHashLock {
 #[macro_export]
 macro_rules! ShmemIndexLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -685,7 +685,7 @@ macro_rules! ShmemIndexLock {
 #[macro_export]
 macro_rules! SubtransSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SyncRepLock from lwlocknames.h:34 (PostgreSQL 15–16), lwlocknames.h:28 (PostgreSQL 17–18), lwlocknames.h:27 (PostgreSQL 19)
@@ -701,7 +701,7 @@ macro_rules! SubtransSLRULock {
 #[macro_export]
 macro_rules! SyncRepLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SyncScanLock from lwlocknames.h:26 (PostgreSQL 15–16), lwlocknames.h:22 (PostgreSQL 17–18), lwlocknames.h:21 (PostgreSQL 19)
@@ -717,7 +717,7 @@ macro_rules! SyncRepLock {
 #[macro_export]
 macro_rules! SyncScanLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TablespaceCreateLock from lwlocknames.h:21 (PostgreSQL 15–16), lwlocknames.h:17 (PostgreSQL 17–18), lwlocknames.h:16 (PostgreSQL 19)
@@ -733,7 +733,7 @@ macro_rules! SyncScanLock {
 #[macro_export]
 macro_rules! TablespaceCreateLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TwoPhaseStateLock from lwlocknames.h:20 (PostgreSQL 15–16), lwlocknames.h:16 (PostgreSQL 17–18), lwlocknames.h:15 (PostgreSQL 19)
@@ -749,7 +749,7 @@ macro_rules! TablespaceCreateLock {
 #[macro_export]
 macro_rules! TwoPhaseStateLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WALBufMappingLock from lwlocknames.h:10 (PostgreSQL 15–18), lwlocknames.h:9 (PostgreSQL 19)
@@ -765,7 +765,7 @@ macro_rules! TwoPhaseStateLock {
 #[macro_export]
 macro_rules! WALBufMappingLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -782,7 +782,7 @@ macro_rules! WALBufMappingLock {
 #[macro_export]
 macro_rules! WALSummarizerLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WALWriteLock from lwlocknames.h:11 (PostgreSQL 15–18), lwlocknames.h:10 (PostgreSQL 19)
@@ -798,7 +798,7 @@ macro_rules! WALSummarizerLock {
 #[macro_export]
 macro_rules! WALWriteLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -815,7 +815,7 @@ macro_rules! WALWriteLock {
 #[macro_export]
 macro_rules! WaitEventCustomLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -832,7 +832,7 @@ macro_rules! WaitEventCustomLock {
 #[macro_export]
 macro_rules! WaitLSNLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro WrapLimitsVacuumLock from lwlocknames.h:47 (PostgreSQL 15–16), lwlocknames.h:39 (PostgreSQL 17–18), lwlocknames.h:38 (PostgreSQL 19)
@@ -848,7 +848,7 @@ macro_rules! WaitLSNLock {
 #[macro_export]
 macro_rules! WrapLimitsVacuumLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -865,7 +865,7 @@ macro_rules! WrapLimitsVacuumLock {
 #[macro_export]
 macro_rules! XactSLRULock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XactTruncationLock from lwlocknames.h:46 (PostgreSQL 15–16), lwlocknames.h:38 (PostgreSQL 17–18), lwlocknames.h:37 (PostgreSQL 19)
@@ -881,7 +881,7 @@ macro_rules! XactSLRULock {
 #[macro_export]
 macro_rules! XactTruncationLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XidGenLock from lwlocknames.h:6 (PostgreSQL 15–18), lwlocknames.h:5 (PostgreSQL 19)
@@ -897,7 +897,7 @@ macro_rules! XactTruncationLock {
 #[macro_export]
 macro_rules! XidGenLock {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AddinShmemInitLock;

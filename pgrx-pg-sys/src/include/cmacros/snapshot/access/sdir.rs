@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! ScanDirectionCombine {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ScanDirectionIsBackward from sdir.h:41 (PostgreSQL 15), sdir.h:50 (PostgreSQL 16–19)
@@ -39,7 +39,7 @@ macro_rules! ScanDirectionCombine {
 #[macro_export]
 macro_rules! ScanDirectionIsBackward {
     ($direction:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ScanDirectionIsForward from sdir.h:55 (PostgreSQL 15), sdir.h:64 (PostgreSQL 16–19)
@@ -59,7 +59,7 @@ macro_rules! ScanDirectionIsBackward {
 #[macro_export]
 macro_rules! ScanDirectionIsForward {
     ($direction:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ScanDirectionIsNoMovement from sdir.h:48 (PostgreSQL 15), sdir.h:57 (PostgreSQL 16–19)
@@ -79,7 +79,7 @@ macro_rules! ScanDirectionIsForward {
 #[macro_export]
 macro_rules! ScanDirectionIsNoMovement {
     ($direction:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ScanDirectionIsValid from sdir.h:33 (PostgreSQL 15), sdir.h:42 (PostgreSQL 16–19)
@@ -99,7 +99,7 @@ macro_rules! ScanDirectionIsNoMovement {
 #[macro_export]
 macro_rules! ScanDirectionIsValid {
     ($direction:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! TypeIsToastable {
     ($typid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro type_is_array from lsyscache.h:203 (PostgreSQL 15), lsyscache.h:207 (PostgreSQL 16), lsyscache.h:210 (PostgreSQL 17), lsyscache.h:215 (PostgreSQL 18), lsyscache.h:221 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! TypeIsToastable {
 #[macro_export]
 macro_rules! type_is_array {
     ($typid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro type_is_array_domain from lsyscache.h:205 (PostgreSQL 15), lsyscache.h:209 (PostgreSQL 16), lsyscache.h:212 (PostgreSQL 17), lsyscache.h:217 (PostgreSQL 18), lsyscache.h:223 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! type_is_array {
 #[macro_export]
 macro_rules! type_is_array_domain {
     ($typid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use TypeIsToastable;

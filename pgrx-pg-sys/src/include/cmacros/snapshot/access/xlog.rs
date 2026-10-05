@@ -21,7 +21,7 @@
 #[macro_export]
 macro_rules! XLogArchivingActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -42,7 +42,7 @@ macro_rules! XLogArchivingActive {
 #[macro_export]
 macro_rules! XLogArchivingActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -65,7 +65,7 @@ macro_rules! XLogArchivingActive {
 #[macro_export]
 macro_rules! XLogArchivingAlways {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -86,7 +86,7 @@ macro_rules! XLogArchivingAlways {
 #[macro_export]
 macro_rules! XLogArchivingAlways {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -107,7 +107,7 @@ macro_rules! XLogArchivingAlways {
 #[macro_export]
 macro_rules! XLogHintBitIsNeeded {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -128,7 +128,7 @@ macro_rules! XLogHintBitIsNeeded {
 #[macro_export]
 macro_rules! XLogHintBitIsNeeded {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogIsNeeded from xlog.h:104 (PostgreSQL 15–16), xlog.h:107 (PostgreSQL 17), xlog.h:109 (PostgreSQL 18), xlog.h:112 (PostgreSQL 19)
@@ -144,7 +144,7 @@ macro_rules! XLogHintBitIsNeeded {
 #[macro_export]
 macro_rules! XLogIsNeeded {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -161,7 +161,7 @@ macro_rules! XLogIsNeeded {
 #[macro_export]
 macro_rules! XLogLogicalInfoActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -178,7 +178,7 @@ macro_rules! XLogLogicalInfoActive {
 #[macro_export]
 macro_rules! XLogLogicalInfoActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogStandbyInfoActive from xlog.h:118 (PostgreSQL 15–16), xlog.h:121 (PostgreSQL 17), xlog.h:123 (PostgreSQL 18), xlog.h:126 (PostgreSQL 19)
@@ -194,7 +194,7 @@ macro_rules! XLogLogicalInfoActive {
 #[macro_export]
 macro_rules! XLogStandbyInfoActive {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use XLogArchivingActive;

@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! AllocSizeIsValid {
     ($size:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -62,7 +62,7 @@ macro_rules! AllocSizeIsValid {
 #[macro_export]
 macro_rules! GetMemoryChunkContext {
     ($pointer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro MemoryContextCopyAndSetIdentifier from memutils.h:99 (PostgreSQL 15), memutils.h:101 (PostgreSQL 16–19)
@@ -82,7 +82,7 @@ macro_rules! GetMemoryChunkContext {
 #[macro_export]
 macro_rules! MemoryContextCopyAndSetIdentifier {
     ($cxt:expr, $id:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -103,7 +103,7 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
 #[macro_export]
 macro_rules! MemoryContextResetAndDeleteChildren {
     ($ctx:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -228,7 +228,7 @@ macro_rules! MemoryContextResetAndDeleteChildren {
 #[macro_export]
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -353,7 +353,7 @@ macro_rules! pg_memory_is_all_zeros {
 #[macro_export]
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use AllocSizeIsValid;

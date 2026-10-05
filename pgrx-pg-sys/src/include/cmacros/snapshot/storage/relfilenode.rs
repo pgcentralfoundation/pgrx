@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! RelFileNodeBackendEquals {
     ($node1:expr, $node2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -32,7 +32,7 @@ macro_rules! RelFileNodeBackendEquals {
 #[macro_export]
 macro_rules! RelFileNodeBackendIsTemp {
     ($rnode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -49,7 +49,7 @@ macro_rules! RelFileNodeBackendIsTemp {
 #[macro_export]
 macro_rules! RelFileNodeEquals {
     ($node1:expr, $node2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]

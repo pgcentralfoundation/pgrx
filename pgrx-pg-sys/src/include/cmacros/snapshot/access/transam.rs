@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! AssertTransactionIdInAllowableRange {
     ($xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro EpochFromFullTransactionId from transam.h:47 (PostgreSQL 15–19)
@@ -39,7 +39,7 @@ macro_rules! AssertTransactionIdInAllowableRange {
 #[macro_export]
 macro_rules! EpochFromFullTransactionId {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdAdvance from transam.h:127 (PostgreSQL 15–19)
@@ -72,7 +72,7 @@ macro_rules! EpochFromFullTransactionId {
 #[macro_export]
 macro_rules! FullTransactionIdAdvance {
     ($dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdEquals from transam.h:50 (PostgreSQL 15–19)
@@ -88,7 +88,7 @@ macro_rules! FullTransactionIdAdvance {
 #[macro_export]
 macro_rules! FullTransactionIdEquals {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdFollows from transam.h:53 (PostgreSQL 15–19)
@@ -104,7 +104,7 @@ macro_rules! FullTransactionIdEquals {
 #[macro_export]
 macro_rules! FullTransactionIdFollows {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdFollowsOrEquals from transam.h:54 (PostgreSQL 15–19)
@@ -120,7 +120,7 @@ macro_rules! FullTransactionIdFollows {
 #[macro_export]
 macro_rules! FullTransactionIdFollowsOrEquals {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -177,7 +177,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
 #[macro_export]
 macro_rules! FullTransactionIdFromAllowableAt {
     ($nextFullXid:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdFromEpochAndXid from transam.h:70 (PostgreSQL 15–19)
@@ -207,7 +207,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
 #[macro_export]
 macro_rules! FullTransactionIdFromEpochAndXid {
     ($epoch:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdFromU64 from transam.h:80 (PostgreSQL 15–19)
@@ -237,7 +237,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
 #[macro_export]
 macro_rules! FullTransactionIdFromU64 {
     ($value:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdIsNormal from transam.h:58 (PostgreSQL 15–19)
@@ -257,7 +257,7 @@ macro_rules! FullTransactionIdFromU64 {
 #[macro_export]
 macro_rules! FullTransactionIdIsNormal {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdIsValid from transam.h:55 (PostgreSQL 15–19)
@@ -277,7 +277,7 @@ macro_rules! FullTransactionIdIsNormal {
 #[macro_export]
 macro_rules! FullTransactionIdIsValid {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdNewer from transam.h:359 (PostgreSQL 15–18), transam.h:419 (PostgreSQL 19)
@@ -311,7 +311,7 @@ macro_rules! FullTransactionIdIsValid {
 #[macro_export]
 macro_rules! FullTransactionIdNewer {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdPrecedes from transam.h:51 (PostgreSQL 15–19)
@@ -327,7 +327,7 @@ macro_rules! FullTransactionIdNewer {
 #[macro_export]
 macro_rules! FullTransactionIdPrecedes {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro FullTransactionIdPrecedesOrEquals from transam.h:52 (PostgreSQL 15–19)
@@ -343,7 +343,7 @@ macro_rules! FullTransactionIdPrecedes {
 #[macro_export]
 macro_rules! FullTransactionIdPrecedesOrEquals {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdRetreat from transam.h:102 (PostgreSQL 15–19)
@@ -384,7 +384,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
 #[macro_export]
 macro_rules! FullTransactionIdRetreat {
     ($dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -409,7 +409,7 @@ macro_rules! FullTransactionIdRetreat {
 #[macro_export]
 macro_rules! NormalTransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -430,7 +430,7 @@ macro_rules! NormalTransactionIdFollows {
 #[macro_export]
 macro_rules! NormalTransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function NormalTransactionIdOlder from transam.h:348 (PostgreSQL 15–18), transam.h:408 (PostgreSQL 19)
@@ -460,7 +460,7 @@ macro_rules! NormalTransactionIdFollows {
 #[macro_export]
 macro_rules! NormalTransactionIdOlder {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
@@ -485,7 +485,7 @@ macro_rules! NormalTransactionIdOlder {
 #[macro_export]
 macro_rules! NormalTransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]
@@ -506,7 +506,7 @@ macro_rules! NormalTransactionIdPrecedes {
 #[macro_export]
 macro_rules! NormalTransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function ReadNextTransactionId from transam.h:314 (PostgreSQL 15–18), transam.h:374 (PostgreSQL 19)
@@ -532,7 +532,7 @@ macro_rules! NormalTransactionIdPrecedes {
 #[macro_export]
 macro_rules! ReadNextTransactionId {
     () => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro StoreInvalidTransactionId from transam.h:45 (PostgreSQL 15–19)
@@ -548,7 +548,7 @@ macro_rules! ReadNextTransactionId {
 #[macro_export]
 macro_rules! StoreInvalidTransactionId {
     ($dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransactionIdAdvance from transam.h:91 (PostgreSQL 15–19)
@@ -570,7 +570,7 @@ macro_rules! StoreInvalidTransactionId {
 #[macro_export]
 macro_rules! TransactionIdAdvance {
     ($dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransactionIdEquals from transam.h:43 (PostgreSQL 15–19)
@@ -586,7 +586,7 @@ macro_rules! TransactionIdAdvance {
 #[macro_export]
 macro_rules! TransactionIdEquals {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -619,7 +619,7 @@ macro_rules! TransactionIdEquals {
 #[macro_export]
 macro_rules! TransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -652,7 +652,7 @@ macro_rules! TransactionIdFollows {
 #[macro_export]
 macro_rules! TransactionIdFollowsOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransactionIdIsNormal from transam.h:42 (PostgreSQL 15–19)
@@ -668,7 +668,7 @@ macro_rules! TransactionIdFollowsOrEquals {
 #[macro_export]
 macro_rules! TransactionIdIsNormal {
     ($xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransactionIdIsValid from transam.h:41 (PostgreSQL 15–19)
@@ -684,7 +684,7 @@ macro_rules! TransactionIdIsNormal {
 #[macro_export]
 macro_rules! TransactionIdIsValid {
     ($xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function TransactionIdOlder from transam.h:333 (PostgreSQL 15–18), transam.h:393 (PostgreSQL 19)
@@ -718,7 +718,7 @@ macro_rules! TransactionIdIsValid {
 #[macro_export]
 macro_rules! TransactionIdOlder {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -755,7 +755,7 @@ macro_rules! TransactionIdOlder {
 #[macro_export]
 macro_rules! TransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -788,7 +788,7 @@ macro_rules! TransactionIdPrecedes {
 #[macro_export]
 macro_rules! TransactionIdPrecedesOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function TransactionIdRetreatedBy from transam.h:321 (PostgreSQL 15–18), transam.h:381 (PostgreSQL 19)
@@ -819,7 +819,7 @@ macro_rules! TransactionIdPrecedesOrEquals {
 #[macro_export]
 macro_rules! TransactionIdRetreatedBy {
     ($xid:expr, $amount:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TransactionIdStore from transam.h:44 (PostgreSQL 15–19)
@@ -835,7 +835,7 @@ macro_rules! TransactionIdRetreatedBy {
 #[macro_export]
 macro_rules! TransactionIdStore {
     ($xid:expr, $dest:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro U64FromFullTransactionId from transam.h:49 (PostgreSQL 15–19)
@@ -851,7 +851,7 @@ macro_rules! TransactionIdStore {
 #[macro_export]
 macro_rules! U64FromFullTransactionId {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XidFromFullTransactionId from transam.h:48 (PostgreSQL 15–19)
@@ -871,7 +871,7 @@ macro_rules! U64FromFullTransactionId {
 #[macro_export]
 macro_rules! XidFromFullTransactionId {
     ($x:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg18")]

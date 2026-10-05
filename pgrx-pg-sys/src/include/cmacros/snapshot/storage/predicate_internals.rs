@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
     ($locktag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_OFFSET from predicate_internals.h:428 (PostgreSQL 15), predicate_internals.h:412 (PostgreSQL 16–19)
@@ -38,7 +38,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
     ($locktag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:426 (PostgreSQL 15), predicate_internals.h:410 (PostgreSQL 16–19)
@@ -58,7 +58,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
     ($locktag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:424 (PostgreSQL 15), predicate_internals.h:408 (PostgreSQL 16–19)
@@ -78,7 +78,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
     ($locktag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_TYPE from predicate_internals.h:430 (PostgreSQL 15), predicate_internals.h:414 (PostgreSQL 16–19)
@@ -94,7 +94,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
     ($locktag:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:410 (PostgreSQL 15), predicate_internals.h:394 (PostgreSQL 16–19)
@@ -110,7 +110,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:404 (PostgreSQL 15), predicate_internals.h:388 (PostgreSQL 16–19)
@@ -126,7 +126,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_TUPLE from predicate_internals.h:416 (PostgreSQL 15), predicate_internals.h:400 (PostgreSQL 16–19)
@@ -142,7 +142,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use GET_PREDICATELOCKTARGETTAG_DB;

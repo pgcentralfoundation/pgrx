@@ -27,7 +27,7 @@
 #[macro_export]
 macro_rules! dclist_count {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -57,7 +57,7 @@ macro_rules! dclist_count {
 #[macro_export]
 macro_rules! dclist_delete_from {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -87,7 +87,7 @@ macro_rules! dclist_delete_from {
 #[macro_export]
 macro_rules! dclist_delete_from_thoroughly {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -117,7 +117,7 @@ macro_rules! dclist_delete_from_thoroughly {
 #[macro_export]
 macro_rules! dclist_has_next {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -147,7 +147,7 @@ macro_rules! dclist_has_next {
 #[macro_export]
 macro_rules! dclist_has_prev {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -176,7 +176,7 @@ macro_rules! dclist_has_prev {
 #[macro_export]
 macro_rules! dclist_head_element_off {
     ($head:expr, $off:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -205,7 +205,7 @@ macro_rules! dclist_head_element_off {
 #[macro_export]
 macro_rules! dclist_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -233,7 +233,7 @@ macro_rules! dclist_head_node {
 #[macro_export]
 macro_rules! dclist_init {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -266,7 +266,7 @@ macro_rules! dclist_init {
 #[macro_export]
 macro_rules! dclist_insert_after {
     ($head:expr, $after:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -299,7 +299,7 @@ macro_rules! dclist_insert_after {
 #[macro_export]
 macro_rules! dclist_insert_before {
     ($head:expr, $before:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -327,7 +327,7 @@ macro_rules! dclist_insert_before {
 #[macro_export]
 macro_rules! dclist_is_empty {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -357,7 +357,7 @@ macro_rules! dclist_is_empty {
 #[macro_export]
 macro_rules! dclist_move_head {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -387,7 +387,7 @@ macro_rules! dclist_move_head {
 #[macro_export]
 macro_rules! dclist_move_tail {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -416,7 +416,7 @@ macro_rules! dclist_move_tail {
 #[macro_export]
 macro_rules! dclist_next_node {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -449,7 +449,7 @@ macro_rules! dclist_next_node {
 #[macro_export]
 macro_rules! dclist_pop_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -478,7 +478,7 @@ macro_rules! dclist_pop_head_node {
 #[macro_export]
 macro_rules! dclist_prev_node {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -511,7 +511,7 @@ macro_rules! dclist_prev_node {
 #[macro_export]
 macro_rules! dclist_push_head {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -544,7 +544,7 @@ macro_rules! dclist_push_head {
 #[macro_export]
 macro_rules! dclist_push_tail {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -573,7 +573,7 @@ macro_rules! dclist_push_tail {
 #[macro_export]
 macro_rules! dclist_tail_element_off {
     ($head:expr, $off:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -602,7 +602,7 @@ macro_rules! dclist_tail_element_off {
 #[macro_export]
 macro_rules! dclist_tail_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro dlist_check from ilist.h:267 (PostgreSQL 15), ilist.h:303 (PostgreSQL 16–19)
@@ -622,7 +622,7 @@ macro_rules! dclist_tail_node {
 #[macro_export]
 macro_rules! dlist_check {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_delete from ilist.h:357 (PostgreSQL 15), ilist.h:404 (PostgreSQL 16–19)
@@ -649,7 +649,7 @@ macro_rules! dlist_check {
 #[macro_export]
 macro_rules! dlist_delete {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -677,7 +677,7 @@ macro_rules! dlist_delete {
 #[macro_export]
 macro_rules! dlist_delete_from {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -705,7 +705,7 @@ macro_rules! dlist_delete_from {
 #[macro_export]
 macro_rules! dlist_delete_from_thoroughly {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -735,7 +735,7 @@ macro_rules! dlist_delete_from_thoroughly {
 #[macro_export]
 macro_rules! dlist_delete_thoroughly {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -762,7 +762,7 @@ macro_rules! dlist_delete_thoroughly {
 #[macro_export]
 macro_rules! dlist_has_next {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -789,7 +789,7 @@ macro_rules! dlist_has_next {
 #[macro_export]
 macro_rules! dlist_has_next {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -816,7 +816,7 @@ macro_rules! dlist_has_next {
 #[macro_export]
 macro_rules! dlist_has_prev {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -843,7 +843,7 @@ macro_rules! dlist_has_prev {
 #[macro_export]
 macro_rules! dlist_has_prev {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_head_element_off from ilist.h:457 (PostgreSQL 15), ilist.h:554 (PostgreSQL 16–19)
@@ -870,7 +870,7 @@ macro_rules! dlist_has_prev {
 #[macro_export]
 macro_rules! dlist_head_element_off {
     ($head:expr, $off:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_head_node from ilist.h:467 (PostgreSQL 15), ilist.h:564 (PostgreSQL 16–19)
@@ -896,7 +896,7 @@ macro_rules! dlist_head_element_off {
 #[macro_export]
 macro_rules! dlist_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_init from ilist.h:277 (PostgreSQL 15), ilist.h:313 (PostgreSQL 16–19)
@@ -922,7 +922,7 @@ macro_rules! dlist_head_node {
 #[macro_export]
 macro_rules! dlist_init {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_insert_after from ilist.h:333 (PostgreSQL 15), ilist.h:380 (PostgreSQL 16–19)
@@ -951,7 +951,7 @@ macro_rules! dlist_init {
 #[macro_export]
 macro_rules! dlist_insert_after {
     ($after:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_insert_before from ilist.h:345 (PostgreSQL 15), ilist.h:392 (PostgreSQL 16–19)
@@ -980,7 +980,7 @@ macro_rules! dlist_insert_after {
 #[macro_export]
 macro_rules! dlist_insert_before {
     ($before:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1009,7 +1009,7 @@ macro_rules! dlist_insert_before {
 #[macro_export]
 macro_rules! dlist_is_empty {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1038,7 +1038,7 @@ macro_rules! dlist_is_empty {
 #[macro_export]
 macro_rules! dlist_is_empty {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1059,7 +1059,7 @@ macro_rules! dlist_is_empty {
 #[macro_export]
 macro_rules! dlist_member_check {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_move_head from ilist.h:384 (PostgreSQL 15), ilist.h:466 (PostgreSQL 16–19)
@@ -1092,7 +1092,7 @@ macro_rules! dlist_member_check {
 #[macro_export]
 macro_rules! dlist_move_head {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_move_tail from ilist.h:403 (PostgreSQL 15), ilist.h:485 (PostgreSQL 16–19)
@@ -1125,7 +1125,7 @@ macro_rules! dlist_move_head {
 #[macro_export]
 macro_rules! dlist_move_tail {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_next_node from ilist.h:439 (PostgreSQL 15), ilist.h:536 (PostgreSQL 16–19)
@@ -1152,7 +1152,7 @@ macro_rules! dlist_move_tail {
 #[macro_export]
 macro_rules! dlist_next_node {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1179,7 +1179,7 @@ macro_rules! dlist_next_node {
 #[macro_export]
 macro_rules! dlist_node_init {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1209,7 +1209,7 @@ macro_rules! dlist_node_init {
 #[macro_export]
 macro_rules! dlist_node_is_detached {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_pop_head_node from ilist.h:367 (PostgreSQL 15), ilist.h:449 (PostgreSQL 16–19)
@@ -1240,7 +1240,7 @@ macro_rules! dlist_node_is_detached {
 #[macro_export]
 macro_rules! dlist_pop_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_prev_node from ilist.h:449 (PostgreSQL 15), ilist.h:546 (PostgreSQL 16–19)
@@ -1267,7 +1267,7 @@ macro_rules! dlist_pop_head_node {
 #[macro_export]
 macro_rules! dlist_prev_node {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_push_head from ilist.h:299 (PostgreSQL 15), ilist.h:346 (PostgreSQL 16–19)
@@ -1301,7 +1301,7 @@ macro_rules! dlist_prev_node {
 #[macro_export]
 macro_rules! dlist_push_head {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_push_tail from ilist.h:316 (PostgreSQL 15), ilist.h:363 (PostgreSQL 16–19)
@@ -1335,7 +1335,7 @@ macro_rules! dlist_push_head {
 #[macro_export]
 macro_rules! dlist_push_tail {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_tail_element_off from ilist.h:474 (PostgreSQL 15), ilist.h:571 (PostgreSQL 16–19)
@@ -1362,7 +1362,7 @@ macro_rules! dlist_push_tail {
 #[macro_export]
 macro_rules! dlist_tail_element_off {
     ($head:expr, $off:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function dlist_tail_node from ilist.h:484 (PostgreSQL 15), ilist.h:581 (PostgreSQL 16–19)
@@ -1388,7 +1388,7 @@ macro_rules! dlist_tail_element_off {
 #[macro_export]
 macro_rules! dlist_tail_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro slist_check from ilist.h:268 (PostgreSQL 15), ilist.h:304 (PostgreSQL 16–19)
@@ -1408,7 +1408,7 @@ macro_rules! dlist_tail_node {
 #[macro_export]
 macro_rules! slist_check {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_delete_current from ilist.h:670 (PostgreSQL 15), ilist.h:1083 (PostgreSQL 16–19)
@@ -1445,7 +1445,7 @@ macro_rules! slist_check {
 #[macro_export]
 macro_rules! slist_delete_current {
     ($iter:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1474,7 +1474,7 @@ macro_rules! slist_delete_current {
 #[macro_export]
 macro_rules! slist_has_next {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1503,7 +1503,7 @@ macro_rules! slist_has_next {
 #[macro_export]
 macro_rules! slist_has_next {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_head_element_off from ilist.h:648 (PostgreSQL 15), ilist.h:1061 (PostgreSQL 16–19)
@@ -1530,7 +1530,7 @@ macro_rules! slist_has_next {
 #[macro_export]
 macro_rules! slist_head_element_off {
     ($head:expr, $off:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_head_node from ilist.h:658 (PostgreSQL 15), ilist.h:1071 (PostgreSQL 16–19)
@@ -1556,7 +1556,7 @@ macro_rules! slist_head_element_off {
 #[macro_export]
 macro_rules! slist_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_init from ilist.h:572 (PostgreSQL 15), ilist.h:985 (PostgreSQL 16–19)
@@ -1582,7 +1582,7 @@ macro_rules! slist_head_node {
 #[macro_export]
 macro_rules! slist_init {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_insert_after from ilist.h:604 (PostgreSQL 15), ilist.h:1017 (PostgreSQL 16–19)
@@ -1609,7 +1609,7 @@ macro_rules! slist_init {
 #[macro_export]
 macro_rules! slist_insert_after {
     ($after:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -1638,7 +1638,7 @@ macro_rules! slist_insert_after {
 #[macro_export]
 macro_rules! slist_is_empty {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1667,7 +1667,7 @@ macro_rules! slist_is_empty {
 #[macro_export]
 macro_rules! slist_is_empty {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_next_node from ilist.h:640 (PostgreSQL 15), ilist.h:1053 (PostgreSQL 16–19)
@@ -1694,7 +1694,7 @@ macro_rules! slist_is_empty {
 #[macro_export]
 macro_rules! slist_next_node {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_pop_head_node from ilist.h:614 (PostgreSQL 15), ilist.h:1027 (PostgreSQL 16–19)
@@ -1726,7 +1726,7 @@ macro_rules! slist_next_node {
 #[macro_export]
 macro_rules! slist_pop_head_node {
     ($head:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function slist_push_head from ilist.h:592 (PostgreSQL 15), ilist.h:1005 (PostgreSQL 16–19)
@@ -1755,7 +1755,7 @@ macro_rules! slist_pop_head_node {
 #[macro_export]
 macro_rules! slist_push_head {
     ($head:expr, $node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

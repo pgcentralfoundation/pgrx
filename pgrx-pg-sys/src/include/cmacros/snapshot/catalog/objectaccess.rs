@@ -20,7 +20,7 @@
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHook {
     ($objectId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeFunctionExecuteHookStr from objectaccess.h:258 (PostgreSQL 15), objectaccess.h:260 (PostgreSQL 16–19)
@@ -42,7 +42,7 @@ macro_rules! InvokeFunctionExecuteHook {
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHookStr {
     ($objectName:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeNamespaceSearchHook from objectaccess.h:206 (PostgreSQL 15), objectaccess.h:208 (PostgreSQL 16–19)
@@ -62,7 +62,7 @@ macro_rules! InvokeFunctionExecuteHookStr {
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHook {
     ($objectId:expr, $ereport_on_violation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeNamespaceSearchHookStr from objectaccess.h:253 (PostgreSQL 15), objectaccess.h:255 (PostgreSQL 16–19)
@@ -82,7 +82,7 @@ macro_rules! InvokeNamespaceSearchHook {
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHookStr {
     ($objectName:expr, $ereport_on_violation:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectDropHook from objectaccess.h:180 (PostgreSQL 15), objectaccess.h:182 (PostgreSQL 16–19)
@@ -104,7 +104,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
 #[macro_export]
 macro_rules! InvokeObjectDropHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectDropHookArg from objectaccess.h:182 (PostgreSQL 15), objectaccess.h:184 (PostgreSQL 16–19)
@@ -126,7 +126,7 @@ macro_rules! InvokeObjectDropHook {
 #[macro_export]
 macro_rules! InvokeObjectDropHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $dropflags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectDropHookArgStr from objectaccess.h:229 (PostgreSQL 15), objectaccess.h:231 (PostgreSQL 16–19)
@@ -148,7 +148,7 @@ macro_rules! InvokeObjectDropHookArg {
 #[macro_export]
 macro_rules! InvokeObjectDropHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $dropflags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectDropHookStr from objectaccess.h:227 (PostgreSQL 15), objectaccess.h:229 (PostgreSQL 16–19)
@@ -170,7 +170,7 @@ macro_rules! InvokeObjectDropHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectDropHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostAlterHook from objectaccess.h:195 (PostgreSQL 15), objectaccess.h:197 (PostgreSQL 16–19)
@@ -192,7 +192,7 @@ macro_rules! InvokeObjectDropHookStr {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostAlterHookArg from objectaccess.h:198 (PostgreSQL 15), objectaccess.h:200 (PostgreSQL 16–19)
@@ -214,7 +214,7 @@ macro_rules! InvokeObjectPostAlterHook {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $auxiliaryId:expr, $is_internal:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostAlterHookArgStr from objectaccess.h:245 (PostgreSQL 15), objectaccess.h:247 (PostgreSQL 16–19)
@@ -236,7 +236,7 @@ macro_rules! InvokeObjectPostAlterHookArg {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $auxiliaryId:expr, $is_internal:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostAlterHookStr from objectaccess.h:242 (PostgreSQL 15), objectaccess.h:244 (PostgreSQL 16–19)
@@ -258,7 +258,7 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostCreateHook from objectaccess.h:171 (PostgreSQL 15), objectaccess.h:173 (PostgreSQL 16–19)
@@ -280,7 +280,7 @@ macro_rules! InvokeObjectPostAlterHookStr {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostCreateHookArg from objectaccess.h:173 (PostgreSQL 15), objectaccess.h:175 (PostgreSQL 16–19)
@@ -302,7 +302,7 @@ macro_rules! InvokeObjectPostCreateHook {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $is_internal:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostCreateHookArgStr from objectaccess.h:220 (PostgreSQL 15), objectaccess.h:222 (PostgreSQL 16–19)
@@ -324,7 +324,7 @@ macro_rules! InvokeObjectPostCreateHookArg {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $is_internal:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectPostCreateHookStr from objectaccess.h:218 (PostgreSQL 15), objectaccess.h:220 (PostgreSQL 16–19)
@@ -346,7 +346,7 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectTruncateHook from objectaccess.h:189 (PostgreSQL 15), objectaccess.h:191 (PostgreSQL 16–19)
@@ -368,7 +368,7 @@ macro_rules! InvokeObjectPostCreateHookStr {
 #[macro_export]
 macro_rules! InvokeObjectTruncateHook {
     ($objectId:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InvokeObjectTruncateHookStr from objectaccess.h:236 (PostgreSQL 15), objectaccess.h:238 (PostgreSQL 16–19)
@@ -390,7 +390,7 @@ macro_rules! InvokeObjectTruncateHook {
 #[macro_export]
 macro_rules! InvokeObjectTruncateHookStr {
     ($objectName:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use InvokeFunctionExecuteHook;

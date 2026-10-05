@@ -28,7 +28,7 @@
 #[macro_export]
 macro_rules! MXOffsetToFlagsBitShift {
     ($offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -59,7 +59,7 @@ macro_rules! MXOffsetToFlagsBitShift {
 #[macro_export]
 macro_rules! MXOffsetToFlagsOffset {
     ($offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -90,7 +90,7 @@ macro_rules! MXOffsetToFlagsOffset {
 #[macro_export]
 macro_rules! MXOffsetToMemberOffset {
     ($offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -117,7 +117,7 @@ macro_rules! MXOffsetToMemberOffset {
 #[macro_export]
 macro_rules! MXOffsetToMemberPage {
     ($offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -144,7 +144,7 @@ macro_rules! MXOffsetToMemberPage {
 #[macro_export]
 macro_rules! MXOffsetToMemberSegment {
     ($offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -171,7 +171,7 @@ macro_rules! MXOffsetToMemberSegment {
 #[macro_export]
 macro_rules! MultiXactIdToOffsetEntry {
     ($multi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -198,7 +198,7 @@ macro_rules! MultiXactIdToOffsetEntry {
 #[macro_export]
 macro_rules! MultiXactIdToOffsetPage {
     ($multi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -225,7 +225,7 @@ macro_rules! MultiXactIdToOffsetPage {
 #[macro_export]
 macro_rules! MultiXactIdToOffsetSegment {
     ($multi:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -257,7 +257,7 @@ macro_rules! MultiXactIdToOffsetSegment {
 #[macro_export]
 macro_rules! MultiXactOffsetStorageSize {
     ($new_offset:expr, $old_offset:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]

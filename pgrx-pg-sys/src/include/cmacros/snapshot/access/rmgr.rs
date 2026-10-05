@@ -24,7 +24,7 @@
 #[macro_export]
 macro_rules! RmgrIdIsBuiltin {
     ($rmid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function RmgrIdIsCustom from rmgr.h:47 (PostgreSQL 15–19)
@@ -50,7 +50,7 @@ macro_rules! RmgrIdIsBuiltin {
 #[macro_export]
 macro_rules! RmgrIdIsCustom {
     ($rmid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RmgrIdIsValid from rmgr.h:53 (PostgreSQL 15–19)
@@ -70,7 +70,7 @@ macro_rules! RmgrIdIsCustom {
 #[macro_export]
 macro_rules! RmgrIdIsValid {
     ($rmid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use RmgrIdIsBuiltin;

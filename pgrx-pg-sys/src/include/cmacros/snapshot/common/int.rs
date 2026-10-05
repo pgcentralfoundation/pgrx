@@ -30,7 +30,7 @@
 #[macro_export]
 macro_rules! pg_abs_s16 {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -62,7 +62,7 @@ macro_rules! pg_abs_s16 {
 #[macro_export]
 macro_rules! pg_abs_s32 {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -91,7 +91,7 @@ macro_rules! pg_abs_s32 {
 #[macro_export]
 macro_rules! pg_abs_s64 {
     ($a:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -130,7 +130,7 @@ macro_rules! pg_abs_s64 {
 #[macro_export]
 macro_rules! pg_add_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -169,7 +169,7 @@ macro_rules! pg_add_s16_overflow {
 #[macro_export]
 macro_rules! pg_add_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -217,7 +217,7 @@ macro_rules! pg_add_s32_overflow {
 #[macro_export]
 macro_rules! pg_add_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -256,7 +256,7 @@ macro_rules! pg_add_s64_overflow {
 #[macro_export]
 macro_rules! pg_add_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -295,7 +295,7 @@ macro_rules! pg_add_size_overflow {
 #[macro_export]
 macro_rules! pg_add_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -334,7 +334,7 @@ macro_rules! pg_add_u16_overflow {
 #[macro_export]
 macro_rules! pg_add_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -373,7 +373,7 @@ macro_rules! pg_add_u32_overflow {
 #[macro_export]
 macro_rules! pg_add_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -400,7 +400,7 @@ macro_rules! pg_add_u64_overflow {
 #[macro_export]
 macro_rules! pg_cmp_s16 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -427,7 +427,7 @@ macro_rules! pg_cmp_s16 {
 #[macro_export]
 macro_rules! pg_cmp_s32 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -454,7 +454,7 @@ macro_rules! pg_cmp_s32 {
 #[macro_export]
 macro_rules! pg_cmp_s64 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -481,7 +481,7 @@ macro_rules! pg_cmp_s64 {
 #[macro_export]
 macro_rules! pg_cmp_size {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -508,7 +508,7 @@ macro_rules! pg_cmp_size {
 #[macro_export]
 macro_rules! pg_cmp_u16 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -535,7 +535,7 @@ macro_rules! pg_cmp_u16 {
 #[macro_export]
 macro_rules! pg_cmp_u32 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -562,7 +562,7 @@ macro_rules! pg_cmp_u32 {
 #[macro_export]
 macro_rules! pg_cmp_u64 {
     ($a:expr, $b:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -601,7 +601,7 @@ macro_rules! pg_cmp_u64 {
 #[macro_export]
 macro_rules! pg_mul_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -640,7 +640,7 @@ macro_rules! pg_mul_s16_overflow {
 #[macro_export]
 macro_rules! pg_mul_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -704,7 +704,7 @@ macro_rules! pg_mul_s32_overflow {
 #[macro_export]
 macro_rules! pg_mul_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -743,7 +743,7 @@ macro_rules! pg_mul_s64_overflow {
 #[macro_export]
 macro_rules! pg_mul_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -782,7 +782,7 @@ macro_rules! pg_mul_size_overflow {
 #[macro_export]
 macro_rules! pg_mul_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -821,7 +821,7 @@ macro_rules! pg_mul_u16_overflow {
 #[macro_export]
 macro_rules! pg_mul_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -870,7 +870,7 @@ macro_rules! pg_mul_u32_overflow {
 #[macro_export]
 macro_rules! pg_mul_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -907,7 +907,7 @@ macro_rules! pg_mul_u64_overflow {
 #[macro_export]
 macro_rules! pg_neg_s16_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -944,7 +944,7 @@ macro_rules! pg_neg_s16_overflow {
 #[macro_export]
 macro_rules! pg_neg_s32_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -981,7 +981,7 @@ macro_rules! pg_neg_s32_overflow {
 #[macro_export]
 macro_rules! pg_neg_s64_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1020,7 +1020,7 @@ macro_rules! pg_neg_s64_overflow {
 #[macro_export]
 macro_rules! pg_neg_u16_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1059,7 +1059,7 @@ macro_rules! pg_neg_u16_overflow {
 #[macro_export]
 macro_rules! pg_neg_u32_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -1109,7 +1109,7 @@ macro_rules! pg_neg_u32_overflow {
 #[macro_export]
 macro_rules! pg_neg_u64_overflow {
     ($a:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1148,7 +1148,7 @@ macro_rules! pg_neg_u64_overflow {
 #[macro_export]
 macro_rules! pg_sub_s16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1187,7 +1187,7 @@ macro_rules! pg_sub_s16_overflow {
 #[macro_export]
 macro_rules! pg_sub_s32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1239,7 +1239,7 @@ macro_rules! pg_sub_s32_overflow {
 #[macro_export]
 macro_rules! pg_sub_s64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1276,7 +1276,7 @@ macro_rules! pg_sub_s64_overflow {
 #[macro_export]
 macro_rules! pg_sub_size_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1313,7 +1313,7 @@ macro_rules! pg_sub_size_overflow {
 #[macro_export]
 macro_rules! pg_sub_u16_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1350,7 +1350,7 @@ macro_rules! pg_sub_u16_overflow {
 #[macro_export]
 macro_rules! pg_sub_u32_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1387,7 +1387,7 @@ macro_rules! pg_sub_u32_overflow {
 #[macro_export]
 macro_rules! pg_sub_u64_overflow {
     ($a:expr, $b:expr, $result:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

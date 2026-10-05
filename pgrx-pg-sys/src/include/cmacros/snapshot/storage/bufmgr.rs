@@ -19,7 +19,7 @@
 #[macro_export]
 macro_rules! BMR_GET_SMGR {
     ($bmr:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -44,7 +44,7 @@ macro_rules! BMR_GET_SMGR {
 #[macro_export]
 macro_rules! BufferGetBlock {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -76,7 +76,7 @@ macro_rules! BufferGetBlock {
 #[macro_export]
 macro_rules! BufferGetBlock {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -101,7 +101,7 @@ macro_rules! BufferGetBlock {
 #[macro_export]
 macro_rules! BufferGetPage {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -128,7 +128,7 @@ macro_rules! BufferGetPage {
 #[macro_export]
 macro_rules! BufferGetPage {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -153,7 +153,7 @@ macro_rules! BufferGetPage {
 #[macro_export]
 macro_rules! BufferGetPageSize {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -181,7 +181,7 @@ macro_rules! BufferGetPageSize {
 #[macro_export]
 macro_rules! BufferGetPageSize {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -209,7 +209,7 @@ macro_rules! BufferGetPageSize {
 #[macro_export]
 macro_rules! BufferGetPageSize {
     ($buffer:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg15")]
@@ -234,7 +234,7 @@ macro_rules! BufferGetPageSize {
 #[macro_export]
 macro_rules! BufferIsValid {
     ($bufnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -264,7 +264,7 @@ macro_rules! BufferIsValid {
 #[macro_export]
 macro_rules! BufferIsValid {
     ($bufnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -294,7 +294,7 @@ macro_rules! BufferIsValid {
 #[macro_export]
 macro_rules! LockBuffer {
     ($buffer:expr, $mode:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RelationGetNumberOfBlocks from bufmgr.h:219 (PostgreSQL 15), bufmgr.h:230 (PostgreSQL 16), bufmgr.h:280 (PostgreSQL 17), bufmgr.h:283 (PostgreSQL 18), bufmgr.h:309 (PostgreSQL 19)
@@ -314,7 +314,7 @@ macro_rules! LockBuffer {
 #[macro_export]
 macro_rules! RelationGetNumberOfBlocks {
     ($reln:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -349,7 +349,7 @@ macro_rules! RelationGetNumberOfBlocks {
 #[macro_export]
 macro_rules! TestForOldSnapshot {
     ($snapshot:expr, $relation:expr, $page:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]

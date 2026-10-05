@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! RelFileLocatorBackendEquals {
     ($locator1:expr, $locator2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg16")]
@@ -32,7 +32,7 @@ macro_rules! RelFileLocatorBackendEquals {
 #[macro_export]
 macro_rules! RelFileLocatorBackendIsTemp {
     ($rlocator:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -49,7 +49,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
 #[macro_export]
 macro_rules! RelFileLocatorBackendIsTemp {
     ($rlocator:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -66,7 +66,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
 #[macro_export]
 macro_rules! RelFileLocatorEquals {
     ($locator1:expr, $locator2:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

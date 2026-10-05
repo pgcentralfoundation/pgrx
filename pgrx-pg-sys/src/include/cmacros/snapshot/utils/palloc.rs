@@ -27,7 +27,7 @@
 #[macro_export]
 macro_rules! MemoryContextSwitchTo {
     ($context:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro palloc0_array from palloc.h:111 (PostgreSQL 15), palloc.h:115 (PostgreSQL 16), palloc.h:114 (PostgreSQL 17–19)
@@ -47,7 +47,7 @@ macro_rules! MemoryContextSwitchTo {
 #[macro_export]
 macro_rules! palloc0_array {
     ($type:ty, $count:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro palloc0_object from palloc.h:105 (PostgreSQL 15), palloc.h:109 (PostgreSQL 16), palloc.h:108 (PostgreSQL 17–19)
@@ -67,7 +67,7 @@ macro_rules! palloc0_array {
 #[macro_export]
 macro_rules! palloc0_object {
     ($type:ty $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -88,7 +88,7 @@ macro_rules! palloc0_object {
 #[macro_export]
 macro_rules! palloc0fast {
     ($sz:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro palloc_array from palloc.h:110 (PostgreSQL 15), palloc.h:114 (PostgreSQL 16), palloc.h:113 (PostgreSQL 17–19)
@@ -108,7 +108,7 @@ macro_rules! palloc0fast {
 #[macro_export]
 macro_rules! palloc_array {
     ($type:ty, $count:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro palloc_array_extended from palloc.h:112 (PostgreSQL 15), palloc.h:116 (PostgreSQL 16), palloc.h:115 (PostgreSQL 17–19)
@@ -128,7 +128,7 @@ macro_rules! palloc_array {
 #[macro_export]
 macro_rules! palloc_array_extended {
     ($type:ty, $count:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro palloc_object from palloc.h:104 (PostgreSQL 15), palloc.h:108 (PostgreSQL 16), palloc.h:107 (PostgreSQL 17–19)
@@ -148,7 +148,7 @@ macro_rules! palloc_array_extended {
 #[macro_export]
 macro_rules! palloc_object {
     ($type:ty $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -169,7 +169,7 @@ macro_rules! palloc_object {
 #[macro_export]
 macro_rules! repalloc0_array {
     ($pointer:expr, $type:ty, $oldcount:expr, $count:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro repalloc_array from palloc.h:118 (PostgreSQL 15), palloc.h:122 (PostgreSQL 16), palloc.h:121 (PostgreSQL 17–19)
@@ -189,7 +189,7 @@ macro_rules! repalloc0_array {
 #[macro_export]
 macro_rules! repalloc_array {
     ($pointer:expr, $type:ty, $count:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro repalloc_array_extended from palloc.h:119 (PostgreSQL 15), palloc.h:124 (PostgreSQL 16), palloc.h:123 (PostgreSQL 17–19)
@@ -209,7 +209,7 @@ macro_rules! repalloc_array {
 #[macro_export]
 macro_rules! repalloc_array_extended {
     ($pointer:expr, $type:ty, $count:expr, $flags:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use MemoryContextSwitchTo;

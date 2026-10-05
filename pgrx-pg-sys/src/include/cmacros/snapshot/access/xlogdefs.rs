@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! XLogRecPtrIsInvalid {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro XLogRecPtrIsValid from xlogdefs.h:29 (PostgreSQL 15–19)
@@ -30,7 +30,7 @@ macro_rules! XLogRecPtrIsInvalid {
 #[macro_export]
 macro_rules! XLogRecPtrIsValid {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use XLogRecPtrIsInvalid;

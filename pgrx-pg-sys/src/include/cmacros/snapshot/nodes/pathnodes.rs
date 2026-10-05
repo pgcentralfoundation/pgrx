@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! EC_MUST_BE_REDUNDANT {
     ($eclass:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +32,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
 #[macro_export]
 macro_rules! EC_MUST_BE_REDUNDANT {
     ($eclass:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_DUMMY_APPEND from pathnodes.h:1464 (PostgreSQL 15), pathnodes.h:1899 (PostgreSQL 16), pathnodes.h:1941 (PostgreSQL 17), pathnodes.h:2073 (PostgreSQL 18), pathnodes.h:2291 (PostgreSQL 19)
@@ -52,7 +52,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
 #[macro_export]
 macro_rules! IS_DUMMY_APPEND {
     ($p:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_DUMMY_REL from pathnodes.h:1472 (PostgreSQL 15), pathnodes.h:1907 (PostgreSQL 16), pathnodes.h:1949 (PostgreSQL 17), pathnodes.h:2081 (PostgreSQL 18), pathnodes.h:2299 (PostgreSQL 19)
@@ -72,7 +72,7 @@ macro_rules! IS_DUMMY_APPEND {
 #[macro_export]
 macro_rules! IS_DUMMY_REL {
     ($r:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -93,7 +93,7 @@ macro_rules! IS_DUMMY_REL {
 #[macro_export]
 macro_rules! IS_GROUPED_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_JOIN_REL from pathnodes.h:660 (PostgreSQL 15), pathnodes.h:829 (PostgreSQL 16), pathnodes.h:838 (PostgreSQL 17), pathnodes.h:868 (PostgreSQL 18), pathnodes.h:994 (PostgreSQL 19)
@@ -109,7 +109,7 @@ macro_rules! IS_GROUPED_REL {
 #[macro_export]
 macro_rules! IS_JOIN_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_OTHER_REL from pathnodes.h:670 (PostgreSQL 15), pathnodes.h:839 (PostgreSQL 16), pathnodes.h:848 (PostgreSQL 17), pathnodes.h:878 (PostgreSQL 18), pathnodes.h:1004 (PostgreSQL 19)
@@ -125,7 +125,7 @@ macro_rules! IS_JOIN_REL {
 #[macro_export]
 macro_rules! IS_OTHER_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_PARTITIONED_REL from pathnodes.h:787 (PostgreSQL 15), pathnodes.h:1041 (PostgreSQL 16), pathnodes.h:1056 (PostgreSQL 17), pathnodes.h:1086 (PostgreSQL 18), pathnodes.h:1231 (PostgreSQL 19)
@@ -145,7 +145,7 @@ macro_rules! IS_OTHER_REL {
 #[macro_export]
 macro_rules! IS_PARTITIONED_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_SIMPLE_REL from pathnodes.h:655 (PostgreSQL 15), pathnodes.h:824 (PostgreSQL 16), pathnodes.h:833 (PostgreSQL 17), pathnodes.h:863 (PostgreSQL 18), pathnodes.h:989 (PostgreSQL 19)
@@ -161,7 +161,7 @@ macro_rules! IS_PARTITIONED_REL {
 #[macro_export]
 macro_rules! IS_SIMPLE_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro IS_UPPER_REL from pathnodes.h:665 (PostgreSQL 15), pathnodes.h:834 (PostgreSQL 16), pathnodes.h:843 (PostgreSQL 17), pathnodes.h:873 (PostgreSQL 18), pathnodes.h:999 (PostgreSQL 19)
@@ -177,7 +177,7 @@ macro_rules! IS_SIMPLE_REL {
 #[macro_export]
 macro_rules! IS_UPPER_REL {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PATH_REQ_OUTER from pathnodes.h:1204 (PostgreSQL 15), pathnodes.h:1640 (PostgreSQL 16), pathnodes.h:1672 (PostgreSQL 17), pathnodes.h:1804 (PostgreSQL 18), pathnodes.h:2015 (PostgreSQL 19)
@@ -197,7 +197,7 @@ macro_rules! IS_UPPER_REL {
 #[macro_export]
 macro_rules! PATH_REQ_OUTER {
     ($path:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -218,7 +218,7 @@ macro_rules! PATH_REQ_OUTER {
 #[macro_export]
 macro_rules! RELATION_WAS_MADE_UNIQUE {
     ($rel:expr, $sjinfo:expr, $nominal_jointype:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro REL_HAS_ALL_PART_PROPS from pathnodes.h:795 (PostgreSQL 15), pathnodes.h:1049 (PostgreSQL 16), pathnodes.h:1064 (PostgreSQL 17), pathnodes.h:1094 (PostgreSQL 18), pathnodes.h:1239 (PostgreSQL 19)
@@ -234,7 +234,7 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
 #[macro_export]
 macro_rules! REL_HAS_ALL_PART_PROPS {
     ($rel:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro RINFO_IS_PUSHED_DOWN from pathnodes.h:2153 (PostgreSQL 15), pathnodes.h:2676 (PostgreSQL 16), pathnodes.h:2724 (PostgreSQL 17), pathnodes.h:2863 (PostgreSQL 18), pathnodes.h:3058 (PostgreSQL 19)
@@ -254,7 +254,7 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
 #[macro_export]
 macro_rules! RINFO_IS_PUSHED_DOWN {
     ($rinfo:expr, $joinrelids:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro get_pathtarget_sortgroupref from pathnodes.h:1122 (PostgreSQL 15), pathnodes.h:1520 (PostgreSQL 16), pathnodes.h:1552 (PostgreSQL 17), pathnodes.h:1683 (PostgreSQL 18), pathnodes.h:1894 (PostgreSQL 19)
@@ -274,7 +274,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
 #[macro_export]
 macro_rules! get_pathtarget_sortgroupref {
     ($target:expr, $colno:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro planner_rt_fetch from pathnodes.h:389 (PostgreSQL 15), pathnodes.h:555 (PostgreSQL 16), pathnodes.h:564 (PostgreSQL 17), pathnodes.h:594 (PostgreSQL 18), pathnodes.h:704 (PostgreSQL 19)
@@ -294,7 +294,7 @@ macro_rules! get_pathtarget_sortgroupref {
 #[macro_export]
 macro_rules! planner_rt_fetch {
     ($rti:expr, $root:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro planner_subplan_get_plan from pathnodes.h:136 (PostgreSQL 15), pathnodes.h:166 (PostgreSQL 16), pathnodes.h:169 (PostgreSQL 17), pathnodes.h:185 (PostgreSQL 18), pathnodes.h:277 (PostgreSQL 19)
@@ -314,7 +314,7 @@ macro_rules! planner_rt_fetch {
 #[macro_export]
 macro_rules! planner_subplan_get_plan {
     ($root:expr, $subplan:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use EC_MUST_BE_REDUNDANT;

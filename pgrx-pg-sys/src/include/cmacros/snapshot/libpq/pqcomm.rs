@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! PG_PROTOCOL {
     ($m:expr, $n:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -39,7 +39,7 @@ macro_rules! PG_PROTOCOL {
 #[macro_export]
 macro_rules! PG_PROTOCOL_FULL {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_PROTOCOL_MAJOR from pqcomm.h:113 (PostgreSQL 15), pqcomm.h:81 (PostgreSQL 16), pqcomm.h:87 (PostgreSQL 17–18), pqcomm.h:86 (PostgreSQL 19)
@@ -59,7 +59,7 @@ macro_rules! PG_PROTOCOL_FULL {
 #[macro_export]
 macro_rules! PG_PROTOCOL_MAJOR {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro PG_PROTOCOL_MINOR from pqcomm.h:114 (PostgreSQL 15), pqcomm.h:82 (PostgreSQL 16), pqcomm.h:88 (PostgreSQL 17–18), pqcomm.h:87 (PostgreSQL 19)
@@ -75,7 +75,7 @@ macro_rules! PG_PROTOCOL_MAJOR {
 #[macro_export]
 macro_rules! PG_PROTOCOL_MINOR {
     ($v:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// Typed call adapter for C inline function is_unixsock_path from pqcomm.h:92 (PostgreSQL 15), pqcomm.h:60 (PostgreSQL 16), pqcomm.h:66 (PostgreSQL 17–18), pqcomm.h:65 (PostgreSQL 19)
@@ -101,7 +101,7 @@ macro_rules! PG_PROTOCOL_MINOR {
 #[macro_export]
 macro_rules! is_unixsock_path {
     ($path:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use PG_PROTOCOL;

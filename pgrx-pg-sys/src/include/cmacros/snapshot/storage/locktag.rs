@@ -15,7 +15,7 @@
 #[macro_export]
 macro_rules! SET_LOCKTAG_ADVISORY {
     ($locktag:expr, $id1:expr, $id2:expr, $id3:expr, $id4:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -32,7 +32,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
 #[macro_export]
 macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
     ($locktag:expr, $dboid:expr, $suboid:expr, $xid:expr, $objid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -49,7 +49,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
     ($locktag:expr, $dboid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -66,7 +66,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
 #[macro_export]
 macro_rules! SET_LOCKTAG_OBJECT {
     ($locktag:expr, $dboid:expr, $classoid:expr, $objoid:expr, $objsubid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -83,7 +83,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
 #[macro_export]
 macro_rules! SET_LOCKTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -100,7 +100,7 @@ macro_rules! SET_LOCKTAG_PAGE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -117,7 +117,7 @@ macro_rules! SET_LOCKTAG_RELATION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION_EXTEND {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -134,7 +134,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
 #[macro_export]
 macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
     ($locktag:expr, $xid:expr, $token:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -151,7 +151,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TRANSACTION {
     ($locktag:expr, $xid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -168,7 +168,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]
@@ -185,7 +185,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 #[cfg(feature = "pg19")]

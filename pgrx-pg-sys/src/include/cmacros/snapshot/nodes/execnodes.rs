@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! InitTupleHashIterator {
     ($htable:expr, $iter:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InstrCountFiltered1 from execnodes.h:1127 (PostgreSQL 15), execnodes.h:1143 (PostgreSQL 16), execnodes.h:1223 (PostgreSQL 17), execnodes.h:1259 (PostgreSQL 18), execnodes.h:1307 (PostgreSQL 19)
@@ -40,7 +40,7 @@ macro_rules! InitTupleHashIterator {
 #[macro_export]
 macro_rules! InstrCountFiltered1 {
     ($node:expr, $delta:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InstrCountFiltered2 from execnodes.h:1132 (PostgreSQL 15), execnodes.h:1148 (PostgreSQL 16), execnodes.h:1228 (PostgreSQL 17), execnodes.h:1264 (PostgreSQL 18), execnodes.h:1312 (PostgreSQL 19)
@@ -62,7 +62,7 @@ macro_rules! InstrCountFiltered1 {
 #[macro_export]
 macro_rules! InstrCountFiltered2 {
     ($node:expr, $delta:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro InstrCountTuples2 from execnodes.h:1122 (PostgreSQL 15), execnodes.h:1138 (PostgreSQL 16), execnodes.h:1218 (PostgreSQL 17), execnodes.h:1254 (PostgreSQL 18), execnodes.h:1302 (PostgreSQL 19)
@@ -84,7 +84,7 @@ macro_rules! InstrCountFiltered2 {
 #[macro_export]
 macro_rules! InstrCountTuples2 {
     ($node:expr, $delta:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ResetTupleHashIterator from execnodes.h:826 (PostgreSQL 15), execnodes.h:840 (PostgreSQL 16), execnodes.h:849 (PostgreSQL 17), execnodes.h:887 (PostgreSQL 18), execnodes.h:934 (PostgreSQL 19)
@@ -104,7 +104,7 @@ macro_rules! InstrCountTuples2 {
 #[macro_export]
 macro_rules! ResetTupleHashIterator {
     ($htable:expr, $iter:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro ScanTupleHashTable from execnodes.h:828 (PostgreSQL 15), execnodes.h:842 (PostgreSQL 16), execnodes.h:851 (PostgreSQL 17), execnodes.h:889 (PostgreSQL 18), execnodes.h:936 (PostgreSQL 19)
@@ -124,7 +124,7 @@ macro_rules! ResetTupleHashIterator {
 #[macro_export]
 macro_rules! ScanTupleHashTable {
     ($htable:expr, $iter:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro TermTupleHashIterator from execnodes.h:824 (PostgreSQL 15), execnodes.h:838 (PostgreSQL 16), execnodes.h:847 (PostgreSQL 17), execnodes.h:885 (PostgreSQL 18), execnodes.h:932 (PostgreSQL 19)
@@ -144,7 +144,7 @@ macro_rules! ScanTupleHashTable {
 #[macro_export]
 macro_rules! TermTupleHashIterator {
     ($iter:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro innerPlanState from execnodes.h:1118 (PostgreSQL 15), execnodes.h:1134 (PostgreSQL 16), execnodes.h:1214 (PostgreSQL 17), execnodes.h:1250 (PostgreSQL 18), execnodes.h:1298 (PostgreSQL 19)
@@ -164,7 +164,7 @@ macro_rules! TermTupleHashIterator {
 #[macro_export]
 macro_rules! innerPlanState {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro outerPlanState from execnodes.h:1119 (PostgreSQL 15), execnodes.h:1135 (PostgreSQL 16), execnodes.h:1215 (PostgreSQL 17), execnodes.h:1251 (PostgreSQL 18), execnodes.h:1299 (PostgreSQL 19)
@@ -184,7 +184,7 @@ macro_rules! innerPlanState {
 #[macro_export]
 macro_rules! outerPlanState {
     ($node:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use InitTupleHashIterator;

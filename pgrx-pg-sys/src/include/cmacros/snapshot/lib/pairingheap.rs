@@ -18,7 +18,7 @@
 #[macro_export]
 macro_rules! pairingheap_is_empty {
     ($h:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pairingheap_is_singular from pairingheap.h:99 (PostgreSQL 15–18), pairingheap.h:102 (PostgreSQL 19)
@@ -38,7 +38,7 @@ macro_rules! pairingheap_is_empty {
 #[macro_export]
 macro_rules! pairingheap_is_singular {
     ($h:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 /// C macro pairingheap_reset from pairingheap.h:93 (PostgreSQL 15–18), pairingheap.h:96 (PostgreSQL 19)
@@ -58,7 +58,7 @@ macro_rules! pairingheap_is_singular {
 #[macro_export]
 macro_rules! pairingheap_reset {
     ($h:expr $(,)?) => {
-        ::core::unimplemented!("pgrx documentation snapshot; C macros are generated for each build")
+        $crate::__pgrx_c_documentation_shell!()
     };
 }
 pub use pairingheap_is_empty;
