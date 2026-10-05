@@ -153,6 +153,16 @@ mod tests {
         assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
     }
 
+    #[pg_test]
+    fn test_of_finds_owning_context_and_rejects_null() {
+        assert!(unsafe { PgMemoryContexts::of(std::ptr::null_mut()) }.is_none());
+
+        let ptr = unsafe { pg_sys::palloc(8) };
+        let owner = unsafe { PgMemoryContexts::of(ptr) }.expect("palloc'd chunk has an owner");
+        assert_eq!(owner.value(), PgMemoryContexts::CurrentMemoryContext.value());
+        unsafe { pg_sys::pfree(ptr) };
+    }
+
     #[cfg(feature = "nightly")]
     #[pg_test]
     fn memcx_allocator_test_string_vecs() {

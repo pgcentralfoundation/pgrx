@@ -16,11 +16,15 @@ use std::num::NonZeroUsize;
 ///
 /// ## Safety
 ///
-/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
+/// This function is safe, but if `row` is a null `HeapTupleHeader` pointer, it will `panic!()`
 #[inline]
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
+    // Detoasting reads the varlena header, so reject NULL before it can be dereferenced.
+    if row.is_null() {
+        panic!("Attempt to dereference a null HeapTupleHeader");
+    }
     let htup_header =
         unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
@@ -50,11 +54,12 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
+    // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
     let datum = unsafe {
         pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
-    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     if is_null { None } else { unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) } }
 }
@@ -110,11 +115,12 @@ pub fn heap_getattr_datum_ex(
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
+    // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
     let datum = unsafe {
         pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
-    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     let mut typlen = 0;
     let mut typbyval = false;

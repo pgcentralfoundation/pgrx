@@ -8,7 +8,9 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
-use crate::{FromDatum, IntoDatum, PgBox, PgTupleDesc, direct_function_call, pg_sys};
+use crate::{
+    FromDatum, IntoDatum, PgBox, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys,
+};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
@@ -141,12 +143,7 @@ impl PgRelation {
     ///
     /// Note that the name is only unique within the containing namespace.
     pub fn name(&self) -> &str {
-        // SAFETY: this open relation owns the catalog name, which is initialized and NUL-terminated.
-        unsafe {
-            core::ffi::CStr::from_ptr(pg_sys::RelationGetRelationName!(self.boxed.as_ptr()).get())
-        }
-        .to_str()
-        .expect("unable to convert relation name to UTF8")
+        name_data_to_str(&self.class_form().relname)
     }
 
     /// RelationGetRelid
@@ -160,8 +157,7 @@ impl PgRelation {
     /// RelationGetNamespace
     ///            Returns the rel's namespace OID.
     pub fn namespace_oid(&self) -> pg_sys::Oid {
-        // SAFETY: the relation keeps its catalog entry initialized for this access.
-        pg_sys::Oid::from(unsafe { pg_sys::RelationGetNamespace!(self.boxed.as_ptr()).get() })
+        self.class_form().relnamespace
     }
 
     /// What is the name of the namespace in which this relation is located?

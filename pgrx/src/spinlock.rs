@@ -62,8 +62,16 @@ impl<T: PGRXSharedMemory> PgSpinLock<T> {
     #[inline]
     #[doc(alias = "SpinLockFree")]
     pub fn is_locked(&self) -> bool {
-        // SAFETY: Doesn't actually modify state, despite appearances.
-        unsafe { pg_sys::SpinLockFree!(self.lock.get()).get() == 0 }
+        use pg_sys::__pgrx_c_macros::expression::{CVolatile, Pointer};
+        // PostgreSQL passes `volatile slock_t *` here. Tag the operand the same way so
+        // `S_LOCK_FREE` performs a volatile load that a polling loop cannot hoist.
+        let lock = Pointer::<CVolatile<pg_sys::__pgrx_c_types::slock_t>>::new(self.lock.get());
+        // SAFETY: `self` keeps the aligned lock initialized by `new` alive. The read goes
+        // through a raw pointer without creating a reference, matching PostgreSQL's own
+        // unlocked `S_LOCK_FREE` reads of a lock other backends may be changing. PG15–17
+        // builds without native spinlocks make this a guarded native call instead, which must
+        // run on the backend thread; the guard panics on any other thread.
+        unsafe { pg_sys::SpinLockFree!(lock).get() == 0 }
     }
 
     /// Returns a lock guard for the spinlock. See the [`PgSpinLockGuard`]

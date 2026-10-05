@@ -19,6 +19,8 @@ pub fn item_pointer_get_both(
     ctid: pg_sys::ItemPointerData,
 ) -> (pg_sys::BlockNumber, pg_sys::OffsetNumber) {
     // SAFETY: ctid is initialized native storage and stays live for both non-mutating reads.
+    // On PG16+ these are guarded native calls: they must run on the backend thread, and
+    // the guard panics on any other thread.
     unsafe {
         let ptr = &raw const ctid;
         (

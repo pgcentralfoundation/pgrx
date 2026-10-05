@@ -890,4 +890,37 @@ mod tests {
         assert_eq!(result, 10_000);
         Ok(())
     }
+
+    /// Build a two-attribute Dog tuple with `scritches` set to 3.
+    fn scritched_dog()
+    -> (pgrx::PgTupleDesc<'static>, pgrx::PgBox<pg_sys::HeapTupleData, AllocatedByRust>) {
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
+        let mut dog = PgHeapTuple::new_composite_type("Dog").unwrap();
+        dog.set_by_name("scritches", 3_i32).unwrap();
+        let tuple = pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap());
+        (tupdesc, tuple)
+    }
+
+    #[pg_test(error = "no attribute")]
+    fn test_htup_heap_getattr_rejects_attno_past_tupdesc() {
+        let (tupdesc, tuple) = scritched_dog();
+        let scritches = NonZeroUsize::new(2).unwrap();
+        assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(3));
+
+        let past_end = NonZeroUsize::new(3).unwrap();
+        let _ = pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc);
+    }
+
+    #[pg_test(error = "no attribute")]
+    fn test_htup_heap_getattr_datum_ex_rejects_attno_past_tupdesc() {
+        let (tupdesc, tuple) = scritched_dog();
+        // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
+        let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
+        let scritches = NonZeroUsize::new(2).unwrap();
+        let attr = pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc);
+        assert_eq!(attr.into_value::<i32>(), 3);
+
+        let past_end = NonZeroUsize::new(3).unwrap();
+        let _ = pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc);
+    }
 }
