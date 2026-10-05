@@ -404,7 +404,8 @@ macro_rules! pg_leftmost_one_pos64 {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function pg_nextpower2_32 from pg_bitutils.h:139 (PostgreSQL 15), pg_bitutils.h:184 (PostgreSQL 16), pg_bitutils.h:188 (PostgreSQL 17–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function pg_nextpower2_32 from pg_bitutils.h:139 (PostgreSQL 15), pg_bitutils.h:184 (PostgreSQL 16), pg_bitutils.h:188 (PostgreSQL 17, 19)
 ///
 /// ```c
 /// static inline uint32
@@ -440,7 +441,45 @@ macro_rules! pg_nextpower2_32 {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function pg_nextpower2_64 from pg_bitutils.h:162 (PostgreSQL 15), pg_bitutils.h:207 (PostgreSQL 16), pg_bitutils.h:211 (PostgreSQL 17–19)
+#[cfg(feature = "pg18")]
+/// C inline function pg_nextpower2_32 from pg_bitutils.h:188 (PostgreSQL 18)
+///
+/// ```c
+/// static inline uint32
+/// pg_nextpower2_32(uint32 num)
+/// {
+/// 	Assert(num > 0 && num <= PG_UINT32_MAX / 2 + 1);
+///
+/// 	/*
+/// 	 * A power 2 number has only 1 bit set.  Subtracting 1 from such a number
+/// 	 * will turn on all previous bits resulting in no common bits being set
+/// 	 * between num and num-1.
+/// 	 */
+/// 	if ((num & (num - 1)) == 0)
+/// 		return num;				/* already power 2 */
+///
+/// 	return ((uint32) 1) << (pg_leftmost_one_pos32(num) + 1);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_nextpower2_32 {
+    ($num:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function pg_nextpower2_64 from pg_bitutils.h:162 (PostgreSQL 15), pg_bitutils.h:207 (PostgreSQL 16), pg_bitutils.h:211 (PostgreSQL 17, 19)
 ///
 /// ```c
 /// static inline uint64
@@ -470,6 +509,43 @@ macro_rules! pg_nextpower2_32 {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_nextpower2_64 {
+    ($num:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function pg_nextpower2_64 from pg_bitutils.h:211 (PostgreSQL 18)
+///
+/// ```c
+/// static inline uint64
+/// pg_nextpower2_64(uint64 num)
+/// {
+/// 	Assert(num > 0 && num <= PG_UINT64_MAX / 2 + 1);
+///
+/// 	/*
+/// 	 * A power 2 number has only 1 bit set.  Subtracting 1 from such a number
+/// 	 * will turn on all previous bits resulting in no common bits being set
+/// 	 * between num and num-1.
+/// 	 */
+/// 	if ((num & (num - 1)) == 0)
+/// 		return num;				/* already power 2 */
+///
+/// 	return ((uint64) 1) << (pg_leftmost_one_pos64(num) + 1);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_nextpower2_64 {
     ($num:expr $(,)?) => {

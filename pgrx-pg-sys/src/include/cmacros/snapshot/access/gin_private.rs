@@ -128,7 +128,7 @@ macro_rules! ginCompareAttEntries {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ginCompareEntries from gin_private.h:503 (PostgreSQL 19)
+/// C inline function ginCompareEntries from gin_private.h:503 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -152,7 +152,7 @@ macro_rules! ginCompareAttEntries {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -160,15 +160,15 @@ macro_rules! ginCompareAttEntries {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ginCompareEntries {
     ($ginstate:expr, $attnum:expr, $a:expr, $categorya:expr, $b:expr, $categoryb:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function ginCompareItemPointers from gin_private.h:484 (PostgreSQL 15), gin_private.h:486 (PostgreSQL 16)
+#[cfg(feature = "pg15")]
+/// C inline function ginCompareItemPointers from gin_private.h:484 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline int
@@ -187,7 +187,7 @@ macro_rules! ginCompareEntries {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -195,7 +195,42 @@ macro_rules! ginCompareEntries {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ginCompareItemPointers {
+    ($a:expr, $b:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg16")]
+/// C inline function ginCompareItemPointers from gin_private.h:486 (PostgreSQL 16)
+///
+/// ```c
+/// static inline int
+/// ginCompareItemPointers(ItemPointer a, ItemPointer b)
+/// {
+/// 	uint64		ia = (uint64) GinItemPointerGetBlockNumber(a) << 32 | GinItemPointerGetOffsetNumber(a);
+/// 	uint64		ib = (uint64) GinItemPointerGetBlockNumber(b) << 32 | GinItemPointerGetOffsetNumber(b);
+///
+/// 	if (ia == ib)
+/// 		return 0;
+/// 	else if (ia > ib)
+/// 		return 1;
+/// 	else
+/// 		return -1;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {
@@ -203,7 +238,7 @@ macro_rules! ginCompareItemPointers {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ginCompareItemPointers from gin_private.h:487 (PostgreSQL 17), gin_private.h:495 (PostgreSQL 18)
+/// C inline function ginCompareItemPointers from gin_private.h:487 (PostgreSQL 17), gin_private.h:495 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline int
@@ -217,7 +252,7 @@ macro_rules! ginCompareItemPointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -225,7 +260,7 @@ macro_rules! ginCompareItemPointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {
@@ -233,7 +268,7 @@ macro_rules! ginCompareItemPointers {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ginCompareItemPointers from gin_private.h:491 (PostgreSQL 19)
+/// C inline function ginCompareItemPointers from gin_private.h:491 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -247,7 +282,7 @@ macro_rules! ginCompareItemPointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -255,7 +290,7 @@ macro_rules! ginCompareItemPointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ginCompareItemPointers {
     ($a:expr, $b:expr $(,)?) => {

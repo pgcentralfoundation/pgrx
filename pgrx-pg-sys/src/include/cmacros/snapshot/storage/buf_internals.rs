@@ -141,7 +141,7 @@ macro_rules! BufMappingPartitionLock {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufMappingPartitionLock from buf_internals.h:184 (PostgreSQL 16), buf_internals.h:185 (PostgreSQL 17), buf_internals.h:198 (PostgreSQL 18), buf_internals.h:253 (PostgreSQL 19)
+/// C inline function BufMappingPartitionLock from buf_internals.h:184 (PostgreSQL 16), buf_internals.h:185 (PostgreSQL 17), buf_internals.h:198 (PostgreSQL 18), buf_internals.h:253 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LWLock *
@@ -153,7 +153,7 @@ macro_rules! BufMappingPartitionLock {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -161,7 +161,7 @@ macro_rules! BufMappingPartitionLock {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
     ($hashcode:expr $(,)?) => {
@@ -238,7 +238,7 @@ macro_rules! BufTableHashPartition {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufTableHashPartition from buf_internals.h:178 (PostgreSQL 16), buf_internals.h:179 (PostgreSQL 17), buf_internals.h:192 (PostgreSQL 18), buf_internals.h:247 (PostgreSQL 19)
+/// C inline function BufTableHashPartition from buf_internals.h:178 (PostgreSQL 16), buf_internals.h:179 (PostgreSQL 17), buf_internals.h:192 (PostgreSQL 18), buf_internals.h:247 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -249,7 +249,7 @@ macro_rules! BufTableHashPartition {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -257,7 +257,7 @@ macro_rules! BufTableHashPartition {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufTableHashPartition {
     ($hashcode:expr $(,)?) => {
@@ -374,7 +374,7 @@ macro_rules! BufTagMatchesRelFileLocator {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufTagSetRelForkDetails from buf_internals.h:113 (PostgreSQL 16), buf_internals.h:114 (PostgreSQL 17), buf_internals.h:127 (PostgreSQL 18), buf_internals.h:182 (PostgreSQL 19)
+/// C inline function BufTagSetRelForkDetails from buf_internals.h:113 (PostgreSQL 16), buf_internals.h:114 (PostgreSQL 17), buf_internals.h:127 (PostgreSQL 18), buf_internals.h:182 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -387,15 +387,11 @@ macro_rules! BufTagMatchesRelFileLocator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufTagSetRelForkDetails {
     ($tag:expr, $relnumber:expr, $forknum:expr $(,)?) => {
@@ -583,7 +579,7 @@ macro_rules! CLEAR_BUFFERTAG {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ClearBufferTag from buf_internals.h:133 (PostgreSQL 16), buf_internals.h:134 (PostgreSQL 17), buf_internals.h:147 (PostgreSQL 18), buf_internals.h:202 (PostgreSQL 19)
+/// C inline function ClearBufferTag from buf_internals.h:133 (PostgreSQL 16), buf_internals.h:134 (PostgreSQL 17), buf_internals.h:147 (PostgreSQL 18), buf_internals.h:202 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -597,7 +593,7 @@ macro_rules! CLEAR_BUFFERTAG {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -605,7 +601,7 @@ macro_rules! CLEAR_BUFFERTAG {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ClearBufferTag {
     ($tag:expr $(,)?) => {
@@ -710,7 +706,7 @@ macro_rules! INIT_BUFFERTAG {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function InitBufferTag from buf_internals.h:142 (PostgreSQL 16), buf_internals.h:143 (PostgreSQL 17), buf_internals.h:156 (PostgreSQL 18), buf_internals.h:211 (PostgreSQL 19)
+/// C inline function InitBufferTag from buf_internals.h:142 (PostgreSQL 16), buf_internals.h:143 (PostgreSQL 17), buf_internals.h:156 (PostgreSQL 18), buf_internals.h:211 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -725,7 +721,7 @@ macro_rules! INIT_BUFFERTAG {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -741,7 +737,7 @@ macro_rules! InitBufferTag {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ResourceOwnerForgetBuffer from buf_internals.h:397 (PostgreSQL 17), buf_internals.h:412 (PostgreSQL 18)
+/// C inline function ResourceOwnerForgetBuffer from buf_internals.h:397 (PostgreSQL 17), buf_internals.h:412 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -752,7 +748,7 @@ macro_rules! InitBufferTag {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -768,7 +764,7 @@ macro_rules! ResourceOwnerForgetBuffer {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ResourceOwnerForgetBuffer from buf_internals.h:530 (PostgreSQL 19)
+/// C inline function ResourceOwnerForgetBuffer from buf_internals.h:530 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -779,7 +775,7 @@ macro_rules! ResourceOwnerForgetBuffer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -795,7 +791,7 @@ macro_rules! ResourceOwnerForgetBuffer {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ResourceOwnerForgetBufferIO from buf_internals.h:407 (PostgreSQL 17), buf_internals.h:422 (PostgreSQL 18), buf_internals.h:540 (PostgreSQL 19)
+/// C inline function ResourceOwnerForgetBufferIO from buf_internals.h:407 (PostgreSQL 17), buf_internals.h:422 (PostgreSQL 18), buf_internals.h:540 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -806,7 +802,7 @@ macro_rules! ResourceOwnerForgetBuffer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -822,7 +818,7 @@ macro_rules! ResourceOwnerForgetBufferIO {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ResourceOwnerRememberBuffer from buf_internals.h:392 (PostgreSQL 17), buf_internals.h:407 (PostgreSQL 18)
+/// C inline function ResourceOwnerRememberBuffer from buf_internals.h:392 (PostgreSQL 17), buf_internals.h:407 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -833,7 +829,7 @@ macro_rules! ResourceOwnerForgetBufferIO {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -849,7 +845,7 @@ macro_rules! ResourceOwnerRememberBuffer {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ResourceOwnerRememberBuffer from buf_internals.h:525 (PostgreSQL 19)
+/// C inline function ResourceOwnerRememberBuffer from buf_internals.h:525 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -860,7 +856,7 @@ macro_rules! ResourceOwnerRememberBuffer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -876,7 +872,7 @@ macro_rules! ResourceOwnerRememberBuffer {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ResourceOwnerRememberBufferIO from buf_internals.h:402 (PostgreSQL 17), buf_internals.h:417 (PostgreSQL 18), buf_internals.h:535 (PostgreSQL 19)
+/// C inline function ResourceOwnerRememberBufferIO from buf_internals.h:402 (PostgreSQL 17), buf_internals.h:417 (PostgreSQL 18), buf_internals.h:535 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -887,7 +883,7 @@ macro_rules! ResourceOwnerRememberBuffer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

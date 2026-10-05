@@ -36,7 +36,7 @@ macro_rules! SmgrIsTemp {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function smgrread from smgr.h:116 (PostgreSQL 17), smgr.h:123 (PostgreSQL 18–19)
+/// C inline function smgrread from smgr.h:116 (PostgreSQL 17), smgr.h:123 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -48,7 +48,7 @@ macro_rules! SmgrIsTemp {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -64,7 +64,7 @@ macro_rules! smgrread {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function smgrwrite from smgr.h:123 (PostgreSQL 17), smgr.h:130 (PostgreSQL 18–19)
+/// C inline function smgrwrite from smgr.h:123 (PostgreSQL 17), smgr.h:130 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -76,7 +76,7 @@ macro_rules! smgrread {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

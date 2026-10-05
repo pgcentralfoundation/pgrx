@@ -11,10 +11,12 @@
 //! actual formals, physical provenance and source are retained separately for reports
 //! and documentation.
 //!
-//! When the definition's body uses no macro, it is also offered to the analyzer as a
-//! private statement root that declares each parameter from its hole. The analyzer
-//! translates that root like a C macro body when it can; otherwise the call root
-//! remains. Neither root is added to the active C preprocessor definitions.
+//! When the frontend retained the definition's body, it is also offered to the analyzer
+//! as a private statement root that declares each parameter from its hole. A body that
+//! names macros is first expanded by the compiler in the final environment, which the
+//! frontend proved expands them as the definition did. The analyzer translates that root
+//! like a C macro body when it can; otherwise the call root remains. Neither root is
+//! added to the active C preprocessor definitions.
 //!
 //! The existing typed renderer and native capability planner own parameter assignment
 //! conversions, qualifiers, original result identity and guarded ABI calls. Native
@@ -60,18 +62,24 @@ impl InlineRoot<'_> {
         match self {
             Self::Ready { call, formals, body, .. } => {
                 // Prefer translating the definition itself. Its analysis must keep exactly
-                // the function's parameters, since a capture would mean an unresolved name,
-                // and every path must return a value.
+                // the function's parameters, since a capture would mean an unresolved name.
+                // Every path of a value-returning function must return; the grammar has no
+                // `return;`, so a void function may not return early.
                 if let Some(body) = body {
+                    let void =
+                        frontend.declarations().function_signatures[name].signature.result.category
+                            == crate::TypeCategory::Void;
                     let analysis = analyze_root(frontend, name, body, formals, constants);
                     if matches!(analysis.status, AnalysisStatus::Candidate)
                         && analysis.parameters.len() == formals.len()
                         && analysis.expression.as_ref().is_some_and(|expression| {
-                            expression
-                                .syntax
-                                .statement_body
-                                .as_ref()
-                                .is_some_and(|body| body.always_returns)
+                            expression.syntax.statement_body.as_ref().is_some_and(|body| {
+                                if void {
+                                    body.return_tokens.is_none()
+                                } else {
+                                    body.always_returns
+                                }
+                            })
                         })
                     {
                         return analysis;
@@ -113,6 +121,55 @@ impl InlineRoot<'_> {
     }
 }
 
+/// Expand translated bodies that name macros in the final environment, where generated
+/// macros also expand. A body the compiler pass refuses leaves only the call root.
+pub(super) fn expand_bodies(
+    scanner: &crate::MacroScanner,
+    frontend: &FrontendOutput,
+    roots: &mut BTreeMap<String, InlineRoot<'_>>,
+) -> Result<(), crate::FrontendError> {
+    let names_macro = |body: &ActiveMacro| {
+        body.definition.tokens.iter().any(|token| {
+            token.kind == TokenKind::Identifier
+                && frontend.environment().active.contains_key(&token.spelling)
+        })
+    };
+    let definitions = roots
+        .values()
+        .filter_map(|root| match root {
+            InlineRoot::Ready { body: Some(body), .. } if names_macro(body) => {
+                Some(body.definition.clone())
+            }
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    if definitions.is_empty() {
+        return Ok(());
+    }
+    let batch = crate::expansion::prepare_synthetic(
+        scanner,
+        frontend,
+        &definitions,
+        ExpansionLimits::default(),
+    )?;
+    for (name, root) in roots.iter_mut() {
+        if let InlineRoot::Ready { body, .. } = root
+            && body.as_deref().is_some_and(&names_macro)
+        {
+            *body = match batch.results.get(name) {
+                Some(crate::ExpansionResult::Expanded { expansion }) => {
+                    Some(Box::new(ActiveMacro {
+                        definition: expansion.definition.clone(),
+                        provenance: ActiveProvenance::Resolved,
+                    }))
+                }
+                _ => None,
+            };
+        }
+    }
+    Ok(())
+}
+
 /// Analyze one private root and restore the definition's parameter labels.
 fn analyze_root(
     frontend: &FrontendOutput,
@@ -138,15 +195,6 @@ pub(super) fn prepare<'a>(
 ) -> BTreeMap<String, InlineRoot<'a>> {
     let mut result = BTreeMap::new();
     let mut bytes = 0_usize;
-    // Body tokens are unexpanded, and a macro may have been replaced or undefined after
-    // the definition, so any name ever defined as a macro makes a body untranslatable.
-    let macros = frontend
-        .environment()
-        .active
-        .keys()
-        .map(String::as_str)
-        .chain(frontend.inventory().macros.iter().map(|definition| definition.name.as_str()))
-        .collect::<BTreeSet<_>>();
     for name in names {
         if frontend.environment().active.contains_key(name) {
             continue;
@@ -316,14 +364,17 @@ pub(super) fn prepare<'a>(
                 })
             })
             .collect();
-        // A void function yields no value, so only value-returning bodies are translated.
-        // A body over the shared budgets leaves only the call root.
+        // A body over the shared budgets leaves only the call root. Records cannot yet
+        // pass into or out of a translation by value.
+        let by_value_record = std::iter::once(&function.signature.result)
+            .chain(parameters)
+            .any(|ty| ty.category == crate::TypeCategory::Record);
         let body = source
             .body
             .as_ref()
-            .filter(|_| function.signature.result.category != crate::TypeCategory::Void)
+            .filter(|_| !by_value_record)
             .and_then(|statements| {
-                body_tokens(name, &holes, source, parameters, statements, &macros)
+                body_tokens(frontend, name, &holes, source, parameters, statements)
             })
             .filter(|tokens| {
                 let added = tokens.iter().map(|token| token.spelling.len()).sum::<usize>();
@@ -377,14 +428,16 @@ pub(super) fn prepare<'a>(
 /// evaluated exactly once and converted to its parameter type by C assignment rules,
 /// as in a call. Parameters and the body's top-level declarations share one block
 /// scope, as they do in C. The body is refused when a parameter is unnamed or has a
-/// type that cannot be spelled as a flat declaration, or when any token names a macro.
+/// type that cannot be spelled as a flat declaration. The frontend already proved the
+/// statements' macros unchanged; the declarations use the compiler's expanded spellings,
+/// so none of their names may be an active macro.
 fn body_tokens(
+    frontend: &FrontendOutput,
     name: &str,
     holes: &[String],
     source: &InlineFunctionDefinition,
     parameters: &[crate::TypeInfo],
     statements: &[Token],
-    macros: &BTreeSet<&str>,
 ) -> Option<Vec<Token>> {
     let token = |kind, spelling: &str| Token { kind, spelling: spelling.into() };
     let mut tokens = vec![token(TokenKind::Identifier, name), token(TokenKind::Punctuation, "(")];
@@ -423,12 +476,14 @@ fn body_tokens(
             token(TokenKind::Punctuation, ";"),
         ]);
     }
-    tokens.extend(statements.iter().cloned());
-    if tokens[1..].iter().any(|token| {
-        token.kind == TokenKind::Identifier && macros.contains(token.spelling.as_str())
-    }) {
+    let active = &frontend.environment().active;
+    if tokens[1..]
+        .iter()
+        .any(|token| token.kind == TokenKind::Identifier && active.contains_key(&token.spelling))
+    {
         return None;
     }
+    tokens.extend(statements.iter().cloned());
     tokens.extend([
         token(TokenKind::Punctuation, "}"),
         token(TokenKind::Keyword, "while"),

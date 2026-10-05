@@ -176,10 +176,11 @@ the actual macro inventory or preprocessing environment, and `list` still shows
 only original macro definitions.
 
 An inline adapter evaluates each argument once and preserves C conversions,
-pointer qualifiers and the actual return type. When a value-returning
-definition's body uses no C macros and the analyzer supports every statement, the
-adapter translates that body; otherwise it calls the original function through its
-verified prototype. `.get()` extracts native storage, including `()` for a void
+pointer qualifiers and the actual return type. When the analyzer supports every
+statement of the definition's body, and every macro the body uses expands at the
+end of the headers as it did in the definition, the adapter translates that body;
+otherwise it calls the original function through its verified prototype. Generated
+calls to a translated function expand its translation. `.get()` extracts native storage, including `()` for a void
 return. When a macro becomes an inline function, its return rank or evaluation
 rules can therefore change with PostgreSQL, and so can whether a call needs
 `unsafe`. Predicate callers can use `.is_true()` for either C `int` or C `bool`;

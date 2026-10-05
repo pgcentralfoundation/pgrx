@@ -129,6 +129,7 @@ impl<'a> AnalysisSession<'a> {
             ExpansionLimits::default(),
             session.expansions.results.len(),
         );
+        inline::expand_bodies(scanner, frontend, &mut session.inline_roots)?;
         session.verify_inputs()?;
         Ok(session)
     }

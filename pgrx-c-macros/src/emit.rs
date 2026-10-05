@@ -126,6 +126,10 @@ pub struct BindingCatalog {
     /// Getters for the original C function addresses, distinct from Rust call wrappers.
     #[serde(skip)]
     pub function_addresses: BTreeMap<String, crate::FunctionAddressBinding>,
+    /// Static inline functions emitted as translated bodies in this defining crate. Calls
+    /// to them expand that translation instead of calling the native binding.
+    #[serde(skip)]
+    pub inline_translations: BTreeSet<String>,
 }
 
 impl BindingCatalog {
@@ -422,74 +426,168 @@ fn emit_prepared_batch(
     for name in roots.keys().map(String::as_str).chain(impacted.keys().copied()) {
         available.macros.remove(name);
     }
-    let mut available_lowering = None;
-    let mut emissions = initial
-        .into_iter()
-        .map(|emission| {
-            let name = &emission.analysis.name;
-            let failure = if let Some(impact) = impacted.get(name.as_str()) {
-                Some((impact.dependency.as_str(), impact.root.as_str()))
-            } else if roots.contains_key(name) {
-                // A wrapper may independently see the same folded constant.
-                // Prefer its direct dependency as the explanation where possible.
-                graph.dependencies(name).find_map(|dependency| {
-                    if dependency != name && roots.contains_key(dependency) {
-                        Some((dependency, dependency))
-                    } else {
-                        impacted.get(dependency).and_then(|impact| {
-                            (impact.root != *name).then_some((dependency, impact.root.as_str()))
-                        })
+    available.inline_translations = translated_callees(session, &initial, &available.macros);
+    let finish = |available: &BindingCatalog| {
+        let mut available_lowering = None;
+        let mut emissions = initial
+            .iter()
+            .map(|emission| {
+                let name = &emission.analysis.name;
+                let failure = if let Some(impact) = impacted.get(name.as_str()) {
+                    Some((impact.dependency.as_str(), impact.root.as_str()))
+                } else if roots.contains_key(name) {
+                    // A wrapper may independently see the same folded constant.
+                    // Prefer its direct dependency as the explanation where possible.
+                    graph.dependencies(name).find_map(|dependency| {
+                        if dependency != name && roots.contains_key(dependency) {
+                            Some((dependency, dependency))
+                        } else {
+                            impacted.get(dependency).and_then(|impact| {
+                                (impact.root != *name).then_some((dependency, impact.root.as_str()))
+                            })
+                        }
+                    })
+                } else {
+                    None
+                };
+                if let Some((dependency, root)) = failure {
+                    let reason =
+                        dependency_skip(&emission.analysis, dependency, root, &roots[root]);
+                    MacroEmission {
+                        analysis: emission.analysis.clone(),
+                        status: EmissionStatus::Skipped { reason },
                     }
+                } else if roots.contains_key(name) {
+                    let reason = roots[name].clone();
+                    MacroEmission {
+                        analysis: emission.analysis.clone(),
+                        status: EmissionStatus::Skipped { reason },
+                    }
+                } else {
+                    emit_with_lowering(session, name, available, &mut available_lowering)
+                }
+            })
+            .collect::<Vec<_>>();
+        // If a final rendering hits an output limit, reject its dependents too rather
+        // than leaving a preserved call to a macro whose definition is absent.
+        let late = emissions
+            .iter()
+            .filter_map(|emission| match &emission.status {
+                EmissionStatus::Skipped { reason }
+                    if available.macros.contains(&emission.analysis.name) =>
+                {
+                    Some((emission.analysis.name.clone(), reason.clone()))
+                }
+                _ => None,
+            })
+            .collect::<BTreeMap<_, _>>();
+        let impacts = graph.impacts(&late.keys().collect::<Vec<_>>());
+        let impacted =
+            impacts.iter().map(|impact| (impact.name.as_str(), impact)).collect::<BTreeMap<_, _>>();
+        for emission in &mut emissions {
+            if let Some(impact) = impacted.get(emission.analysis.name.as_str()) {
+                emission.status = EmissionStatus::Skipped {
+                    reason: dependency_skip(
+                        &emission.analysis,
+                        &impact.dependency,
+                        &impact.root,
+                        &late[&impact.root],
+                    ),
+                };
+            }
+        }
+        emissions
+    };
+    // A translated callee must itself be emitted as a translation; otherwise its callers
+    // keep calling the native binding.
+    let mut emissions = finish(&available);
+    loop {
+        let lost = available
+            .inline_translations
+            .iter()
+            .filter(|name| {
+                !emissions.iter().any(|emission| {
+                    emission.analysis.name == **name
+                        && matches!(emission.status, EmissionStatus::Emitted { .. })
+                        && translated_inline(session, &emission.analysis)
                 })
-            } else {
-                None
-            };
-            if let Some((dependency, root)) = failure {
-                let reason = dependency_skip(&emission.analysis, dependency, root, &roots[root]);
-                MacroEmission {
-                    analysis: emission.analysis,
-                    status: EmissionStatus::Skipped { reason },
-                }
-            } else if roots.contains_key(name) {
-                let reason = roots[name].clone();
-                MacroEmission {
-                    analysis: emission.analysis,
-                    status: EmissionStatus::Skipped { reason },
-                }
-            } else {
-                emit_with_lowering(session, name, &available, &mut available_lowering)
-            }
-        })
-        .collect::<Vec<_>>();
-    // If a final rendering hits an output limit, reject its dependents too rather
-    // than leaving a preserved call to a macro whose definition is absent.
-    let late = emissions
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+        if lost.is_empty() {
+            return emissions;
+        }
+        for name in &lost {
+            available.inline_translations.remove(name);
+        }
+        emissions = finish(&available);
+    }
+}
+
+/// Whether an analysis translates a static inline function's own definition.
+fn translated_inline(session: &AnalysisSession<'_>, analysis: &MacroAnalysis) -> bool {
+    session.inline_definition(&analysis.name).is_some()
+        && analysis
+            .expression
+            .as_ref()
+            .is_some_and(|expression| expression.syntax.statement_body.is_some())
+}
+
+/// Translated inline functions whose calls can expand their translation.
+///
+/// A function that reaches itself through such calls keeps its native binding for them,
+/// since expanding it would never terminate.
+fn translated_callees(
+    session: &AnalysisSession<'_>,
+    emissions: &[MacroEmission],
+    available: &BTreeSet<String>,
+) -> BTreeSet<String> {
+    let translated = emissions
         .iter()
-        .filter_map(|emission| match &emission.status {
-            EmissionStatus::Skipped { reason }
-                if available.macros.contains(&emission.analysis.name) =>
-            {
-                Some((emission.analysis.name.clone(), reason.clone()))
-            }
-            _ => None,
+        .filter(|emission| {
+            available.contains(&emission.analysis.name)
+                && matches!(emission.status, EmissionStatus::Emitted { .. })
+                && translated_inline(session, &emission.analysis)
         })
+        .map(|emission| &emission.analysis)
+        .collect::<Vec<_>>();
+    let index = translated
+        .iter()
+        .enumerate()
+        .map(|(index, analysis)| (analysis.name.as_str(), index))
         .collect::<BTreeMap<_, _>>();
-    let impacts = graph.impacts(&late.keys().collect::<Vec<_>>());
-    let impacted =
-        impacts.iter().map(|impact| (impact.name.as_str(), impact)).collect::<BTreeMap<_, _>>();
-    for emission in &mut emissions {
-        if let Some(impact) = impacted.get(emission.analysis.name.as_str()) {
-            emission.status = EmissionStatus::Skipped {
-                reason: dependency_skip(
-                    &emission.analysis,
-                    &impact.dependency,
-                    &impact.root,
-                    &late[&impact.root],
-                ),
-            };
+    let mut graph = petgraph::graph::DiGraph::<(), ()>::with_capacity(translated.len(), 0);
+    let nodes = translated.iter().map(|_| graph.add_node(())).collect::<Vec<_>>();
+    for (caller, analysis) in translated.iter().enumerate() {
+        for callee in direct_calls(analysis) {
+            if let Some(&callee) = index.get(callee) {
+                graph.add_edge(nodes[caller], nodes[callee], ());
+            }
         }
     }
-    emissions
+    petgraph::algo::tarjan_scc(&graph)
+        .into_iter()
+        .filter(|component| {
+            component.len() == 1 && !graph.contains_edge(component[0], component[0])
+        })
+        .map(|component| translated[component[0].index()].name.clone())
+        .collect()
+}
+
+/// Names of the functions an analyzed expression calls directly.
+fn direct_calls(analysis: &MacroAnalysis) -> impl Iterator<Item = &str> {
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    nodes.iter().filter_map(move |node| {
+        let ExpressionKind::Call { callee, .. } = node.kind else { return None };
+        let mut callee = callee;
+        while let ExpressionKind::Group { operand } = nodes[callee].kind {
+            callee = operand;
+        }
+        match &nodes[callee].kind {
+            ExpressionKind::Identifier { name } => Some(name.as_str()),
+            _ => None,
+        }
+    })
 }
 
 /// Generate Rust support when the selected macros need no native C artifact.
@@ -908,8 +1006,6 @@ fn render(
             None,
         )
     })?;
-    let empty =
-        matches!(expression.syntax.nodes[expression.syntax.root].kind, ExpressionKind::Empty);
     let mut constants = vec![None; expression.syntax.nodes.len()];
     for constant in &expression.constants {
         constants[constant.node] = Some(constant);
@@ -922,6 +1018,10 @@ fn render(
         && expression.syntax.statement_body.is_some())
     .then(|| inline_result(session, analysis, lowering))
     .transpose()?;
+    // A translated void body has no return, so its root expression is empty, but the
+    // body itself is the macro's value.
+    let empty = inline_body.is_none()
+        && matches!(expression.syntax.nodes[expression.syntax.root].kind, ExpressionKind::Empty);
     let statement_body =
         expression.syntax.statement_body.as_ref().filter(|_| inline_body.is_none());
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
@@ -938,16 +1038,21 @@ fn render(
             format!("$crate::{normalizer}!(@collect {mode} [{prefix}]; $($raw)*)")
         }
     };
-    let value = if let Some(marker) = &inline_body {
+    let value = if let Some(result) = &inline_body {
+        let marker = match result {
+            InlineResult::Void => None,
+            InlineResult::Value(marker) => Some(marker.as_str()),
+        };
         let body = statements::render(
             session,
             analysis,
             bindings,
             &renderer,
-            statements::Returns::Value(marker),
+            statements::Returns::Inline(marker),
         )?;
-        // Translation requires every path to return, so the block always breaks with a value.
-        format!("'{INLINE_LABEL}: {body}")
+        // A value-returning body returns on every path, so its block always breaks with a
+        // value. A void body has no return statement and evaluates to `()`.
+        if marker.is_some() { format!("'{INLINE_LABEL}: {body}") } else { body }
     } else if statement_body.is_some() {
         statements::render(
             session,
@@ -1211,10 +1316,15 @@ fn render(
                 "compile_error!(\"an empty C macro has no expression operand\")".into()
             } else if mode == "value" {
                 value.clone()
-            } else if let Some(marker) = &inline_body {
-                match context {
-                    typed::Context::Discard => format!("{{ let _ = {value}; }}"),
-                    typed::Context::Size => format!("{SUPPORT}::expression::size_of::<{marker}>()"),
+            } else if let Some(result) = &inline_body {
+                match (context, result) {
+                    (typed::Context::Discard, _) => format!("{{ let _ = {value}; }}"),
+                    (typed::Context::Size, InlineResult::Void) => {
+                        "compile_error!(\"a void C function call has no size\")".into()
+                    }
+                    (typed::Context::Size, InlineResult::Value(marker)) => {
+                        format!("{SUPPORT}::expression::size_of::<{marker}>()")
+                    }
                     _ => "compile_error!(\"a C function call result is not an lvalue\")".into(),
                 }
             } else {
@@ -1321,7 +1431,7 @@ const SHARED_PARAGRAPHS: [(&str, &str); 7] = [
 /// How a typed inline-function adapter calls and converts.
 const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
 /// How a translated inline function body evaluates.
-const INLINE_BODY: &str = "Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage. Calls inside the body keep the backend thread and PostgreSQL error contracts of their guarded bindings.";
+const INLINE_BODY: &str = "Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings.";
 /// How `__FILE__` and `__LINE__` translate.
 const INVOCATION_DIAGNOSTICS: &str = "Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.";
 /// How dependency stringification translates.
@@ -1455,12 +1565,20 @@ fn documentation_forms(
     forms
 }
 
-/// Resolve a translated inline function's C return type to its runtime marker.
+/// The C result of a translated inline function body.
+enum InlineResult {
+    /// A void function, whose body evaluates to `()`.
+    Void,
+    /// The runtime marker of the function's C return type.
+    Value(String),
+}
+
+/// Resolve a translated inline function's C return type.
 fn inline_result(
     session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
     lowering: &types::Lowering<'_>,
-) -> Result<String, SkipReason> {
+) -> Result<InlineResult, SkipReason> {
     let refuse = |message: String| skip(analysis, SkipReasonCode::UnsupportedType, message, None);
     let function = session
         .frontend()
@@ -1469,9 +1587,12 @@ fn inline_result(
         .get(&analysis.name)
         .ok_or_else(|| refuse("inline function has no compiler prototype".into()))?;
     if function.signature.result.category == crate::TypeCategory::Void {
-        return Err(refuse("a void inline function has no value to translate".into()));
+        return Ok(InlineResult::Void);
     }
-    lowering.resolve(&function.signature.result).map(|lowered| lowered.marker).map_err(refuse)
+    lowering
+        .resolve(&function.signature.result)
+        .map(|lowered| InlineResult::Value(lowered.marker))
+        .map_err(refuse)
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.

@@ -250,18 +250,9 @@ pub(crate) fn prepare_inner_with_objects(
     limits: ExpansionLimits,
 ) -> Result<ExpansionBatch, FrontendError> {
     let mut results = BTreeMap::new();
-    let mut discovered_dependencies = BTreeMap::new();
     let mut dependencies = Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
     let names = names.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
-    let file = std::fs::File::open(&frontend.profile().header).map_err(|source| {
-        FrontendError::CompilerIo { compiler: frontend.profile().header.clone(), source }
-    })?;
-    let read_limit = u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1);
-    let mut original = Vec::new();
-    file.take(read_limit).read_to_end(&mut original).map_err(|source| {
-        FrontendError::CompilerIo { compiler: frontend.profile().header.clone(), source }
-    })?;
-    if original.len().checked_add(2).is_none_or(|bytes| bytes > limits.source_bytes) {
+    let Some(probe) = ProbeSource::read(frontend, limits)? else {
         for name in names {
             let code = if frontend.environment().active.contains_key(&name) {
                 ExpansionSkipCode::BudgetExceeded
@@ -282,13 +273,12 @@ pub(crate) fn prepare_inner_with_objects(
         }
         return Ok(ExpansionBatch {
             results,
-            discovered_dependencies,
+            discovered_dependencies: BTreeMap::new(),
             inputs: frontend.profile().inputs.clone(),
         });
-    }
-    let directory = ProbeDirectory::new()?;
-    let prefix = namespace(frontend);
-    let mut source_bytes = original.len();
+    };
+    let prefix = &probe.prefix;
+    let mut source_bytes = probe.original.len();
     // Separate a possible final splice/comment, and enforce the validation
     // diagnostic after any header pragmas under MS compatibility modes too.
     source_bytes = source_bytes.saturating_add(PROBE_PRAGMAS.len());
@@ -385,12 +375,10 @@ pub(crate) fn prepare_inner_with_objects(
             .collect::<Vec<_>>();
         let begin = format!("{prefix}begin_{index}");
         let end = format!("{prefix}end_{index}");
-        let tag = probe_tag(&directory.0, index)?;
+        let tag = probe_tag(&probe.directory.0, index)?;
+        let symbolic = symbolic_invocation(&active.definition, &markers);
         // GNU markers without flags reset inherited system-header status.
-        let invocation = format!(
-            "# 1 {tag:?}\n{begin}\n{}\n{end}\n",
-            symbolic_invocation(&active.definition, &markers)
-        );
+        let invocation = format!("# 1 {tag:?}\n{begin}\n{symbolic}\n{end}\n");
         if source_bytes.saturating_add(invocation.len()) > limits.source_bytes {
             record_skip(
                 &mut results,
@@ -411,18 +399,167 @@ pub(crate) fn prepare_inner_with_objects(
             parameters,
             body_start,
             markers,
+            invocation: symbolic,
             begin,
             end,
             dependencies: closure,
             pastes,
         });
     }
+    expand_prepared(scanner, frontend, &probe, prepared, dependencies, results, limits)
+}
+
+/// Expand synthetic function-like definitions in the final preprocessing environment.
+///
+/// Each replacement list is expanded where an invocation of an active macro would be,
+/// after the original main file, with fresh markers in place of its formals. The
+/// definitions are never added to the environment, and names they reach are checked
+/// like the dependencies of an active macro. Token pasting is refused.
+pub(crate) fn prepare_synthetic(
+    scanner: &MacroScanner,
+    frontend: &FrontendOutput,
+    definitions: &[MacroDefinition],
+    limits: ExpansionLimits,
+) -> Result<ExpansionBatch, FrontendError> {
+    let mut results = BTreeMap::new();
+    let Some(probe) = ProbeSource::read(frontend, limits)? else {
+        for definition in definitions {
+            record_skip(
+                &mut results,
+                &definition.name,
+                skip(
+                    ExpansionSkipCode::BudgetExceeded,
+                    "original main file and probe separators exceed the source byte budget",
+                    None,
+                    frontend,
+                ),
+                frontend,
+            );
+        }
+        return Ok(ExpansionBatch {
+            results,
+            discovered_dependencies: BTreeMap::new(),
+            inputs: frontend.profile().inputs.clone(),
+        });
+    };
+    let mut dependencies = Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
+    let mut source_bytes = probe.original.len().saturating_add(PROBE_PRAGMAS.len());
+    let mut prepared = Vec::new();
+    'definitions: for definition in definitions {
+        let refuse = |results: &mut BTreeMap<_, _>, code, message: &str| {
+            record_skip(results, &definition.name, skip(code, message, None, frontend), frontend);
+        };
+        if prepared.len() >= limits.macros || definition.tokens.len() > limits.macro_tokens {
+            refuse(
+                &mut results,
+                ExpansionSkipCode::BudgetExceeded,
+                "macro count or original token budget exceeded",
+            );
+            continue;
+        }
+        let (parameters, body_start) = match parameters(definition) {
+            Ok(parameters) => parameters,
+            Err((code, message)) => {
+                refuse(&mut results, code, &message);
+                continue;
+            }
+        };
+        let body = &definition.tokens[body_start..];
+        let mut closure = BTreeMap::new();
+        for token in body {
+            let Some((name, active)) = frontend.environment().active.get_key_value(&token.spelling)
+            else {
+                continue;
+            };
+            if parameters.contains(name) || closure.contains_key(name) {
+                continue;
+            }
+            match dependencies.closure(name) {
+                Ok((_, true)) => {
+                    refuse(
+                        &mut results,
+                        ExpansionSkipCode::TokenPaste,
+                        "a synthetic replacement cannot reach token pasting",
+                    );
+                    continue 'definitions;
+                }
+                Ok((reached, false)) => {
+                    closure.insert(
+                        name.clone(),
+                        ExpansionDependency {
+                            name: name.clone(),
+                            kind: active.definition.kind,
+                            provenance: active.definition.provenance.clone(),
+                        },
+                    );
+                    closure.extend(
+                        reached.into_iter().map(|dependency| (dependency.name.clone(), dependency)),
+                    );
+                }
+                Err(reason) => {
+                    record_skip(&mut results, &definition.name, reason, frontend);
+                    continue 'definitions;
+                }
+            }
+        }
+        let index = prepared.len();
+        let prefix = &probe.prefix;
+        let markers = (0..parameters.len())
+            .map(|parameter| format!("{prefix}parameter_{index}_{parameter}"))
+            .collect::<Vec<_>>();
+        let formals = parameters.iter().zip(&markers).collect::<HashMap<_, _>>();
+        let mut symbolic = String::new();
+        for token in body {
+            symbolic
+                .push_str(formals.get(&token.spelling).map_or(&token.spelling, |marker| marker));
+            symbolic.push(' ');
+        }
+        let begin = format!("{prefix}begin_{index}");
+        let end = format!("{prefix}end_{index}");
+        let tag = probe_tag(&probe.directory.0, index)?;
+        let invocation = format!("# 1 {tag:?}\n{begin}\n{symbolic}\n{end}\n");
+        if source_bytes.saturating_add(invocation.len()) > limits.source_bytes {
+            refuse(
+                &mut results,
+                ExpansionSkipCode::BudgetExceeded,
+                "synthetic replacement source exceeds its byte budget",
+            );
+            continue;
+        }
+        source_bytes += invocation.len();
+        prepared.push(Prepared {
+            definition,
+            parameters,
+            body_start,
+            markers,
+            invocation: symbolic,
+            begin,
+            end,
+            dependencies: closure.into_values().collect(),
+            pastes: false,
+        });
+    }
+    expand_prepared(scanner, frontend, &probe, prepared, dependencies, results, limits)
+}
+
+/// Run the compiler over prepared probes and record each item's expanded replacement.
+fn expand_prepared<'a>(
+    scanner: &MacroScanner,
+    frontend: &'a FrontendOutput,
+    probe: &ProbeSource,
+    mut prepared: Vec<Prepared<'a>>,
+    mut dependencies: Dependencies<'a>,
+    mut results: BTreeMap<String, ExpansionResult>,
+    limits: ExpansionLimits,
+) -> Result<ExpansionBatch, FrontendError> {
+    let ProbeSource { directory, original, prefix } = probe;
+    let mut discovered_dependencies = BTreeMap::new();
     let inputs = frontend.profile().inputs.clone();
     if prepared.is_empty() {
         return Ok(ExpansionBatch { results, discovered_dependencies, inputs });
     }
-    verify_original_environment(scanner, frontend, &directory.0, &original, &inputs)?;
-    let proof = paste::prove(frontend, &directory.0, &original, &prefix, &prepared, limits)?;
+    verify_original_environment(scanner, frontend, &directory.0, original, &inputs)?;
+    let proof = paste::prove(frontend, &directory.0, original, prefix, &prepared, limits)?;
     let mut rejected = proof.rejected;
     for (&index, discovered) in &proof.dependencies {
         let item = &mut prepared[index];
@@ -496,7 +633,7 @@ pub(crate) fn prepare_inner_with_objects(
     let Some((prepared, output)) = preprocess_prepared(
         frontend,
         &directory.0,
-        &original,
+        original,
         prepared,
         limits,
         proof.runs,
@@ -565,8 +702,8 @@ pub(crate) fn prepare_inner_with_objects(
         // invocation builtins inside a string still have no such contract.
         if body.iter().any(|token| {
             token.kind == TokenKind::Literal
-                && token.spelling.contains(&prefix)
-                && !formal_string(&token.spelling, &item.markers, &prefix)
+                && token.spelling.contains(prefix.as_str())
+                && !formal_string(&token.spelling, &item.markers, prefix)
         }) {
             record_skip(
                 &mut results,
@@ -581,7 +718,7 @@ pub(crate) fn prepare_inner_with_objects(
             );
             continue;
         }
-        restore_invocation_diagnostics(&mut body, &prefix);
+        restore_invocation_diagnostics(&mut body, prefix);
         let mut occurrences = Vec::new();
         for (index, token) in body.iter().enumerate() {
             if let Some(&parameter) = markers.get(token.spelling.as_str()) {
@@ -589,10 +726,10 @@ pub(crate) fn prepare_inner_with_objects(
             }
         }
         if body.iter().any(|token| {
-            token.spelling.contains(&prefix)
+            token.spelling.contains(prefix.as_str())
                 && !markers.contains_key(token.spelling.as_str())
                 && !(token.kind == TokenKind::Literal
-                    && formal_string(&token.spelling, &item.markers, &prefix))
+                    && formal_string(&token.spelling, &item.markers, prefix))
         }) {
             record_skip(
                 &mut results,
@@ -792,12 +929,8 @@ fn preprocess_prepared<'a>(
         for &index in &pending {
             let item = &prepared[index];
             let tag = probe_tag(directory, index)?;
-            let invocation = format!(
-                "# 1 {tag:?}\n{}\n{}\n{}\n",
-                item.begin,
-                symbolic_invocation(item.definition, &item.markers),
-                item.end
-            );
+            let invocation =
+                format!("# 1 {tag:?}\n{}\n{}\n{}\n", item.begin, item.invocation, item.end);
             if source.len().saturating_add(invocation.len()) > limits.source_bytes {
                 for &index in &pending {
                     let item = &prepared[index];
@@ -1090,6 +1223,9 @@ struct Prepared<'a> {
     body_start: usize,
     /// Fresh symbolic formal identifiers supplied to the driver without added parentheses.
     markers: Vec<String>,
+    /// Probe text the compiler expands: a symbolic invocation of an active macro, or a
+    /// synthetic replacement list with the markers in place of its formals.
+    invocation: String,
     /// Fresh opening probe boundary that must appear exactly once in accepted output.
     begin: String,
     /// Fresh closing probe boundary that must follow the matching opening boundary.
@@ -1277,7 +1413,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
 
 /// Recognize context-sensitive builtins whose changing expansion cannot be represented by a static
 /// translation.
-fn dynamic_builtin(name: &str) -> bool {
+pub(crate) fn dynamic_builtin(name: &str) -> bool {
     name.starts_with("__has_")
         || name.starts_with("__is_")
         || matches!(
@@ -1452,6 +1588,37 @@ struct ProbeDirectory(
     /// Unique owned scratch directory removed on drop.
     PathBuf,
 );
+
+/// The original main file, its probe namespace, and scratch space shared by one batch.
+struct ProbeSource {
+    /// Owned scratch directory for probe files.
+    directory: ProbeDirectory,
+    /// Original main-file bytes that every probe repeats before its invocations.
+    original: Vec<u8>,
+    /// Collision-free prefix for probe markers.
+    prefix: String,
+}
+
+/// Read the main file once for a batch of compiler probes.
+impl ProbeSource {
+    /// Read the original main file, or return `None` when it and the probe separators
+    /// exceed the source budget.
+    fn read(
+        frontend: &FrontendOutput,
+        limits: ExpansionLimits,
+    ) -> Result<Option<Self>, FrontendError> {
+        let header = &frontend.profile().header;
+        let error = |source| FrontendError::CompilerIo { compiler: header.clone(), source };
+        let file = std::fs::File::open(header).map_err(error)?;
+        let read_limit = u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1);
+        let mut original = Vec::new();
+        file.take(read_limit).read_to_end(&mut original).map_err(error)?;
+        if original.len().checked_add(2).is_none_or(|bytes| bytes > limits.source_bytes) {
+            return Ok(None);
+        }
+        Ok(Some(Self { directory: ProbeDirectory::new()?, original, prefix: namespace(frontend) }))
+    }
+}
 
 /// Allocate unique owned scratch space for compiler probes and staged native outputs.
 impl ProbeDirectory {

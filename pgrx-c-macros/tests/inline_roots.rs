@@ -160,10 +160,9 @@ fn compare(scanner: &MacroScanner, native: bool) {
             panic!("root {} must emit: {emission:?}", emission.analysis.name);
         };
         if native && emission.analysis.name != "ROOT_COLLISION" {
-            // Value-returning definitions the analyzer accepts are translated; a void
-            // function and a parameter named like its own function stay native calls.
-            let translated =
-                !matches!(emission.analysis.name.as_str(), "ROOT_VOID" | "ROOT_CAPTURE");
+            // Definitions the analyzer accepts are translated; a parameter named like its
+            // own function stays a native call.
+            let translated = emission.analysis.name != "ROOT_CAPTURE";
             assert_eq!(
                 definition.contains("Translates the original function definition"),
                 translated,
@@ -196,15 +195,15 @@ fn compare(scanner: &MacroScanner, native: bool) {
             &arguments,
         );
         assert!(error.contains("discards qualifiers"), "{error}");
-        // A native call still needs unsafe; a translated pure function, like the
-        // equivalent C macro, does not.
+        // A translated pointer write, like a native call, still needs unsafe; a translated
+        // pure function, like the equivalent C macro, does not.
         let error = rust_oracle::reject_rust(&format!(
             "{rust}\n{prelude}\nfn main() {{ let mut value = 0_i32; ROOT_VOID!(&raw mut value, 7_i32).get(); }}\n"
         ));
         assert!(error.contains("unsafe"), "{error}");
     }
-    // Only ROOT_VOID and ROOT_CAPTURE remain native calls through the guard.
-    rust.push_str(&format!("const EXPECTED_GUARDS: usize = {};\n", if native { 2 } else { 0 }));
+    // Only ROOT_CAPTURE remains a native call through the guard.
+    rust.push_str(&format!("const EXPECTED_GUARDS: usize = {};\n", if native { 1 } else { 0 }));
     rust.push_str(include_str!("fixtures/inline_roots.rs"));
     let profile = frontend.profile();
     let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();

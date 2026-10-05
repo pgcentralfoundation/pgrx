@@ -277,9 +277,17 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans, original formals and bounded definition text from that same
    parse. Header contents are copied once per physical source, rather than once
-   per function. The body's tokens are also retained, one active statement at a
-   time so that inactive `#if` text is excluded; a statement outside the
-   definition's own text or containing a directive leaves no body.
+   per function. The body's tokens are also retained without the text of
+   conditional directives and the branches they skipped. Any other directive, or
+   a token outside the compiler's statements other than `;`, leaves no body. A
+   token that names a macro must have a top-level expansion record at that
+   position; that macro, and every macro its replacement list names, must have
+   its last definition before the expansion and still be active at the end of the
+   unit. Undefinitions are not recorded, so this is what proves the end-of-unit
+   expansion identical. A macro name without a record is admitted only inside the
+   arguments of such an expanded function-like invocation, which dropped or
+   stringified it, and only when it is unchanged since that invocation. Token pasting and invocation-dependent builtins such as
+   `__LINE__` leave no body.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -399,16 +407,24 @@ outside the declared identifier namespace. Original formals and physical source
 are retained separately for reporting and documentation. No preprocessing of a
 synthetic definition or per-function translation unit is needed.
 
-A value-returning definition whose retained body names no macro, including one
-defined only before or after it, also yields a private statement root:
+A retained body also yields a private statement root:
 `NAME(holes) do { T p = (hole); ...; body } while (0)`. Each parameter is a local
 initialized from its hole, so arguments are evaluated once and converted as in a
-call, and parameters share the body's outer scope as in C. When the analyzer
-admits that root with exactly the function's parameters and every path returns,
-the body is emitted as an expression whose `return` breaks out of a labeled
-block, converted to the result type. Rust hygiene keeps caller tokens from
-seeing the locals, so no local-name guard applies. A body the analyzer or
-renderer refuses falls back to the call root, which also covers void functions.
+call, and parameters share the body's outer scope as in C. A root that names
+macros is expanded like a macro invocation, after the original header, without
+retaining object macros as binding constants. When the analyzer admits the root
+with exactly the function's parameters, the body is emitted as an expression. In
+a value-returning function every path must return, and `return` breaks out of a
+labeled block, converted to the result type; a void body has no `return` and
+evaluates to `()`. Rust hygiene keeps caller tokens from seeing the locals, so no
+local-name guard applies. A body the analyzer or renderer refuses falls back to
+the call root.
+
+A generated call to a translated function expands its macro with compiled value
+operands instead of calling the native binding. Functions that reach themselves
+through such calls keep the binding, since the expansion would not terminate. If
+a callee's final rendering is not a translation, its callers are rendered again
+with the binding.
 
 The normal native capability path preserves prototype conversions, qualifiers,
 original C result identity and guard boundaries. Function operands evaluate once;

@@ -124,7 +124,7 @@ macro_rules! RelationCloseSmgr {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function RelationCloseSmgr from rel.h:581 (PostgreSQL 17), rel.h:592 (PostgreSQL 18–19)
+/// C inline function RelationCloseSmgr from rel.h:581 (PostgreSQL 17), rel.h:592 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -140,7 +140,7 @@ macro_rules! RelationCloseSmgr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -148,7 +148,7 @@ macro_rules! RelationCloseSmgr {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationCloseSmgr {
     ($relation:expr $(,)?) => {
@@ -292,7 +292,7 @@ macro_rules! RelationGetRelid {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function RelationGetSmgr from rel.h:555 (PostgreSQL 15)
+/// C inline function RelationGetSmgr from rel.h:555 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline SMgrRelation
@@ -305,7 +305,7 @@ macro_rules! RelationGetRelid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -313,7 +313,7 @@ macro_rules! RelationGetRelid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetSmgr {
     ($rel:expr $(,)?) => {
@@ -321,7 +321,7 @@ macro_rules! RelationGetSmgr {
     };
 }
 #[cfg(feature = "pg16")]
-/// Typed call adapter for C inline function RelationGetSmgr from rel.h:571 (PostgreSQL 16)
+/// C inline function RelationGetSmgr from rel.h:571 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline SMgrRelation
@@ -334,7 +334,7 @@ macro_rules! RelationGetSmgr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -342,7 +342,7 @@ macro_rules! RelationGetSmgr {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetSmgr {
     ($rel:expr $(,)?) => {
@@ -350,7 +350,7 @@ macro_rules! RelationGetSmgr {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function RelationGetSmgr from rel.h:566 (PostgreSQL 17), rel.h:577 (PostgreSQL 18–19)
+/// C inline function RelationGetSmgr from rel.h:566 (PostgreSQL 17), rel.h:577 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline SMgrRelation
@@ -366,7 +366,7 @@ macro_rules! RelationGetSmgr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -374,7 +374,7 @@ macro_rules! RelationGetSmgr {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationGetSmgr {
     ($rel:expr $(,)?) => {

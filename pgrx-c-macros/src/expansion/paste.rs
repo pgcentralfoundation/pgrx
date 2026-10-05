@@ -785,6 +785,7 @@ mod tests {
             parameters: vec!["operand".into()],
             body_start: 0,
             markers: vec![format!("fresh_parameter_{index}")],
+            invocation: format!("{}(fresh_parameter_{index})", definition.name),
             begin: format!("fresh_begin_{index}"),
             end: format!("fresh_end_{index}"),
             dependencies: Vec::new(),

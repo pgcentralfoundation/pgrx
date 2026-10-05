@@ -2,7 +2,7 @@
 // C macros from tableam.h.
 
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_beginscan from tableam.h:890 (PostgreSQL 15)
+/// C inline function table_beginscan from tableam.h:890 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -17,7 +17,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -25,7 +25,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -33,7 +33,7 @@ macro_rules! table_beginscan {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan from tableam.h:906 (PostgreSQL 16), tableam.h:913 (PostgreSQL 17), tableam.h:874 (PostgreSQL 18)
+/// C inline function table_beginscan from tableam.h:906 (PostgreSQL 16), tableam.h:913 (PostgreSQL 17), tableam.h:874 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -48,7 +48,7 @@ macro_rules! table_beginscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -56,7 +56,7 @@ macro_rules! table_beginscan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -64,7 +64,7 @@ macro_rules! table_beginscan {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan from tableam.h:942 (PostgreSQL 19)
+/// C inline function table_beginscan from tableam.h:942 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -80,7 +80,7 @@ macro_rules! table_beginscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -88,7 +88,7 @@ macro_rules! table_beginscan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
@@ -96,7 +96,7 @@ macro_rules! table_beginscan {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_analyze from tableam.h:987 (PostgreSQL 15), tableam.h:1003 (PostgreSQL 16), tableam.h:1013 (PostgreSQL 17), tableam.h:972 (PostgreSQL 18)
+/// C inline function table_beginscan_analyze from tableam.h:987 (PostgreSQL 15), tableam.h:1003 (PostgreSQL 16), tableam.h:1013 (PostgreSQL 17), tableam.h:972 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -109,7 +109,7 @@ macro_rules! table_beginscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -117,7 +117,7 @@ macro_rules! table_beginscan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
@@ -125,7 +125,7 @@ macro_rules! table_beginscan_analyze {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_analyze from tableam.h:1048 (PostgreSQL 19)
+/// C inline function table_beginscan_analyze from tableam.h:1048 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -139,7 +139,7 @@ macro_rules! table_beginscan_analyze {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -147,7 +147,7 @@ macro_rules! table_beginscan_analyze {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
@@ -155,7 +155,7 @@ macro_rules! table_beginscan_analyze {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:935 (PostgreSQL 15), tableam.h:951 (PostgreSQL 16)
+/// C inline function table_beginscan_bm from tableam.h:935 (PostgreSQL 15), tableam.h:951 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -169,7 +169,7 @@ macro_rules! table_beginscan_analyze {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -177,7 +177,7 @@ macro_rules! table_beginscan_analyze {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -185,7 +185,7 @@ macro_rules! table_beginscan_bm {
     };
 }
 #[cfg(feature = "pg17")]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:958 (PostgreSQL 17)
+/// C inline function table_beginscan_bm from tableam.h:958 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -202,7 +202,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -210,7 +210,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $need_tuple:expr $(,)?) => {
@@ -218,7 +218,7 @@ macro_rules! table_beginscan_bm {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:919 (PostgreSQL 18)
+/// C inline function table_beginscan_bm from tableam.h:919 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -233,7 +233,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -241,7 +241,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -249,7 +249,7 @@ macro_rules! table_beginscan_bm {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:991 (PostgreSQL 19)
+/// C inline function table_beginscan_bm from tableam.h:991 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -264,7 +264,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -272,7 +272,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
@@ -280,7 +280,7 @@ macro_rules! table_beginscan_bm {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_sampling from tableam.h:951 (PostgreSQL 15), tableam.h:967 (PostgreSQL 16), tableam.h:977 (PostgreSQL 17), tableam.h:936 (PostgreSQL 18)
+/// C inline function table_beginscan_sampling from tableam.h:951 (PostgreSQL 15), tableam.h:967 (PostgreSQL 16), tableam.h:977 (PostgreSQL 17), tableam.h:936 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -303,7 +303,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -311,7 +311,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_sampling {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
@@ -319,7 +319,7 @@ macro_rules! table_beginscan_sampling {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_sampling from tableam.h:1010 (PostgreSQL 19)
+/// C inline function table_beginscan_sampling from tableam.h:1010 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -343,7 +343,7 @@ macro_rules! table_beginscan_sampling {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -351,7 +351,7 @@ macro_rules! table_beginscan_sampling {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_sampling {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr, $flags:expr $(,)?) => {
@@ -359,7 +359,7 @@ macro_rules! table_beginscan_sampling {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_strat from tableam.h:914 (PostgreSQL 15), tableam.h:930 (PostgreSQL 16), tableam.h:937 (PostgreSQL 17), tableam.h:898 (PostgreSQL 18)
+/// C inline function table_beginscan_strat from tableam.h:914 (PostgreSQL 15), tableam.h:930 (PostgreSQL 16), tableam.h:937 (PostgreSQL 17), tableam.h:898 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -379,7 +379,7 @@ macro_rules! table_beginscan_sampling {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -387,7 +387,7 @@ macro_rules! table_beginscan_sampling {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
@@ -395,7 +395,7 @@ macro_rules! table_beginscan_strat {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_strat from tableam.h:967 (PostgreSQL 19)
+/// C inline function table_beginscan_strat from tableam.h:967 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -416,7 +416,7 @@ macro_rules! table_beginscan_strat {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -424,7 +424,7 @@ macro_rules! table_beginscan_strat {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
@@ -432,7 +432,7 @@ macro_rules! table_beginscan_strat {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_tid from tableam.h:974 (PostgreSQL 15), tableam.h:990 (PostgreSQL 16), tableam.h:1000 (PostgreSQL 17), tableam.h:959 (PostgreSQL 18)
+/// C inline function table_beginscan_tid from tableam.h:974 (PostgreSQL 15), tableam.h:990 (PostgreSQL 16), tableam.h:1000 (PostgreSQL 17), tableam.h:959 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -445,7 +445,7 @@ macro_rules! table_beginscan_strat {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -453,7 +453,7 @@ macro_rules! table_beginscan_strat {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
@@ -461,7 +461,7 @@ macro_rules! table_beginscan_tid {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_tid from tableam.h:1034 (PostgreSQL 19)
+/// C inline function table_beginscan_tid from tableam.h:1034 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -475,7 +475,7 @@ macro_rules! table_beginscan_tid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -483,7 +483,7 @@ macro_rules! table_beginscan_tid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
@@ -491,7 +491,7 @@ macro_rules! table_beginscan_tid {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_tidrange from tableam.h:1064 (PostgreSQL 15), tableam.h:1084 (PostgreSQL 16), tableam.h:1089 (PostgreSQL 17), tableam.h:1048 (PostgreSQL 18)
+/// C inline function table_beginscan_tidrange from tableam.h:1064 (PostgreSQL 15), tableam.h:1084 (PostgreSQL 16), tableam.h:1089 (PostgreSQL 17), tableam.h:1048 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -512,7 +512,7 @@ macro_rules! table_beginscan_tid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -520,7 +520,7 @@ macro_rules! table_beginscan_tid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr $(,)?) => {
@@ -528,7 +528,7 @@ macro_rules! table_beginscan_tidrange {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_beginscan_tidrange from tableam.h:1118 (PostgreSQL 19)
+/// C inline function table_beginscan_tidrange from tableam.h:1118 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -550,7 +550,7 @@ macro_rules! table_beginscan_tidrange {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -558,14 +558,14 @@ macro_rules! table_beginscan_tidrange {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr, $flags:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
+/// C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -576,7 +576,7 @@ macro_rules! table_beginscan_tidrange {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -592,7 +592,7 @@ macro_rules! table_endscan {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1573 (PostgreSQL 15), tableam.h:1597 (PostgreSQL 16), tableam.h:1602 (PostgreSQL 17), tableam.h:1561 (PostgreSQL 18)
+/// C inline function table_finish_bulk_insert from tableam.h:1573 (PostgreSQL 15), tableam.h:1597 (PostgreSQL 16), tableam.h:1602 (PostgreSQL 17), tableam.h:1561 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -605,7 +605,7 @@ macro_rules! table_endscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -621,7 +621,7 @@ macro_rules! table_finish_bulk_insert {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1660 (PostgreSQL 19)
+/// C inline function table_finish_bulk_insert from tableam.h:1660 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -634,7 +634,7 @@ macro_rules! table_finish_bulk_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -744,7 +744,7 @@ macro_rules! table_index_build_range_scan {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1754 (PostgreSQL 15), tableam.h:1779 (PostgreSQL 16), tableam.h:1782 (PostgreSQL 17), tableam.h:1741 (PostgreSQL 18)
+/// C inline function table_index_build_scan from tableam.h:1754 (PostgreSQL 15), tableam.h:1779 (PostgreSQL 16), tableam.h:1782 (PostgreSQL 17), tableam.h:1741 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline double
@@ -772,7 +772,7 @@ macro_rules! table_index_build_range_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -780,7 +780,7 @@ macro_rules! table_index_build_range_scan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
@@ -788,7 +788,7 @@ macro_rules! table_index_build_scan {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1844 (PostgreSQL 19)
+/// C inline function table_index_build_scan from tableam.h:1844 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -816,7 +816,7 @@ macro_rules! table_index_build_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -824,7 +824,7 @@ macro_rules! table_index_build_scan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
@@ -921,7 +921,7 @@ macro_rules! table_index_fetch_begin {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
+/// C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -932,7 +932,7 @@ macro_rules! table_index_fetch_begin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -947,7 +947,7 @@ macro_rules! table_index_fetch_end {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
+/// C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -958,7 +958,7 @@ macro_rules! table_index_fetch_end {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1048,7 +1048,7 @@ macro_rules! table_index_fetch_tuple {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1818 (PostgreSQL 15), tableam.h:1843 (PostgreSQL 16), tableam.h:1846 (PostgreSQL 17), tableam.h:1805 (PostgreSQL 18)
+/// C inline function table_index_validate_scan from tableam.h:1818 (PostgreSQL 15), tableam.h:1843 (PostgreSQL 16), tableam.h:1846 (PostgreSQL 17), tableam.h:1805 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1067,7 +1067,7 @@ macro_rules! table_index_fetch_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1083,7 +1083,7 @@ macro_rules! table_index_validate_scan {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1908 (PostgreSQL 19)
+/// C inline function table_index_validate_scan from tableam.h:1908 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1102,7 +1102,7 @@ macro_rules! table_index_validate_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1118,7 +1118,7 @@ macro_rules! table_index_validate_scan {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_multi_insert from tableam.h:1433 (PostgreSQL 15), tableam.h:1457 (PostgreSQL 16), tableam.h:1462 (PostgreSQL 17), tableam.h:1421 (PostgreSQL 18)
+/// C inline function table_multi_insert from tableam.h:1433 (PostgreSQL 15), tableam.h:1457 (PostgreSQL 16), tableam.h:1462 (PostgreSQL 17), tableam.h:1421 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1131,7 +1131,7 @@ macro_rules! table_index_validate_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1147,7 +1147,7 @@ macro_rules! table_multi_insert {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_multi_insert from tableam.h:1512 (PostgreSQL 19)
+/// C inline function table_multi_insert from tableam.h:1512 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1160,7 +1160,7 @@ macro_rules! table_multi_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1175,7 +1175,7 @@ macro_rules! table_multi_insert {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
+/// C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1186,7 +1186,7 @@ macro_rules! table_multi_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1202,7 +1202,7 @@ macro_rules! table_parallelscan_reinitialize {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1628 (PostgreSQL 15)
+/// C inline function table_relation_copy_data from tableam.h:1628 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -1213,7 +1213,7 @@ macro_rules! table_parallelscan_reinitialize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1229,7 +1229,7 @@ macro_rules! table_relation_copy_data {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1716 (PostgreSQL 19)
+/// C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1716 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1240,7 +1240,7 @@ macro_rules! table_relation_copy_data {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1256,7 +1256,7 @@ macro_rules! table_relation_copy_data {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1655 (PostgreSQL 15), tableam.h:1680 (PostgreSQL 16), tableam.h:1685 (PostgreSQL 17), tableam.h:1644 (PostgreSQL 18)
+/// C inline function table_relation_copy_for_cluster from tableam.h:1655 (PostgreSQL 15), tableam.h:1680 (PostgreSQL 16), tableam.h:1685 (PostgreSQL 17), tableam.h:1644 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1279,7 +1279,7 @@ macro_rules! table_relation_copy_data {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1295,7 +1295,7 @@ macro_rules! table_relation_copy_for_cluster {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1745 (PostgreSQL 19)
+/// C inline function table_relation_copy_for_cluster from tableam.h:1745 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1320,7 +1320,7 @@ macro_rules! table_relation_copy_for_cluster {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1335,7 +1335,7 @@ macro_rules! table_relation_copy_for_cluster {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2006 (PostgreSQL 19)
+/// C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2006 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1349,7 +1349,7 @@ macro_rules! table_relation_copy_for_cluster {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1365,7 +1365,7 @@ macro_rules! table_relation_estimate_size {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
+/// C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1381,7 +1381,7 @@ macro_rules! table_relation_estimate_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1397,7 +1397,7 @@ macro_rules! table_relation_fetch_toast_slice {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1985 (PostgreSQL 19)
+/// C inline function table_relation_fetch_toast_slice from tableam.h:1985 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1413,7 +1413,7 @@ macro_rules! table_relation_fetch_toast_slice {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1454,7 +1454,7 @@ macro_rules! table_relation_needs_toast_table {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1704 (PostgreSQL 19)
+/// C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1704 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1465,7 +1465,7 @@ macro_rules! table_relation_needs_toast_table {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1481,7 +1481,7 @@ macro_rules! table_relation_nontransactional_truncate {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1686 (PostgreSQL 19)
+/// C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1686 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1498,7 +1498,7 @@ macro_rules! table_relation_nontransactional_truncate {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1514,7 +1514,7 @@ macro_rules! table_relation_set_new_filelocator {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_relation_set_new_filenode from tableam.h:1599 (PostgreSQL 15)
+/// C inline function table_relation_set_new_filenode from tableam.h:1599 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -1530,7 +1530,7 @@ macro_rules! table_relation_set_new_filelocator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1598,7 +1598,7 @@ macro_rules! table_relation_toast_am {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1684 (PostgreSQL 15), tableam.h:1709 (PostgreSQL 16), tableam.h:1714 (PostgreSQL 17), tableam.h:1673 (PostgreSQL 18)
+/// C inline function table_relation_vacuum from tableam.h:1684 (PostgreSQL 15), tableam.h:1709 (PostgreSQL 16), tableam.h:1714 (PostgreSQL 17), tableam.h:1673 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1610,7 +1610,7 @@ macro_rules! table_relation_toast_am {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1626,7 +1626,7 @@ macro_rules! table_relation_vacuum {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1776 (PostgreSQL 19)
+/// C inline function table_relation_vacuum from tableam.h:1776 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1638,7 +1638,7 @@ macro_rules! table_relation_vacuum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1654,7 +1654,7 @@ macro_rules! table_relation_vacuum {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_rescan from tableam.h:1007 (PostgreSQL 15), tableam.h:1023 (PostgreSQL 16), tableam.h:1033 (PostgreSQL 17), tableam.h:992 (PostgreSQL 18)
+/// C inline function table_rescan from tableam.h:1007 (PostgreSQL 15), tableam.h:1023 (PostgreSQL 16), tableam.h:1033 (PostgreSQL 17), tableam.h:992 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1666,7 +1666,7 @@ macro_rules! table_relation_vacuum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1682,7 +1682,7 @@ macro_rules! table_rescan {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_rescan from tableam.h:1069 (PostgreSQL 19)
+/// C inline function table_rescan from tableam.h:1069 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1693,7 +1693,7 @@ macro_rules! table_rescan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1709,7 +1709,7 @@ macro_rules! table_rescan {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_rescan_set_params from tableam.h:1022 (PostgreSQL 15), tableam.h:1038 (PostgreSQL 16), tableam.h:1048 (PostgreSQL 17), tableam.h:1007 (PostgreSQL 18)
+/// C inline function table_rescan_set_params from tableam.h:1022 (PostgreSQL 15), tableam.h:1038 (PostgreSQL 16), tableam.h:1048 (PostgreSQL 17), tableam.h:1007 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1723,7 +1723,7 @@ macro_rules! table_rescan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1739,7 +1739,7 @@ macro_rules! table_rescan_set_params {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_rescan_set_params from tableam.h:1083 (PostgreSQL 19)
+/// C inline function table_rescan_set_params from tableam.h:1083 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1753,7 +1753,7 @@ macro_rules! table_rescan_set_params {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1768,7 +1768,8 @@ macro_rules! table_rescan_set_params {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_rescan_tidrange from tableam.h:1085 (PostgreSQL 15), tableam.h:1105 (PostgreSQL 16), tableam.h:1110 (PostgreSQL 17), tableam.h:1069 (PostgreSQL 18), tableam.h:1140 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function table_rescan_tidrange from tableam.h:1085 (PostgreSQL 15), tableam.h:1105 (PostgreSQL 16), tableam.h:1110 (PostgreSQL 17), tableam.h:1140 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1793,6 +1794,38 @@ macro_rules! table_rescan_set_params {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_rescan_tidrange {
+    ($sscan:expr, $mintid:expr, $maxtid:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function table_rescan_tidrange from tableam.h:1069 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// table_rescan_tidrange(TableScanDesc sscan, ItemPointer mintid,
+/// 					  ItemPointer maxtid)
+/// {
+/// 	/* Ensure table_beginscan_tidrange() was used. */
+/// 	Assert((sscan->rs_flags & SO_TYPE_TIDRANGESCAN) != 0);
+///
+/// 	sscan->rs_rd->rd_tableam->scan_rescan(sscan, NULL, false, false, false, false);
+/// 	sscan->rs_rd->rd_tableam->scan_set_tidrange(sscan, mintid, maxtid);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_rescan_tidrange {
     ($sscan:expr, $mintid:expr, $maxtid:expr $(,)?) => {
@@ -2215,8 +2248,8 @@ macro_rules! table_scan_getnextslot_tidrange {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_scan_getnextslot_tidrange from tableam.h:1121 (PostgreSQL 16), tableam.h:1126 (PostgreSQL 17), tableam.h:1085 (PostgreSQL 18), tableam.h:1156 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function table_scan_getnextslot_tidrange from tableam.h:1121 (PostgreSQL 16), tableam.h:1126 (PostgreSQL 17), tableam.h:1156 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2246,6 +2279,43 @@ macro_rules! table_scan_getnextslot_tidrange {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_scan_getnextslot_tidrange {
+    ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function table_scan_getnextslot_tidrange from tableam.h:1085 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// table_scan_getnextslot_tidrange(TableScanDesc sscan, ScanDirection direction,
+/// 								TupleTableSlot *slot)
+/// {
+/// 	/* Ensure table_beginscan_tidrange() was used. */
+/// 	Assert((sscan->rs_flags & SO_TYPE_TIDRANGESCAN) != 0);
+///
+/// 	/* We don't expect actual scans using NoMovementScanDirection */
+/// 	Assert(direction == ForwardScanDirection ||
+/// 		   direction == BackwardScanDirection);
+///
+/// 	return sscan->rs_rd->rd_tableam->scan_getnextslot_tidrange(sscan,
+/// 															   direction,
+/// 															   slot);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
@@ -2382,7 +2452,7 @@ macro_rules! table_scan_sample_next_tuple {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
+/// C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2395,7 +2465,7 @@ macro_rules! table_scan_sample_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2510,7 +2580,7 @@ macro_rules! table_tuple_fetch_row_version {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_insert from tableam.h:1378 (PostgreSQL 15), tableam.h:1402 (PostgreSQL 16), tableam.h:1407 (PostgreSQL 17), tableam.h:1366 (PostgreSQL 18)
+/// C inline function table_tuple_insert from tableam.h:1378 (PostgreSQL 15), tableam.h:1402 (PostgreSQL 16), tableam.h:1407 (PostgreSQL 17), tableam.h:1366 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2523,7 +2593,7 @@ macro_rules! table_tuple_fetch_row_version {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2539,7 +2609,7 @@ macro_rules! table_tuple_insert {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_insert from tableam.h:1457 (PostgreSQL 19)
+/// C inline function table_tuple_insert from tableam.h:1457 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2552,7 +2622,7 @@ macro_rules! table_tuple_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2568,7 +2638,7 @@ macro_rules! table_tuple_insert {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_insert_speculative from tableam.h:1397 (PostgreSQL 15), tableam.h:1421 (PostgreSQL 16), tableam.h:1426 (PostgreSQL 17), tableam.h:1385 (PostgreSQL 18)
+/// C inline function table_tuple_insert_speculative from tableam.h:1397 (PostgreSQL 15), tableam.h:1421 (PostgreSQL 16), tableam.h:1426 (PostgreSQL 17), tableam.h:1385 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2583,7 +2653,7 @@ macro_rules! table_tuple_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2599,7 +2669,7 @@ macro_rules! table_tuple_insert_speculative {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_insert_speculative from tableam.h:1476 (PostgreSQL 19)
+/// C inline function table_tuple_insert_speculative from tableam.h:1476 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2614,7 +2684,7 @@ macro_rules! table_tuple_insert_speculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

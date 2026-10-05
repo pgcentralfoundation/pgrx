@@ -53,8 +53,8 @@ macro_rules! ItemPointerCopy {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerCopy from itemptr.h:171 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// Typed call adapter for C inline function ItemPointerCopy from itemptr.h:171 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline void
@@ -76,6 +76,35 @@ macro_rules! ItemPointerCopy {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerCopy {
+    ($fromPointer:expr, $toPointer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerCopy from itemptr.h:171 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// ItemPointerCopy(const ItemPointerData *fromPointer, ItemPointerData *toPointer)
+/// {
+/// 	Assert(PointerIsValid(toPointer));
+/// 	Assert(PointerIsValid(fromPointer));
+/// 	*toPointer = *fromPointer;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerCopy {
     ($fromPointer:expr, $toPointer:expr $(,)?) => {
@@ -136,8 +165,8 @@ macro_rules! ItemPointerGetBlockNumber {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ItemPointerGetBlockNumber from itemptr.h:102 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ItemPointerGetBlockNumber from itemptr.h:102 (PostgreSQL 16–17, 19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -158,6 +187,34 @@ macro_rules! ItemPointerGetBlockNumber {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerGetBlockNumber {
+    ($pointer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerGetBlockNumber from itemptr.h:102 (PostgreSQL 18)
+///
+/// ```c
+/// static inline BlockNumber
+/// ItemPointerGetBlockNumber(const ItemPointerData *pointer)
+/// {
+/// 	Assert(ItemPointerIsValid(pointer));
+/// 	return ItemPointerGetBlockNumberNoCheck(pointer);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
@@ -240,7 +297,7 @@ macro_rules! ItemPointerGetDatum {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ItemPointerGetDatum from itemptr.h:236 (PostgreSQL 19)
+/// C inline function ItemPointerGetDatum from itemptr.h:236 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -251,7 +308,7 @@ macro_rules! ItemPointerGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -259,7 +316,7 @@ macro_rules! ItemPointerGetDatum {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerGetDatum {
     ($X:expr $(,)?) => {
@@ -291,8 +348,8 @@ macro_rules! ItemPointerGetOffsetNumber {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ItemPointerGetOffsetNumber from itemptr.h:123 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ItemPointerGetOffsetNumber from itemptr.h:123 (PostgreSQL 16–17, 19)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -313,6 +370,34 @@ macro_rules! ItemPointerGetOffsetNumber {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerGetOffsetNumber {
+    ($pointer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerGetOffsetNumber from itemptr.h:123 (PostgreSQL 18)
+///
+/// ```c
+/// static inline OffsetNumber
+/// ItemPointerGetOffsetNumber(const ItemPointerData *pointer)
+/// {
+/// 	Assert(ItemPointerIsValid(pointer));
+/// 	return ItemPointerGetOffsetNumberNoCheck(pointer);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
@@ -385,7 +470,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ItemPointerIndicatesMovedPartitions from itemptr.h:196 (PostgreSQL 16–19)
+/// C inline function ItemPointerIndicatesMovedPartitions from itemptr.h:196 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline bool
@@ -398,7 +483,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -406,7 +491,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIndicatesMovedPartitions {
     ($pointer:expr $(,)?) => {
@@ -435,7 +520,7 @@ macro_rules! ItemPointerIsValid {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerIsValid from itemptr.h:82 (PostgreSQL 16–18)
+/// C inline function ItemPointerIsValid from itemptr.h:82 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline bool
@@ -446,7 +531,7 @@ macro_rules! ItemPointerIsValid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -454,7 +539,7 @@ macro_rules! ItemPointerIsValid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIsValid {
     ($pointer:expr $(,)?) => {
@@ -509,8 +594,8 @@ macro_rules! ItemPointerSet {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerSet from itemptr.h:134 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// Typed call adapter for C inline function ItemPointerSet from itemptr.h:134 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline void
@@ -532,6 +617,35 @@ macro_rules! ItemPointerSet {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerSet {
+    ($pointer:expr, $blockNumber:expr, $offNum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerSet from itemptr.h:134 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// ItemPointerSet(ItemPointerData *pointer, BlockNumber blockNumber, OffsetNumber offNum)
+/// {
+/// 	Assert(PointerIsValid(pointer));
+/// 	BlockIdSet(&pointer->ip_blkid, blockNumber);
+/// 	pointer->ip_posid = offNum;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerSet {
     ($pointer:expr, $blockNumber:expr, $offNum:expr $(,)?) => {
@@ -592,8 +706,8 @@ macro_rules! ItemPointerSetBlockNumber {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerSetBlockNumber from itemptr.h:146 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// Typed call adapter for C inline function ItemPointerSetBlockNumber from itemptr.h:146 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline void
@@ -614,6 +728,34 @@ macro_rules! ItemPointerSetBlockNumber {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerSetBlockNumber {
+    ($pointer:expr, $blockNumber:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerSetBlockNumber from itemptr.h:146 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// ItemPointerSetBlockNumber(ItemPointerData *pointer, BlockNumber blockNumber)
+/// {
+/// 	Assert(PointerIsValid(pointer));
+/// 	BlockIdSet(&pointer->ip_blkid, blockNumber);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {
@@ -673,8 +815,8 @@ macro_rules! ItemPointerSetInvalid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerSetInvalid from itemptr.h:183 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// Typed call adapter for C inline function ItemPointerSetInvalid from itemptr.h:183 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline void
@@ -696,6 +838,35 @@ macro_rules! ItemPointerSetInvalid {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerSetInvalid {
+    ($pointer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerSetInvalid from itemptr.h:183 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// ItemPointerSetInvalid(ItemPointerData *pointer)
+/// {
+/// 	Assert(PointerIsValid(pointer));
+/// 	BlockIdSet(&pointer->ip_blkid, InvalidBlockNumber);
+/// 	pointer->ip_posid = InvalidOffsetNumber;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerSetInvalid {
     ($pointer:expr $(,)?) => {
@@ -757,7 +928,7 @@ macro_rules! ItemPointerSetMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ItemPointerSetMovedPartitions from itemptr.h:209 (PostgreSQL 16–19)
+/// C inline function ItemPointerSetMovedPartitions from itemptr.h:209 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline void
@@ -768,7 +939,7 @@ macro_rules! ItemPointerSetMovedPartitions {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -776,7 +947,7 @@ macro_rules! ItemPointerSetMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerSetMovedPartitions {
     ($pointer:expr $(,)?) => {
@@ -808,8 +979,8 @@ macro_rules! ItemPointerSetOffsetNumber {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 16–18)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// Typed call adapter for C inline function ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline void
@@ -830,6 +1001,34 @@ macro_rules! ItemPointerSetOffsetNumber {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ItemPointerSetOffsetNumber {
+    ($pointer:expr, $offsetNumber:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ItemPointerSetOffsetNumber from itemptr.h:157 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// ItemPointerSetOffsetNumber(ItemPointerData *pointer, OffsetNumber offsetNumber)
+/// {
+/// 	Assert(PointerIsValid(pointer));
+/// 	pointer->ip_posid = offsetNumber;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerSetOffsetNumber {
     ($pointer:expr, $offsetNumber:expr $(,)?) => {

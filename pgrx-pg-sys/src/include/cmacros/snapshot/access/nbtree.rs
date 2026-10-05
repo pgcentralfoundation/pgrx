@@ -486,8 +486,8 @@ macro_rules! BTPageIsRecyclable {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:290 (PostgreSQL 16–17), nbtree.h:291 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:290 (PostgreSQL 16–17), nbtree.h:291 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -531,6 +531,57 @@ macro_rules! BTPageIsRecyclable {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTPageIsRecyclable {
+    ($page:expr, $heaprel:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function BTPageIsRecyclable from nbtree.h:291 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// BTPageIsRecyclable(Page page, Relation heaprel)
+/// {
+/// 	BTPageOpaque opaque;
+///
+/// 	Assert(!PageIsNew(page));
+/// 	Assert(heaprel != NULL);
+///
+/// 	/* Recycling okay iff page is deleted and safexid is old enough */
+/// 	opaque = BTPageGetOpaque(page);
+/// 	if (P_ISDELETED(opaque))
+/// 	{
+/// 		FullTransactionId safexid = BTPageGetDeleteXid(page);
+///
+/// 		/*
+/// 		 * The page was deleted, but when? If it was just deleted, a scan
+/// 		 * might have seen the downlink to it, and will read the page later.
+/// 		 * As long as that can happen, we must keep the deleted page around as
+/// 		 * a tombstone.
+/// 		 *
+/// 		 * For that check if the deletion XID could still be visible to
+/// 		 * anyone. If not, then no scan that's still in progress could have
+/// 		 * seen its downlink, and we can recycle it.
+/// 		 */
+/// 		return GlobalVisCheckRemovableFullXid(heaprel, safexid);
+/// 	}
+///
+/// 	return false;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr, $heaprel:expr $(,)?) => {
@@ -858,7 +909,7 @@ macro_rules! BTScanPosUnpinIfPinned {
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15)
+/// C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -869,7 +920,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -877,7 +928,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetDownLink {
     ($pivot:expr $(,)?) => {
@@ -911,7 +962,7 @@ macro_rules! BTreeTupleGetDownLink {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -936,7 +987,7 @@ macro_rules! BTreeTupleGetDownLink {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -944,14 +995,15 @@ macro_rules! BTreeTupleGetDownLink {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetHeapTID {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -986,6 +1038,42 @@ macro_rules! BTreeTupleGetMaxHeapTID {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function BTreeTupleGetMaxHeapTID from nbtree.h:664 (PostgreSQL 18)
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetMaxHeapTID(IndexTuple itup)
+/// {
+/// 	Assert(!BTreeTupleIsPivot(itup));
+///
+/// 	if (BTreeTupleIsPosting(itup))
+/// 	{
+/// 		uint16		nposting = BTreeTupleGetNPosting(itup);
+///
+/// 		return BTreeTupleGetPostingN(itup, nposting - 1);
+/// 	}
+///
+/// 	return &itup->t_tid;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetMaxHeapTID {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 /// C macro BTreeTupleGetNAtts from nbtree.h:572 (PostgreSQL 15), nbtree.h:577 (PostgreSQL 16–17), nbtree.h:578 (PostgreSQL 18–19)
 ///
 /// ```text
@@ -1006,7 +1094,8 @@ macro_rules! BTreeTupleGetNAtts {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint16
@@ -1031,6 +1120,38 @@ macro_rules! BTreeTupleGetNAtts {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetNPosting {
+    ($posting:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function BTreeTupleGetNPosting from nbtree.h:518 (PostgreSQL 18)
+///
+/// ```c
+/// static inline uint16
+/// BTreeTupleGetNPosting(IndexTuple posting)
+/// {
+/// 	OffsetNumber existing;
+///
+/// 	Assert(BTreeTupleIsPosting(posting));
+///
+/// 	existing = ItemPointerGetOffsetNumberNoCheck(&posting->t_tid);
+/// 	return (existing & BT_OFFSET_MASK);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetNPosting {
     ($posting:expr $(,)?) => {
@@ -1090,7 +1211,8 @@ macro_rules! BTreeTupleGetPostingN {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -1118,8 +1240,37 @@ macro_rules! BTreeTupleGetPostingOffset {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function BTreeTupleGetPostingOffset from nbtree.h:529 (PostgreSQL 18)
+///
+/// ```c
+/// static inline uint32
+/// BTreeTupleGetPostingOffset(IndexTuple posting)
+/// {
+/// 	Assert(BTreeTupleIsPosting(posting));
+///
+/// 	return ItemPointerGetBlockNumberNoCheck(&posting->t_tid);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetPostingOffset {
+    ($posting:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15)
+/// C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -1130,7 +1281,7 @@ macro_rules! BTreeTupleGetPostingOffset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1138,7 +1289,7 @@ macro_rules! BTreeTupleGetPostingOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetTopParent {
     ($leafhikey:expr $(,)?) => {
@@ -1172,7 +1323,8 @@ macro_rules! BTreeTupleGetTopParent {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15), nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -1189,7 +1341,36 @@ macro_rules! BTreeTupleGetTopParent {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! BTreeTupleIsPivot {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleIsPivot from nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline bool
+/// BTreeTupleIsPivot(IndexTuple itup)
+/// {
+/// 	if ((itup->t_info & INDEX_ALT_TID_MASK) == 0)
+/// 		return false;
+/// 	/* absence of BT_IS_POSTING in offset number indicates pivot tuple */
+/// 	if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) & BT_IS_POSTING) != 0)
+/// 		return false;
+///
+/// 	return true;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1204,7 +1385,8 @@ macro_rules! BTreeTupleIsPivot {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15), nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -1221,7 +1403,36 @@ macro_rules! BTreeTupleIsPivot {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+#[macro_export]
+macro_rules! BTreeTupleIsPosting {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleIsPosting from nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline bool
+/// BTreeTupleIsPosting(IndexTuple itup)
+/// {
+/// 	if ((itup->t_info & INDEX_ALT_TID_MASK) == 0)
+/// 		return false;
+/// 	/* presence of BT_IS_POSTING in offset number indicates posting tuple */
+/// 	if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) & BT_IS_POSTING) == 0)
+/// 		return false;
+///
+/// 	return true;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1236,7 +1447,8 @@ macro_rules! BTreeTupleIsPosting {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15), nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -1262,7 +1474,35 @@ macro_rules! BTreeTupleSetDownLink {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleSetDownLink from nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetDownLink(IndexTuple pivot, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&pivot->t_tid, blkno);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetDownLink {
+    ($pivot:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1300,7 +1540,47 @@ macro_rules! BTreeTupleSetNAtts {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 18–19)
+#[cfg(feature = "pg18")]
+/// C inline function BTreeTupleSetNAtts from nbtree.h:595 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetNAtts(IndexTuple itup, uint16 nkeyatts, bool heaptid)
+/// {
+/// 	Assert(nkeyatts <= INDEX_MAX_KEYS);
+/// 	Assert((nkeyatts & BT_STATUS_OFFSET_MASK) == 0);
+/// 	Assert(!heaptid || nkeyatts > 0);
+/// 	Assert(!BTreeTupleIsPivot(itup) || nkeyatts == 0);
+///
+/// 	itup->t_info |= INDEX_ALT_TID_MASK;
+///
+/// 	if (heaptid)
+/// 		nkeyatts |= BT_PIVOT_HEAP_TID_ATTR;
+///
+/// 	/* BT_IS_POSTING bit is deliberately unset here */
+/// 	ItemPointerSetOffsetNumber(&itup->t_tid, nkeyatts);
+/// 	Assert(BTreeTupleIsPivot(itup));
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetNAtts {
+    ($itup:expr, $nkeyatts:expr, $heaptid:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1334,7 +1614,43 @@ macro_rules! BTreeTupleSetPosting {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15), nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
+#[cfg(feature = "pg18")]
+/// C inline function BTreeTupleSetPosting from nbtree.h:504 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetPosting(IndexTuple itup, uint16 nhtids, int postingoffset)
+/// {
+/// 	Assert(nhtids > 1);
+/// 	Assert((nhtids & BT_STATUS_OFFSET_MASK) == 0);
+/// 	Assert((size_t) postingoffset == MAXALIGN(postingoffset));
+/// 	Assert(postingoffset < INDEX_SIZE_MASK);
+/// 	Assert(!BTreeTupleIsPivot(itup));
+///
+/// 	itup->t_info |= INDEX_ALT_TID_MASK;
+/// 	ItemPointerSetOffsetNumber(&itup->t_tid, (nhtids | BT_IS_POSTING));
+/// 	ItemPointerSetBlockNumber(&itup->t_tid, postingoffset);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetPosting {
+    ($itup:expr, $nhtids:expr, $postingoffset:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -1347,6 +1663,34 @@ macro_rules! BTreeTupleSetPosting {
 ///
 ///
 #[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetTopParent {
+    ($leafhikey:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleSetTopParent from nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetTopParent(IndexTuple leafhikey, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&leafhikey->t_tid, blkno);
+/// 	BTreeTupleSetNAtts(leafhikey, 0, false);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

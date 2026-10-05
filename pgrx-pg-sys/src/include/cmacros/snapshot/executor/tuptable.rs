@@ -93,8 +93,8 @@ macro_rules! ExecCopySlot {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecCopySlot from tuptable.h:508 (PostgreSQL 17), tuptable.h:524 (PostgreSQL 18), tuptable.h:543 (PostgreSQL 19)
+#[cfg(any(feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ExecCopySlot from tuptable.h:508 (PostgreSQL 17), tuptable.h:543 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -127,7 +127,42 @@ macro_rules! ExecCopySlot {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecCopySlotHeapTuple from tuptable.h:451 (PostgreSQL 15), tuptable.h:458 (PostgreSQL 16), tuptable.h:480 (PostgreSQL 17), tuptable.h:484 (PostgreSQL 18), tuptable.h:503 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function ExecCopySlot from tuptable.h:524 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TupleTableSlot *
+/// ExecCopySlot(TupleTableSlot *dstslot, TupleTableSlot *srcslot)
+/// {
+/// 	Assert(!TTS_EMPTY(srcslot));
+/// 	Assert(srcslot != dstslot);
+/// 	Assert(dstslot->tts_tupleDescriptor->natts ==
+/// 		   srcslot->tts_tupleDescriptor->natts);
+///
+/// 	dstslot->tts_ops->copyslot(dstslot, srcslot);
+///
+/// 	return dstslot;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExecCopySlot {
+    ($dstslot:expr, $srcslot:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ExecCopySlotHeapTuple from tuptable.h:451 (PostgreSQL 15), tuptable.h:458 (PostgreSQL 16), tuptable.h:480 (PostgreSQL 17), tuptable.h:503 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline HeapTuple
@@ -149,6 +184,35 @@ macro_rules! ExecCopySlot {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExecCopySlotHeapTuple {
+    ($slot:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function ExecCopySlotHeapTuple from tuptable.h:484 (PostgreSQL 18)
+///
+/// ```c
+/// static inline HeapTuple
+/// ExecCopySlotHeapTuple(TupleTableSlot *slot)
+/// {
+/// 	Assert(!TTS_EMPTY(slot));
+///
+/// 	return slot->tts_ops->copy_heap_tuple(slot);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecCopySlotHeapTuple {
     ($slot:expr $(,)?) => {
@@ -236,7 +300,7 @@ macro_rules! ExecCopySlotMinimalTupleExtra {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecMaterializeSlot from tuptable.h:442 (PostgreSQL 15), tuptable.h:449 (PostgreSQL 16), tuptable.h:471 (PostgreSQL 17), tuptable.h:475 (PostgreSQL 18), tuptable.h:494 (PostgreSQL 19)
+/// C inline function ExecMaterializeSlot from tuptable.h:442 (PostgreSQL 15), tuptable.h:449 (PostgreSQL 16), tuptable.h:471 (PostgreSQL 17), tuptable.h:475 (PostgreSQL 18), tuptable.h:494 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -247,7 +311,7 @@ macro_rules! ExecCopySlotMinimalTupleExtra {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -460,8 +524,8 @@ macro_rules! slot_attisnull {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function slot_attisnull from tuptable.h:373 (PostgreSQL 16), tuptable.h:380 (PostgreSQL 17), tuptable.h:384 (PostgreSQL 18), tuptable.h:402 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function slot_attisnull from tuptable.h:373 (PostgreSQL 16), tuptable.h:380 (PostgreSQL 17), tuptable.h:402 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -492,7 +556,39 @@ macro_rules! slot_attisnull {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function slot_getallattrs from tuptable.h:353 (PostgreSQL 15), tuptable.h:360 (PostgreSQL 16), tuptable.h:367 (PostgreSQL 17), tuptable.h:371 (PostgreSQL 18), tuptable.h:389 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function slot_attisnull from tuptable.h:384 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// slot_attisnull(TupleTableSlot *slot, int attnum)
+/// {
+/// 	Assert(attnum > 0);
+///
+/// 	if (attnum > slot->tts_nvalid)
+/// 		slot_getsomeattrs(slot, attnum);
+///
+/// 	return slot->tts_isnull[attnum - 1];
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! slot_attisnull {
+    ($slot:expr, $attnum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+/// C inline function slot_getallattrs from tuptable.h:353 (PostgreSQL 15), tuptable.h:360 (PostgreSQL 16), tuptable.h:367 (PostgreSQL 17), tuptable.h:371 (PostgreSQL 18), tuptable.h:389 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -503,7 +599,7 @@ macro_rules! slot_attisnull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -553,8 +649,8 @@ macro_rules! slot_getattr {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function slot_getattr from tuptable.h:387 (PostgreSQL 16), tuptable.h:394 (PostgreSQL 17), tuptable.h:398 (PostgreSQL 18), tuptable.h:416 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function slot_getattr from tuptable.h:387 (PostgreSQL 16), tuptable.h:394 (PostgreSQL 17), tuptable.h:416 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -588,8 +684,43 @@ macro_rules! slot_getattr {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function slot_getattr from tuptable.h:398 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Datum
+/// slot_getattr(TupleTableSlot *slot, int attnum,
+/// 			 bool *isnull)
+/// {
+/// 	Assert(attnum > 0);
+///
+/// 	if (attnum > slot->tts_nvalid)
+/// 		slot_getsomeattrs(slot, attnum);
+///
+/// 	*isnull = slot->tts_isnull[attnum - 1];
+///
+/// 	return slot->tts_values[attnum - 1];
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! slot_getattr {
+    ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function slot_getsomeattrs from tuptable.h:340 (PostgreSQL 15), tuptable.h:347 (PostgreSQL 16), tuptable.h:354 (PostgreSQL 17), tuptable.h:358 (PostgreSQL 18)
+/// C inline function slot_getsomeattrs from tuptable.h:340 (PostgreSQL 15), tuptable.h:347 (PostgreSQL 16), tuptable.h:354 (PostgreSQL 17), tuptable.h:358 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -601,7 +732,7 @@ macro_rules! slot_getattr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -617,7 +748,7 @@ macro_rules! slot_getsomeattrs {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function slot_getsomeattrs from tuptable.h:375 (PostgreSQL 19)
+/// C inline function slot_getsomeattrs from tuptable.h:375 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -630,7 +761,7 @@ macro_rules! slot_getsomeattrs {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -686,8 +817,8 @@ macro_rules! slot_getsysattr {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function slot_getsysattr from tuptable.h:408 (PostgreSQL 16), tuptable.h:415 (PostgreSQL 17), tuptable.h:419 (PostgreSQL 18), tuptable.h:437 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function slot_getsysattr from tuptable.h:408 (PostgreSQL 16), tuptable.h:415 (PostgreSQL 17), tuptable.h:437 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -721,6 +852,47 @@ macro_rules! slot_getsysattr {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! slot_getsysattr {
+    ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function slot_getsysattr from tuptable.h:419 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Datum
+/// slot_getsysattr(TupleTableSlot *slot, int attnum, bool *isnull)
+/// {
+/// 	Assert(attnum < 0);			/* caller error */
+///
+/// 	if (attnum == TableOidAttributeNumber)
+/// 	{
+/// 		*isnull = false;
+/// 		return ObjectIdGetDatum(slot->tts_tableOid);
+/// 	}
+/// 	else if (attnum == SelfItemPointerAttributeNumber)
+/// 	{
+/// 		*isnull = false;
+/// 		return PointerGetDatum(&slot->tts_tid);
+/// 	}
+///
+/// 	/* Fetch the system attribute from the underlying tuple. */
+/// 	return slot->tts_ops->getsysattr(slot, attnum, isnull);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! slot_getsysattr {
     ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {

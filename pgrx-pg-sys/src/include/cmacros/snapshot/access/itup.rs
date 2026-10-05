@@ -23,7 +23,7 @@ macro_rules! IndexInfoFindDataOffset {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IndexInfoFindDataOffset from itup.h:98 (PostgreSQL 16–17), itup.h:112 (PostgreSQL 18–19)
+/// C inline function IndexInfoFindDataOffset from itup.h:98 (PostgreSQL 16–17), itup.h:112 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline Size
@@ -37,7 +37,7 @@ macro_rules! IndexInfoFindDataOffset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -45,7 +45,7 @@ macro_rules! IndexInfoFindDataOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IndexInfoFindDataOffset {
     ($t_info:expr $(,)?) => {
@@ -74,7 +74,7 @@ macro_rules! IndexTupleHasNulls {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IndexTupleHasNulls from itup.h:77 (PostgreSQL 18–19)
+/// C inline function IndexTupleHasNulls from itup.h:77 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -85,15 +85,11 @@ macro_rules! IndexTupleHasNulls {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IndexTupleHasNulls {
     ($itup:expr $(,)?) => {
@@ -122,7 +118,7 @@ macro_rules! IndexTupleHasVarwidths {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IndexTupleHasVarwidths from itup.h:83 (PostgreSQL 18–19)
+/// C inline function IndexTupleHasVarwidths from itup.h:83 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -133,15 +129,11 @@ macro_rules! IndexTupleHasVarwidths {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IndexTupleHasVarwidths {
     ($itup:expr $(,)?) => {
@@ -170,7 +162,7 @@ macro_rules! IndexTupleSize {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function IndexTupleSize from itup.h:71 (PostgreSQL 18–19)
+/// C inline function IndexTupleSize from itup.h:71 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline Size
@@ -181,15 +173,11 @@ macro_rules! IndexTupleSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! IndexTupleSize {
     ($itup:expr $(,)?) => {
@@ -249,7 +237,7 @@ macro_rules! index_getattr {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function index_getattr from itup.h:131 (PostgreSQL 18)
+/// C inline function index_getattr from itup.h:131 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline Datum
@@ -287,7 +275,7 @@ macro_rules! index_getattr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -295,7 +283,7 @@ macro_rules! index_getattr {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! index_getattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {

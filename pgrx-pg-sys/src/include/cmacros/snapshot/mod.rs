@@ -22,7 +22,7 @@ macro_rules! __pgrx_c_doc_inline_call {
 #[macro_export]
 macro_rules! __pgrx_c_doc_inline_body {
     () => {
-        " Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage. Calls inside the body keep the backend thread and PostgreSQL error contracts of their guarded bindings."
+        " Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings."
     };
 }
 /// One documentation paragraph shared by snapshot shells.

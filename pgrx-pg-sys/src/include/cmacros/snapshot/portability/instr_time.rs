@@ -546,7 +546,7 @@ macro_rules! pg_current_timing_clock_source {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function pg_get_ticks from instr_time.h:409 (PostgreSQL 19)
+/// Typed call adapter for C inline function pg_get_ticks from instr_time.h:409 (PostgreSQL 19)
 ///
 /// ```c
 /// static pg_attribute_always_inline instr_time
@@ -557,7 +557,7 @@ macro_rules! pg_current_timing_clock_source {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_body!()]
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
@@ -573,7 +573,7 @@ macro_rules! pg_get_ticks {
     };
 }
 #[cfg(feature = "pg19")]
-/// C inline function pg_get_ticks_fast from instr_time.h:415 (PostgreSQL 19)
+/// Typed call adapter for C inline function pg_get_ticks_fast from instr_time.h:415 (PostgreSQL 19)
 ///
 /// ```c
 /// static pg_attribute_always_inline instr_time
@@ -584,7 +584,7 @@ macro_rules! pg_get_ticks {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_body!()]
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///

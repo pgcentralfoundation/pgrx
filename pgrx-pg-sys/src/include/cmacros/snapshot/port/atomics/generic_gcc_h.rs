@@ -377,7 +377,7 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function pg_atomic_init_flag_impl from generic-gcc.h:150 (PostgreSQL 15–17), generic-gcc.h:148 (PostgreSQL 18), generic-gcc.h:147 (PostgreSQL 19)
+/// C inline function pg_atomic_init_flag_impl from generic-gcc.h:150 (PostgreSQL 15–17), generic-gcc.h:148 (PostgreSQL 18), generic-gcc.h:147 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -388,7 +388,7 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

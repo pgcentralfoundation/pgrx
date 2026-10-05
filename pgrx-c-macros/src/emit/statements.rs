@@ -10,7 +10,7 @@
 //! arguments whose local-name capture would differ under Rust macro hygiene.
 
 use super::{BindingCatalog, INLINE_LABEL, SUPPORT, macro_identifier, typed, write_fallback};
-use crate::{AnalysisSession, MacroAnalysis, SkipReason, syntax::Statement};
+use crate::{AnalysisSession, MacroAnalysis, SkipReason, SkipReasonCode, syntax::Statement};
 use std::fmt::Write;
 
 /// What a C `return` statement does in the lowered body.
@@ -20,8 +20,9 @@ pub(super) enum Returns<'a> {
     /// explicit C marker when one is given.
     Caller(Option<&'a str>),
     /// Yield the value of a translated inline function: break out of the labeled block
-    /// holding its body, converted to the function's C return type marker.
-    Value(&'a str),
+    /// holding its body, converted to the function's C return type marker. A void
+    /// function, without a marker, has no return statements.
+    Inline(Option<&'a str>),
 }
 
 /// Lower an entire admitted statement body, preserving ordered effects and return context.
@@ -37,6 +38,14 @@ pub(super) fn render(
 ) -> Result<String, SkipReason> {
     let expression = analysis.expression.as_ref().expect("candidate statement expression");
     let body = expression.syntax.statement_body.as_ref().expect("statement body");
+    if matches!(returns, Returns::Inline(None)) && body.return_tokens.is_some() {
+        return Err(super::skip(
+            analysis,
+            SkipReasonCode::Statement,
+            "a translated void function cannot return",
+            body.return_tokens,
+        ));
+    }
     let mut rust = String::from("{ ");
     if let Some(crate::ExpansionResult::Expanded { expansion }) =
         session.expansions().results.get(&analysis.name)
@@ -109,10 +118,13 @@ fn render_statements(
                     Returns::Caller(None) => {
                         write!(rust, "return {SUPPORT}::expression_result::return_value(")
                     }
-                    Returns::Value(marker) => write!(
+                    Returns::Inline(Some(marker)) => write!(
                         rust,
                         "break '{INLINE_LABEL} {SUPPORT}::expression::implicit::<{marker}, _>("
                     ),
+                    Returns::Inline(None) => {
+                        unreachable!("render refuses void bodies that contain a return")
+                    }
                 }
                 .expect("String output");
                 renderer.render(*expression, typed::Context::Value, rust)?;
