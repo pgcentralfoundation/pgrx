@@ -338,7 +338,8 @@ macro_rules! linitial_oid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_cell_number from pg_list.h:311 (PostgreSQL 15), pg_list.h:332 (PostgreSQL 16–18), pg_list.h:364 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function list_cell_number from pg_list.h:311 (PostgreSQL 15), pg_list.h:332 (PostgreSQL 16–17), pg_list.h:364 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -365,7 +366,35 @@ macro_rules! list_cell_number {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_head from pg_list.h:124 (PostgreSQL 15), pg_list.h:127 (PostgreSQL 16–19)
+#[cfg(feature = "pg18")]
+/// C inline function list_cell_number from pg_list.h:332 (PostgreSQL 18)
+///
+/// ```c
+/// static inline int
+/// list_cell_number(const List *l, const ListCell *c)
+/// {
+/// 	Assert(c >= &l->elements[0] && c < &l->elements[l->length]);
+/// 	return c - l->elements;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! list_cell_number {
+    ($l:expr, $c:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+/// C inline function list_head from pg_list.h:124 (PostgreSQL 15), pg_list.h:127 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -376,7 +405,7 @@ macro_rules! list_cell_number {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -384,14 +413,15 @@ macro_rules! list_cell_number {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_head {
     ($l:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_last_cell from pg_list.h:266 (PostgreSQL 15), pg_list.h:287 (PostgreSQL 16–18), pg_list.h:319 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function list_last_cell from pg_list.h:266 (PostgreSQL 15), pg_list.h:287 (PostgreSQL 16–17), pg_list.h:319 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -418,7 +448,35 @@ macro_rules! list_last_cell {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
+#[cfg(feature = "pg18")]
+/// C inline function list_last_cell from pg_list.h:287 (PostgreSQL 18)
+///
+/// ```c
+/// static inline ListCell *
+/// list_last_cell(const List *list)
+/// {
+/// 	Assert(list != NIL);
+/// 	return &list->elements[list->length - 1];
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! list_last_cell {
+    ($list:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+/// C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline int
@@ -429,15 +487,11 @@ macro_rules! list_last_cell {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_length {
     ($l:expr $(,)?) => {
@@ -1011,7 +1065,8 @@ macro_rules! list_nth {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_nth_cell from pg_list.h:255 (PostgreSQL 15), pg_list.h:276 (PostgreSQL 16–18), pg_list.h:308 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function list_nth_cell from pg_list.h:255 (PostgreSQL 15), pg_list.h:276 (PostgreSQL 16–17), pg_list.h:308 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -1033,6 +1088,35 @@ macro_rules! list_nth {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! list_nth_cell {
+    ($list:expr, $n:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function list_nth_cell from pg_list.h:276 (PostgreSQL 18)
+///
+/// ```c
+/// static inline ListCell *
+/// list_nth_cell(const List *list, int n)
+/// {
+/// 	Assert(list != NIL);
+/// 	Assert(n >= 0 && n < list->length);
+/// 	return &list->elements[n];
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_nth_cell {
     ($list:expr, $n:expr $(,)?) => {
@@ -1114,7 +1198,7 @@ macro_rules! list_nth_oid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_second_cell from pg_list.h:138 (PostgreSQL 15), pg_list.h:141 (PostgreSQL 16–19)
+/// C inline function list_second_cell from pg_list.h:138 (PostgreSQL 15), pg_list.h:141 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -1128,7 +1212,7 @@ macro_rules! list_nth_oid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1136,14 +1220,14 @@ macro_rules! list_nth_oid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_second_cell {
     ($l:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function list_tail from pg_list.h:131 (PostgreSQL 15), pg_list.h:134 (PostgreSQL 16–19)
+/// C inline function list_tail from pg_list.h:131 (PostgreSQL 15), pg_list.h:134 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -1154,7 +1238,7 @@ macro_rules! list_second_cell {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1162,7 +1246,7 @@ macro_rules! list_second_cell {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! list_tail {
     ($l:expr $(,)?) => {
@@ -1271,7 +1355,8 @@ macro_rules! llast_xid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function lnext from pg_list.h:321 (PostgreSQL 15), pg_list.h:342 (PostgreSQL 16–18), pg_list.h:374 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function lnext from pg_list.h:321 (PostgreSQL 15), pg_list.h:342 (PostgreSQL 16–17), pg_list.h:374 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ListCell *
@@ -1296,6 +1381,38 @@ macro_rules! llast_xid {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! lnext {
+    ($l:expr, $c:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function lnext from pg_list.h:342 (PostgreSQL 18)
+///
+/// ```c
+/// static inline ListCell *
+/// lnext(const List *l, const ListCell *c)
+/// {
+/// 	Assert(c >= &l->elements[0] && c < &l->elements[l->length]);
+/// 	c++;
+/// 	if (c < &l->elements[l->length])
+/// 		return (ListCell *) c;
+/// 	else
+/// 		return NULL;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! lnext {
     ($l:expr, $c:expr $(,)?) => {

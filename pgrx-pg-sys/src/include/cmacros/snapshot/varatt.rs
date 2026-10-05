@@ -23,7 +23,7 @@ macro_rules! SET_VARSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function SET_VARSIZE from varatt.h:431 (PostgreSQL 19)
+/// C inline function SET_VARSIZE from varatt.h:431 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -34,7 +34,7 @@ macro_rules! SET_VARSIZE {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -42,7 +42,7 @@ macro_rules! SET_VARSIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE {
     ($PTR:expr, $len:expr $(,)?) => {
@@ -134,7 +134,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function SET_VARSIZE_COMPRESSED from varatt.h:445 (PostgreSQL 19)
+/// C inline function SET_VARSIZE_COMPRESSED from varatt.h:445 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -145,7 +145,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -153,7 +153,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_COMPRESSED {
     ($PTR:expr, $len:expr $(,)?) => {
@@ -182,7 +182,7 @@ macro_rules! SET_VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function SET_VARSIZE_SHORT from varatt.h:438 (PostgreSQL 19)
+/// C inline function SET_VARSIZE_SHORT from varatt.h:438 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -193,7 +193,7 @@ macro_rules! SET_VARSIZE_SHORT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -201,7 +201,7 @@ macro_rules! SET_VARSIZE_SHORT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARSIZE_SHORT {
     ($PTR:expr, $len:expr $(,)?) => {
@@ -251,7 +251,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function SET_VARTAG_EXTERNAL from varatt.h:452 (PostgreSQL 19)
+/// C inline function SET_VARTAG_EXTERNAL from varatt.h:452 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -262,7 +262,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -270,7 +270,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SET_VARTAG_EXTERNAL {
     ($PTR:expr, $tag:expr $(,)?) => {
@@ -299,7 +299,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_CAN_MAKE_SHORT from varatt.h:416 (PostgreSQL 19)
+/// C inline function VARATT_CAN_MAKE_SHORT from varatt.h:416 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -311,7 +311,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -319,7 +319,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_CAN_MAKE_SHORT {
     ($PTR:expr $(,)?) => {
@@ -348,7 +348,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_CONVERTED_SHORT_SIZE from varatt.h:424 (PostgreSQL 19)
+/// C inline function VARATT_CONVERTED_SHORT_SIZE from varatt.h:424 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -359,7 +359,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -367,7 +367,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_CONVERTED_SHORT_SIZE {
     ($PTR:expr $(,)?) => {
@@ -797,7 +797,7 @@ macro_rules! VARATT_IS_COMPRESSED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_COMPRESSED from varatt.h:346 (PostgreSQL 19)
+/// C inline function VARATT_IS_COMPRESSED from varatt.h:346 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -808,7 +808,7 @@ macro_rules! VARATT_IS_COMPRESSED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -816,7 +816,7 @@ macro_rules! VARATT_IS_COMPRESSED {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_COMPRESSED {
     ($PTR:expr $(,)?) => {
@@ -845,7 +845,7 @@ macro_rules! VARATT_IS_EXTENDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTENDED from varatt.h:409 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTENDED from varatt.h:409 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -856,7 +856,7 @@ macro_rules! VARATT_IS_EXTENDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -864,7 +864,7 @@ macro_rules! VARATT_IS_EXTENDED {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTENDED {
     ($PTR:expr $(,)?) => {
@@ -893,7 +893,7 @@ macro_rules! VARATT_IS_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL from varatt.h:353 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL from varatt.h:353 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -904,7 +904,7 @@ macro_rules! VARATT_IS_EXTERNAL {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -912,7 +912,7 @@ macro_rules! VARATT_IS_EXTERNAL {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_EXTERNAL {
     ($PTR:expr $(,)?) => {
@@ -941,7 +941,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:388 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED from varatt.h:388 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -952,7 +952,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -989,7 +989,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:374 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:374 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1000,7 +1000,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1037,7 +1037,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:381 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:381 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1048,7 +1048,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1085,7 +1085,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:367 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_INDIRECT from varatt.h:367 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1096,7 +1096,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1133,7 +1133,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:395 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:395 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1144,7 +1144,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1181,7 +1181,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:360 (PostgreSQL 19)
+/// C inline function VARATT_IS_EXTERNAL_ONDISK from varatt.h:360 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1192,7 +1192,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1229,7 +1229,7 @@ macro_rules! VARATT_IS_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARATT_IS_SHORT from varatt.h:402 (PostgreSQL 19)
+/// C inline function VARATT_IS_SHORT from varatt.h:402 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1240,7 +1240,7 @@ macro_rules! VARATT_IS_SHORT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1248,7 +1248,7 @@ macro_rules! VARATT_IS_SHORT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARATT_IS_SHORT {
     ($PTR:expr $(,)?) => {
@@ -1319,7 +1319,7 @@ macro_rules! VARDATA {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA from varatt.h:304 (PostgreSQL 19)
+/// C inline function VARDATA from varatt.h:304 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -1330,7 +1330,7 @@ macro_rules! VARDATA {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1338,7 +1338,7 @@ macro_rules! VARDATA {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA {
     ($PTR:expr $(,)?) => {
@@ -1451,7 +1451,7 @@ macro_rules! VARDATA_ANY {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA_ANY from varatt.h:485 (PostgreSQL 19)
+/// C inline function VARDATA_ANY from varatt.h:485 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -1462,7 +1462,7 @@ macro_rules! VARDATA_ANY {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1470,7 +1470,7 @@ macro_rules! VARDATA_ANY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_ANY {
     ($PTR:expr $(,)?) => {
@@ -1499,7 +1499,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:499 (PostgreSQL 19)
+/// C inline function VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:499 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -1510,7 +1510,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1518,7 +1518,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     ($PTR:expr $(,)?) => {
@@ -1547,7 +1547,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:492 (PostgreSQL 19)
+/// C inline function VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:492 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1558,7 +1558,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1566,7 +1566,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
     ($PTR:expr $(,)?) => {
@@ -1595,7 +1595,7 @@ macro_rules! VARDATA_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA_EXTERNAL from varatt.h:339 (PostgreSQL 19)
+/// C inline function VARDATA_EXTERNAL from varatt.h:339 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -1606,7 +1606,7 @@ macro_rules! VARDATA_EXTERNAL {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1614,7 +1614,7 @@ macro_rules! VARDATA_EXTERNAL {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_EXTERNAL {
     ($PTR:expr $(,)?) => {
@@ -1643,7 +1643,7 @@ macro_rules! VARDATA_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARDATA_SHORT from varatt.h:318 (PostgreSQL 19)
+/// C inline function VARDATA_SHORT from varatt.h:318 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -1654,7 +1654,7 @@ macro_rules! VARDATA_SHORT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1662,7 +1662,7 @@ macro_rules! VARDATA_SHORT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARDATA_SHORT {
     ($PTR:expr $(,)?) => {
@@ -1691,7 +1691,7 @@ macro_rules! VARSIZE {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARSIZE from varatt.h:297 (PostgreSQL 19)
+/// C inline function VARSIZE from varatt.h:297 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1702,7 +1702,7 @@ macro_rules! VARSIZE {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1710,7 +1710,7 @@ macro_rules! VARSIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE {
     ($PTR:expr $(,)?) => {
@@ -1846,7 +1846,7 @@ macro_rules! VARSIZE_ANY {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARSIZE_ANY from varatt.h:459 (PostgreSQL 19)
+/// C inline function VARSIZE_ANY from varatt.h:459 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1862,7 +1862,7 @@ macro_rules! VARSIZE_ANY {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1870,7 +1870,7 @@ macro_rules! VARSIZE_ANY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_ANY {
     ($PTR:expr $(,)?) => {
@@ -1922,7 +1922,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARSIZE_ANY_EXHDR from varatt.h:471 (PostgreSQL 19)
+/// C inline function VARSIZE_ANY_EXHDR from varatt.h:471 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1938,7 +1938,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1946,7 +1946,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_ANY_EXHDR {
     ($PTR:expr $(,)?) => {
@@ -1998,7 +1998,7 @@ macro_rules! VARSIZE_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARSIZE_EXTERNAL from varatt.h:332 (PostgreSQL 19)
+/// C inline function VARSIZE_EXTERNAL from varatt.h:332 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -2009,7 +2009,7 @@ macro_rules! VARSIZE_EXTERNAL {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2017,7 +2017,7 @@ macro_rules! VARSIZE_EXTERNAL {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_EXTERNAL {
     ($PTR:expr $(,)?) => {
@@ -2046,7 +2046,7 @@ macro_rules! VARSIZE_SHORT {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARSIZE_SHORT from varatt.h:311 (PostgreSQL 19)
+/// C inline function VARSIZE_SHORT from varatt.h:311 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -2057,7 +2057,7 @@ macro_rules! VARSIZE_SHORT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2065,7 +2065,7 @@ macro_rules! VARSIZE_SHORT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARSIZE_SHORT {
     ($PTR:expr $(,)?) => {
@@ -2136,7 +2136,7 @@ macro_rules! VARTAG_EXTERNAL {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARTAG_EXTERNAL from varatt.h:325 (PostgreSQL 19)
+/// C inline function VARTAG_EXTERNAL from varatt.h:325 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline vartag_external
@@ -2147,7 +2147,7 @@ macro_rules! VARTAG_EXTERNAL {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2155,7 +2155,7 @@ macro_rules! VARTAG_EXTERNAL {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARTAG_EXTERNAL {
     ($PTR:expr $(,)?) => {
@@ -2180,7 +2180,7 @@ macro_rules! VARTAG_IS_EXPANDED {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 19)
+/// C inline function VARTAG_IS_EXPANDED from varatt.h:94 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2191,15 +2191,11 @@ macro_rules! VARTAG_IS_EXPANDED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! VARTAG_IS_EXPANDED {
     ($tag:expr $(,)?) => {

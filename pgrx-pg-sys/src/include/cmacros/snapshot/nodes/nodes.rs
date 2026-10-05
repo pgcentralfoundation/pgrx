@@ -176,8 +176,8 @@ macro_rules! castNodeImpl {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function newNode from nodes.h:143 (PostgreSQL 17), nodes.h:149 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function newNode from nodes.h:143 (PostgreSQL 17), nodes.h:149 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Node *
@@ -203,6 +203,39 @@ macro_rules! castNodeImpl {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! newNode {
+    ($size:expr, $tag:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function newNode from nodes.h:149 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Node *
+/// newNode(size_t size, NodeTag tag)
+/// {
+/// 	Node	   *result;
+///
+/// 	Assert(size >= sizeof(Node));	/* need the tag, at least */
+/// 	result = (Node *) palloc0(size);
+/// 	result->type = tag;
+///
+/// 	return result;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! newNode {
     ($size:expr, $tag:expr $(,)?) => {

@@ -2,7 +2,7 @@
 // C macros from geqo.h.
 
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function GetGeqoPrivateData from geqo.h:85 (PostgreSQL 19)
+/// C inline function GetGeqoPrivateData from geqo.h:85 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline GeqoPrivateData *
@@ -15,7 +15,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -23,7 +23,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GetGeqoPrivateData {
     ($root:expr $(,)?) => {

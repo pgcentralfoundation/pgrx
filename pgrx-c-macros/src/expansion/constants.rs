@@ -250,6 +250,7 @@ pub(crate) fn retain_integer_constants(
             parameters: Vec::new(),
             body_start: 1,
             markers: Vec::new(),
+            invocation: name.clone(),
             begin,
             end,
             dependencies: closure,
@@ -810,10 +811,8 @@ fn mask_constants(
         };
         let begin = format!("{prefix}retained_begin_{index}");
         let end = format!("{prefix}retained_end_{index}");
-        let invocation = format!(
-            "{begin}\n{}\n{end}\n",
-            super::symbolic_invocation(definition, &expansion.symbolic_parameters)
-        );
+        let symbolic = super::symbolic_invocation(definition, &expansion.symbolic_parameters);
+        let invocation = format!("{begin}\n{symbolic}\n{end}\n");
         if source.len().saturating_add(invocation.len()) > limits.source_bytes {
             for name in eligible.keys() {
                 rejected.insert(
@@ -829,6 +828,7 @@ fn mask_constants(
             parameters: expansion.parameters.clone(),
             body_start,
             markers: expansion.symbolic_parameters.clone(),
+            invocation: symbolic,
             begin,
             end,
             dependencies: Vec::new(),

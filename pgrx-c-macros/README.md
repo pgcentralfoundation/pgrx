@@ -175,13 +175,17 @@ lists. Active C macros win any name collision; no function adapter is inserted i
 the actual macro inventory or preprocessing environment, and `list` still shows
 only original macro definitions.
 
-An inline adapter calls the original function through its verified prototype,
-evaluates each argument once, and preserves C conversions, pointer qualifiers and
-the actual return type. `.get()` extracts native storage, including `()` for a void
+An inline adapter evaluates each argument once and preserves C conversions,
+pointer qualifiers and the actual return type. When the analyzer supports every
+statement of the definition's body, and every macro the body uses expands at the
+end of the headers as it did in the definition, the adapter translates that body;
+otherwise it calls the original function through its verified prototype. Generated
+calls to a translated function expand its translation. `.get()` extracts native storage, including `()` for a void
 return. When a macro becomes an inline function, its return rank or evaluation
-rules can therefore change with PostgreSQL. Predicate callers can use `.is_true()`
-for either C `int` or C `bool`; this explicitly converts truth without changing
-`.get()` or the original C identity. Native calls retain generated FFI guards and
+rules can therefore change with PostgreSQL, and so can whether a call needs
+`unsafe`. Predicate callers can use `.is_true()` for either C `int` or C `bool`;
+this explicitly converts truth without changing `.get()` or the original C
+identity. Native calls retain generated FFI guards and
 require the original function's unsafe caller contract.
 
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains

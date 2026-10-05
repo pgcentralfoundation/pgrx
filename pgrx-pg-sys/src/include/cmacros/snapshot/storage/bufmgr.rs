@@ -47,8 +47,8 @@ macro_rules! BufferGetBlock {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferGetBlock from bufmgr.h:321 (PostgreSQL 16), bufmgr.h:373 (PostgreSQL 17), bufmgr.h:383 (PostgreSQL 18), bufmgr.h:434 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BufferGetBlock from bufmgr.h:321 (PostgreSQL 16), bufmgr.h:373 (PostgreSQL 17), bufmgr.h:434 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Block
@@ -73,6 +73,38 @@ macro_rules! BufferGetBlock {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BufferGetBlock {
+    ($buffer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg18")]
+/// C inline function BufferGetBlock from bufmgr.h:383 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Block
+/// BufferGetBlock(Buffer buffer)
+/// {
+/// 	Assert(BufferIsValid(buffer));
+///
+/// 	if (BufferIsLocal(buffer))
+/// 		return LocalBufferBlockPointers[-buffer - 1];
+/// 	else
+/// 		return (Block) (BufferBlocks + ((Size) (buffer - 1)) * BLCKSZ);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferGetBlock {
     ($buffer:expr $(,)?) => {
@@ -105,7 +137,7 @@ macro_rules! BufferGetPage {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferGetPage from bufmgr.h:357 (PostgreSQL 16), bufmgr.h:406 (PostgreSQL 17), bufmgr.h:416 (PostgreSQL 18), bufmgr.h:467 (PostgreSQL 19)
+/// C inline function BufferGetPage from bufmgr.h:357 (PostgreSQL 16), bufmgr.h:406 (PostgreSQL 17), bufmgr.h:416 (PostgreSQL 18), bufmgr.h:467 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Page
@@ -116,7 +148,7 @@ macro_rules! BufferGetPage {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -124,7 +156,7 @@ macro_rules! BufferGetPage {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferGetPage {
     ($buffer:expr $(,)?) => {
@@ -184,8 +216,36 @@ macro_rules! BufferGetPageSize {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferGetPageSize from bufmgr.h:405 (PostgreSQL 18), bufmgr.h:456 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function BufferGetPageSize from bufmgr.h:405 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Size
+/// BufferGetPageSize(Buffer buffer)
+/// {
+/// 	Assert(BufferIsValid(buffer));
+/// 	return (Size) BLCKSZ;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BufferGetPageSize {
+    ($buffer:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function BufferGetPageSize from bufmgr.h:456 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -237,8 +297,8 @@ macro_rules! BufferIsValid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferIsValid from bufmgr.h:305 (PostgreSQL 16), bufmgr.h:357 (PostgreSQL 17), bufmgr.h:367 (PostgreSQL 18), bufmgr.h:418 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function BufferIsValid from bufmgr.h:305 (PostgreSQL 16), bufmgr.h:357 (PostgreSQL 17), bufmgr.h:418 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -267,8 +327,38 @@ macro_rules! BufferIsValid {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function BufferIsValid from bufmgr.h:367 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// BufferIsValid(Buffer bufnum)
+/// {
+/// 	Assert(bufnum <= NBuffers);
+/// 	Assert(bufnum >= -NLocBuffer);
+///
+/// 	return bufnum != InvalidBuffer;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BufferIsValid {
+    ($bufnum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function LockBuffer from bufmgr.h:333 (PostgreSQL 19)
+/// C inline function LockBuffer from bufmgr.h:333 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -282,7 +372,7 @@ macro_rules! BufferIsValid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

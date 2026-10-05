@@ -2,7 +2,7 @@
 // C macros from slru.h.
 
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function SimpleLruGetBankLock from slru.h:174 (PostgreSQL 17–18)
+/// C inline function SimpleLruGetBankLock from slru.h:174 (PostgreSQL 17–18)
 ///
 /// ```c
 /// static inline LWLock *
@@ -16,7 +16,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -24,7 +24,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SimpleLruGetBankLock {
     ($ctl:expr, $pageno:expr $(,)?) => {

@@ -17,7 +17,7 @@ macro_rules! EvalPlanQualSetSlot {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecEvalExpr from executor.h:324 (PostgreSQL 15), executor.h:335 (PostgreSQL 16), executor.h:336 (PostgreSQL 17), executor.h:388 (PostgreSQL 18), executor.h:402 (PostgreSQL 19)
+/// C inline function ExecEvalExpr from executor.h:324 (PostgreSQL 15), executor.h:335 (PostgreSQL 16), executor.h:336 (PostgreSQL 17), executor.h:388 (PostgreSQL 18), executor.h:402 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -30,7 +30,7 @@ macro_rules! EvalPlanQualSetSlot {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -78,7 +78,7 @@ macro_rules! ExecEvalExprNoReturn {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecEvalExprNoReturnSwitchContext from executor.h:453 (PostgreSQL 18), executor.h:467 (PostgreSQL 19)
+/// C inline function ExecEvalExprNoReturnSwitchContext from executor.h:453 (PostgreSQL 18), executor.h:467 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -94,7 +94,7 @@ macro_rules! ExecEvalExprNoReturn {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -109,7 +109,7 @@ macro_rules! ExecEvalExprNoReturnSwitchContext {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecEvalExprSwitchContext from executor.h:339 (PostgreSQL 15), executor.h:350 (PostgreSQL 16), executor.h:351 (PostgreSQL 17), executor.h:431 (PostgreSQL 18), executor.h:445 (PostgreSQL 19)
+/// C inline function ExecEvalExprSwitchContext from executor.h:339 (PostgreSQL 15), executor.h:350 (PostgreSQL 16), executor.h:351 (PostgreSQL 17), executor.h:431 (PostgreSQL 18), executor.h:445 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -128,7 +128,7 @@ macro_rules! ExecEvalExprNoReturnSwitchContext {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -143,7 +143,8 @@ macro_rules! ExecEvalExprSwitchContext {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecGetJunkAttribute from executor.h:177 (PostgreSQL 15), executor.h:189 (PostgreSQL 16–17), executor.h:220 (PostgreSQL 18), executor.h:225 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ExecGetJunkAttribute from executor.h:177 (PostgreSQL 15), executor.h:189 (PostgreSQL 16–17), executor.h:225 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -170,7 +171,35 @@ macro_rules! ExecGetJunkAttribute {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecProcNode from executor.h:260 (PostgreSQL 15), executor.h:271 (PostgreSQL 16), executor.h:272 (PostgreSQL 17), executor.h:309 (PostgreSQL 18), executor.h:321 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function ExecGetJunkAttribute from executor.h:220 (PostgreSQL 18)
+///
+/// ```c
+/// static inline Datum
+/// ExecGetJunkAttribute(TupleTableSlot *slot, AttrNumber attno, bool *isNull)
+/// {
+/// 	Assert(attno > 0);
+/// 	return slot_getattr(slot, attno, isNull);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExecGetJunkAttribute {
+    ($slot:expr, $attno:expr, $isNull:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+/// C inline function ExecProcNode from executor.h:260 (PostgreSQL 15), executor.h:271 (PostgreSQL 16), executor.h:272 (PostgreSQL 17), executor.h:309 (PostgreSQL 18), executor.h:321 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -184,7 +213,7 @@ macro_rules! ExecGetJunkAttribute {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -192,7 +221,7 @@ macro_rules! ExecGetJunkAttribute {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecProcNode {
     ($node:expr $(,)?) => {
@@ -200,7 +229,7 @@ macro_rules! ExecProcNode {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function ExecProject from executor.h:367 (PostgreSQL 15), executor.h:378 (PostgreSQL 16), executor.h:379 (PostgreSQL 17)
+/// C inline function ExecProject from executor.h:367 (PostgreSQL 15), executor.h:378 (PostgreSQL 16), executor.h:379 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -232,7 +261,7 @@ macro_rules! ExecProcNode {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -240,7 +269,7 @@ macro_rules! ExecProcNode {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
@@ -248,7 +277,7 @@ macro_rules! ExecProject {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecProject from executor.h:478 (PostgreSQL 18), executor.h:492 (PostgreSQL 19)
+/// C inline function ExecProject from executor.h:478 (PostgreSQL 18), executor.h:492 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -279,7 +308,7 @@ macro_rules! ExecProject {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -287,14 +316,15 @@ macro_rules! ExecProject {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecQual from executor.h:404 (PostgreSQL 15), executor.h:415 (PostgreSQL 16), executor.h:416 (PostgreSQL 17), executor.h:514 (PostgreSQL 18), executor.h:528 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function ExecQual from executor.h:404 (PostgreSQL 15), executor.h:415 (PostgreSQL 16), executor.h:416 (PostgreSQL 17), executor.h:528 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -335,7 +365,49 @@ macro_rules! ExecQual {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:555 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// C inline function ExecQual from executor.h:514 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// ExecQual(ExprState *state, ExprContext *econtext)
+/// {
+/// 	Datum		ret;
+/// 	bool		isnull;
+///
+/// 	/* short-circuit (here and in ExecInitQual) for empty restriction list */
+/// 	if (state == NULL)
+/// 		return true;
+///
+/// 	/* verify that expression was compiled using ExecInitQual */
+/// 	Assert(state->flags & EEO_FLAG_IS_QUAL);
+///
+/// 	ret = ExecEvalExprSwitchContext(state, econtext, &isnull);
+///
+/// 	/* EEOP_QUAL should never return NULL */
+/// 	Assert(!isnull);
+///
+/// 	return DatumGetBool(ret);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExecQual {
+    ($state:expr, $econtext:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+/// C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:555 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -350,7 +422,7 @@ macro_rules! ExecQual {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -448,7 +520,7 @@ macro_rules! ResetPerTupleExprContext {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TupleHashEntryGetAdditional from executor.h:187 (PostgreSQL 18), executor.h:192 (PostgreSQL 19)
+/// C inline function TupleHashEntryGetAdditional from executor.h:187 (PostgreSQL 18), executor.h:192 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void *
@@ -462,7 +534,7 @@ macro_rules! ResetPerTupleExprContext {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -470,7 +542,7 @@ macro_rules! ResetPerTupleExprContext {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TupleHashEntryGetAdditional {
     ($hashtable:expr, $entry:expr $(,)?) => {
@@ -478,7 +550,7 @@ macro_rules! TupleHashEntryGetAdditional {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TupleHashEntryGetTuple from executor.h:173 (PostgreSQL 18), executor.h:178 (PostgreSQL 19)
+/// C inline function TupleHashEntryGetTuple from executor.h:173 (PostgreSQL 18), executor.h:178 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline MinimalTuple
@@ -489,15 +561,11 @@ macro_rules! TupleHashEntryGetAdditional {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TupleHashEntryGetTuple {
     ($entry:expr $(,)?) => {
@@ -505,7 +573,7 @@ macro_rules! TupleHashEntryGetTuple {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TupleHashEntrySize from executor.h:164 (PostgreSQL 18), executor.h:169 (PostgreSQL 19)
+/// C inline function TupleHashEntrySize from executor.h:164 (PostgreSQL 18), executor.h:169 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline size_t
@@ -516,22 +584,18 @@ macro_rules! TupleHashEntryGetTuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TupleHashEntrySize {
     () => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-/// Typed call adapter for C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:709 (PostgreSQL 19)
+/// C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:709 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline RangeTblEntry *
@@ -542,7 +606,7 @@ macro_rules! TupleHashEntrySize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -550,7 +614,7 @@ macro_rules! TupleHashEntrySize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! exec_rt_fetch {
     ($rti:expr, $estate:expr $(,)?) => {

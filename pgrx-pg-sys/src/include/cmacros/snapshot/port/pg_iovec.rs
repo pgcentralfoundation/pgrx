@@ -2,7 +2,7 @@
 // C macros from pg_iovec.h.
 
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pg_preadv from pg_iovec.h:49 (PostgreSQL 17), pg_iovec.h:53 (PostgreSQL 18)
+/// C inline function pg_preadv from pg_iovec.h:49 (PostgreSQL 17), pg_iovec.h:53 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline ssize_t
@@ -42,7 +42,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -58,7 +58,7 @@ macro_rules! pg_preadv {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_preadv from pg_iovec.h:53 (PostgreSQL 19)
+/// C inline function pg_preadv from pg_iovec.h:53 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ssize_t
@@ -98,7 +98,7 @@ macro_rules! pg_preadv {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -114,7 +114,7 @@ macro_rules! pg_preadv {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function pg_pwritev from pg_iovec.h:88 (PostgreSQL 17), pg_iovec.h:92 (PostgreSQL 18)
+/// C inline function pg_pwritev from pg_iovec.h:88 (PostgreSQL 17), pg_iovec.h:92 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline ssize_t
@@ -154,7 +154,7 @@ macro_rules! pg_preadv {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -170,7 +170,7 @@ macro_rules! pg_pwritev {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_pwritev from pg_iovec.h:92 (PostgreSQL 19)
+/// C inline function pg_pwritev from pg_iovec.h:92 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ssize_t
@@ -210,7 +210,7 @@ macro_rules! pg_pwritev {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

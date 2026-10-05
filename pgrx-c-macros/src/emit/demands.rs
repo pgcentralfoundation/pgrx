@@ -97,7 +97,19 @@ pub(super) fn plan(
                 )
                 .map(|ty| (name.clone(), ty))
             })
-            .collect();
+            .collect::<BTreeMap<_, _>>();
+        // A translated inline function lowers its result and its parameters, which it
+        // declares as locals, without a call that would request their types.
+        if super::translated_inline(session, &analysis) {
+            let result =
+                &frontend.declarations().function_signatures[&analysis.name].signature.result;
+            for ty in std::iter::once(result)
+                .chain(locals.values())
+                .filter(|ty| ty.category != TypeCategory::Void)
+            {
+                requests.types.insert(ty.canonical_spelling.clone(), ty.clone());
+            }
+        }
         let objects = typed::declared_objects(frontend, &analysis, &lowering, &locals);
         let constraints = Constraints::new(frontend, &analysis, &objects, &records, &compatibility);
         let mut callees = BTreeSet::new();

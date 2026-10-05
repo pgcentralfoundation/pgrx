@@ -22,8 +22,8 @@ macro_rules! BoxPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BoxPGetDatum from geo_decls.h:238 (PostgreSQL 16–18), geo_decls.h:237 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function BoxPGetDatum from geo_decls.h:238 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -34,7 +34,7 @@ macro_rules! BoxPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -43,6 +43,33 @@ macro_rules! BoxPGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BoxPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function BoxPGetDatum from geo_decls.h:237 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// BoxPGetDatum(const BOX *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BoxPGetDatum {
     ($X:expr $(,)?) => {
@@ -70,8 +97,8 @@ macro_rules! CirclePGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function CirclePGetDatum from geo_decls.h:270 (PostgreSQL 16–18), geo_decls.h:269 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function CirclePGetDatum from geo_decls.h:270 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -82,7 +109,7 @@ macro_rules! CirclePGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -91,6 +118,33 @@ macro_rules! CirclePGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! CirclePGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function CirclePGetDatum from geo_decls.h:269 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// CirclePGetDatum(const CIRCLE *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! CirclePGetDatum {
     ($X:expr $(,)?) => {
@@ -119,7 +173,7 @@ macro_rules! DatumGetBoxP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetBoxP from geo_decls.h:233 (PostgreSQL 16–18), geo_decls.h:232 (PostgreSQL 19)
+/// C inline function DatumGetBoxP from geo_decls.h:233 (PostgreSQL 16–18), geo_decls.h:232 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BOX *
@@ -130,7 +184,7 @@ macro_rules! DatumGetBoxP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -138,7 +192,7 @@ macro_rules! DatumGetBoxP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetBoxP {
     ($X:expr $(,)?) => {
@@ -167,7 +221,7 @@ macro_rules! DatumGetCircleP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetCircleP from geo_decls.h:265 (PostgreSQL 16–18), geo_decls.h:264 (PostgreSQL 19)
+/// C inline function DatumGetCircleP from geo_decls.h:265 (PostgreSQL 16–18), geo_decls.h:264 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline CIRCLE *
@@ -178,7 +232,7 @@ macro_rules! DatumGetCircleP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -186,7 +240,7 @@ macro_rules! DatumGetCircleP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetCircleP {
     ($X:expr $(,)?) => {
@@ -215,7 +269,7 @@ macro_rules! DatumGetLineP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetLineP from geo_decls.h:220 (PostgreSQL 16–18), geo_decls.h:219 (PostgreSQL 19)
+/// C inline function DatumGetLineP from geo_decls.h:220 (PostgreSQL 16–18), geo_decls.h:219 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LINE *
@@ -226,7 +280,7 @@ macro_rules! DatumGetLineP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -234,7 +288,7 @@ macro_rules! DatumGetLineP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetLineP {
     ($X:expr $(,)?) => {
@@ -263,7 +317,7 @@ macro_rules! DatumGetLsegP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetLsegP from geo_decls.h:188 (PostgreSQL 16–18), geo_decls.h:187 (PostgreSQL 19)
+/// C inline function DatumGetLsegP from geo_decls.h:188 (PostgreSQL 16–18), geo_decls.h:187 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LSEG *
@@ -274,7 +328,7 @@ macro_rules! DatumGetLsegP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -282,7 +336,7 @@ macro_rules! DatumGetLsegP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetLsegP {
     ($X:expr $(,)?) => {
@@ -311,7 +365,7 @@ macro_rules! DatumGetPathP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetPathP from geo_decls.h:201 (PostgreSQL 16–18), geo_decls.h:200 (PostgreSQL 19)
+/// C inline function DatumGetPathP from geo_decls.h:201 (PostgreSQL 16–18), geo_decls.h:200 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline PATH *
@@ -322,7 +376,7 @@ macro_rules! DatumGetPathP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -330,7 +384,7 @@ macro_rules! DatumGetPathP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetPathP {
     ($X:expr $(,)?) => {
@@ -359,7 +413,7 @@ macro_rules! DatumGetPathPCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetPathPCopy from geo_decls.h:206 (PostgreSQL 16–18), geo_decls.h:205 (PostgreSQL 19)
+/// C inline function DatumGetPathPCopy from geo_decls.h:206 (PostgreSQL 16–18), geo_decls.h:205 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline PATH *
@@ -370,7 +424,7 @@ macro_rules! DatumGetPathPCopy {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -378,7 +432,7 @@ macro_rules! DatumGetPathPCopy {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetPathPCopy {
     ($X:expr $(,)?) => {
@@ -407,7 +461,7 @@ macro_rules! DatumGetPointP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetPointP from geo_decls.h:175 (PostgreSQL 16–18), geo_decls.h:174 (PostgreSQL 19)
+/// C inline function DatumGetPointP from geo_decls.h:175 (PostgreSQL 16–18), geo_decls.h:174 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Point *
@@ -418,7 +472,7 @@ macro_rules! DatumGetPointP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -426,7 +480,7 @@ macro_rules! DatumGetPointP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetPointP {
     ($X:expr $(,)?) => {
@@ -455,7 +509,7 @@ macro_rules! DatumGetPolygonP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetPolygonP from geo_decls.h:246 (PostgreSQL 16–18), geo_decls.h:245 (PostgreSQL 19)
+/// C inline function DatumGetPolygonP from geo_decls.h:246 (PostgreSQL 16–18), geo_decls.h:245 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline POLYGON *
@@ -466,7 +520,7 @@ macro_rules! DatumGetPolygonP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -474,7 +528,7 @@ macro_rules! DatumGetPolygonP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetPolygonP {
     ($X:expr $(,)?) => {
@@ -503,7 +557,7 @@ macro_rules! DatumGetPolygonPCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetPolygonPCopy from geo_decls.h:251 (PostgreSQL 16–18), geo_decls.h:250 (PostgreSQL 19)
+/// C inline function DatumGetPolygonPCopy from geo_decls.h:251 (PostgreSQL 16–18), geo_decls.h:250 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline POLYGON *
@@ -514,7 +568,7 @@ macro_rules! DatumGetPolygonPCopy {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -522,7 +576,7 @@ macro_rules! DatumGetPolygonPCopy {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetPolygonPCopy {
     ($X:expr $(,)?) => {
@@ -727,8 +781,8 @@ macro_rules! LinePGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function LinePGetDatum from geo_decls.h:225 (PostgreSQL 16–18), geo_decls.h:224 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function LinePGetDatum from geo_decls.h:225 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -739,7 +793,7 @@ macro_rules! LinePGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -748,6 +802,33 @@ macro_rules! LinePGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! LinePGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function LinePGetDatum from geo_decls.h:224 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// LinePGetDatum(const LINE *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! LinePGetDatum {
     ($X:expr $(,)?) => {
@@ -775,8 +856,8 @@ macro_rules! LsegPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function LsegPGetDatum from geo_decls.h:193 (PostgreSQL 16–18), geo_decls.h:192 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function LsegPGetDatum from geo_decls.h:193 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -787,7 +868,7 @@ macro_rules! LsegPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -796,6 +877,33 @@ macro_rules! LsegPGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! LsegPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function LsegPGetDatum from geo_decls.h:192 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// LsegPGetDatum(const LSEG *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! LsegPGetDatum {
     ($X:expr $(,)?) => {
@@ -1601,8 +1709,8 @@ macro_rules! PathPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PathPGetDatum from geo_decls.h:211 (PostgreSQL 16–18), geo_decls.h:210 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function PathPGetDatum from geo_decls.h:211 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -1613,7 +1721,7 @@ macro_rules! PathPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1622,6 +1730,33 @@ macro_rules! PathPGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! PathPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function PathPGetDatum from geo_decls.h:210 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// PathPGetDatum(const PATH *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PathPGetDatum {
     ($X:expr $(,)?) => {
@@ -1649,8 +1784,8 @@ macro_rules! PointPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PointPGetDatum from geo_decls.h:180 (PostgreSQL 16–18), geo_decls.h:179 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function PointPGetDatum from geo_decls.h:180 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -1661,7 +1796,7 @@ macro_rules! PointPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1670,6 +1805,33 @@ macro_rules! PointPGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! PointPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function PointPGetDatum from geo_decls.h:179 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// PointPGetDatum(const Point *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PointPGetDatum {
     ($X:expr $(,)?) => {
@@ -1697,8 +1859,8 @@ macro_rules! PolygonPGetDatum {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PolygonPGetDatum from geo_decls.h:256 (PostgreSQL 16–18), geo_decls.h:255 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function PolygonPGetDatum from geo_decls.h:256 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -1709,7 +1871,7 @@ macro_rules! PolygonPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1718,6 +1880,33 @@ macro_rules! PolygonPGetDatum {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! PolygonPGetDatum {
+    ($X:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function PolygonPGetDatum from geo_decls.h:255 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// PolygonPGetDatum(const POLYGON *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PolygonPGetDatum {
     ($X:expr $(,)?) => {

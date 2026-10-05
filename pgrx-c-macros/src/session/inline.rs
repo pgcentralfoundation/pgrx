@@ -9,8 +9,14 @@
 //! definition supply protected `(name)(arguments...)` call syntax to the common
 //! analyzer. Private formal holes prevent a caller label from capturing the callee;
 //! actual formals, physical provenance and source are retained separately for reports
-//! and documentation. No function body is translated into Rust or fabricated as an
-//! active C preprocessor definition.
+//! and documentation.
+//!
+//! When the frontend retained the definition's body, it is also offered to the analyzer
+//! as a private statement root that declares each parameter from its hole. A body that
+//! names macros is first expanded by the compiler in the final environment, which the
+//! frontend proved expands them as the definition did. The analyzer translates that root
+//! like a C macro body when it can; otherwise the call root remains. Neither root is
+//! added to the active C preprocessor definitions.
 //!
 //! The existing typed renderer and native capability planner own parameter assignment
 //! conversions, qualifiers, original result identity and guarded ABI calls. Native
@@ -36,6 +42,9 @@ pub(super) enum InlineRoot<'a> {
         call: ActiveMacro,
         /// Actual definition labels, with deterministic labels for unnamed parameters.
         formals: Vec<String>,
+        /// The definition's body as a statement macro that declares each parameter as a
+        /// local initialized from its hole, when the body's tokens can be analyzed.
+        body: Option<Box<ActiveMacro>>,
     },
     /// A selected function lacks the exact native proof or fits outside the bounded call budget.
     Skipped(SkipReason),
@@ -51,18 +60,32 @@ impl InlineRoot<'_> {
         constants: &BTreeMap<String, IntegerConstant>,
     ) -> MacroAnalysis {
         match self {
-            Self::Ready { call, formals, .. } => {
-                let mut analysis = crate::analysis::analyze_active_with_constants(
-                    frontend,
-                    name,
-                    Some(call),
-                    constants,
-                    true,
-                );
-                for (parameter, name) in analysis.parameters.iter_mut().zip(formals) {
-                    parameter.name.clone_from(name);
+            Self::Ready { call, formals, body, .. } => {
+                // Prefer translating the definition itself. Its analysis must keep exactly
+                // the function's parameters, since a capture would mean an unresolved name.
+                // Every path of a value-returning function must return; the grammar has no
+                // `return;`, so a void function may not return early.
+                if let Some(body) = body {
+                    let void =
+                        frontend.declarations().function_signatures[name].signature.result.category
+                            == crate::TypeCategory::Void;
+                    let analysis = analyze_root(frontend, name, body, formals, constants);
+                    if matches!(analysis.status, AnalysisStatus::Candidate)
+                        && analysis.parameters.len() == formals.len()
+                        && analysis.expression.as_ref().is_some_and(|expression| {
+                            expression.syntax.statement_body.as_ref().is_some_and(|body| {
+                                if void {
+                                    body.return_tokens.is_none()
+                                } else {
+                                    body.always_returns
+                                }
+                            })
+                        })
+                    {
+                        return analysis;
+                    }
                 }
-                analysis
+                analyze_root(frontend, name, call, formals, constants)
             }
             Self::Skipped(reason) => {
                 let mut analysis = crate::analyze(frontend, name);
@@ -74,6 +97,21 @@ impl InlineRoot<'_> {
         }
     }
 
+    /// Analyze the native call root even when the definition itself is translatable.
+    pub(super) fn analyze_call(
+        &self,
+        frontend: &FrontendOutput,
+        name: &str,
+        constants: &BTreeMap<String, IntegerConstant>,
+    ) -> Option<MacroAnalysis> {
+        match self {
+            Self::Ready { call, formals, .. } => {
+                Some(analyze_root(frontend, name, call, formals, constants))
+            }
+            Self::Skipped(_) => None,
+        }
+    }
+
     /// Expose actual function source only for an admitted private call root.
     pub(super) fn source(&self) -> Option<&InlineFunctionDefinition> {
         match self {
@@ -81,6 +119,71 @@ impl InlineRoot<'_> {
             Self::Skipped(_) => None,
         }
     }
+}
+
+/// Expand translated bodies that name macros in the final environment, where generated
+/// macros also expand. A body the compiler pass refuses leaves only the call root.
+pub(super) fn expand_bodies(
+    scanner: &crate::MacroScanner,
+    frontend: &FrontendOutput,
+    roots: &mut BTreeMap<String, InlineRoot<'_>>,
+) -> Result<(), crate::FrontendError> {
+    let names_macro = |body: &ActiveMacro| {
+        body.definition.tokens.iter().any(|token| {
+            token.kind == TokenKind::Identifier
+                && frontend.environment().active.contains_key(&token.spelling)
+        })
+    };
+    let definitions = roots
+        .values()
+        .filter_map(|root| match root {
+            InlineRoot::Ready { body: Some(body), .. } if names_macro(body) => {
+                Some(body.definition.clone())
+            }
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    if definitions.is_empty() {
+        return Ok(());
+    }
+    let batch = crate::expansion::prepare_synthetic(
+        scanner,
+        frontend,
+        &definitions,
+        ExpansionLimits::default(),
+    )?;
+    for (name, root) in roots.iter_mut() {
+        if let InlineRoot::Ready { body, .. } = root
+            && body.as_deref().is_some_and(&names_macro)
+        {
+            *body = match batch.results.get(name) {
+                Some(crate::ExpansionResult::Expanded { expansion }) => {
+                    Some(Box::new(ActiveMacro {
+                        definition: expansion.definition.clone(),
+                        provenance: ActiveProvenance::Resolved,
+                    }))
+                }
+                _ => None,
+            };
+        }
+    }
+    Ok(())
+}
+
+/// Analyze one private root and restore the definition's parameter labels.
+fn analyze_root(
+    frontend: &FrontendOutput,
+    name: &str,
+    root: &ActiveMacro,
+    formals: &[String],
+    constants: &BTreeMap<String, IntegerConstant>,
+) -> MacroAnalysis {
+    let mut analysis =
+        crate::analysis::analyze_active_with_constants(frontend, name, Some(root), constants, true);
+    for (parameter, name) in analysis.parameters.iter_mut().zip(formals) {
+        parameter.name.clone_from(name);
+    }
+    analysis
 }
 
 /// Construct bounded native call syntax from actual prototypes, without preprocessing a fake macro.
@@ -184,8 +287,16 @@ pub(super) fn prepare<'a>(
             continue;
         }
         let declarations = frontend.declarations();
+        let body_identifiers = source
+            .body
+            .iter()
+            .flatten()
+            .filter(|token| token.kind == TokenKind::Identifier)
+            .map(|token| token.spelling.as_str())
+            .collect::<BTreeSet<_>>();
         let occupied = |identifier: &str| {
             identifier == name
+                || body_identifiers.contains(identifier)
                 || frontend.environment().active.contains_key(identifier)
                 || declarations.function_signatures.contains_key(identifier)
                 || declarations.variables.contains_key(identifier)
@@ -253,9 +364,44 @@ pub(super) fn prepare<'a>(
                 })
             })
             .collect();
+        // A body over the shared budgets leaves only the call root. Records cannot yet
+        // pass into or out of a translation by value.
+        let by_value_record = std::iter::once(&function.signature.result)
+            .chain(parameters)
+            .any(|ty| ty.category == crate::TypeCategory::Record);
+        let body = source
+            .body
+            .as_ref()
+            .filter(|_| !by_value_record)
+            .and_then(|statements| {
+                body_tokens(frontend, name, &holes, source, parameters, statements)
+            })
+            .filter(|tokens| {
+                let added = tokens.iter().map(|token| token.spelling.len()).sum::<usize>();
+                let fits = tokens.len() <= limits.macro_tokens
+                    && added <= limits.source_bytes.saturating_sub(bytes);
+                if fits {
+                    bytes += added;
+                }
+                fits
+            });
         result.insert(
             name.clone(),
             InlineRoot::Ready {
+                body: body.map(|tokens| {
+                    Box::new(ActiveMacro {
+                        definition: MacroDefinition {
+                            name: name.clone(),
+                            kind: MacroKind::FunctionLike,
+                            location: None,
+                            provenance: Some(source.provenance.clone()),
+                            tokens,
+                            builtin: false,
+                            main_file: false,
+                        },
+                        provenance: ActiveProvenance::Resolved,
+                    })
+                }),
                 source,
                 call: ActiveMacro {
                     definition: MacroDefinition {
@@ -274,4 +420,76 @@ pub(super) fn prepare<'a>(
         );
     }
     result
+}
+
+/// Build `NAME(holes...) do { T0 p0 = (hole0); ...; statements } while (0)`.
+///
+/// Each parameter becomes a local initialized from its hole, so every argument is
+/// evaluated exactly once and converted to its parameter type by C assignment rules,
+/// as in a call. Parameters and the body's top-level declarations share one block
+/// scope, as they do in C. The body is refused when a parameter is unnamed or has a
+/// type that cannot be spelled as a flat declaration. The frontend already proved the
+/// statements' macros unchanged; the declarations use the compiler's expanded spellings,
+/// so none of their names may be an active macro.
+fn body_tokens(
+    frontend: &FrontendOutput,
+    name: &str,
+    holes: &[String],
+    source: &InlineFunctionDefinition,
+    parameters: &[crate::TypeInfo],
+    statements: &[Token],
+) -> Option<Vec<Token>> {
+    let token = |kind, spelling: &str| Token { kind, spelling: spelling.into() };
+    let mut tokens = vec![token(TokenKind::Identifier, name), token(TokenKind::Punctuation, "(")];
+    for (index, hole) in holes.iter().enumerate() {
+        if index != 0 {
+            tokens.push(token(TokenKind::Punctuation, ","));
+        }
+        tokens.push(token(TokenKind::Identifier, hole));
+    }
+    tokens.extend([
+        token(TokenKind::Punctuation, ")"),
+        token(TokenKind::Keyword, "do"),
+        token(TokenKind::Punctuation, "{"),
+    ]);
+    for ((parameter, ty), hole) in source.parameters.iter().zip(parameters).zip(holes) {
+        let parameter = parameter.as_ref()?;
+        if ty.spelling.contains(['(', '[', ',']) {
+            return None;
+        }
+        for word in ty.spelling.replace('*', " * ").split_whitespace() {
+            let kind = match word {
+                "*" => TokenKind::Punctuation,
+                "const" | "volatile" | "restrict" | "struct" | "union" | "enum" | "unsigned"
+                | "signed" | "char" | "short" | "int" | "long" | "float" | "double" | "void"
+                | "_Bool" => TokenKind::Keyword,
+                _ => TokenKind::Identifier,
+            };
+            tokens.push(token(kind, word));
+        }
+        tokens.extend([
+            token(TokenKind::Identifier, parameter),
+            token(TokenKind::Punctuation, "="),
+            token(TokenKind::Punctuation, "("),
+            token(TokenKind::Identifier, hole),
+            token(TokenKind::Punctuation, ")"),
+            token(TokenKind::Punctuation, ";"),
+        ]);
+    }
+    let active = &frontend.environment().active;
+    if tokens[1..]
+        .iter()
+        .any(|token| token.kind == TokenKind::Identifier && active.contains_key(&token.spelling))
+    {
+        return None;
+    }
+    tokens.extend(statements.iter().cloned());
+    tokens.extend([
+        token(TokenKind::Punctuation, "}"),
+        token(TokenKind::Keyword, "while"),
+        token(TokenKind::Punctuation, "("),
+        token(TokenKind::Literal, "0"),
+        token(TokenKind::Punctuation, ")"),
+    ]);
+    Some(tokens)
 }

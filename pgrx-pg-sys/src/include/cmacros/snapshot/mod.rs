@@ -20,6 +20,14 @@ macro_rules! __pgrx_c_doc_inline_call {
 /// One documentation paragraph shared by snapshot shells.
 #[doc(hidden)]
 #[macro_export]
+macro_rules! __pgrx_c_doc_inline_body {
+    () => {
+        " Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage, including `()` for a void function. Calls to other translated inline functions run their translations; other calls keep the backend thread and PostgreSQL error contracts of their guarded bindings."
+    };
+}
+/// One documentation paragraph shared by snapshot shells.
+#[doc(hidden)]
+#[macro_export]
 macro_rules! __pgrx_c_doc_invocation_diagnostics {
     () => {
         " Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract."

@@ -25,7 +25,7 @@ macro_rules! WalSndWakeupProcessRequests {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function WalSndWakeupProcessRequests from walsender.h:63 (PostgreSQL 16, 19), walsender.h:65 (PostgreSQL 17), walsender.h:64 (PostgreSQL 18)
+/// C inline function WalSndWakeupProcessRequests from walsender.h:63 (PostgreSQL 16, 19), walsender.h:65 (PostgreSQL 17), walsender.h:64 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -41,7 +41,7 @@ macro_rules! WalSndWakeupProcessRequests {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///

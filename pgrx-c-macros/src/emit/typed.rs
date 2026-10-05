@@ -920,6 +920,29 @@ impl<'a> Renderer<'a> {
                                         .map_err(failure)?,
                                 )
                             };
+                            if bindings.inline_translations.contains(name.as_str())
+                                && let Some(callee) = super::macro_identifier(name)
+                            {
+                                // The translation evaluates each argument once and converts it
+                                // to its parameter type, as the call does, using only its value.
+                                const VALUE_ONLY: &str = "::core::compile_error!(\"a translated C function argument is only a value\")";
+                                if let Some(result) = &result {
+                                    write!(rust, "{EXPRESSION}::implicit::<{}, _>(", result.marker)
+                                        .expect("String output");
+                                    tasks.push(text(")"));
+                                }
+                                write!(rust, "$crate::{callee}!(@__pgrx_emit_value; ")
+                                    .expect("String output");
+                                tasks.push(text(")"));
+                                for argument in arguments.iter().rev() {
+                                    tasks.push(Task::Text(format!(
+                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}]), "
+                                    )));
+                                    tasks.push(value(*argument));
+                                    tasks.push(text("(@compiled ["));
+                                }
+                                continue;
+                            }
                             let path = rust_path(&binding.path).map_err(failure)?;
                             if let Some(result) = &result {
                                 write!(

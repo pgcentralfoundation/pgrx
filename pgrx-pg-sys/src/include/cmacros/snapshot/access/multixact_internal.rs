@@ -2,7 +2,7 @@
 // C macros from multixact_internal.h.
 
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MXOffsetToFlagsBitShift from multixact_internal.h:104 (PostgreSQL 19)
+/// C inline function MXOffsetToFlagsBitShift from multixact_internal.h:104 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -16,7 +16,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -24,7 +24,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MXOffsetToFlagsBitShift {
     ($offset:expr $(,)?) => {
@@ -32,7 +32,7 @@ macro_rules! MXOffsetToFlagsBitShift {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MXOffsetToFlagsOffset from multixact_internal.h:94 (PostgreSQL 19)
+/// C inline function MXOffsetToFlagsOffset from multixact_internal.h:94 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -47,7 +47,7 @@ macro_rules! MXOffsetToFlagsBitShift {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -55,7 +55,7 @@ macro_rules! MXOffsetToFlagsBitShift {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MXOffsetToFlagsOffset {
     ($offset:expr $(,)?) => {
@@ -63,7 +63,7 @@ macro_rules! MXOffsetToFlagsOffset {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MXOffsetToMemberOffset from multixact_internal.h:114 (PostgreSQL 19)
+/// C inline function MXOffsetToMemberOffset from multixact_internal.h:114 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -78,7 +78,7 @@ macro_rules! MXOffsetToFlagsOffset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -86,7 +86,7 @@ macro_rules! MXOffsetToFlagsOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MXOffsetToMemberOffset {
     ($offset:expr $(,)?) => {
@@ -94,7 +94,7 @@ macro_rules! MXOffsetToMemberOffset {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MXOffsetToMemberPage from multixact_internal.h:81 (PostgreSQL 19)
+/// C inline function MXOffsetToMemberPage from multixact_internal.h:81 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int64
@@ -105,7 +105,7 @@ macro_rules! MXOffsetToMemberOffset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -113,7 +113,7 @@ macro_rules! MXOffsetToMemberOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MXOffsetToMemberPage {
     ($offset:expr $(,)?) => {
@@ -121,7 +121,7 @@ macro_rules! MXOffsetToMemberPage {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MXOffsetToMemberSegment from multixact_internal.h:87 (PostgreSQL 19)
+/// C inline function MXOffsetToMemberSegment from multixact_internal.h:87 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int64
@@ -132,7 +132,7 @@ macro_rules! MXOffsetToMemberPage {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -140,7 +140,7 @@ macro_rules! MXOffsetToMemberPage {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MXOffsetToMemberSegment {
     ($offset:expr $(,)?) => {
@@ -148,7 +148,7 @@ macro_rules! MXOffsetToMemberSegment {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MultiXactIdToOffsetEntry from multixact_internal.h:40 (PostgreSQL 19)
+/// C inline function MultiXactIdToOffsetEntry from multixact_internal.h:40 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -159,7 +159,7 @@ macro_rules! MXOffsetToMemberSegment {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -167,7 +167,7 @@ macro_rules! MXOffsetToMemberSegment {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MultiXactIdToOffsetEntry {
     ($multi:expr $(,)?) => {
@@ -175,7 +175,7 @@ macro_rules! MultiXactIdToOffsetEntry {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MultiXactIdToOffsetPage from multixact_internal.h:34 (PostgreSQL 19)
+/// C inline function MultiXactIdToOffsetPage from multixact_internal.h:34 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int64
@@ -186,7 +186,7 @@ macro_rules! MultiXactIdToOffsetEntry {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -194,7 +194,7 @@ macro_rules! MultiXactIdToOffsetEntry {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MultiXactIdToOffsetPage {
     ($multi:expr $(,)?) => {
@@ -202,7 +202,7 @@ macro_rules! MultiXactIdToOffsetPage {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function MultiXactIdToOffsetSegment from multixact_internal.h:46 (PostgreSQL 19)
+/// C inline function MultiXactIdToOffsetSegment from multixact_internal.h:46 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int64
@@ -213,7 +213,7 @@ macro_rules! MultiXactIdToOffsetPage {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -221,7 +221,7 @@ macro_rules! MultiXactIdToOffsetPage {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! MultiXactIdToOffsetSegment {
     ($multi:expr $(,)?) => {

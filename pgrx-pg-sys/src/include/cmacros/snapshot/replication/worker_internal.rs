@@ -2,7 +2,7 @@
 // C macros from worker_internal.h.
 
 #[cfg(feature = "pg16")]
-/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:316 (PostgreSQL 16)
+/// C inline function am_leader_apply_worker from worker_internal.h:316 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -14,7 +14,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -22,15 +22,15 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:340 (PostgreSQL 18), worker_internal.h:381 (PostgreSQL 19)
+#[cfg(any(feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:381 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -57,8 +57,36 @@ macro_rules! am_leader_apply_worker {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function am_leader_apply_worker from worker_internal.h:340 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// am_leader_apply_worker(void)
+/// {
+/// 	Assert(MyLogicalRepWorker->in_use);
+/// 	return (MyLogicalRepWorker->type == WORKERTYPE_APPLY);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! am_leader_apply_worker {
+    () => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(feature = "pg16")]
-/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:323 (PostgreSQL 16)
+/// C inline function am_parallel_apply_worker from worker_internal.h:323 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -69,7 +97,7 @@ macro_rules! am_leader_apply_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -77,15 +105,15 @@ macro_rules! am_leader_apply_worker {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:347 (PostgreSQL 18), worker_internal.h:388 (PostgreSQL 19)
+#[cfg(any(feature = "pg17", feature = "pg19"))]
+/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:388 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -112,8 +140,36 @@ macro_rules! am_parallel_apply_worker {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
+#[cfg(feature = "pg18")]
+/// C inline function am_parallel_apply_worker from worker_internal.h:347 (PostgreSQL 18)
+///
+/// ```c
+/// static inline bool
+/// am_parallel_apply_worker(void)
+/// {
+/// 	Assert(MyLogicalRepWorker->in_use);
+/// 	return isParallelApplyWorker(MyLogicalRepWorker);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! am_parallel_apply_worker {
+    () => {
+        $crate::__pgrx_c_documentation_shell!()
+    };
+}
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function am_sequencesync_worker from worker_internal.h:375 (PostgreSQL 19)
+/// C inline function am_sequencesync_worker from worker_internal.h:375 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -124,15 +180,11 @@ macro_rules! am_parallel_apply_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_sequencesync_worker {
     () => {
@@ -140,7 +192,7 @@ macro_rules! am_sequencesync_worker {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function am_tablesync_worker from worker_internal.h:106 (PostgreSQL 15), worker_internal.h:310 (PostgreSQL 16)
+/// C inline function am_tablesync_worker from worker_internal.h:106 (PostgreSQL 15), worker_internal.h:310 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -151,7 +203,7 @@ macro_rules! am_sequencesync_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -159,7 +211,7 @@ macro_rules! am_sequencesync_worker {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
@@ -167,7 +219,7 @@ macro_rules! am_tablesync_worker {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function am_tablesync_worker from worker_internal.h:333 (PostgreSQL 17), worker_internal.h:334 (PostgreSQL 18)
+/// C inline function am_tablesync_worker from worker_internal.h:333 (PostgreSQL 17), worker_internal.h:334 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -178,15 +230,11 @@ macro_rules! am_tablesync_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
@@ -194,7 +242,7 @@ macro_rules! am_tablesync_worker {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function am_tablesync_worker from worker_internal.h:369 (PostgreSQL 19)
+/// C inline function am_tablesync_worker from worker_internal.h:369 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -205,15 +253,11 @@ macro_rules! am_tablesync_worker {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
