@@ -180,14 +180,15 @@ pub struct OwnedMemoryContext {
 
 impl Drop for OwnedMemoryContext {
     fn drop(&mut self) {
-        unsafe {
-            // In order to prevent crashes, if we're trying to drop
-            // a context that is current, switch to its predecessor, and then drop it
-            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
-                pg_sys::CurrentMemoryContext = self.previous;
-            }
-            pg_sys::MemoryContextDelete(self.owned);
+        // SAFETY: Owned contexts are used and dropped on the backend thread, where
+        // CurrentMemoryContext can be read without concurrent mutation.
+        if unsafe { ptr::eq(pg_sys::CurrentMemoryContext, self.owned) } {
+            // SAFETY: The remembered predecessor must outlive this owned context.
+            // Switch away before deleting the current allocation context.
+            unsafe { pg_sys::MemoryContextSwitchTo(self.previous) };
         }
+        // SAFETY: This wrapper owns the live PostgreSQL context and releases it once.
+        unsafe { pg_sys::MemoryContextDelete(self.owned) };
     }
 }
 
@@ -231,6 +232,10 @@ impl PgMemoryContexts {
     /// Furthermore, users of this function's return value have no choice but to assume the returned
     /// [`PgMemoryContexts::Of`] variant represents a legitimate [`pg_sys::MemoryContext`].
     pub unsafe fn of(ptr: void_mut_ptr) -> Option<PgMemoryContexts> {
+        // `GetMemoryChunkContext` reads the chunk header before `ptr`, so NULL must not reach it.
+        if ptr.is_null() {
+            return None;
+        }
         let parent = unsafe {
             // (un)SAFETY: the caller assumes responsibility for ensuring the provided pointer is
             // going to be accepted by Postgres `GetMemoryChunkContext`.  Postgres will ERROR
@@ -265,9 +270,16 @@ impl PgMemoryContexts {
         }
     }
 
-    /// Set this MemoryContext as the `CurrentMemoryContext, returning whatever `CurrentMemoryContext` is
+    /// Set this context as current and return the previous current context.
+    ///
+    /// # Safety
+    ///
+    /// Call on the backend thread with a live context represented by `self`.
+    /// Keep the previous context alive until it is no longer used, including as
+    /// the predecessor of an owned context.
     pub unsafe fn set_as_current(&mut self) -> PgMemoryContexts {
-        let old_context = pg_sys::CurrentMemoryContext;
+        // SAFETY: The caller establishes backend-thread access to the context global.
+        let old_context = unsafe { pg_sys::CurrentMemoryContext };
 
         if let PgMemoryContexts::Owned(mc) = self {
             // If the context is set as current while it's already current,
@@ -277,7 +289,9 @@ impl PgMemoryContexts {
             }
         }
 
-        pg_sys::CurrentMemoryContext = self.value();
+        // SAFETY: The caller guarantees the target context is live. Bookkeeping
+        // above retains the predecessor before changing the allocation context.
+        unsafe { pg_sys::MemoryContextSwitchTo(self.value()) };
 
         PgMemoryContexts::For(old_context)
     }
@@ -367,6 +381,9 @@ impl PgMemoryContexts {
     ///
     /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
     /// borrow checker thinks it will.
+    ///
+    /// Call on the backend thread and keep the previous current context alive
+    /// through `f`. The previous context is restored only when `f` returns normally.
     pub unsafe fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
         match self {
             PgMemoryContexts::Transient {
@@ -387,7 +404,9 @@ impl PgMemoryContexts {
                     )
                 };
 
-                let result = PgMemoryContexts::exec_in_context(context, f);
+                // SAFETY: The new context is live, and the caller guarantees the
+                // backend thread and the previous context's lifetime through `f`.
+                let result = unsafe { PgMemoryContexts::exec_in_context(context, f) };
 
                 unsafe {
                     pg_sys::MemoryContextDelete(context);
@@ -395,7 +414,11 @@ impl PgMemoryContexts {
 
                 result
             }
-            _ => PgMemoryContexts::exec_in_context(self.value(), f),
+            _ => {
+                // SAFETY: The caller establishes both context lifetimes and
+                // backend-thread access for the execution and restoration.
+                unsafe { PgMemoryContexts::exec_in_context(self.value(), f) }
+            }
         }
     }
 
@@ -572,24 +595,22 @@ impl PgMemoryContexts {
         leaked_ptr
     }
 
-    /// helper function
-    fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
+    /// Execute in a context and restore its predecessor after a normal return.
+    ///
+    /// # Safety
+    ///
+    /// Call on the backend thread with a live target context. The current context
+    /// must remain live through `f` so it can be restored afterward.
+    unsafe fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
-        let prev_context;
-
-        // mimic what palloc.h does for switching memory contexts
-        unsafe {
-            prev_context = pg_sys::CurrentMemoryContext;
-            pg_sys::CurrentMemoryContext = context;
-        }
+        // SAFETY: The caller establishes backend-thread access and a live target.
+        let prev_context = unsafe { pg_sys::MemoryContextSwitchTo(context) };
 
         let result = f(&mut PgMemoryContexts::For(context));
-        // restore our understanding of the current memory context
-        unsafe {
-            pg_sys::CurrentMemoryContext = prev_context;
-        }
+        // SAFETY: The caller keeps the remembered context live through `f`.
+        unsafe { pg_sys::MemoryContextSwitchTo(prev_context) };
 
         result
     }

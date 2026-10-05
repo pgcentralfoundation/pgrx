@@ -12,8 +12,8 @@ one of your Rust functions or tests.
 
 ## Migrate handwritten helper calls
 
-To migrate a handwritten helper call, use the generated macro with its original
-PostgreSQL name and extract the result at the Rust boundary:
+pgrx's handwritten C macro helpers have been removed. Call the generated macro
+with its original PostgreSQL name and extract the result at the Rust boundary:
 
 | Previous call | Generated call |
 | --- | --- |
@@ -29,7 +29,7 @@ and unsafe blocks. For example, `VARSIZE_ANY!` reads raw storage, and
 Statement macros yield `()`, so they do not need `.get()`. Return macros return
 from the enclosing Rust function or closure; replace the complete return site.
 
-When replacing a `pgrx::is_a` call, preserve its NULL short-circuit before
+The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
 loading a tag with `nodeTag!`; a generated C field access requires valid storage.
 Application-level ownership and error adapters retain their Rust contracts.
 
@@ -51,6 +51,42 @@ use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
 function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
 original definition. Genuine signature changes can still require caller changes.
+
+### Other removed helpers
+
+Other Rust ports of PostgreSQL macros and inline functions were removed as well.
+Call the generated macro with the PostgreSQL name instead:
+
+| Removed | Generated replacement |
+| --- | --- |
+| `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` |
+| PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, and `BufferIsValid` | The macro with the same name |
+| `pg_sys::PageGetSpecialPointer` on PG15, PG18, and PG19 | `PageGetSpecialPointer!` |
+| `pg_sys::IndexBuildHeapScan` | `table_index_build_scan!`, with `allow_sync` and `progress` set to true |
+| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` |
+| `pgrx::pg_arg_is_null`, `pg_getarg_datum_raw`, `pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_ARGISNULL!`, `PG_GETARG_DATUM!`, `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` |
+| `pg_sys::elog::interrupt_pending()` | `INTERRUPTS_PENDING_CONDITION!().get() != 0` |
+| `pgrx::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` |
+
+C macros that read an implicit `fcinfo` variable take it as their last argument,
+as in `PG_ARGISNULL!(n, fcinfo)`. The removed `rt_fetch`, `BufferIsValid`, and
+`PageGetSpecialPointer` ports panicked on an invalid index, buffer, or page.
+PostgreSQL checks those only in assert-enabled builds, so validate them first.
+
+### Changed constants and version-specific items
+
+`pg_sys::InvalidOid` is now the bindgen `u32` constant rather than an `Oid`; use
+`pg_sys::Oid::INVALID` where an `Oid` is required. Likewise,
+`InvalidTransactionId`, `BootstrapTransactionId`, `FrozenTransactionId`,
+`FirstNormalTransactionId`, and `MaxTransactionId` are now `u32`; use the
+matching `pg_sys::TransactionId` constants, such as `TransactionId::FIRST_NORMAL`.
+`pg_sys::VARHDRSZ` is now C `int` (`i32`) instead of `usize`, so convert it
+explicitly where you need a size.
+
+`pg_sys::get_pg_version_string()` is not available on MSVC builds for PG15 and
+PG16, where bindgen cannot read `PG_VERSION_STR`. The removed fallback returned
+a synthesized string. `PgSqlErrorCode::ERRCODE_SNAPSHOT_TOO_OLD` exists only for
+PG15 and PG16, because later PostgreSQL headers no longer define it.
 
 ## Call an expression macro
 

@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{AnyNumeric, FromDatum, IntoDatum, Numeric, pg_sys, varsize_any};
+use crate::{AnyNumeric, FromDatum, IntoDatum, Numeric, pg_sys};
 
 impl FromDatum for AnyNumeric {
     #[inline]
@@ -40,7 +40,7 @@ impl FromDatum for AnyNumeric {
             );
 
             // copy us into a rust-owned/allocated Box<[u8]>
-            let size = varsize_any(numeric);
+            let size = pg_sys::VARSIZE_ANY!(numeric).get() as usize;
             let slice = std::slice::from_raw_parts(numeric.cast::<u8>(), size);
             let boxed: Box<[u8]> = slice.into();
 

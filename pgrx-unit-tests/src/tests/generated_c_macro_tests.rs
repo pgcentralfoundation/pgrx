@@ -8,9 +8,9 @@
 //! invocation short-circuits before calling them. Its complete expansion still
 //! needs the backend's symbols at link/load time, so these integration checks
 //! belong in the extension test harness rather than a standalone test binary.
-//! The availability classifier follows the selected build's actual emitted API.
+//! The availability classifier follows the selected build's actual emitted API
+//! under its verified target and compiler profile.
 
-#![cfg(not(target_os = "windows"))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 /// Register generated backend-dependent macro checks in the harness’s tests schema.
@@ -24,8 +24,8 @@ mod tests {
     use pgrx::pg_sys as pg;
     use pgrx::prelude::*;
 
-    // Assertion-enabled C profiles skip this macro's stringification dependency.
-    // Test its generated API only when that API exists in the inspected profile.
+    // Admission depends on the inspected header and assertion/compiler profile.
+    // Test the generated API when the classifier proves that it was emitted.
     pg::__pgrx_c_classify! { @if_available PageSetPrunable {
     /// Check that the generated page macro short-circuits before a backend comparison.
     #[pg_test]

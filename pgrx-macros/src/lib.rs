@@ -1059,7 +1059,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 let mut serialized = ::pgrx::StringInfo::new();
 
-                serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ]); // reserve space for the header
+                serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ as usize]); // reserve space for the header
                 serialized.push_bytes(unsafe {
                     core::slice::from_raw_parts(
                         buf.data as *const u8,
@@ -1070,8 +1070,12 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 let size = serialized.len();
                 let varlena = serialized.into_char_ptr();
 
+                // SAFETY: StringInfo owns the aligned PostgreSQL allocation and initialized
+                // header prefix, and bounds its total size by MaxAllocSize. into_char_ptr
+                // transfers that live allocation without freeing it. Under the fmgr receive
+                // contract, the copied payload is the serialized value decoded below.
                 unsafe{
-                    ::pgrx::set_varsize_4b(varlena as *mut ::pgrx::pg_sys::varlena, size as i32);
+                    ::pgrx::pg_sys::SET_VARSIZE_4B!(varlena as *mut ::pgrx::pg_sys::varlena, size as i32).get();
                     buf.cursor = buf.len;
                     ::pgrx::datum::cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
                 }

@@ -220,8 +220,8 @@ impl BackgroundWorker {
             );
         }
 
-        let dboid = dboid.unwrap_or(pg_sys::InvalidOid);
-        let useroid = useroid.unwrap_or(pg_sys::InvalidOid);
+        let dboid = dboid.unwrap_or(pg_sys::Oid::INVALID);
+        let useroid = useroid.unwrap_or(pg_sys::Oid::INVALID);
 
         unsafe {
             pg_sys::BackgroundWorkerInitializeConnectionByOid(dboid, useroid, 0);
@@ -721,7 +721,7 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
             pg_sys::PG_WAIT_EXTENSION,
         );
         pg_sys::ResetLatch(pg_sys::MyLatch);
-        pg_sys::check_for_interrupts!();
+        pg_sys::CHECK_FOR_INTERRUPTS!();
 
         latch
     }

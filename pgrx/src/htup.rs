@@ -16,59 +16,24 @@ use std::num::NonZeroUsize;
 ///
 /// ## Safety
 ///
-/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
+/// This function is safe, but if `row` is a null `HeapTupleHeader` pointer, it will `panic!()`
 #[inline]
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
+    // Detoasting reads the varlena header, so reject NULL before it can be dereferenced.
+    if row.is_null() {
+        panic!("Attempt to dereference a null HeapTupleHeader");
+    }
     let htup_header =
         unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
-    tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
+    // SAFETY: The detoasted composite has a HeapTupleHeader datum header.
+    tuple.t_len = unsafe { pg_sys::HeapTupleHeaderGetDatumLength!(htup_header).get() };
     tuple.t_data = htup_header;
 
     tuple
-}
-
-/// ## Safety
-///
-/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
-#[inline]
-pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) -> usize {
-    if htup_header.is_null() {
-        panic!("Attempt to dereference a null HeapTupleHeader");
-    }
-
-    unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
-}
-
-/// convert a HeapTupleHeader to a Datum.
-#[inline]
-pub unsafe fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
-    unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
-}
-
-/// ```c
-/// #define HeapTupleHeaderGetTypeId(tup) \
-/// ( \
-/// (tup)->t_choice.t_datum.datum_typeid \
-/// )
-/// ```
-#[inline]
-pub unsafe fn heap_tuple_header_get_type_id(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid {
-    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typeid
-}
-
-/// ```c
-/// #define HeapTupleHeaderGetTypMod(tup) \
-/// ( \
-/// (tup)->t_choice.t_datum.datum_typmod \
-/// )
-/// ```
-#[inline]
-pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader) -> i32 {
-    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
 }
 
 /// Extract an attribute of a heap tuple and return it as Rust type.
@@ -89,11 +54,12 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
+    // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
     let datum = unsafe {
         pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
-    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     if is_null { None } else { unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) } }
 }
@@ -149,11 +115,12 @@ pub fn heap_getattr_datum_ex(
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
+    // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
     let datum = unsafe {
         pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
-    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     let mut typlen = 0;
     let mut typbyval = false;

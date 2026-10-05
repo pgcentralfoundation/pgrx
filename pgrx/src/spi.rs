@@ -14,7 +14,6 @@ use crate::pg_sys;
 use core::fmt::Formatter;
 use std::ffi::{CStr, CString};
 use std::fmt::Debug;
-use std::mem;
 
 mod client;
 mod cursor;
@@ -33,25 +32,25 @@ pub use SpiResult as Result;
 #[repr(i32)]
 #[non_exhaustive]
 pub enum SpiOkCodes {
-    Connect = 1,
-    Finish = 2,
-    Fetch = 3,
-    Utility = 4,
-    Select = 5,
-    SelInto = 6,
-    Insert = 7,
-    Delete = 8,
-    Update = 9,
-    Cursor = 10,
-    InsertReturning = 11,
-    DeleteReturning = 12,
-    UpdateReturning = 13,
-    Rewritten = 14,
-    RelRegister = 15,
-    RelUnregister = 16,
-    TdRegister = 17,
+    Connect = pg_sys::SPI_OK_CONNECT as i32,
+    Finish = pg_sys::SPI_OK_FINISH as i32,
+    Fetch = pg_sys::SPI_OK_FETCH as i32,
+    Utility = pg_sys::SPI_OK_UTILITY as i32,
+    Select = pg_sys::SPI_OK_SELECT as i32,
+    SelInto = pg_sys::SPI_OK_SELINTO as i32,
+    Insert = pg_sys::SPI_OK_INSERT as i32,
+    Delete = pg_sys::SPI_OK_DELETE as i32,
+    Update = pg_sys::SPI_OK_UPDATE as i32,
+    Cursor = pg_sys::SPI_OK_CURSOR as i32,
+    InsertReturning = pg_sys::SPI_OK_INSERT_RETURNING as i32,
+    DeleteReturning = pg_sys::SPI_OK_DELETE_RETURNING as i32,
+    UpdateReturning = pg_sys::SPI_OK_UPDATE_RETURNING as i32,
+    Rewritten = pg_sys::SPI_OK_REWRITTEN as i32,
+    RelRegister = pg_sys::SPI_OK_REL_REGISTER as i32,
+    RelUnregister = pg_sys::SPI_OK_REL_UNREGISTER as i32,
+    TdRegister = pg_sys::SPI_OK_TD_REGISTER as i32,
     /// Added in Postgres 15
-    Merge = 18,
+    Merge = pg_sys::SPI_OK_MERGE as i32,
 }
 
 /// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
@@ -60,20 +59,20 @@ pub enum SpiOkCodes {
 #[derive(thiserror::Error, Debug, PartialEq)]
 #[repr(i32)]
 pub enum SpiErrorCodes {
-    Connect = -1,
-    Copy = -2,
-    OpUnknown = -3,
-    Unconnected = -4,
+    Connect = pg_sys::SPI_ERROR_CONNECT as i32,
+    Copy = pg_sys::SPI_ERROR_COPY as i32,
+    OpUnknown = pg_sys::SPI_ERROR_OPUNKNOWN as i32,
+    Unconnected = pg_sys::SPI_ERROR_UNCONNECTED as i32,
     #[allow(dead_code)]
-    Cursor = -5, /* not used anymore */
-    Argument = -6,
-    Param = -7,
-    Transaction = -8,
-    NoAttribute = -9,
-    NoOutFunc = -10,
-    TypUnknown = -11,
-    RelDuplicate = -12,
-    RelNotFound = -13,
+    Cursor = pg_sys::SPI_ERROR_CURSOR as i32, /* not used anymore */
+    Argument = pg_sys::SPI_ERROR_ARGUMENT as i32,
+    Param = pg_sys::SPI_ERROR_PARAM as i32,
+    Transaction = pg_sys::SPI_ERROR_TRANSACTION as i32,
+    NoAttribute = pg_sys::SPI_ERROR_NOATTRIBUTE as i32,
+    NoOutFunc = pg_sys::SPI_ERROR_NOOUTFUNC as i32,
+    TypUnknown = pg_sys::SPI_ERROR_TYPUNKNOWN as i32,
+    RelDuplicate = pg_sys::SPI_ERROR_REL_DUPLICATE as i32,
+    RelNotFound = pg_sys::SPI_ERROR_REL_NOT_FOUND as i32,
 }
 
 impl std::fmt::Display for SpiErrorCodes {
@@ -132,18 +131,41 @@ impl TryFrom<libc::c_int> for SpiOkCodes {
     type Error = std::result::Result<SpiErrorCodes, UnknownVariant>;
 
     fn try_from(code: libc::c_int) -> std::result::Result<SpiOkCodes, Self::Error> {
-        // Cast to assure that we're obeying repr rules even on platforms where c_ints are not 4 bytes wide,
-        // as we don't support any but we may wish to in the future.
-        match code as i32 {
-            err @ -13..=-1 => Err(Ok(
-                // SAFETY: These values are described in SpiError, thus they are inbounds for transmute
-                unsafe { mem::transmute::<i32, SpiErrorCodes>(err) },
-            )),
-            ok @ 1..=18 => Ok(
-                //SAFETY: These values are described in SpiOk, thus they are inbounds for transmute
-                unsafe { mem::transmute::<i32, SpiOkCodes>(ok) },
-            ),
-            _unknown => Err(Err(UnknownVariant)),
+        // Match declared variants rather than assuming the generated constants
+        // form contiguous ranges suitable for unchecked enum conversion.
+        match code {
+            pg_sys::SPI_ERROR_CONNECT => Err(Ok(SpiErrorCodes::Connect)),
+            pg_sys::SPI_ERROR_COPY => Err(Ok(SpiErrorCodes::Copy)),
+            pg_sys::SPI_ERROR_OPUNKNOWN => Err(Ok(SpiErrorCodes::OpUnknown)),
+            pg_sys::SPI_ERROR_UNCONNECTED => Err(Ok(SpiErrorCodes::Unconnected)),
+            pg_sys::SPI_ERROR_CURSOR => Err(Ok(SpiErrorCodes::Cursor)),
+            pg_sys::SPI_ERROR_ARGUMENT => Err(Ok(SpiErrorCodes::Argument)),
+            pg_sys::SPI_ERROR_PARAM => Err(Ok(SpiErrorCodes::Param)),
+            pg_sys::SPI_ERROR_TRANSACTION => Err(Ok(SpiErrorCodes::Transaction)),
+            pg_sys::SPI_ERROR_NOATTRIBUTE => Err(Ok(SpiErrorCodes::NoAttribute)),
+            pg_sys::SPI_ERROR_NOOUTFUNC => Err(Ok(SpiErrorCodes::NoOutFunc)),
+            pg_sys::SPI_ERROR_TYPUNKNOWN => Err(Ok(SpiErrorCodes::TypUnknown)),
+            pg_sys::SPI_ERROR_REL_DUPLICATE => Err(Ok(SpiErrorCodes::RelDuplicate)),
+            pg_sys::SPI_ERROR_REL_NOT_FOUND => Err(Ok(SpiErrorCodes::RelNotFound)),
+            value if value == pg_sys::SPI_OK_CONNECT as i32 => Ok(Self::Connect),
+            value if value == pg_sys::SPI_OK_FINISH as i32 => Ok(Self::Finish),
+            value if value == pg_sys::SPI_OK_FETCH as i32 => Ok(Self::Fetch),
+            value if value == pg_sys::SPI_OK_UTILITY as i32 => Ok(Self::Utility),
+            value if value == pg_sys::SPI_OK_SELECT as i32 => Ok(Self::Select),
+            value if value == pg_sys::SPI_OK_SELINTO as i32 => Ok(Self::SelInto),
+            value if value == pg_sys::SPI_OK_INSERT as i32 => Ok(Self::Insert),
+            value if value == pg_sys::SPI_OK_DELETE as i32 => Ok(Self::Delete),
+            value if value == pg_sys::SPI_OK_UPDATE as i32 => Ok(Self::Update),
+            value if value == pg_sys::SPI_OK_CURSOR as i32 => Ok(Self::Cursor),
+            value if value == pg_sys::SPI_OK_INSERT_RETURNING as i32 => Ok(Self::InsertReturning),
+            value if value == pg_sys::SPI_OK_DELETE_RETURNING as i32 => Ok(Self::DeleteReturning),
+            value if value == pg_sys::SPI_OK_UPDATE_RETURNING as i32 => Ok(Self::UpdateReturning),
+            value if value == pg_sys::SPI_OK_REWRITTEN as i32 => Ok(Self::Rewritten),
+            value if value == pg_sys::SPI_OK_REL_REGISTER as i32 => Ok(Self::RelRegister),
+            value if value == pg_sys::SPI_OK_REL_UNREGISTER as i32 => Ok(Self::RelUnregister),
+            value if value == pg_sys::SPI_OK_TD_REGISTER as i32 => Ok(Self::TdRegister),
+            value if value == pg_sys::SPI_OK_MERGE as i32 => Ok(Self::Merge),
+            _ => Err(Err(UnknownVariant)),
         }
     }
 }
@@ -216,7 +238,7 @@ impl Spi {
             let current_xid = pg_sys::GetCurrentTransactionIdIfAny();
 
             // no assigned TransactionId means no mutation has occurred in this transaction
-            current_xid == pg_sys::InvalidTransactionId
+            current_xid == pg_sys::TransactionId::INVALID
         }
     }
 

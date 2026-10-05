@@ -13,8 +13,14 @@ use crate::pg_sys;
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let full_xid = unsafe { pg_sys::ReadNextFullTransactionId() };
 
-    let last_xid = full_xid.value as u32;
-    let epoch = (full_xid.value >> 32) as u32;
+    // SAFETY: full_xid is an initialized, aligned local returned by PostgreSQL. These
+    // projections only read its live scalar field and neither retain nor mutate its address.
+    let (last_xid, epoch) = unsafe {
+        (
+            pg_sys::XidFromFullTransactionId!(full_xid).get(),
+            pg_sys::EpochFromFullTransactionId!(full_xid).get(),
+        )
+    };
 
     convert_xid_common(xid, last_xid.into(), epoch)
 }
@@ -26,7 +32,7 @@ fn convert_xid_common(
     epoch: u32,
 ) -> u64 {
     /* return special xid's as-is */
-    if !pg_sys::TransactionIdIsNormal(xid) {
+    if pg_sys::TransactionIdIsNormal!(xid).get() == 0 {
         return xid.into_inner() as u64;
     }
 
@@ -38,5 +44,8 @@ fn convert_xid_common(
         epoch += 1;
     }
 
-    (epoch << 32) | xid.into_inner() as u64
+    // SAFETY: the constructor accepts every native epoch and transaction ID bit pattern.
+    let full_xid = unsafe { pg_sys::FullTransactionIdFromEpochAndXid(epoch as u32, xid) };
+    // SAFETY: the initialized local's live scalar field is readable and has no other aliases.
+    unsafe { pg_sys::U64FromFullTransactionId!(full_xid).get() }
 }

@@ -11,12 +11,6 @@
 
 use crate::pg_sys;
 
-/// #define IsA(nodeptr,_type_)            (nodeTag(nodeptr) == T_##_type_)
-#[inline]
-pub unsafe fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
-    !nodeptr.is_null() && nodeptr.as_ref().unwrap().type_ == tag
-}
-
 /// Convert a [pg_sys::Node] into its textual representation
 ///
 /// ### Safety

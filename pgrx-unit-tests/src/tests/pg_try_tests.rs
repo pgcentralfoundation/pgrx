@@ -15,11 +15,26 @@ use pgrx::prelude::*;
 #[pg_extern]
 fn crash() {
     use pgrx::{list::List, memcx};
+    // SAFETY: the list allocation belongs to the live current memory context;
+    // walker uses pg_guard so its intentional panic crosses C through pgrx's
+    // callback guard rather than unwinding across an unguarded C frame.
     memcx::current_context(|current| unsafe {
         let mut list = List::downcast_ptr_in_memcx(ptr::null_mut(), current).unwrap();
         list.unstable_push_in_context(ptr::null_mut(), current);
 
+        #[cfg(feature = "pg15")]
         pg_sys::raw_expression_tree_walker(list.as_mut_ptr().cast(), Some(walker), ptr::null_mut());
+        #[cfg(not(feature = "pg15"))]
+        {
+            let callback: pg_sys::tree_walker_callback = Some(walker);
+            pg_sys::raw_expression_tree_walker!(
+                list.as_mut_ptr().cast::<pg_sys::Node>(),
+                // Rust callback aliases erase C typedef identity. The generated
+                // wrapper supplies it while checking the exact C-unwind storage.
+                pg_sys::__pgrx_c_callbacks::tree_walker_callback::new(callback),
+                ptr::null_mut::<core::ffi::c_void>()
+            );
+        }
     });
 }
 
