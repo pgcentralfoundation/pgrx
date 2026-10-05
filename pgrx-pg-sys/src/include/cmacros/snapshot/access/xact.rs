@@ -10,7 +10,7 @@
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! IsolationIsSerializable {
     () => {
@@ -26,7 +26,7 @@ macro_rules! IsolationIsSerializable {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! IsolationUsesXactSnapshot {
     () => {
@@ -42,7 +42,7 @@ macro_rules! IsolationUsesXactSnapshot {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! XactCompletionApplyFeedback {
     ($xinfo:expr $(,)?) => {
@@ -58,7 +58,7 @@ macro_rules! XactCompletionApplyFeedback {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! XactCompletionForceSyncCommit {
     ($xinfo:expr $(,)?) => {
@@ -74,7 +74,7 @@ macro_rules! XactCompletionForceSyncCommit {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! XactCompletionRelcacheInitFileInval {
     ($xinfo:expr $(,)?) => {

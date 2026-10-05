@@ -10,7 +10,7 @@
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -28,11 +28,11 @@ macro_rules! DTK_M {
 /// ```
 ///
 ///
-/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -50,11 +50,11 @@ macro_rules! FMODULO {
 /// ```
 ///
 ///
-/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -74,7 +74,7 @@ macro_rules! TMODULO {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///

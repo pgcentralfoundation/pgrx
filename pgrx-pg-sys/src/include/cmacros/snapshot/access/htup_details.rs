@@ -11,7 +11,7 @@
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -34,11 +34,11 @@ macro_rules! BITMAPLEN {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -59,7 +59,7 @@ macro_rules! BITMAPLEN {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -82,11 +82,11 @@ macro_rules! GETSTRUCT {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -107,7 +107,7 @@ macro_rules! GETSTRUCT {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
@@ -129,11 +129,11 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -154,7 +154,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
@@ -173,11 +173,11 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -200,11 +200,11 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -225,7 +225,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
@@ -244,11 +244,11 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -271,11 +271,11 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -296,7 +296,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
@@ -316,11 +316,11 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -341,7 +341,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
@@ -360,11 +360,11 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -387,11 +387,11 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -412,7 +412,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
@@ -431,11 +431,11 @@ macro_rules! HeapTupleAllFixed {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -456,7 +456,7 @@ macro_rules! HeapTupleAllFixed {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleClearHeapOnly {
     ($tuple:expr $(,)?) => {
@@ -475,11 +475,11 @@ macro_rules! HeapTupleClearHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -500,7 +500,7 @@ macro_rules! HeapTupleClearHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleClearHotUpdated {
     ($tuple:expr $(,)?) => {
@@ -519,11 +519,11 @@ macro_rules! HeapTupleClearHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -544,7 +544,7 @@ macro_rules! HeapTupleClearHotUpdated {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
@@ -563,11 +563,11 @@ macro_rules! HeapTupleHasExternal {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -588,7 +588,7 @@ macro_rules! HeapTupleHasExternal {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
@@ -607,11 +607,11 @@ macro_rules! HeapTupleHasNulls {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -632,7 +632,7 @@ macro_rules! HeapTupleHasNulls {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
@@ -651,11 +651,11 @@ macro_rules! HeapTupleHasVarWidth {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -676,7 +676,7 @@ macro_rules! HeapTupleHasVarWidth {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHeapOnly {
     ($tup:expr $(,)?) => {
@@ -695,11 +695,11 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -720,7 +720,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHotUpdated {
     ($tup:expr $(,)?) => {
@@ -739,11 +739,11 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -764,7 +764,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderClearMatch {
     ($tup:expr $(,)?) => {
@@ -783,11 +783,11 @@ macro_rules! HeapTupleHeaderClearMatch {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -808,7 +808,7 @@ macro_rules! HeapTupleHeaderClearMatch {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -831,11 +831,11 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -855,7 +855,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetNatts {
     ($tup:expr $(,)?) => {
@@ -872,7 +872,7 @@ macro_rules! HeapTupleHeaderGetNatts {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawCommandId {
     ($tup:expr $(,)?) => {
@@ -891,11 +891,11 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -916,7 +916,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmax {
     ($tup:expr $(,)?) => {
@@ -935,11 +935,11 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -960,7 +960,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmin {
     ($tup:expr $(,)?) => {
@@ -979,11 +979,11 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1002,13 +1002,13 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1027,13 +1027,13 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1057,11 +1057,11 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1082,7 +1082,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypMod {
     ($tup:expr $(,)?) => {
@@ -1101,11 +1101,11 @@ macro_rules! HeapTupleHeaderGetTypMod {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1126,7 +1126,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypeId {
     ($tup:expr $(,)?) => {
@@ -1145,11 +1145,11 @@ macro_rules! HeapTupleHeaderGetTypeId {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1170,7 +1170,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1198,11 +1198,11 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1223,7 +1223,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXmin {
     ($tup:expr $(,)?) => {
@@ -1243,11 +1243,11 @@ macro_rules! HeapTupleHeaderGetXmin {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1268,7 +1268,7 @@ macro_rules! HeapTupleHeaderGetXmin {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXvac {
     ($tup:expr $(,)?) => {
@@ -1290,11 +1290,11 @@ macro_rules! HeapTupleHeaderGetXvac {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1314,7 +1314,7 @@ macro_rules! HeapTupleHeaderGetXvac {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderHasExternal {
     ($tup:expr $(,)?) => {
@@ -1331,7 +1331,7 @@ macro_rules! HeapTupleHeaderHasExternal {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
@@ -1350,11 +1350,11 @@ macro_rules! HeapTupleHeaderHasMatch {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1373,13 +1373,13 @@ macro_rules! HeapTupleHeaderHasMatch {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1400,7 +1400,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1423,11 +1423,11 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1448,7 +1448,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
@@ -1467,11 +1467,11 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1492,7 +1492,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
@@ -1514,11 +1514,11 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1539,7 +1539,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
@@ -1556,7 +1556,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1579,11 +1579,11 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1602,15 +1602,15 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
-/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1638,11 +1638,11 @@ macro_rules! HeapTupleHeaderSetCmax {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1661,15 +1661,15 @@ macro_rules! HeapTupleHeaderSetCmax {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
-/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1694,11 +1694,11 @@ macro_rules! HeapTupleHeaderSetCmin {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1719,7 +1719,7 @@ macro_rules! HeapTupleHeaderSetCmin {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1742,11 +1742,11 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1767,7 +1767,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHeapOnly {
     ($tup:expr $(,)?) => {
@@ -1786,11 +1786,11 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1811,7 +1811,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHotUpdated {
     ($tup:expr $(,)?) => {
@@ -1830,11 +1830,11 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1855,7 +1855,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMatch {
     ($tup:expr $(,)?) => {
@@ -1874,11 +1874,11 @@ macro_rules! HeapTupleHeaderSetMatch {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1897,13 +1897,13 @@ macro_rules! HeapTupleHeaderSetMatch {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1924,7 +1924,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1947,11 +1947,11 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -1971,7 +1971,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetNatts {
     ($tup:expr, $natts:expr $(,)?) => {
@@ -1986,13 +1986,13 @@ macro_rules! HeapTupleHeaderSetNatts {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2013,7 +2013,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2036,11 +2036,11 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2061,7 +2061,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypMod {
     ($tup:expr, $typmod:expr $(,)?) => {
@@ -2080,11 +2080,11 @@ macro_rules! HeapTupleHeaderSetTypMod {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2105,7 +2105,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypeId {
     ($tup:expr, $typeid:expr $(,)?) => {
@@ -2124,11 +2124,11 @@ macro_rules! HeapTupleHeaderSetTypeId {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2149,7 +2149,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmax {
     ($tup:expr, $xid:expr $(,)?) => {
@@ -2168,11 +2168,11 @@ macro_rules! HeapTupleHeaderSetXmax {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2193,7 +2193,7 @@ macro_rules! HeapTupleHeaderSetXmax {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmin {
     ($tup:expr, $xid:expr $(,)?) => {
@@ -2212,11 +2212,11 @@ macro_rules! HeapTupleHeaderSetXmin {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2235,13 +2235,13 @@ macro_rules! HeapTupleHeaderSetXmin {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2265,11 +2265,11 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2288,13 +2288,13 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2318,11 +2318,11 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2341,13 +2341,13 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2371,11 +2371,11 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2394,15 +2394,15 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
 /// ```
 ///
 ///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.
+#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
 ///
 /// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
-/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2426,11 +2426,11 @@ macro_rules! HeapTupleHeaderSetXvac {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2451,7 +2451,7 @@ macro_rules! HeapTupleHeaderSetXvac {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
@@ -2470,11 +2470,11 @@ macro_rules! HeapTupleHeaderXminCommitted {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2495,7 +2495,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
@@ -2514,11 +2514,11 @@ macro_rules! HeapTupleHeaderXminFrozen {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2539,7 +2539,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
@@ -2559,11 +2559,11 @@ macro_rules! HeapTupleHeaderXminInvalid {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2584,7 +2584,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
@@ -2603,11 +2603,11 @@ macro_rules! HeapTupleIsHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2628,7 +2628,7 @@ macro_rules! HeapTupleIsHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
@@ -2647,11 +2647,11 @@ macro_rules! HeapTupleIsHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2672,7 +2672,7 @@ macro_rules! HeapTupleIsHotUpdated {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
@@ -2691,11 +2691,11 @@ macro_rules! HeapTupleNoNulls {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2716,7 +2716,7 @@ macro_rules! HeapTupleNoNulls {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleSetHeapOnly {
     ($tuple:expr $(,)?) => {
@@ -2735,11 +2735,11 @@ macro_rules! HeapTupleSetHeapOnly {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2760,7 +2760,7 @@ macro_rules! HeapTupleSetHeapOnly {
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! HeapTupleSetHotUpdated {
     ($tuple:expr $(,)?) => {
@@ -2779,11 +2779,11 @@ macro_rules! HeapTupleSetHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2829,11 +2829,11 @@ macro_rules! HeapTupleSetHotUpdated {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2879,11 +2879,11 @@ macro_rules! fastgetattr {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2929,11 +2929,11 @@ macro_rules! fastgetattr {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
@@ -2963,11 +2963,11 @@ macro_rules! fastgetattr {
 /// ```
 ///
 ///
-/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+#[doc = crate::__pgrx_c_doc_inline_call!()]
 ///
 /// # Safety
 ///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
