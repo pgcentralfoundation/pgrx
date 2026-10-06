@@ -51,6 +51,7 @@ mod pg_operator_tests;
 mod pg_try_tests;
 mod pgbox_tests;
 mod pgrx_module_qualification;
+mod postgres_reexport_tests;
 mod postgres_type_tests;
 mod postgres_type_variants_smoke;
 #[cfg(feature = "proptest")]
