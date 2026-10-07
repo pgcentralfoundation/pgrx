@@ -16,7 +16,6 @@ use crate::{
     BindingCatalog, CallbackBinding, DeclarationCatalog, FunctionSignature, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fmt::Write;
 
@@ -31,8 +30,8 @@ const DEPTH_LIMIT: usize = 64;
 pub(super) struct CallbackAdapters {
     /// Nominal signature markers, physical pointer families, and selected call adapters.
     pub rust: String,
-    /// Whether selected, validated typedef wrappers need a defining-crate re-export.
-    pub has_typedefs: bool,
+    /// Binding-relative paths of the emitted `__pgrx_c_callbacks` typedef aliases.
+    pub typedefs: BTreeSet<Vec<String>>,
     /// Compiler canonical function types mapped to verified nullable Rust pointer storage.
     pub markers: BTreeMap<String, CallbackBinding>,
     /// Rejected signature witnesses retained even when demand would omit their code.
@@ -291,13 +290,12 @@ pub(super) fn generate(
     let mut capabilities = bindings.clone();
     let mut marker_names = BTreeMap::new();
     for (key, candidate) in &candidates {
-        let mut hash = Sha256::new();
-        hash.update(&candidate.function.canonical_spelling);
-        hash.update(serde_json::to_vec(&candidate.storage).map_err(|error| error.to_string())?);
-        hash.update(super::semantic_target_bytes(target)?);
-        let suffix =
-            hash.finalize()[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-        let name = format!("Signature_{suffix}");
+        // One canonical C function type has exactly one validated ABI witness
+        // above, so its spelling alone names the marker.
+        let name = format!(
+            "Signature_{}",
+            super::names::type_spelling(&candidate.function.canonical_spelling)
+        );
         let binding = CallbackBinding {
             marker: format!("$crate::__pgrx_c_generated::{name}"),
             storage: candidate.storage.clone(),
@@ -357,7 +355,7 @@ pub(super) fn generate(
     }
     let mut output = CallbackAdapters {
         rust: String::new(),
-        has_typedefs: false,
+        typedefs: BTreeSet::new(),
         markers: BTreeMap::new(),
         unsupported,
         required_types: Vec::new(),
@@ -499,8 +497,8 @@ pub(super) fn generate(
         }
     }
     output.required_types = required_types.into_values().collect();
-    let aliases = typedef_aliases(declarations, bindings, &output.markers, &emitted)?;
-    output.has_typedefs = !aliases.is_empty();
+    let (aliases, typedefs) = typedef_aliases(declarations, bindings, &output.markers, &emitted)?;
+    output.typedefs = typedefs;
     output.rust.push_str(&aliases);
     if output.rust.len() > SOURCE_LIMIT {
         return Err("generated callback adapters exceed the 16 MiB source budget".into());
@@ -518,7 +516,7 @@ fn typedef_aliases(
     bindings: &BindingCatalog,
     markers: &BTreeMap<String, CallbackBinding>,
     emitted: &BTreeSet<String>,
-) -> Result<String, String> {
+) -> Result<(String, BTreeSet<Vec<String>>), String> {
     let mut aliases = BTreeMap::new();
     for (name, alias) in &bindings.types {
         let Some(name) = bindings.relative_type_name(name) else { continue };
@@ -545,7 +543,7 @@ fn typedef_aliases(
         }
     }
     if aliases.is_empty() {
-        return Ok(String::new());
+        return Ok((String::new(), BTreeSet::new()));
     }
     let mut rust = String::from(
         "/// Explicit C typedef identities for the selected native callback capabilities.\n\
@@ -553,7 +551,7 @@ fn typedef_aliases(
     );
     render_typedef_aliases(&mut rust, &aliases, 0)?;
     rust.push_str("}\n");
-    Ok(rust)
+    Ok((rust, aliases.into_keys().collect()))
 }
 
 /// Render one level of validated typedef paths without flattening distinct binding modules.
@@ -1416,7 +1414,7 @@ mod tests {
         };
         let output =
             generate(&declarations, &bindings, &target, &BTreeSet::new(), &requests).unwrap();
-        assert!(output.has_typedefs);
+        assert!(!output.typedefs.is_empty());
         assert!(output.rust.contains("pub type One ="));
         assert!(output.rust.contains("pub mod nested {"));
         assert!(output.rust.contains("pub type r#type ="));
@@ -1444,7 +1442,7 @@ mod tests {
         let output =
             generate(&declarations, &bindings, &target, &BTreeSet::new(), &requests).unwrap();
         assert!(output.unsupported.contains_key(&declarations.types["One"].canonical_spelling));
-        assert!(!output.has_typedefs);
+        assert!(output.typedefs.is_empty());
         assert!(!output.rust.contains("pub type One ="));
     }
 

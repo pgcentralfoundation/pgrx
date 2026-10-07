@@ -41,9 +41,15 @@ impl Fixture {
         Self(root)
     }
 
-    /// Configure an isolated consumer build with controlled release or documentation settings
+    /// Configure an isolated consumer run with controlled release or documentation settings
     /// and no inherited pgrx installation state.
     fn command(&self) -> Command {
+        self.cargo("run")
+    }
+
+    /// Configure an isolated Cargo `subcommand` for the consumer without inherited pgrx
+    /// installation state.
+    fn cargo(&self, subcommand: &str) -> Command {
         let mut command = Command::new("cargo");
         for (name, _) in std::env::vars_os() {
             if name.to_str().is_some_and(|name| {
@@ -53,7 +59,7 @@ impl Fixture {
             }
         }
         command
-            .args(["run", "--offline", "--manifest-path"])
+            .args([subcommand, "--offline", "--manifest-path"])
             .arg(self.0.join("Cargo.toml"))
             .args(["--features", "pg18"])
             .env("CARGO_TARGET_DIR", self.0.join("target"))
@@ -95,19 +101,6 @@ impl Fixture {
         };
         assert!(status.success(), "{phase} failed:\n{}", fs::read_to_string(&paths[1]).unwrap());
         fs::read_to_string(&paths[0]).unwrap()
-    }
-
-    /// Require the isolated generated file to agree with rustfmt's final representation.
-    fn formatted(&self, file: &syn::File, phase: &str) -> String {
-        let path = self.0.join(format!("{phase}.rs"));
-        fs::write(&path, file.to_token_stream().to_string()).unwrap();
-        self.successful_output(
-            Command::new("rustfmt")
-                .args(["--edition", "2024", "--config", "skip_children=true"])
-                .arg(&path),
-            phase,
-        );
-        fs::read_to_string(path).unwrap()
     }
 
     /// Find the Cargo build report that records macro generation warnings and skip reasons.
@@ -282,9 +275,10 @@ impl Drop for Fixture {
     }
 }
 
-/// Check ordinary and docsrs exports with and without generated adapter modules.
+/// Check that ordinary builds export the generated tree, with and without adapter modules,
+/// and docs.rs builds export the documentation snapshot instead.
 #[test]
-fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots() {
+fn ordinary_builds_export_generated_trees_and_docsrs_exports_the_snapshot() {
     let fixture = Fixture::new();
     let support = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -366,6 +360,13 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
     library.items.extend(syn::parse_file("pub struct Datum; pub struct Oid; pub struct TransactionId; pub type MultiXactId = TransactionId; pub trait PgNode {}").unwrap().items);
     let library_path = fixture.0.join("src/lib.rs");
     fs::write(&library_path, library.into_token_stream().to_string()).unwrap();
+    let snapshot = fixture.0.join("src/include/cmacros/snapshot");
+    fs::create_dir_all(&snapshot).unwrap();
+    fs::write(
+        snapshot.join("mod.rs"),
+        "#[doc(hidden)] #[macro_export] macro_rules! __pgrx_c_classify { (@if_available $name:ident { $($items:tt)* }) => {}; }\n#[macro_export] macro_rules! SNAPSHOT_ADAPTER_VALUE { () => { ::core::unimplemented!() }; }\npub use SNAPSHOT_ADAPTER_VALUE;\n",
+    )
+    .unwrap();
 
     for with_support in [false, true] {
         let kind = if with_support { "generated" } else { "support-free" };
@@ -424,12 +425,32 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
                     command.args(["--cfg", "docsrs"]);
                 }
                 fixture.successful_output(&mut command, &format!("{phase}-library"));
+                let consumer = fixture.0.join(format!("{phase}.rs"));
+                if docsrs {
+                    // The snapshot macro is a documentation shell: it must resolve and
+                    // type-check in value position, but it is never executed.
+                    fs::write(
+                        &consumer,
+                        "extern crate docs_snapshot as renamed;\npub fn value() -> u32 { renamed::SNAPSHOT_ADAPTER_VALUE!() }\n",
+                    )
+                    .unwrap();
+                    fixture.successful_output(
+                        Command::new("rustc")
+                            .args(["--edition=2024", "--crate-name=docs_consumer"])
+                            .args(["--crate-type=lib", "--emit=metadata", "--extern"])
+                            .arg(format!("docs_snapshot={}", archive.display()))
+                            .arg(&consumer)
+                            .arg("-o")
+                            .arg(fixture.0.join(format!("{phase}.rmeta"))),
+                        &format!("{phase}-consumer"),
+                    );
+                    continue;
+                }
                 let adapter_assertion = if with_support {
                     "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);"
                 } else {
                     ""
                 };
-                let consumer = fixture.0.join(format!("{phase}.rs"));
                 fs::write(
                 &consumer,
                 format!("extern crate docs_snapshot as renamed;\nfn main() {{ {adapter_assertion} println!(\"{{}}\", renamed::SNAPSHOT_ADAPTER_VALUE!()); }}\n"),
@@ -448,7 +469,7 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
                 assert_eq!(
                     fixture.successful_output(&mut Command::new(executable), &phase),
                     format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
-                    "actual include exports must resolve adapter paths in {mode} builds"
+                    "actual include exports must resolve adapter paths in ordinary builds"
                 );
             }
         }
@@ -456,8 +477,8 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
 }
 
 /// Prove diagnostic mode changes rerun Cargo without changing macro semantics,
-/// release snapshots preserve generated definitions, and docs.rs consumes those
-/// snapshots without requiring PostgreSQL or Clang.
+/// release snapshots keep each generated macro's documentation, and docs.rs
+/// documents a consumer of that snapshot without requiring PostgreSQL or Clang.
 #[test]
 #[ignore = "compiles isolated ordinary, release and docs.rs builds; requires native Clang and cached dependencies"]
 fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {
@@ -555,7 +576,7 @@ pub use pg18::*;
 #[cfg(not(docsrs))] pub mod cmacros {{
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg18/mod.rs"));
 }}
-#[cfg(docsrs)] #[path = "include/cmacros/pg18/mod.rs"] pub mod cmacros;
+#[cfg(docsrs)] #[path = "include/cmacros/snapshot/mod.rs"] pub mod cmacros;
 pub use cmacros::*;
 "#
         ),
@@ -604,7 +625,7 @@ fn main() {
     )
     .unwrap();
 
-    let snapshot = fixture.0.join("src/include/cmacros/pg18");
+    let snapshot = fixture.0.join("src/include/cmacros/snapshot");
     fs::create_dir_all(&snapshot).unwrap();
     fs::write(snapshot.join("mod.rs"), "// ordinary builds must preserve this snapshot\n").unwrap();
     fixture.run(&mut fixture.command(), "ordinary");
@@ -643,17 +664,8 @@ fn main() {
     assert_eq!(fixture.assert_mismatch_skips("release", true), ordinary_report);
     assert_eq!(rust_tree(&generated_root), generated);
     let shipped = rust_tree(&snapshot);
-    assert_eq!(shipped.keys().collect::<Vec<_>>(), generated.keys().collect::<Vec<_>>());
-    let generated_source = generated.values().map(String::as_str).collect::<Vec<_>>().join("\n");
     let shipped_source = shipped.values().map(String::as_str).collect::<Vec<_>>().join("\n");
-    assert!(
-        shipped_source.contains("$crate::__pgrx_c_bindings::SNAPSHOT_SMALL"),
-        "matching constants remain binding references"
-    );
-    assert!(
-        shipped_source.contains("$crate::SNAPSHOT_SMALL_VALID!"),
-        "matching wrappers remain macro calls"
-    );
+    let generated_source = generated.values().map(String::as_str).collect::<Vec<_>>().join("\n");
     for tree in [&generated, &shipped] {
         let mut names = BTreeSet::new();
         for source in tree.values() {
@@ -670,110 +682,37 @@ fn main() {
         assert!(names.contains("SNAPSHOT_SMALL_VALID"));
         assert!(names.contains("SNAPSHOT_SMALL_VALID_WRAPPER"));
     }
-    assert!(shipped_source.contains("$crate::SNAPSHOT_ALIGN!"), "preserve macro calls");
-    assert!(
-        shipped_source.contains("/* PGRX: SNAPSHOT_SPLIT"),
-        "snapshot keeps fallback explanations"
-    );
-    assert!(shipped_source.contains("/// #define SNAPSHOT_ADD"), "keep original C doc comments");
-    assert!(shipped_source.contains("0xFFFFFFFFu32"), "keep original hexadecimal literal notation");
-    assert!(
-        generated_source.contains("/// #define SNAPSHOT_ADD"),
-        "normal build output keeps original C doc comments"
-    );
-    let documentation_guard: syn::Attribute = syn::parse_quote!(#[cfg(not(docsrs))]);
-    let mut guards = 0;
-    for (index, (name, shipped_source)) in shipped.iter().enumerate() {
-        let generated_source = &generated[name];
-        let comments = |source: &str| {
-            source
-                .lines()
-                .map(str::trim)
-                .filter(|line| line.starts_with("//"))
-                .map(str::to_owned)
-                .collect::<Vec<_>>()
-        };
-        assert_eq!(
-            comments(shipped_source),
-            comments(generated_source),
-            "snapshot preserves original C doc comments in {}",
-            name.display()
-        );
-        let mut shipped_file = syn::parse_file(shipped_source).unwrap();
-        let generated_file = syn::parse_file(generated_source).unwrap();
-        assert_eq!(shipped_file.items.len(), generated_file.items.len());
-        for (item, original) in shipped_file.items.iter_mut().zip(&generated_file.items) {
-            let (attrs, expected_guard) = match item {
-                syn::Item::Macro(item) => {
-                    let target_guard = item.mac.path.is_ident("compile_error");
-                    guards += usize::from(target_guard);
-                    (&mut item.attrs, target_guard)
-                }
-                syn::Item::Mod(item) => (&mut item.attrs, false),
-                syn::Item::Use(item) => (&mut item.attrs, false),
-                _ => continue,
-            };
-            let original_attrs: &[syn::Attribute] = match original {
-                syn::Item::Macro(item) => &item.attrs,
-                syn::Item::Mod(item) => &item.attrs,
-                syn::Item::Use(item) => &item.attrs,
-                _ => &[],
-            };
-            let existing_guard = original_attrs.iter().any(|attr| {
-                attr.to_token_stream().to_string()
-                    == documentation_guard.to_token_stream().to_string()
-            });
-            let original_len = attrs.len();
-            if !existing_guard {
-                attrs.retain(|attr| {
-                    attr.to_token_stream().to_string()
-                        != documentation_guard.to_token_stream().to_string()
-                });
-            }
-            if expected_guard && !existing_guard {
-                assert_eq!(
-                    attrs.len() + 1,
-                    original_len,
-                    "shipped guard excludes docs.rs in {}",
-                    name.display()
-                );
-            } else {
-                assert_eq!(
-                    attrs.len(),
-                    original_len,
-                    "unexpected docs.rs guard in {}",
-                    name.display()
-                );
-            }
-        }
-        // Rustfmt adds optional trailing commas inside opaque macro token bodies.
-        // Normalize each file's syntax; doc comments were checked separately.
-        assert_eq!(
-            fixture.formatted(&shipped_file, &format!("format-shipped-{index}")),
-            fixture.formatted(&generated_file, &format!("format-generated-{index}")),
-            "release snapshot preserves macro tokens and integer bridges in {}",
-            name.display()
+    // The snapshot keeps each macro's documentation and invocation forms, but none
+    // of the generated implementation, support code, or target guards.
+    for source in shipped.values() {
+        assert!(
+            source.starts_with("// Automatically generated by pgrx-c-macros for documentation.")
         );
     }
-    assert!(guards > 0, "generated macros must retain their target guards");
-
-    // Force a target mismatch so docs.rs compilation proves the guard exclusion
-    // instead of merely succeeding on the same target as the generator.
-    for (name, source) in &shipped {
-        let mut file = syn::parse_file(source).unwrap();
-        let mut changed = false;
-        for item in &mut file.items {
-            if let syn::Item::Macro(item) = item
-                && item.mac.path.is_ident("compile_error")
-            {
-                item.attrs = vec![syn::parse_quote!(#[cfg(all())]), documentation_guard.clone()];
-                changed = true;
-            }
-        }
-        if changed {
-            fs::write(snapshot.join(name), file.into_token_stream().to_string()).unwrap();
-        }
+    let shipped_comments = shipped_source
+        .lines()
+        .map(str::trim)
+        .filter(|line| line.starts_with("/// #define"))
+        .collect::<BTreeSet<_>>();
+    let generated_comments = generated_source
+        .lines()
+        .map(str::trim)
+        .filter(|line| line.starts_with("/// #define"))
+        .collect::<BTreeSet<_>>();
+    assert_eq!(shipped_comments, generated_comments, "snapshot keeps original C definitions");
+    assert!(shipped_source.contains("/// C macro SNAPSHOT_ADD from server.h:"));
+    assert!(shipped_source.contains("(PostgreSQL 18)"));
+    assert_eq!(shipped_source.matches("::core::unimplemented!(").count(), 1);
+    assert!(shipped_source.contains("$crate::__pgrx_c_documentation_shell!()"));
+    assert!(shipped_source.contains("macro_rules! __pgrx_c_classify"));
+    assert!(shipped_source.contains("pub mod __pgrx_c_callbacks"));
+    for implementation in ["$crate::__pgrx_c_macros", "__pgrx_c_generated", "compile_error!"] {
+        assert!(!shipped_source.contains(implementation), "snapshot contains {implementation}");
     }
+    assert!(
+        shipped.keys().all(|path| !path.starts_with("__pgrx_c_support")),
+        "snapshot has no support fragments"
+    );
 
     // Raw-only imports cannot supply the macro adapters now used by pgrx.
     // Verify refusal, then restore the consumer for the docs.rs snapshot check.
@@ -801,8 +740,14 @@ fn main() {
     fs::remove_file(pg_config).unwrap();
     fs::remove_dir_all(fixture.0.join("server")).unwrap();
     fs::remove_dir_all(fixture.out_dir()).unwrap();
-    fixture.run(
-        fixture.command().env("DOCS_RS", "1").env("CLANG_PATH", "/deliberately/unavailable/clang"),
+    // docs.rs compiles the defining crate and documents the consumer. Rustdoc does
+    // not type-check function bodies, so the consumer's macro calls are accepted
+    // even though each documentation shell only expands to `unimplemented!()`.
+    fixture.successful_output(
+        fixture
+            .cargo("doc")
+            .env("DOCS_RS", "1")
+            .env("CLANG_PATH", "/deliberately/unavailable/clang"),
         "docsrs",
     );
 }

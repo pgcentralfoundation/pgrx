@@ -14,7 +14,6 @@ use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionBinding, FunctionInfo,
     IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
@@ -35,15 +34,14 @@ pub(super) struct FunctionAdapters {
 
 /// Emit required thunks for static inline declarations and ABI-sensitive value transport.
 ///
-/// A profile salt includes record layouts so otherwise-identical signatures cannot
-/// reuse a native symbol across different PostgreSQL compilation profiles.
+/// Each adapter is named after its C function. One build links one profile's
+/// adapters, so a function name identifies its adapter within that link.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
     used_functions: &BTreeSet<String>,
     called_functions: &BTreeSet<String>,
     target: &TargetFacts,
-    profile_identity: &str,
 ) -> Result<FunctionAdapters, String> {
     let lowering = Lowering::new_native(declarations, bindings, target);
     let mut result = FunctionAdapters {
@@ -52,16 +50,6 @@ pub(super) fn generate(
         bindings: BTreeMap::new(),
         unsupported: BTreeMap::new(),
     };
-    // Include every compiler-owned layout once in the profile salt. A helper
-    // signature can contain nested pointers whose pointee layout differs across
-    // PostgreSQL profiles even when the immediate prototype is identical.
-    let layouts = serde_json::to_vec(&declarations.records)
-        .map_err(|error| format!("cannot fingerprint inline record layouts: {error}"))?;
-    let mut profile_hash = Sha256::new();
-    profile_hash.update(profile_identity);
-    profile_hash.update(super::semantic_target_bytes(target)?);
-    profile_hash.update(layouts);
-    let profile_hash = profile_hash.finalize();
     for name in used_functions {
         let Some(function) = declarations.function_signatures.get(name) else {
             continue;
@@ -90,7 +78,6 @@ pub(super) fn generate(
             bindings,
             &lowering,
             target,
-            &profile_hash,
             called_functions.contains(name),
         ) {
             Ok((rust, c_source, binding)) => {
@@ -113,7 +100,7 @@ pub(super) fn generate(
 ///
 /// Availability, convention, object validity, and destructor restrictions are checked
 /// before emitting call code; C owns the original function invocation.
-#[allow(clippy::too_many_arguments)] // One ABI proof owns declaration, storage, profile and demand.
+#[allow(clippy::too_many_arguments)] // One ABI proof owns declaration, storage, target and demand.
 fn adapter(
     name: &str,
     function: &FunctionInfo,
@@ -121,7 +108,6 @@ fn adapter(
     bindings: &BindingCatalog,
     lowering: &Lowering<'_>,
     target: &TargetFacts,
-    profile_hash: &[u8],
     emit_call: bool,
 ) -> Result<(String, String, FunctionBinding), String> {
     if !c_identifier(name) {
@@ -225,28 +211,9 @@ fn adapter(
             .storage
             .replace("$crate", "crate")
     };
-    let mut hash = Sha256::new();
-    hash.update(profile_hash);
-    hash.update(name);
-    // Input fingerprints already identify the original definition once per
-    // profile. Adapter identity needs its prototype and linkage, not another
-    // serialized copy of the retained function body for every demand.
-    hash.update(
-        serde_json::to_vec(&(
-            &function.signature,
-            &function.linkage,
-            function.is_static,
-            function.is_inline,
-        ))
-        .map_err(|error| error.to_string())?,
-    );
-    hash.update(serde_json::to_vec(&parameter_storage).map_err(|error| error.to_string())?);
-    hash.update(serde_json::to_vec(&result_storage).map_err(|error| error.to_string())?);
-    let hash = hash.finalize();
-    let suffix = hash[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-    let symbol = format!("__pgrx_inline_{suffix}");
-    let wrapper = format!("Inline_{suffix}");
-    let raw = format!("raw_inline_{suffix}");
+    let symbol = super::names::helper("__pgrx_inline", "fn", &[name]);
+    let wrapper = format!("Inline_{name}");
+    let raw = format!("raw_inline_{name}");
     let binding = FunctionBinding {
         path: vec!["__pgrx_c_generated".into(), wrapper.clone()],
         parameters: parameter_storage,
@@ -264,14 +231,15 @@ fn adapter(
     let mut c_arguments = Vec::new();
     let mut rust_signature = Vec::new();
     for (index, (parameter, storage)) in parameters.iter().zip(&rust_parameters).enumerate() {
-        let alias = format!("{symbol}_arg{index}");
+        let alias = super::names::helper("__pgrx_inline", &format!("arg{index}"), &[name]);
         let native = enum_abi_type(parameter, declarations)?;
         c_alias(&mut c_source, &alias, native, declarations)?;
         abi_assertions(&mut rust, storage, parameter);
         c_parameters.push(format!("{alias} arg{index}"));
         rust_signature.push(format!("arg{index}: {storage}"));
         if parameter.category == TypeCategory::Enum {
-            let original = format!("{alias}_enum");
+            let original =
+                super::names::helper("__pgrx_inline", &format!("arg{index}_enum"), &[name]);
             c_alias(&mut c_source, &original, parameter, declarations)?;
             writeln!(c_source, "_Static_assert(__builtin_types_compatible_p({original}, {alias}), \"C enum compatible integer ABI\");").expect("String output");
             c_arguments.push(format!("({original})arg{index}"));
@@ -283,7 +251,7 @@ fn adapter(
     let c_result = if signature.result.category == TypeCategory::Void {
         "void".to_owned()
     } else {
-        let alias = format!("{symbol}_result");
+        let alias = super::names::helper("__pgrx_inline", "result", &[name]);
         c_alias(
             &mut c_source,
             &alias,
@@ -291,7 +259,7 @@ fn adapter(
             declarations,
         )?;
         if signature.result.category == TypeCategory::Enum {
-            let original = format!("{alias}_enum");
+            let original = super::names::helper("__pgrx_inline", "result_enum", &[name]);
             c_alias(&mut c_source, &original, &signature.result, declarations)?;
             writeln!(c_source, "_Static_assert(__builtin_types_compatible_p({original}, {alias}), \"C enum compatible integer ABI\");").expect("String output");
         }

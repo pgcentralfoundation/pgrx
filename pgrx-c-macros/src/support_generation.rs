@@ -301,15 +301,12 @@ pub fn support_alignment_profile(
     Ok(rust)
 }
 
-/// Generate numeric input adapters for pg-sys's own opaque integer types.
+/// List the C integer typedefs published in `__pgrx_c_types` with their runtime marker names.
 ///
-/// The C declarations establish each identity independently. Rust's `Oid` and
-/// `TransactionId` expose exactly 32 bits of numeric storage; no adapter is
-/// emitted unless that storage matches the inspected C typedef. Datum's pointer
-/// storage uses exposed provenance when crossing its C integer representation.
-pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, SupportProfileError> {
-    let mut rust = support_abi_assertions(frontend.profile())?;
-    rust.push_str("/// C integer identities established from this installation's typedef declarations.\n#[doc(hidden)]\n#[allow(non_camel_case_types)]\npub mod __pgrx_c_types {\n");
+/// Only typedef names that form Rust identifiers and whose size matches the
+/// target's layout for their integer kind are included.
+pub fn integer_typedef_markers(frontend: &FrontendOutput) -> Vec<(&str, &'static str)> {
+    let mut markers = Vec::new();
     for (name, ty) in &frontend.declarations().types {
         let TypeCategory::Integer(kind) = ty.category else { continue };
         // C type spellings with spaces or declarator syntax are not typedef
@@ -322,9 +319,23 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
         if ty.size != Some(u64::from(layout.bits / 8)) || ty.is_const || ty.is_volatile {
             continue;
         }
+        markers.push((name.as_str(), crate::emit::marker(kind)));
+    }
+    markers
+}
+
+/// Generate numeric input adapters for pg-sys's own opaque integer types.
+///
+/// The C declarations establish each identity independently. Rust's `Oid` and
+/// `TransactionId` expose exactly 32 bits of numeric storage; no adapter is
+/// emitted unless that storage matches the inspected C typedef. Datum's pointer
+/// storage uses exposed provenance when crossing its C integer representation.
+pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, SupportProfileError> {
+    let mut rust = support_abi_assertions(frontend.profile())?;
+    rust.push_str("/// C integer identities established from this installation's typedef declarations.\n#[doc(hidden)]\n#[allow(non_camel_case_types)]\npub mod __pgrx_c_types {\n");
+    for (name, marker) in integer_typedef_markers(frontend) {
         rust.push_str(&format!(
-            "/// Preserve the compiler-established rank and width of C `{name}`.\npub type r#{name} = crate::__pgrx_c_macros::{};\n",
-            crate::emit::marker(kind),
+            "/// Preserve the compiler-established rank and width of C `{name}`.\npub type r#{name} = crate::__pgrx_c_macros::{marker};\n",
         ));
     }
     rust.push_str("}\n");

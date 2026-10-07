@@ -465,11 +465,14 @@ whose cast and hexadecimal mask it implements:
 `/* PGRX: ... */` comments explain cases where expansion had to remain instead of
 preserving a symbol or nested macro call.
 
-The checked-in `pgrx-pg-sys/src/include/cmacros/` files are documentation snapshots,
-made with the release-generation installation and target. Their source includes
-target guards; they may describe a different platform from your computer. Use
-your build's `OUT_DIR` bindings, macros, and report when
-checking actual platform values or diagnosing an unavailable macro.
+The checked-in `pgrx-pg-sys/src/include/cmacros/snapshot/` files are a documentation
+snapshot made with the release-generation installations and target. They hold each
+supported PostgreSQL version's macro documentation, gated by the `pgNN` features, with
+arms that only show the accepted invocations. docs.rs uses them because it cannot
+generate macros; ordinary builds never do. A definition that changed between versions
+appears once per version range, next to its other versions. Use your build's `OUT_DIR`
+bindings, macros, and report when checking actual platform values or diagnosing an
+unavailable macro.
 
 ## Understand refusals and runtime limits
 

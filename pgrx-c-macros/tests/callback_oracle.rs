@@ -153,7 +153,7 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
     catalog.ffi_boundary = Some(vec!["ffi".into(), "boundary".into()]);
     let artifact = emit_support_artifact_with_bindings(&session, NAMES, &catalog)
         .expect("derive callback adapters");
-    assert!(artifact.c_source.contains("__pgrx_function_address_"));
+    assert!(artifact.c_source.contains("__pgrx_address__fn__"));
     assert!(!artifact.c_source.contains("CALLBACK_"), "adapters must never forward C macros");
     assert!(artifact.rust.contains("::NativeFunctionSignature for Signature_"));
     assert!(artifact.rust.contains("::Call<"));
@@ -277,7 +277,7 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
     let artifact = emit_support_artifact_with_bindings(&session, &names, &safe_catalog)
         .expect("safe pointer witnesses are rejected locally");
     assert!(!artifact.rust.contains("::NativeFunctionSignature for Signature_"));
-    assert!(!artifact.c_source.contains("__pgrx_function_address_"));
+    assert!(!artifact.c_source.contains("__pgrx_address__fn__"));
     for emission in emit_batch_with_bindings(&session, &names, &safe_catalog).unwrap() {
         assert!(
             matches!(emission.status, EmissionStatus::Skipped { .. }),

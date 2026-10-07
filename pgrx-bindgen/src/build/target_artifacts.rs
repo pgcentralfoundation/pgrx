@@ -269,6 +269,7 @@ pub(super) fn import(
             inspected: true,
             integrated_cshim: active && expected.cshim,
             runtime_cfg: manifest.runtime_cfg,
+            snapshot: None,
         },
     ))
 }
@@ -703,6 +704,7 @@ mod tests {
                 "pgrx_c_size_type=\"unsigned_long\"".into(),
                 "pgrx_c_ptrdiff_type=\"long\"".into(),
             ],
+            snapshot: None,
         };
         (directory, domain, macros)
     }
