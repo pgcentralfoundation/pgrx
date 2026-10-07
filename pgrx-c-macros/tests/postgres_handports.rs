@@ -100,14 +100,20 @@ fn migrated_primitives_match_each_original_postgres_version() {
         let artifact = generation.support;
         rust.push_str(&artifact.rust);
         let mut emitted = BTreeSet::new();
+        let mut skipped = Vec::new();
         for emission in generation.macros {
-            if let EmissionStatus::Emitted { rust: generated, .. } = emission.status {
-                let name = emission.analysis.name;
-                assert!(
-                    emitted.insert(name),
-                    "a corpus primitive must have one primary definition"
-                );
-                rust.push_str(&generated);
+            match emission.status {
+                EmissionStatus::Emitted { rust: generated, .. } => {
+                    let name = emission.analysis.name;
+                    assert!(
+                        emitted.insert(name),
+                        "a corpus primitive must have one primary definition"
+                    );
+                    rust.push_str(&generated);
+                }
+                EmissionStatus::Skipped { reason } => {
+                    skipped.push((emission.analysis.name, reason));
+                }
             }
         }
         let mut expected = BTreeSet::from([
@@ -131,7 +137,7 @@ fn migrated_primitives_match_each_original_postgres_version() {
         assert_eq!(
             emitted.iter().map(String::as_str).collect::<BTreeSet<_>>(),
             expected,
-            "PG{major}: every emitted corpus primitive needs an original-C case"
+            "PG{major}: every emitted corpus primitive needs an original-C case; skipped: {skipped:?}"
         );
 
         let mut prefix = String::new();

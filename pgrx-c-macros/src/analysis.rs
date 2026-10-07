@@ -1829,15 +1829,15 @@ pub(crate) fn resolve_type_info(
             is_volatile: name.split_whitespace().any(|word| word == "volatile"),
         });
     }
-    if name == "void" {
+    if name.split_whitespace().filter(|word| !matches!(*word, "const" | "volatile")).eq(["void"]) {
         return Some(TypeInfo {
             spelling: name.into(),
             canonical_spelling: name.into(),
             category: TypeCategory::Void,
             size: None,
             alignment: None,
-            is_const: false,
-            is_volatile: false,
+            is_const: name.split_whitespace().any(|word| word == "const"),
+            is_volatile: name.split_whitespace().any(|word| word == "volatile"),
         });
     }
     if let Some((pointee, _)) = name.rsplit_once('*') {
@@ -2409,6 +2409,39 @@ mod tests {
         assert_eq!(qualified.canonical_spelling, pointer_alias.canonical_spelling);
         let outer = resolve_type_info("volatile ConstPointer *", &catalog, &target).unwrap();
         assert!(!outer.is_const && !outer.is_volatile);
+    }
+
+    /// Resolve qualified void leaves without a coincidental declaration, preserving each pointer layer.
+    #[test]
+    fn qualified_void_does_not_depend_on_unrelated_declarations() {
+        let catalog = DeclarationCatalog::default();
+        for target in [target(32), target(64)] {
+            for (spelling, is_const, is_volatile) in [
+                ("void", false, false),
+                ("const void", true, false),
+                ("void const", true, false),
+                ("volatile void", false, true),
+                ("void volatile", false, true),
+                ("const volatile void", true, true),
+                ("void volatile const", true, true),
+            ] {
+                let leaf = resolve_type_info(spelling, &catalog, &target).unwrap();
+                assert_eq!(leaf.category, TypeCategory::Void);
+                assert_eq!((leaf.is_const, leaf.is_volatile), (is_const, is_volatile));
+                assert_eq!(leaf.size, None, "void never becomes a complete object");
+                assert_eq!(leaf.alignment, None);
+                let pointer =
+                    resolve_type_info(&format!("{spelling} *"), &catalog, &target).unwrap();
+                assert_eq!(pointer.category, TypeCategory::Pointer);
+                assert!(!pointer.is_const && !pointer.is_volatile);
+                let outer =
+                    resolve_type_info(&format!("{spelling} * const * volatile"), &catalog, &target)
+                        .unwrap();
+                assert!(!outer.is_const && outer.is_volatile);
+            }
+            assert!(resolve_type_info("unknown void", &catalog, &target).is_none());
+            assert!(resolve_type_info("void unknown *", &catalog, &target).is_none());
+        }
     }
 
     /// Checks terminal return locals use declared types and are never caller captures.
