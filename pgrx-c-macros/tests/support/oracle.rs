@@ -44,6 +44,8 @@ pub fn native_arguments() -> Vec<String> {
 
 /// Each runner includes the original header; it never reconstructs its macro definitions.
 /// Without execution, compiler-owned static assertions need no native linker or runtime.
+/// Execution returns text observations, undoing Windows CRT newline translation so their bytes
+/// can be compared with Rust stdout. Literal carriage returns and all other whitespace remain.
 pub fn run_c(
     compiler: &Path,
     header: &Path,
@@ -72,7 +74,12 @@ pub fn run_c(
     }
     let output = run_bounded(&mut compiler, &directory.0, "compile");
     if execute {
-        run_bounded(&mut Command::new(executable), &directory.0, "execute")
+        let output = run_bounded(&mut Command::new(executable), &directory.0, "execute");
+        // The Windows CRT inserts CR before each LF on text-mode stdout. Undo precisely that
+        // transport step: an explicit C CRLF becomes CRCRLF and retains its original CR here.
+        #[cfg(windows)]
+        let output = output.replace("\r\n", "\n");
+        output
     } else {
         output
     }

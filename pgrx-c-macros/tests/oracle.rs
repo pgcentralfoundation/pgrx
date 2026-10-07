@@ -45,6 +45,28 @@ fn observations(output: &str) -> BTreeMap<String, Observation> {
     records
 }
 
+/// Require C text observations to retain empty records, spacing and literal carriage returns
+/// while undoing only the Windows CRT's extra carriage returns before newlines.
+#[test]
+fn original_c_text_observations_preserve_record_contents() {
+    let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
+    let arguments = oracle::native_arguments();
+    let output = oracle::run_c(
+        Path::new("clang"),
+        &header,
+        r#"
+#include <stdio.h>
+int main(void) {
+    fputs("41\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\n", stdout);
+    return 0;
+}
+"#,
+        &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        true,
+    );
+    assert_eq!(output, "41\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\n");
+}
+
 /// Checks that original C integer macros establish types values and evaluation counts.
 #[test]
 fn original_c_integer_macros_establish_types_values_and_evaluation_counts() {
