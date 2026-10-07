@@ -36,7 +36,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 pub struct MacroAnalysis {
     /// The original C identifier retained for reports, symbol lookup, and readable generated output.
     pub name: String,
-    /// Physical source origins or their resolution status used for ownership filtering and auditing.
+    /// Unique physical source, absent for ambiguous, unresolved, or source-less definitions.
     pub provenance: Option<SourceSpan>,
     /// Whether symbolic analysis produced a candidate or an explicit auditable refusal.
     pub status: AnalysisStatus,
@@ -295,8 +295,10 @@ pub struct MacroDependency {
     pub name: String,
     /// The semantic or structural category kept separate from representation and source spelling.
     pub kind: MacroKind,
-    /// Physical source origins or their resolution status used for ownership filtering and auditing.
+    /// Unique physical source, absent when ownership is ambiguous or the definition is source-less.
     pub provenance: Option<SourceSpan>,
+    /// Resolution and all matching origins kept for auditing admitted object-macro dependencies.
+    pub provenance_resolution: ActiveProvenance,
     /// Exact lexical reference ranges where established; compiler closures can provide only possible
     /// origins.
     pub uses: Vec<TokenRange>,
@@ -448,7 +450,7 @@ pub(crate) fn analyze_active_with_constants(
         );
     };
     let definition = &active.definition;
-    result.provenance = definition.provenance.clone();
+    result.provenance = active.resolved_provenance().cloned();
     match &active.provenance {
         ActiveProvenance::Resolved => {}
         ActiveProvenance::Ambiguous(spans) => {
@@ -524,7 +526,8 @@ pub(crate) fn analyze_active_with_constants(
                 .or_insert_with(|| MacroDependency {
                     name: token.spelling.clone(),
                     kind: dependency.definition.kind,
-                    provenance: dependency.definition.provenance.clone(),
+                    provenance: dependency.resolved_provenance().cloned(),
+                    provenance_resolution: dependency.provenance.clone(),
                     uses: Vec::new(),
                 })
                 .uses

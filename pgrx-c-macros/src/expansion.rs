@@ -118,8 +118,10 @@ pub struct ExpansionDependency {
     pub name: String,
     /// Whether the observed dependency is function-like or object-like expansion context.
     pub kind: MacroKind,
-    /// Physical source origins or their resolution status used for ownership filtering and auditing.
+    /// Unique physical source, absent when ownership is ambiguous or the definition is source-less.
     pub provenance: Option<SourceSpan>,
+    /// Resolution and every matching physical origin, retained even for admitted object context.
+    pub provenance_resolution: ActiveProvenance,
 }
 
 /// Explain why a selected macro could not yield a reliable compiler-expanded symbolic invocation.
@@ -327,6 +329,22 @@ pub(crate) fn prepare_inner_with_objects(
             );
             continue;
         }
+        // Public roots require resolved provenance even when an identical replacement
+        // can be expanded safely as somebody else's object-macro context.
+        if !matches!(active.provenance, ActiveProvenance::Resolved) {
+            let code = if matches!(active.provenance, ActiveProvenance::Ambiguous(_)) {
+                ExpansionSkipCode::ProvenanceAmbiguous
+            } else {
+                ExpansionSkipCode::ProvenanceUnresolved
+            };
+            record_skip(
+                &mut results,
+                &name,
+                skip(code, "primary macro provenance is not resolved", Some(&name), frontend),
+                frontend,
+            );
+            continue;
+        }
         if prepared.len() >= limits.macros || active.definition.tokens.len() > limits.macro_tokens {
             record_skip(
                 &mut results,
@@ -445,7 +463,8 @@ pub(crate) fn prepare_inner_with_objects(
                         ExpansionDependency {
                             name: name.clone(),
                             kind: active.definition.kind,
-                            provenance: active.definition.provenance.clone(),
+                            provenance: active.resolved_provenance().cloned(),
+                            provenance_resolution: active.provenance.clone(),
                         },
                     );
                     merged.extend(
@@ -1172,11 +1191,12 @@ impl<'a> Dependencies<'a> {
             names
                 .into_iter()
                 .map(|name| {
-                    let definition = &self.frontend.environment().active[name].definition;
+                    let active = &self.frontend.environment().active[name];
                     ExpansionDependency {
                         name: name.into(),
-                        kind: definition.kind,
-                        provenance: definition.provenance.clone(),
+                        kind: active.definition.kind,
+                        provenance: active.resolved_provenance().cloned(),
+                        provenance_resolution: active.provenance.clone(),
                     }
                 })
                 .collect(),
@@ -1196,6 +1216,10 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
     };
     match &active.provenance {
         ActiveProvenance::Resolved => {}
+        // join_active established the final object replacement signature even
+        // when identical definitions have several possible physical owners.
+        // Clang expands the original headers; no guessed definition is replayed.
+        ActiveProvenance::Ambiguous(_) if active.definition.kind == MacroKind::ObjectLike => {}
         ActiveProvenance::Ambiguous(_) => {
             return reject(
                 ExpansionSkipCode::ProvenanceAmbiguous,

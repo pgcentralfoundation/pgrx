@@ -251,6 +251,7 @@ impl<'a> AnalysisSession<'a> {
                         name: dependency.name.clone(),
                         kind: dependency.kind,
                         provenance: dependency.provenance.clone(),
+                        provenance_resolution: dependency.provenance_resolution.clone(),
                         // Dependency spans identify possible source origins. The compiler
                         // token stream does not provide an exact per-token origin map.
                         uses: Vec::new(),

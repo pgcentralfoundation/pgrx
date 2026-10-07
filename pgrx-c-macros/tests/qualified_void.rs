@@ -16,8 +16,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner,
-    generate_with_bindings, inspect,
+    ActiveProvenance, AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput,
+    MacroScanner, generate_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -72,6 +72,23 @@ fn generated(scanner: &MacroScanner, frontend: &FrontendOutput) -> String {
         generation.support.rust,
     );
     for emission in generation.macros {
+        if emission.analysis.name.ends_with("VALID")
+            && let ActiveProvenance::Ambiguous(origins) =
+                &frontend.environment().active["QVOID_NULL"].provenance
+        {
+            assert_eq!(origins.len(), 2, "both original null definitions remain auditable");
+            let dependency = emission
+                .analysis
+                .dependencies
+                .iter()
+                .find(|dependency| dependency.name == "QVOID_NULL")
+                .expect("null dependency survives in the analysis report");
+            assert!(dependency.provenance.is_none(), "ambiguous context has no guessed owner");
+            let ActiveProvenance::Ambiguous(recorded) = &dependency.provenance_resolution else {
+                panic!("context report must retain the matching alternatives");
+            };
+            assert_eq!(recorded, origins);
+        }
         let EmissionStatus::Emitted { rust, .. } = emission.status else {
             panic!("qualified void fixture must emit: {emission:?}");
         };
@@ -86,9 +103,12 @@ fn qualified_void_native_casts_and_validity_match_original_c() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/qualified_void.h");
-    for null in ["0", "0LL", "((void *)0)"] {
+    for null in [None, Some("0"), Some("0LL"), Some("((void *)0)")] {
         let mut arguments = oracle::native_arguments();
-        arguments.extend(["-std=c17".into(), format!("-DQVOID_NULL={null}")]);
+        arguments.push("-std=c17".into());
+        if let Some(null) = null {
+            arguments.push(format!("-DQVOID_NULL={null}"));
+        }
         let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
         let profile = frontend.profile();
         let rust = generated(&scanner, &frontend);

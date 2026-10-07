@@ -329,6 +329,12 @@ bypass it. `postgres_object_macro_names` applies the same ownership/provenance
 rules to explicitly selected object roots. External definitions, unselected
 objects, wrapper definitions outside the server tree, command-line macros, and
 compiler predefines remain context.
+An object context may have several matching physical definitions while its final
+replacement signature is established. Expand it through the original headers,
+retain the full `ActiveProvenance` resolution in dependency reports, and leave
+the singular source span absent. Do not select one candidate as its owner.
+Primary object/function roots still require unique provenance, as do function
+dependencies; an unresolved replacement remains a refusal in every role.
 If final provenance is unresolved or ambiguous but PostgreSQL-owned historical
 definitions exist, retain the selected name for a provenance skip report rather
 than silently losing it from the analysis results. `list` remains a historical
@@ -433,7 +439,9 @@ partially successful batch as proof.
 Inspect each root's active dependency closure before and during expansion.
 Reject unsupported variadics, root stringification, dynamic preprocessing builtins
 outside the invocation-location contract,
-unproved pastes, ambiguous provenance, and budget overflows. A dependency's
+unproved pastes, unresolved provenance, ambiguous primary/function provenance,
+and budget overflows. Matching ambiguous object context is admitted without
+changing any construct, constant, type, or token-restoration proofs. A dependency's
 origin span is useful for an explanation; it is not an exact source map for each
 fully expanded token.
 

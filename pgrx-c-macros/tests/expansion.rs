@@ -14,9 +14,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch, ExpansionLimits,
-    ExpansionResult, ExpansionSkipCode, FrontendError, MacroScanner, SkipReasonCode, inspect,
-    prepare_expansions, prepare_expansions_with_limits,
+    ActiveProvenance, AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch,
+    ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, MacroScanner,
+    SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -99,6 +99,73 @@ fn assert_skip(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode) {
     assert_eq!(reason.code, code, "{name}: {}", reason.message);
     assert!(!reason.message.is_empty());
     assert!(!reason.spans.is_empty(), "{name} retains original source provenance");
+}
+
+/// Admit identical object replacements from different headers as context while retaining all
+/// origins, actual push/pop restoration, public-root refusals and dynamic-builtin refusals.
+#[test]
+fn matching_object_context_retains_ambiguous_origins_without_guessing_ownership() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let directory = Directory::new();
+    let definitions = "#define CONTEXT_VALUE 7\n#define CONTEXT_COUNTER __COUNTER__\n";
+    std::fs::write(directory.0.join("first.h"), definitions).unwrap();
+    std::fs::write(
+        directory.0.join("second.h"),
+        format!(
+            "{definitions}#pragma push_macro(\"CONTEXT_VALUE\")\n#undef CONTEXT_VALUE\n#define CONTEXT_VALUE 99\n#pragma pop_macro(\"CONTEXT_VALUE\")\n"
+        ),
+    )
+    .unwrap();
+    let header = directory.0.join("root.h");
+    std::fs::write(
+        &header,
+        "#include \"first.h\"\n#include \"second.h\"\n#define CONTEXT_SUM(value) ((value) + CONTEXT_VALUE)\n#define CONTEXT_DYNAMIC() CONTEXT_COUNTER\n",
+    )
+    .unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let active = &frontend.environment().active["CONTEXT_VALUE"];
+    let ActiveProvenance::Ambiguous(origins) = &active.provenance else {
+        panic!("matching definitions in two headers must retain ambiguous ownership");
+    };
+    assert_eq!(origins.len(), 2);
+    assert_ne!(origins[0].file, origins[1].file);
+    assert!(origins.iter().all(|span| span.start_line == 1));
+    assert!(active.resolved_provenance().is_none());
+
+    let session =
+        AnalysisSession::prepare(&scanner, &frontend, &["CONTEXT_SUM", "CONTEXT_DYNAMIC"]).unwrap();
+    let expansion = expanded(session.expansions(), "CONTEXT_SUM");
+    let dependency =
+        expansion.dependencies.iter().find(|item| item.name == "CONTEXT_VALUE").unwrap();
+    assert!(dependency.provenance.is_none());
+    let ActiveProvenance::Ambiguous(recorded) = &dependency.provenance_resolution else {
+        panic!("expanded context must retain both source alternatives");
+    };
+    assert_eq!(recorded, origins);
+    assert!(matches!(session.analyze("CONTEXT_SUM").status, AnalysisStatus::Candidate));
+    assert_skip(session.expansions(), "CONTEXT_DYNAMIC", ExpansionSkipCode::DynamicBuiltin);
+
+    let objects =
+        AnalysisSession::prepare_objects(&scanner, &frontend, &["CONTEXT_VALUE"]).unwrap();
+    assert_skip(objects.expansions(), "CONTEXT_VALUE", ExpansionSkipCode::ProvenanceAmbiguous);
+    let object_analysis = objects.analyze("CONTEXT_VALUE");
+    assert!(object_analysis.provenance.is_none(), "a refused root cannot claim one source owner");
+    assert!(matches!(
+        object_analysis.status,
+        AnalysisStatus::Skipped { reason } if reason.code == SkipReasonCode::ProvenanceAmbiguous
+    ));
+    let profile = frontend.profile();
+    assert!(
+        oracle::run_c(
+            &profile.compiler.executable,
+            &header,
+            "_Static_assert(CONTEXT_SUM(5) == 12, \"restored original value\");\n",
+            &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
 }
 
 /// Checks that clang expands nested late prescanned rescanned and suppressed macros as one

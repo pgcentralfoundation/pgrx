@@ -3,6 +3,8 @@
 
 #ifndef QVOID_NULL
 #define QVOID_NULL ((void *)0)
+/* System headers can define the same null replacement at distinct origins. */
+#define QVOID_NULL ((void *)0)
 #endif
 
 #define QVOID_CONST(pointer) ((const void *)(pointer))

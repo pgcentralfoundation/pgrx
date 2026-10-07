@@ -478,6 +478,19 @@ pub struct ActiveMacro {
     pub provenance: ActiveProvenance,
 }
 
+/// Keep a singular physical source separate from a matched replacement with several origins.
+impl ActiveMacro {
+    /// Return a physical span only when the final definition has a unique discovered origin.
+    /// Resolved compiler/command-line definitions have no physical span; ambiguous definitions
+    /// retain their alternatives in `provenance` rather than selecting the last history entry.
+    pub fn resolved_provenance(&self) -> Option<&SourceSpan> {
+        match self.provenance {
+            ActiveProvenance::Resolved => self.definition.provenance.as_ref(),
+            ActiveProvenance::Ambiguous(_) | ActiveProvenance::Unresolved => None,
+        }
+    }
+}
+
 /// Whether a final active macro has one physical origin, multiple matching origins, or no resolved
 /// origin.
 #[derive(Clone, Debug, Serialize)]
