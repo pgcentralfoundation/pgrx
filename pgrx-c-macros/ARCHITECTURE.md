@@ -1699,7 +1699,12 @@ non-LTO archive, not just successful compilation of two source files.
 
 `tests/support/` builds isolated C/Rust oracle programs. `tests/fixtures/` stores
 their definitions; fixture Rust files are test consumers, not macro ground
-truth. Normal crate tests need Clang/libclang and exercise pure/native programs,
+truth. Execution oracles append `tests/support/binary_stdout.h` after the original
+C source to keep source-location probes intact. On Windows, its Clang startup
+function puts CRT stdout in binary mode before main. This gives native C and
+Rust writes the same byte-preserving transport, including intentional CRLFs;
+captured output is never normalized. The setup belongs only to test executables.
+Normal crate tests need Clang/libclang and exercise pure/native programs,
 without using a PostgreSQL database:
 
 ```sh

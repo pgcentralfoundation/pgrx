@@ -44,8 +44,8 @@ pub fn native_arguments() -> Vec<String> {
 
 /// Each runner includes the original header; it never reconstructs its macro definitions.
 /// Without execution, compiler-owned static assertions need no native linker or runtime.
-/// Execution returns text observations, undoing Windows CRT newline translation so their bytes
-/// can be compared with Rust stdout. Literal carriage returns and all other whitespace remain.
+/// Execution returns exact observations with Windows CRT newline translation disabled before
+/// main, so literal carriage returns and all other bytes can be compared with Rust stdout.
 pub fn run_c(
     compiler: &Path,
     header: &Path,
@@ -56,6 +56,11 @@ pub fn run_c(
     let directory = TemporaryDirectory::new();
     let program = directory.0.join("oracle.c");
     let executable = directory.0.join(format!("oracle{}", std::env::consts::EXE_SUFFIX));
+    let source = if execute {
+        format!("{source}\n{}", include_str!("binary_stdout.h"))
+    } else {
+        source.to_owned()
+    };
     fs::write(&program, source).expect("write C oracle source");
     let mut compiler = Command::new(compiler);
     compiler.args(["-x", "c"]).args(compiler_arguments).arg("-include").arg(header).arg(&program);
@@ -74,12 +79,7 @@ pub fn run_c(
     }
     let output = run_bounded(&mut compiler, &directory.0, "compile");
     if execute {
-        let output = run_bounded(&mut Command::new(executable), &directory.0, "execute");
-        // The Windows CRT inserts CR before each LF on text-mode stdout. Undo precisely that
-        // transport step: an explicit C CRLF becomes CRCRLF and retains its original CR here.
-        #[cfg(windows)]
-        let output = output.replace("\r\n", "\n");
-        output
+        run_bounded(&mut Command::new(executable), &directory.0, "execute")
     } else {
         output
     }

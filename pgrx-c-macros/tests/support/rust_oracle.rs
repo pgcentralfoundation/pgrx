@@ -92,6 +92,8 @@ pub fn run_rust_linked_with_cfg(
 }
 
 /// Apply native C arguments and Rust runtime configuration within one bounded oracle run.
+/// The native startup also disables Windows CRT stdout translation, preserving exact mixed
+/// C/Rust output without rewriting intentional CRLFs or changing fixture source locations.
 fn run_rust_linked_with_arguments(
     source: &str,
     c_compiler: &Path,
@@ -103,7 +105,8 @@ fn run_rust_linked_with_arguments(
     let directory = TemporaryDirectory::new();
     let native = directory.0.join("native.c");
     let object = directory.0.join("native.o");
-    fs::write(&native, c_source).expect("write original C function definitions");
+    fs::write(&native, format!("{c_source}\n{}", include_str!("binary_stdout.h")))
+        .expect("write original C function definitions");
     let mut compiler = Command::new(c_compiler);
     compiler
         .args(["-x", "c"])

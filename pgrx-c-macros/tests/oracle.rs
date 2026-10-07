@@ -14,6 +14,9 @@ mod installed;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Link original C observation functions with a Rust caller under the same output contract.
+#[path = "support/rust_oracle.rs"]
+mod rust_oracle;
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -46,7 +49,7 @@ fn observations(output: &str) -> BTreeMap<String, Observation> {
 }
 
 /// Require C text observations to retain empty records, spacing and literal carriage returns
-/// while undoing only the Windows CRT's extra carriage returns before newlines.
+/// with Windows CRT newline translation disabled before the first observation.
 #[test]
 fn original_c_text_observations_preserve_record_contents() {
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
@@ -65,6 +68,41 @@ int main(void) {
         true,
     );
     assert_eq!(output, "41\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\n");
+}
+
+/// Require alternating C and Rust writes to preserve explicit CRLFs and bare carriage returns,
+/// proving that mixed observations are captured exactly rather than normalized after execution.
+#[test]
+fn mixed_c_and_rust_observations_preserve_every_byte() {
+    let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
+    let arguments = oracle::native_arguments();
+    let output = rust_oracle::run_rust_linked(
+        r#"
+unsafe extern "C" { fn record_c(); }
+fn main() {
+    use std::io::Write;
+    print!("rust\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\n");
+    std::io::stdout().flush().unwrap();
+    // SAFETY: The native recorder accepts no inputs and writes fixed bytes to initialized stdout.
+    unsafe { record_c(); }
+    print!("rust_end\r\n\n");
+}
+"#,
+        Path::new("clang"),
+        &header,
+        r#"
+#include <stdio.h>
+void record_c(void) {
+    fputs("c\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\n", stdout);
+    fflush(stdout);
+}
+"#,
+        &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+    );
+    assert_eq!(
+        output,
+        "rust\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\nc\t  1 0 \n\nbare\rcarriage\nexplicit\r\n\nrust_end\r\n\n"
+    );
 }
 
 /// Checks that original C integer macros establish types values and evaluation counts.
