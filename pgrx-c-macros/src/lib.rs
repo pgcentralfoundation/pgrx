@@ -300,6 +300,8 @@ pub enum Error {
 /// An existing `clang-sys` runtime entry, such as bindgen's, is reused during discovery. The
 /// runtime stays loaded on this thread after the scanner is dropped, so Clang objects created
 /// by bindgen during the scanner's lifetime also keep access to their library.
+/// On Windows, loaded libraries additionally remain mapped until process exit: affected LLVM
+/// releases leave native thread-exit callbacks registered after the DLL is unloaded.
 #[derive(Debug)]
 pub struct MacroScanner {
     /// The live thread-bound runtime handle required while indexes and translation units are in use.
@@ -318,6 +320,25 @@ struct RestoreRuntime(
     Arc<clang_sys::SharedLibrary>,
 );
 
+/// Keep one owner of each loaded Windows DLL until process exit. LLVM 20/21's rpmalloc callbacks
+/// can outlive DLL unloading, including when clang-sys releases its final thread-local handle.
+/// Static values are not dropped at process exit, so callbacks retain executable code throughout
+/// thread teardown. See <https://github.com/llvm/llvm-project/issues/154361>.
+#[cfg(windows)]
+static WINDOWS_RUNTIMES: std::sync::Mutex<Vec<Arc<clang_sys::SharedLibrary>>> =
+    std::sync::Mutex::new(Vec::new());
+
+/// Retain a DLL before any temporary or thread-local owner can release it. Repeated scanner
+/// construction loads the same DLL again; one retained loader reference per path is sufficient
+/// without accumulating an owner for every scan or changing the selected thread's library.
+#[cfg(windows)]
+fn retain_windows_runtime(library: &Arc<clang_sys::SharedLibrary>) {
+    let mut runtimes = WINDOWS_RUNTIMES.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if !runtimes.iter().any(|retained| retained.path() == library.path()) {
+        runtimes.push(Arc::clone(library));
+    }
+}
+
 /// Release resources owned by RestoreRuntime even when a compiler or proof phase exits early.
 impl Drop for RestoreRuntime {
     /// Restore the shared thread-local runtime after the scanner handle releases its own Clang
@@ -333,11 +354,17 @@ impl MacroScanner {
     pub fn new() -> Result<Self, Error> {
         let previous = clang_sys::get_library();
         let clang = Clang::new().map_err(Error::Clang)?;
+        let loaded =
+            clang_sys::get_library().expect("successful Clang::new installs the thread's runtime");
+        // Even a newly loaded DLL discarded in favor of bindgen's existing runtime can register
+        // native callbacks during initialization. Retain both before replacing either owner.
+        #[cfg(windows)]
+        for library in previous.iter().chain(std::iter::once(&loaded)) {
+            retain_windows_runtime(library);
+        }
         // Clang::new replaces TLS even when bindgen already owns a loaded library. All
         // existing translation units and indexes must keep using their original library.
-        let library = previous
-            .or_else(clang_sys::get_library)
-            .expect("successful Clang::new installs the thread's runtime");
+        let library = previous.unwrap_or(loaded);
         clang_sys::set_library(Some(Arc::clone(&library)));
         Ok(Self { clang, _restore_runtime: RestoreRuntime(library) })
     }

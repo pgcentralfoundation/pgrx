@@ -1358,6 +1358,14 @@ even when version-level generation threads exist. Reuse immutable indexes and
 batched compiler probes instead of repeating full header inspection for every
 macro.
 
+Scanner teardown restores the thread's original shared library so existing bindgen
+handles remain usable. On Windows, retain one shared library owner per loaded DLL
+path for the lifetime of the process as well. LLVM 20/21 builds can leave rpmalloc
+thread-exit callbacks registered after DLL unloading; thread-local ownership alone
+does not keep their code mapped when a scanner worker exits. Retain both an existing
+bindgen library and any newly loaded library before restoring the selected runtime.
+This retention changes library lifetime, not C profiles or macro semantics.
+
 Typical output layout is:
 
 ```text

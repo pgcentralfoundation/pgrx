@@ -7,6 +7,7 @@
 //! The scanner and bindgen are constructed in both orders and exercised while
 //! callbacks are active. Inventory checks and generated declarations establish
 //! that neither participant silently replaces or invalidates the other's runtime.
+//! A subprocess also exercises worker-thread teardown without another test retaining libclang.
 
 use bindgen::callbacks::{MacroParsingBehavior, ParseCallbacks};
 use pgrx_c_macros::{MacroInventory, MacroScanner};
@@ -133,4 +134,48 @@ fn discovery_preserves_bindgens_runtime_in_both_construction_orders() {
     drop(scanner);
     assert_inventory(&inventory);
     assert_runtime(&runtime);
+}
+
+/// Prove discovery remains usable after worker teardown and that Windows retains the first DLL
+/// owner after its thread-local handle disappears, preventing stale native exit callbacks.
+#[test]
+fn discovery_runtime_survives_worker_thread_exit() {
+    /// Isolate the lifetime check from bindgen's other test and its retained runtime handles.
+    const CHILD: &str = "PGRX_C_MACROS_RUNTIME_EXIT_TEST_CHILD";
+    if std::env::var_os(CHILD).is_none() {
+        let output = std::process::Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "discovery_runtime_survives_worker_thread_exit", "--nocapture"])
+            .env(CHILD, "1")
+            .output()
+            .expect("the isolated runtime test must start");
+        assert!(
+            output.status.success(),
+            "worker teardown failed: {}\n{}\n{}",
+            output.status,
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        return;
+    }
+    let runtime = std::thread::spawn(|| {
+        let scanner = MacroScanner::new().expect("libclang must load on the worker");
+        assert_inventory(&scanner.scan(&fixture(), &[]).expect("the fixture must parse"));
+        let runtime = Arc::downgrade(&clang_sys::get_library().unwrap());
+        drop(scanner);
+        runtime
+    })
+    .join()
+    .expect("the first scanner worker must finish");
+    if cfg!(windows) {
+        assert!(runtime.upgrade().is_some(), "Windows must retain libclang after TLS teardown");
+    }
+    for _ in 0..3 {
+        std::thread::spawn(|| {
+            let scanner = MacroScanner::new().expect("later workers must load libclang");
+            assert_inventory(&scanner.scan(&fixture(), &[]).expect("the fixture must parse"));
+        })
+        .join()
+        .expect("later scanner workers must finish");
+        std::thread::spawn(|| {}).join().expect("native exit callbacks must remain valid");
+    }
 }
