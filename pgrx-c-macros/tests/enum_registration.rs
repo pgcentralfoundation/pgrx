@@ -68,14 +68,14 @@ unsafe impl EnumStorage<Legacy, CUnsignedInt> for u32 {
 }
 "#;
 
-/// Checks that numeric registration coexists with checked and legacy storage.
+/// Checks that target-exact numeric registration coexists with checked and legacy storage.
 #[test]
 fn numeric_registration_coexists_with_checked_and_legacy_storage() {
     let output = rust_oracle::run_rust(&source(
         r#"
         assert_eq!(<u32 as EnumStorage<Unsigned,CUnsignedInt>>::decode(u32::MAX), u32::MAX);
         assert_eq!(<u32 as EnumStorage<Unsigned,CUnsignedInt>>::encode(17), 17);
-        assert_eq!(<u64 as EnumStorage<Wide,CUnsignedLong>>::encode(u64::MAX), u64::MAX);
+        assert_eq!(<core::ffi::c_ulong as EnumStorage<Wide,CUnsignedLong>>::encode(core::ffi::c_ulong::MAX), core::ffi::c_ulong::MAX);
         assert_eq!(<u64 as EnumStorage<WideLongLong,CUnsignedLongLong>>::encode(19), 19);
         assert_eq!(<u32 as EnumStorage<Legacy,CUnsignedInt>>::encode(23), 23);
         assert_eq!(<Checked as EnumStorage<Unsigned,CUnsignedInt>>::decode(Checked::One), 1);
@@ -86,13 +86,18 @@ fn numeric_registration_coexists_with_checked_and_legacy_storage() {
     assert!(output.is_empty());
 }
 
-/// Checks that numeric registration rejects other ranks storage and identity pairs.
+/// Checks that numeric registration rejects wrong ranks, storage widths, and identity pairs.
 #[test]
 fn numeric_registration_rejects_other_ranks_storage_and_identity_pairs() {
+    let wrong_width = if core::mem::size_of::<core::ffi::c_ulong>() == 4 {
+        "<u64 as EnumStorage<Wide,CUnsignedLong>>::encode(0)"
+    } else {
+        "<u32 as EnumStorage<Wide,CUnsignedLong>>::encode(0)"
+    };
     for expression in [
         "<u64 as EnumStorage<Wide,CUnsignedLongLong>>::encode(0)",
         "<u64 as EnumStorage<Wide,CLong>>::encode(0)",
-        "<u32 as EnumStorage<Wide,CUnsignedLong>>::encode(0)",
+        wrong_width,
         "<u64 as EnumStorage<Unsigned,CUnsignedLong>>::encode(0)",
         "<u32 as EnumStorage<Unregistered,CUnsignedInt>>::encode(0)",
         "<Checked as EnumStorage<Wide,CUnsignedLong>>::encode(0)",
