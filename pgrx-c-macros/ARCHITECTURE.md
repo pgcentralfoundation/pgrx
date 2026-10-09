@@ -1421,9 +1421,12 @@ Format macro token trees with the source-preserving formatter first. Rustfmt
 can leave repetition-heavy macro transcribers on one line; the custom layout
 handles delimiters, punctuation, and generic groups with a preferred width of
 100 while retaining spellings and comments. Then stage the tree and run
-rustfmt over generated leaves when accessible. A missing executable or precise
-rustup missing-component diagnostic permits unformatted output; genuine
-formatting/source failures remain errors.
+rustfmt over generated leaves when accessible, batching filenames within a
+16 KiB conservative quoting budget to avoid an aggregate command-line overflow
+on Windows. Each batch retains the edition, configuration search, and
+`skip_children=true`; publish only after all formatting succeeds. A missing
+executable or precise rustup missing-component diagnostic permits unformatted
+output; genuine formatting/source failures remain errors.
 
 Write changed content stably and remove obsolete files only within the owned
 version's generated macro tree. Publish documentation snapshots when

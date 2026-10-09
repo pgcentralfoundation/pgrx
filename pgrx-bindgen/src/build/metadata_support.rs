@@ -173,10 +173,10 @@ impl StorageProof<'_> {
         if depth > 64 {
             return Err(eyre!("metadata alias recursion exceeds its bound"));
         }
-        if let RustBindingType::Named { path } = binding {
-            if let Some(alias) = self.bindings.types.values().find(|alias| alias.path == *path) {
-                return self.normalize(&alias.target, depth + 1);
-            }
+        if let RustBindingType::Named { path } = binding
+            && let Some(alias) = self.bindings.types.values().find(|alias| alias.path == *path)
+        {
+            return self.normalize(&alias.target, depth + 1);
         }
         Ok(binding.clone())
     }

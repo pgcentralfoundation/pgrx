@@ -638,36 +638,58 @@ fn missing_rustfmt_component(stderr: &[u8]) -> bool {
         && !lines.any(|line| line.starts_with("error:"))
 }
 
-/// Format generated leaves together while preventing child traversal; tolerate an absent
-/// executable or rustup component, but propagate actual formatter failures.
-fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
-    if paths.is_empty() {
-        return Ok(());
-    }
-    let mut command = Command::new(rustfmt);
-    command.args(paths).args(["--edition", "2024", "--config", "skip_children=true"]);
-    match run_command(&mut command, "C macro formatting") {
-        Ok(output) if output.status.success() => Ok(()),
-        Ok(output) if missing_rustfmt_component(&output.stderr) => {
-            // The rustup proxy failed before invoking a formatter, so the staged
-            // original sources remain suitable for optional unformatted output.
-            Ok(())
+/// Bound escaped filenames per process, leaving headroom below Windows' 32,767 UTF-16-unit
+/// command-line limit for the formatter executable, options, and terminating null.
+const MACRO_FORMAT_PATH_BUDGET: usize = 16 * 1024;
+
+/// Borrow the largest prefix within the formatter's filename budget without allocating commands.
+/// Double the encoded byte length for Windows quoting/backslash escaping; it also bounds UTF-16
+/// length. Always admit one path so an individually oversized filename yields an OS error.
+fn macro_format_batch_len(paths: &[PathBuf]) -> usize {
+    let mut size = 0usize;
+    for (index, path) in paths.iter().enumerate() {
+        let cost = path.as_os_str().as_encoded_bytes().len().saturating_mul(2).saturating_add(3);
+        if index > 0 && size.saturating_add(cost) > MACRO_FORMAT_PATH_BUDGET {
+            return index;
         }
-        Ok(output) => Err(eyre!(
-            "could not format generated C macros: {}",
-            String::from_utf8_lossy(&output.stderr)
-        )),
-        Err(error)
-            if error
-                .downcast_ref::<std::io::Error>()
-                .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound) =>
-        {
-            // Rustfmt is optional for macro generation. The staged original
-            // source remains the output when the executable is unavailable.
-            Ok(())
-        }
-        Err(error) => Err(error).wrap_err("could not start the C macro formatter"),
+        size = size.saturating_add(cost);
     }
+    paths.len()
+}
+
+/// Format generated leaves in bounded batches without child traversal; tolerate an absent
+/// executable or rustup component, but propagate actual formatter failures before publication.
+fn format_macro_files(mut paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
+    while !paths.is_empty() {
+        let (batch, remaining) = paths.split_at(macro_format_batch_len(paths));
+        let mut command = Command::new(rustfmt);
+        command.args(batch).args(["--edition", "2024", "--config", "skip_children=true"]);
+        match run_command(&mut command, "C macro formatting") {
+            Ok(output) if output.status.success() => {}
+            Ok(output) if missing_rustfmt_component(&output.stderr) => {
+                // The proxy failed before formatting this batch. Original staged
+                // sources remain suitable for optional unformatted output.
+                return Ok(());
+            }
+            Ok(output) => {
+                return Err(eyre!(
+                    "could not format generated C macros: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                ));
+            }
+            Err(error)
+                if error
+                    .downcast_ref::<std::io::Error>()
+                    .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound) =>
+            {
+                // Rustfmt is optional; untouched staged sources remain usable.
+                return Ok(());
+            }
+            Err(error) => return Err(error).wrap_err("could not start the C macro formatter"),
+        }
+        paths = remaining;
+    }
+    Ok(())
 }
 
 /// Remove the obsolete monolithic macro file after publishing the modular tree, tolerating an
@@ -2308,12 +2330,9 @@ macro_rules! EXAMPLE {
     /// Checks that documentation snapshots require guarded items on their own lines.
     #[test]
     fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
-        for (source, description) in
-            [("const PROFILE: () = (); compile_error!(\"wrong target\");", "C macro target guard")]
-        {
-            let error = macro_snapshot(source).unwrap_err().to_string();
-            assert_eq!(error, format!("{description} does not start on its own line"));
-        }
+        let source = "const PROFILE: () = (); compile_error!(\"wrong target\");";
+        let error = macro_snapshot(source).unwrap_err().to_string();
+        assert_eq!(error, "C macro target guard does not start on its own line");
     }
 
     /// Checks that environment arguments match bindgen priority and shell quoting.
@@ -2487,6 +2506,82 @@ macro_rules! EXAMPLE {
                 assert_eq!(fs::metadata(version.join(relative)).unwrap().modified().unwrap(), old);
             }
         }
+    }
+
+    /// Format every leaf in a long-path tree that exceeds Windows' aggregate command-line limit,
+    /// preserving source meaning and comments without traversing undeclared child modules.
+    #[test]
+    fn large_macro_trees_are_formatted_without_oversized_commands() {
+        let directory = TemporaryDirectory::new();
+        let leaves = directory
+            .0
+            .join("generated headers with spaces and Unicode λ")
+            .join("a longer directory for the generated macro formatting regression");
+        fs::create_dir_all(&leaves).unwrap();
+        let original = "mod absent;\npub fn value( arg:u32 )->u32{ /* PGRX: keep */ arg+1 }\n";
+        let expected = syn::parse_file(original).unwrap();
+        let paths = (0..256)
+            .map(|index| {
+                let path = leaves.join(format!("header_{index:03}.rs"));
+                fs::write(&path, original).unwrap();
+                path
+            })
+            .collect::<Vec<_>>();
+        assert!(
+            paths.iter().map(|path| path.to_str().unwrap().encode_utf16().count()).sum::<usize>()
+                > 32_767,
+            "the unbatched command must exceed Windows' process limit"
+        );
+        #[cfg(not(unix))]
+        let formatter = PathBuf::from("rustfmt");
+        // A Unix proxy reproduces the process limit locally while still executing the real
+        // formatter. Windows exercises its own command-line limit with rustfmt directly.
+        #[cfg(unix)]
+        let formatter = {
+            use std::os::unix::fs::PermissionsExt;
+
+            let proxy = directory.0.join("bounded-rustfmt");
+            fs::write(
+                &proxy,
+                "#!/bin/sh\nsize=0\nfor arg; do size=$((size + ${#arg} + 1)); done\nif [ \"$size\" -gt 32767 ]; then echo 'formatter command exceeds process limit' >&2; exit 1; fi\nexec rustfmt \"$@\"\n",
+            )
+            .unwrap();
+            fs::set_permissions(&proxy, fs::Permissions::from_mode(0o700)).unwrap();
+            proxy
+        };
+        format_macro_files(&paths, &formatter).unwrap();
+        for path in paths {
+            let source = fs::read_to_string(path).unwrap();
+            assert!(source.contains("pub fn value(arg: u32) -> u32 {"));
+            assert!(source.contains("/* PGRX: keep */"));
+            assert_eq!(syn::parse_file(&source).unwrap(), expected);
+        }
+    }
+
+    /// Bound quoting and Unicode costs without losing progress for empty or individually
+    /// oversized input; a subsequent path must begin a new batch once the budget is exhausted.
+    #[test]
+    fn macro_formatter_batches_account_for_escaped_paths_and_always_progress() {
+        let paths = (0..256)
+            .map(|index| {
+                PathBuf::from(format!("{}λ😀\"\\{index:03}.rs", "path with spaces/".repeat(12)))
+            })
+            .collect::<Vec<_>>();
+        let count = macro_format_batch_len(&paths);
+        assert!(count > 0 && count < paths.len());
+        let size = paths[..count]
+            .iter()
+            .map(|path| 2 * path.as_os_str().as_encoded_bytes().len() + 3)
+            .sum::<usize>();
+        assert!(size <= MACRO_FORMAT_PATH_BUDGET);
+        assert!(
+            size + 2 * paths[count].as_os_str().as_encoded_bytes().len() + 3
+                > MACRO_FORMAT_PATH_BUDGET
+        );
+        assert_eq!(macro_format_batch_len(&[]), 0);
+        assert_eq!(macro_format_batch_len(&paths[..1]), 1);
+        let oversized = [PathBuf::from("x".repeat(MACRO_FORMAT_PATH_BUDGET)), paths[0].clone()];
+        assert_eq!(macro_format_batch_len(&oversized), 1);
     }
 
     /// Checks that unavailable macro formatter preserves original sources.

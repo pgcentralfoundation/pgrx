@@ -440,7 +440,7 @@ fn validate_inventory(names: &BTreeSet<String>, domain: &ArtifactDomain) -> eyre
     let prefix = format!("cmacros/pg{}/", domain.major);
     for name in names {
         relative_name(Path::new(name))?;
-        if !required.contains(name) && !(name.starts_with(&prefix) && name.ends_with(".rs")) {
+        if !(required.contains(name) || name.starts_with(&prefix) && name.ends_with(".rs")) {
             return Err(eyre!("target artifact has an unexpected member {name}"));
         }
     }
@@ -642,14 +642,14 @@ fn publish(mut stage: Stage, destination: &Path, domain: &ArtifactDomain) -> eyr
         }
     }
     if let Err(error) = std::fs::rename(&stage.path, destination) {
-        if let Some(mut backup) = old {
-            if let Err(rollback) = std::fs::rename(backup.path.join("old"), destination) {
-                backup.cleanup = false;
-                return Err(eyre!(
-                    "target artifact publication failed ({error}); previous bundle preserved at {} after rollback failed ({rollback})",
-                    backup.path.display()
-                ));
-            }
+        if let Some(mut backup) = old
+            && let Err(rollback) = std::fs::rename(backup.path.join("old"), destination)
+        {
+            backup.cleanup = false;
+            return Err(eyre!(
+                "target artifact publication failed ({error}); previous bundle preserved at {} after rollback failed ({rollback})",
+                backup.path.display()
+            ));
         }
         return Err(error.into());
     }
