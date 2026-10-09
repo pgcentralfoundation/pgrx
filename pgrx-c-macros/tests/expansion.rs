@@ -1,0 +1,652 @@
+//LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+//! Test compiler-owned preprocessing before expression analysis.
+//!
+//! The batch expansion path must retain prescan, rescan, suppression, original
+//! include lookup, and late definitions. Malformed probes, unsafe preprocessing,
+//! and stale inputs must produce isolated structured skips without contaminating
+//! valid peers or changing the original header's interpretation.
+
+/// Run original C headers through the bounded independent oracle harness.
+#[path = "support/oracle.rs"]
+mod oracle;
+
+use pgrx_c_macros::{
+    ActiveProvenance, AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch,
+    ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, MacroScanner,
+    SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
+};
+use std::path::PathBuf;
+use std::sync::Mutex;
+
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
+fn fixture(name: &str) -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
+}
+
+/// Own the temporary header tree for this test and remove only its fixture files afterward.
+struct Directory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
+
+/// Construct owned header trees for freshness and include-identity tests.
+impl Directory {
+    /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
+    /// cannot collide with another invocation.
+    fn new() -> Self {
+        for attempt in 0..128 {
+            let path = std::env::temp_dir()
+                .join(format!("pgrx-expansion-tests-{}-{attempt}", std::process::id()));
+            match std::fs::create_dir(&path) {
+                Ok(()) => return Self(path),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => panic!("could not create expansion fixture: {error}"),
+            }
+        }
+        panic!("could not reserve expansion fixture directory");
+    }
+}
+
+/// Release only temporary artifacts owned by this fixture, including on failed compiler or
+/// assertion paths.
+impl Drop for Directory {
+    /// Remove only this fixture's owned temporary storage after the test or oracle completes.
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Inspect and expand selected fixture macros under one verified frontend session.
+fn expanded<'a>(batch: &'a ExpansionBatch, name: &str) -> &'a ExpandedMacro {
+    match &batch.results[name] {
+        ExpansionResult::Expanded { expansion } => expansion,
+        other => panic!("{name} must expand: {other:?}"),
+    }
+}
+
+/// Retrieve a supported expansion body and turn an unexpected structured skip into a useful
+/// test failure.
+fn body(expansion: &ExpandedMacro) -> Vec<&str> {
+    let start =
+        expansion.definition.tokens.iter().position(|token| token.spelling == ")").unwrap() + 1;
+    expansion.definition.tokens[start..]
+        .iter()
+        .map(|token| {
+            expansion
+                .symbolic_parameters
+                .iter()
+                .position(|marker| marker == &token.spelling)
+                .map(|index| expansion.parameters[index].as_str())
+                .unwrap_or(token.spelling.as_str())
+        })
+        .collect()
+}
+
+/// Require the expected structured rejection, including the reason used to explain unsupported
+/// C syntax.
+fn assert_skip(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode) {
+    let ExpansionResult::Skipped { reason } = &batch.results[name] else {
+        panic!("{name} must skip as {code:?}: {:?}", batch.results[name]);
+    };
+    assert_eq!(reason.code, code, "{name}: {}", reason.message);
+    assert!(!reason.message.is_empty());
+    assert!(!reason.spans.is_empty(), "{name} retains original source provenance");
+}
+
+/// Admit identical object replacements from different headers as context while retaining all
+/// origins, actual push/pop restoration, public-root refusals and dynamic-builtin refusals.
+#[test]
+fn matching_object_context_retains_ambiguous_origins_without_guessing_ownership() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let directory = Directory::new();
+    let definitions = "#define CONTEXT_VALUE 7\n#define CONTEXT_COUNTER __COUNTER__\n";
+    std::fs::write(directory.0.join("first.h"), definitions).unwrap();
+    std::fs::write(
+        directory.0.join("second.h"),
+        format!(
+            "{definitions}#pragma push_macro(\"CONTEXT_VALUE\")\n#undef CONTEXT_VALUE\n#define CONTEXT_VALUE 99\n#pragma pop_macro(\"CONTEXT_VALUE\")\n"
+        ),
+    )
+    .unwrap();
+    let header = directory.0.join("root.h");
+    std::fs::write(
+        &header,
+        "#include \"first.h\"\n#include \"second.h\"\n#define CONTEXT_SUM(value) ((value) + CONTEXT_VALUE)\n#define CONTEXT_DYNAMIC() CONTEXT_COUNTER\n",
+    )
+    .unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let active = &frontend.environment().active["CONTEXT_VALUE"];
+    let ActiveProvenance::Ambiguous(origins) = &active.provenance else {
+        panic!("matching definitions in two headers must retain ambiguous ownership");
+    };
+    assert_eq!(origins.len(), 2);
+    assert_ne!(origins[0].file, origins[1].file);
+    assert!(origins.iter().all(|span| span.start_line == 1));
+    assert!(active.resolved_provenance().is_none());
+
+    let session =
+        AnalysisSession::prepare(&scanner, &frontend, &["CONTEXT_SUM", "CONTEXT_DYNAMIC"]).unwrap();
+    let expansion = expanded(session.expansions(), "CONTEXT_SUM");
+    let dependency =
+        expansion.dependencies.iter().find(|item| item.name == "CONTEXT_VALUE").unwrap();
+    assert!(dependency.provenance.is_none());
+    let ActiveProvenance::Ambiguous(recorded) = &dependency.provenance_resolution else {
+        panic!("expanded context must retain both source alternatives");
+    };
+    assert_eq!(recorded, origins);
+    assert!(matches!(session.analyze("CONTEXT_SUM").status, AnalysisStatus::Candidate));
+    assert_skip(session.expansions(), "CONTEXT_DYNAMIC", ExpansionSkipCode::DynamicBuiltin);
+
+    let objects =
+        AnalysisSession::prepare_objects(&scanner, &frontend, &["CONTEXT_VALUE"]).unwrap();
+    assert_skip(objects.expansions(), "CONTEXT_VALUE", ExpansionSkipCode::ProvenanceAmbiguous);
+    let object_analysis = objects.analyze("CONTEXT_VALUE");
+    assert!(object_analysis.provenance.is_none(), "a refused root cannot claim one source owner");
+    assert!(matches!(
+        object_analysis.status,
+        AnalysisStatus::Skipped { reason } if reason.code == SkipReasonCode::ProvenanceAmbiguous
+    ));
+    let profile = frontend.profile();
+    assert!(
+        oracle::run_c(
+            &profile.compiler.executable,
+            &header,
+            "_Static_assert(CONTEXT_SUM(5) == 12, \"restored original value\");\n",
+            &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+}
+
+/// Checks that clang expands nested late prescanned rescanned and suppressed macros as one
+/// batch.
+#[test]
+fn clang_expands_nested_late_prescanned_rescanned_and_suppressed_macros_as_one_batch() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = fixture("expansion.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let inventory = frontend.inventory().clone();
+    let batch = prepare_expansions(
+        &scanner,
+        &frontend,
+        &[
+            "EXP_NESTED",
+            "EXP_LATE",
+            "EXP_PRESCAN",
+            "EXP_RESCAN",
+            "EXP_RECURSIVE",
+            "EXP_CYCLE_A",
+            "EXP_UNUSED",
+        ],
+    )
+    .unwrap();
+    assert_eq!(frontend.inventory(), &inventory, "expansion preserves raw definition history");
+    assert_eq!(
+        body(expanded(&batch, "EXP_NESTED")),
+        ["(", "(", "(", "(", "x", ")", "+", "(", "1", ")", ")", ")", "+", "(", "2", ")", ")"]
+    );
+    assert_eq!(body(expanded(&batch, "EXP_LATE")), ["(", "(", "x", ")", "+", "9", ")"]);
+    assert_eq!(expanded(&batch, "EXP_PRESCAN").occurrences.len(), 4);
+    assert_eq!(body(expanded(&batch, "EXP_RESCAN")), ["(", "(", "x", ")", ")"]);
+    assert_eq!(
+        body(expanded(&batch, "EXP_RECURSIVE")),
+        ["(", "(", "x", ")", "+", "EXP_RECURSIVE", "(", "x", ")", ")"]
+    );
+    assert_eq!(body(expanded(&batch, "EXP_CYCLE_A")), ["EXP_CYCLE_A", "(", "x", ")"]);
+    assert!(expanded(&batch, "EXP_UNUSED").occurrences.is_empty());
+    assert_eq!(body(expanded(&batch, "EXP_UNUSED")), ["(", "7", ")"]);
+    let nested = expanded(&batch, "EXP_NESTED");
+    assert!(
+        nested.dependencies.iter().any(
+            |dependency| dependency.name == "EXP_ADD_HELPER" && dependency.provenance.is_some()
+        )
+    );
+    assert_eq!(
+        nested.definition.provenance,
+        frontend.environment().active["EXP_NESTED"].definition.provenance
+    );
+    assert!(batch.inputs.files.contains(&header));
+    assert!(!batch.inputs.files.iter().any(|path| {
+        path.file_name().is_some_and(|name| name == "environment.c" || name == "expansion.c")
+    }));
+
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "_Static_assert(EXP_NESTED(4) == 7, \"nested\");\n_Static_assert(EXP_LATE(4) == 13, \"late\");\n_Static_assert(EXP_PRESCAN(4) == 16, \"prescan\");\n_Static_assert(EXP_RESCAN(4) == 4, \"rescan\");\n_Static_assert(EXP_UNUSED(never_declared) == 7, \"unused argument\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that malformed ordinary probes are isolated before using clean output.
+#[test]
+fn malformed_ordinary_probes_are_isolated_before_using_clean_output() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("ordinary-errors.h");
+    std::fs::write(
+        &header,
+        "#define EXPECTS_TWO(a,b) ((a)+(b))\n#define BAD(x) EXPECTS_TWO(x)\n#define HEALTHY(x) ((x)+1)\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let batch = prepare_expansions(&scanner, &frontend, &["BAD", "HEALTHY"]).unwrap();
+    assert_skip(&batch, "BAD", ExpansionSkipCode::CompilerRejected);
+    assert_eq!(body(expanded(&batch, "HEALTHY")), ["(", "(", "x", ")", "+", "1", ")"]);
+    assert_eq!(expanded(&batch, "HEALTHY").occurrences.len(), 1);
+}
+
+/// Checks that parameter markers do not invent grouping and cannot collide with header symbols.
+#[test]
+fn parameter_markers_do_not_invent_grouping_and_cannot_collide_with_header_symbols() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion.h"), &[], None).unwrap();
+    let batch =
+        prepare_expansions(&scanner, &frontend, &["EXP_RAW", "EXP_OUTER_GROUP", "EXP_HOSTILE"])
+            .unwrap();
+    assert_eq!(body(expanded(&batch, "EXP_RAW")), ["x", "+", "1"]);
+    assert_eq!(body(expanded(&batch, "EXP_OUTER_GROUP")), ["(", "x", "+", "1", ")"]);
+    assert_eq!(expanded(&batch, "EXP_RAW").occurrences[0].token, 0);
+    assert_eq!(expanded(&batch, "EXP_OUTER_GROUP").occurrences[0].token, 1);
+    assert_eq!(
+        body(expanded(&batch, "EXP_HOSTILE")),
+        ["(", "(", "__pgrx_c_expand_1_parameter_0_0", ")", ")"]
+    );
+    assert_eq!(expanded(&batch, "EXP_HOSTILE").occurrences.len(), 1);
+}
+
+/// Reject unsafe dependency preprocessing while retaining stringification for contextual analysis.
+#[test]
+fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion.h"), &[], None).unwrap();
+    let batch = prepare_expansions(
+        &scanner,
+        &frontend,
+        &[
+            "EXP_STRING",
+            "EXP_PASTE",
+            "EXP_DYNAMIC",
+            "EXP_COUNTER",
+            "EXP_DATE",
+            "EXP_PRAGMA",
+            "EXP_HAS_INCLUDE",
+            "EXP_TARGET_QUERY",
+            "EXP_MODULE_QUERY",
+            "EXP_UNKNOWN_QUERY",
+            "EXP_VARIADIC",
+            "EXP_AMBIG",
+        ],
+    )
+    .unwrap();
+    for (name, code) in [
+        ("EXP_PASTE", ExpansionSkipCode::TokenPaste),
+        ("EXP_COUNTER", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_DATE", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_PRAGMA", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_HAS_INCLUDE", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_TARGET_QUERY", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_MODULE_QUERY", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_UNKNOWN_QUERY", ExpansionSkipCode::DynamicBuiltin),
+        ("EXP_VARIADIC", ExpansionSkipCode::Variadic),
+        ("EXP_AMBIG", ExpansionSkipCode::ProvenanceAmbiguous),
+    ] {
+        assert_skip(&batch, name, code);
+    }
+    let string = expanded(&batch, "EXP_STRING");
+    assert!(string.definition.provenance.is_some());
+    assert!(string.dependencies.iter().any(|dependency| {
+        dependency.name == "EXP_STRING_HELPER" && dependency.provenance.is_some()
+    }));
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EXP_STRING"]).unwrap();
+    let analysis = session.analyze("EXP_STRING");
+    let AnalysisStatus::Skipped { reason } = analysis.status else {
+        panic!("a returned stringified operand must remain unsupported");
+    };
+    assert_eq!(reason.code, SkipReasonCode::Stringification);
+    assert!(!reason.message.is_empty());
+    let dynamic = expanded(&batch, "EXP_DYNAMIC");
+    assert!(body(dynamic).contains(&"__LINE__"));
+    assert!(dynamic.dependencies.iter().any(|dependency| {
+        dependency.name == "EXP_DYNAMIC_HELPER" && dependency.provenance.is_some()
+    }));
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EXP_DYNAMIC"]).unwrap();
+    let analysis = session.analyze("EXP_DYNAMIC");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    let ExpansionResult::Skipped { reason } = &batch.results["EXP_AMBIG"] else { unreachable!() };
+    assert_eq!(reason.spans.len(), 3, "both ambiguous definitions and the root are retained");
+    assert!(reason.spans.windows(2).all(|pair| pair[0].start_line <= pair[1].start_line));
+}
+
+/// Checks that expansion budgets and compiler rejection are structured skips.
+#[test]
+fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion.h"), &[], None).unwrap();
+    let batch = prepare_expansions_with_limits(
+        &scanner,
+        &frontend,
+        &["EXP_BIG", "EXP_ID"],
+        ExpansionLimits { macro_tokens: 20, ..ExpansionLimits::default() },
+    )
+    .unwrap();
+    assert_skip(&batch, "EXP_BIG", ExpansionSkipCode::BudgetExceeded);
+    assert_eq!(expanded(&batch, "EXP_ID").occurrences.len(), 1);
+    for limits in [
+        ExpansionLimits { macros: 0, ..ExpansionLimits::default() },
+        ExpansionLimits { source_bytes: 0, ..ExpansionLimits::default() },
+        ExpansionLimits { expanded_bytes: 0, ..ExpansionLimits::default() },
+        ExpansionLimits { total_tokens: 0, ..ExpansionLimits::default() },
+        ExpansionLimits { dependency_tokens: 0, ..ExpansionLimits::default() },
+        ExpansionLimits { dependencies_per_macro: 0, ..ExpansionLimits::default() },
+    ] {
+        let batch =
+            prepare_expansions_with_limits(&scanner, &frontend, &["EXP_ID"], limits).unwrap();
+        assert_skip(&batch, "EXP_ID", ExpansionSkipCode::BudgetExceeded);
+    }
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_BAD_ARITY"]).unwrap();
+    assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
+}
+
+/// Reject unsafe pastes and probe collisions without rejecting fully erased stringification.
+#[test]
+fn closed_pastes_reject_erased_operands_dynamic_helpers_and_probe_collisions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("paste.h");
+    let definitions = r#"
+int __paste_native(int);
+#define CAT(a,b) a##b
+#define CAT3(a,b,c) a##b##c
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define UNPAREN(x) x
+#define STRIP(x) UNPAREN x
+#define P_STRING(x) #x
+#define P_VARIADIC(...) 0
+#define pre___pgrx_c_expand_0_parameter_0_0 99
+#define P_CLOSED(x) ((x)+CAT(0xFF,U))
+#define P_REAL(x) CAT(__paste_,native)(x)
+#define P_EMPTY_LEFT(x) (CAT(,x))
+#define P_EMPTY_RIGHT(x) (CAT(x,))
+#define P_ERASED_PREFIX(x) PRESCAN(CAT(prefix_,x))
+#define P_ERASED_SUFFIX(x) PRESCAN(CAT(x,_suffix))
+#define P_ERASED_STRIP(x) PRESCAN(CAT(STRIP(x),_suffix))
+#define P_HIDDEN_COUNTER(x) PRESCAN(CAT(__COUN,TER__))
+#define P_HIDDEN_LINE(x) CAT(__LI,NE__)
+#define P_HIDDEN_PRAGMA(x) PRESCAN(CAT(_Pr,agma)("GCC poison P_CLOSED"))
+#define P_HIDDEN_QUERY(x) PRESCAN(CAT(__has_in,clude)("never-created.h"))
+#define P_UNKNOWN(x) CAT(__builtin_,constant_p)(x)
+#define P_SYNTH_STRING(x) PRESCAN(CAT(P_STR,ING)(x))
+#define P_SYNTH_VARIADIC(x) PRESCAN(CAT(P_VARI,ADIC)(x))
+#define P_FORGED_PARAMETER(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,parameter_0_0))
+#define P_FORGED_BOUNDARY(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,end_0))
+#define P_FORGED_CONSTANT(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,c0))
+#pragma clang diagnostic ignored "-Winvalid-token-paste"
+#pragma clang diagnostic ignored "-Wgnu-line-marker"
+"#;
+    // Preserve real definition provenance, then leave the original main file in
+    // system-header status. The generator must reset that status for its probes.
+    std::fs::write(&header, format!("{definitions}\n# 1 {:?} 3\n", header.to_str().unwrap()))
+        .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let good = ["P_CLOSED", "P_REAL", "P_EMPTY_LEFT", "P_EMPTY_RIGHT"];
+    let bad = [
+        "P_ERASED_PREFIX",
+        "P_ERASED_SUFFIX",
+        "P_ERASED_STRIP",
+        "P_HIDDEN_COUNTER",
+        "P_HIDDEN_LINE",
+        "P_HIDDEN_PRAGMA",
+        "P_HIDDEN_QUERY",
+        "P_UNKNOWN",
+        "P_SYNTH_VARIADIC",
+        "P_FORGED_PARAMETER",
+        "P_FORGED_BOUNDARY",
+        "P_FORGED_CONSTANT",
+    ];
+    for arguments in [
+        vec!["-std=c17".into()],
+        vec!["-std=c17".into(), "-fms-extensions".into(), "-Wno-everything".into()],
+        vec!["-std=c17".into(), "-Werror".into()],
+        vec!["-std=c17".into(), "-pedantic-errors".into()],
+    ] {
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        let original = frontend.inventory().clone();
+        let names = good.iter().chain(&bad).copied().chain(["P_SYNTH_STRING"]).collect::<Vec<_>>();
+        let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
+        for name in good {
+            let expansion = expanded(&batch, name);
+            assert_eq!(expansion.occurrences.len(), 1, "{name}: {arguments:?}");
+            assert!(expansion.symbolic_parameters[0].starts_with("__pgrx_c_expand_1_"));
+        }
+        assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"));
+        let erased_string = expanded(&batch, "P_SYNTH_STRING");
+        assert_eq!(body(erased_string), ["0"]);
+        assert!(erased_string.occurrences.is_empty());
+        assert!(erased_string.dependencies.iter().any(|dependency| {
+            dependency.name == "P_STRING" && dependency.provenance.is_some()
+        }));
+        let session = AnalysisSession::prepare(&scanner, &frontend, &["P_SYNTH_STRING"]).unwrap();
+        let analysis = session.analyze("P_SYNTH_STRING");
+        if arguments.iter().any(|argument| argument == "-fms-extensions") {
+            // Preprocessing is valid in this profile, but its extra Unix semantic
+            // option still must not bypass the independent runtime profile gate.
+            assert!(
+                matches!(analysis.status, AnalysisStatus::Skipped { ref reason }
+                if reason.code == SkipReasonCode::UnsupportedProfile
+                    && reason.message.contains("-fms-extensions")),
+                "{analysis:?}"
+            );
+        } else {
+            assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+        }
+        let checked = oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &header,
+            "_Static_assert(P_SYNTH_STRING(never_declared) == 0, \"erased stringification\");\n",
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        );
+        assert!(checked.is_empty());
+        for name in bad {
+            let ExpansionResult::Skipped { reason } = &batch.results[name] else {
+                panic!("{name} must reject under {arguments:?}");
+            };
+            assert!(!reason.message.is_empty());
+            assert!(!reason.spans.is_empty());
+        }
+        assert_skip(&batch, "P_SYNTH_VARIADIC", ExpansionSkipCode::Variadic);
+        let ExpansionResult::Skipped { reason } = &batch.results["P_SYNTH_VARIADIC"] else {
+            unreachable!()
+        };
+        assert_eq!(reason.dependency.as_deref(), Some("P_VARIADIC"));
+        assert_eq!(reason.spans.len(), 2);
+        assert_eq!(frontend.inventory(), &original);
+        assert!(!frontend.environment().active.keys().any(|name| name.contains("paste_forbidden")));
+    }
+}
+
+/// Checks that malformed paste probes cannot swallow a later operand validation.
+#[test]
+fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("swallowed.h");
+    std::fs::write(
+        &header,
+        r#"
+#define CAT(a,b) a##b
+#define ARG(x) x
+#define OPEN() ARG(
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define A_OPEN(x) CAT(0,U) OPEN()
+#define B_ERASED(x) PRESCAN(CAT(x,_suffix))
+#define C_HEALTHY(x) ((x)+CAT(1,U))
+"#,
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let batch =
+        prepare_expansions(&scanner, &frontend, &["A_OPEN", "B_ERASED", "C_HEALTHY"]).unwrap();
+    assert_skip(&batch, "A_OPEN", ExpansionSkipCode::TokenPaste);
+    assert_skip(&batch, "B_ERASED", ExpansionSkipCode::TokenPaste);
+    assert_eq!(expanded(&batch, "C_HEALTHY").occurrences.len(), 1);
+}
+
+/// Checks that original main file context preserves macros and conditional declarations.
+#[test]
+fn original_main_file_context_preserves_macros_and_conditional_declarations() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion_context.h"), &[], None).unwrap();
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_CONTEXT"]).unwrap();
+    assert_eq!(body(expanded(&batch, "EXP_CONTEXT")), ["(", "(", "x", ")", "+", "1", ")"]);
+    assert_eq!(frontend.declarations().types["ExpansionContextType"].size, Some(1));
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_CONTEXT_TYPE"]).unwrap();
+    assert!(body(expanded(&batch, "EXP_CONTEXT_TYPE")).contains(&"ExpansionContextType"));
+}
+
+/// Checks that nested expansion does not capture an identifier named like an unused formal.
+#[test]
+fn nested_expansion_does_not_capture_an_identifier_named_like_an_unused_formal() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion.h"), &[], None).unwrap();
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_CAPTURE"]).unwrap();
+    let expansion = expanded(&batch, "EXP_CAPTURE");
+    assert_eq!(expansion.parameters, ["x", "captured"]);
+    assert_eq!(expansion.occurrences.len(), 1);
+    assert_eq!(expansion.occurrences[0].parameter, 0);
+    let tokens = &expansion.definition.tokens;
+    assert!(tokens.iter().any(|token| token.spelling == expansion.symbolic_parameters[0]));
+    assert!(tokens.iter().any(|token| token.spelling == expansion.symbolic_parameters[1]));
+    assert!(body(expansion).contains(&"captured"));
+    assert_ne!(expansion.symbolic_parameters[1], "captured");
+}
+
+/// Checks that original symlink path keeps quoted include lookup and main file context.
+#[test]
+#[cfg(unix)]
+fn original_symlink_path_keeps_quoted_include_lookup_and_main_file_context() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let source = directory.0.join("source");
+    let entry = directory.0.join("entry");
+    std::fs::create_dir(&source).unwrap();
+    std::fs::create_dir(&entry).unwrap();
+    std::fs::write(source.join("main.h"), "#include \"choice.h\"\n#if __INCLUDE_LEVEL__ == 0\n#define EXP_MAIN_VALUE 3\n#else\n#define EXP_MAIN_VALUE 100\n#endif\n#define EXP_PATH(x) ((x) + CHOICE + EXP_MAIN_VALUE)\n").unwrap();
+    std::fs::write(source.join("choice.h"), "#define CHOICE 41\n").unwrap();
+    std::fs::write(entry.join("choice.h"), "#define CHOICE 7\n").unwrap();
+    let header = entry.join("main.h");
+    std::os::unix::fs::symlink(source.join("main.h"), &header).unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_PATH"]).unwrap();
+    assert_eq!(body(expanded(&batch, "EXP_PATH")), ["(", "(", "x", ")", "+", "7", "+", "3", ")"]);
+}
+
+/// Checks that stale declarations and new shadowing headers reject even with identical macro
+/// maps.
+#[test]
+fn stale_declarations_and_new_shadowing_headers_reject_even_with_identical_macro_maps() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("main.h");
+    std::fs::write(&header, "typedef char ValueType;\n#define EXP_STALE(x) ((ValueType)(x))\n")
+        .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let metadata = std::fs::metadata(&header).unwrap();
+    std::fs::write(&header, "typedef long ValueType;\n#define EXP_STALE(x) ((ValueType)(x))\n")
+        .unwrap();
+    std::fs::OpenOptions::new()
+        .write(true)
+        .open(&header)
+        .unwrap()
+        .set_times(std::fs::FileTimes::new().set_modified(metadata.modified().unwrap()))
+        .unwrap();
+    assert_eq!(std::fs::metadata(&header).unwrap().len(), metadata.len());
+    assert_eq!(
+        std::fs::metadata(&header).unwrap().modified().unwrap(),
+        metadata.modified().unwrap()
+    );
+    assert!(
+        matches!(prepare_expansions(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("changed"))
+    );
+    assert!(
+        matches!(AnalysisSession::prepare(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("changed"))
+    );
+
+    let earlier = directory.0.join("earlier");
+    let later = directory.0.join("later");
+    std::fs::create_dir(&earlier).unwrap();
+    std::fs::create_dir(&later).unwrap();
+    std::fs::write(later.join("choice.h"), "typedef char ValueType;\n").unwrap();
+    std::fs::write(&header, "#include <choice.h>\n#define EXP_STALE(x) ((ValueType)(x))\n")
+        .unwrap();
+    let frontend = inspect(
+        &scanner,
+        &header,
+        &[format!("-I{}", earlier.display()), format!("-I{}", later.display())],
+        None,
+    )
+    .unwrap();
+    std::fs::write(earlier.join("choice.h"), "typedef long ValueType;\n").unwrap();
+    assert!(
+        matches!(prepare_expansions(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("new header dependency"))
+    );
+    assert!(
+        matches!(AnalysisSession::prepare(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("new header dependency"))
+    );
+}
+
+/// Checks that appending probes cannot turn a trailing backslash into a new macro body.
+#[test]
+fn appending_probes_cannot_turn_a_trailing_backslash_into_a_new_macro_body() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("main.h");
+    std::fs::write(&header, "#define EXP_TRAILING(x) (x) \\").unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    assert!(
+        matches!(prepare_expansions(&scanner, &frontend, &["EXP_TRAILING"]), Err(FrontendError::Environment(message)) if message.contains("final macro environment"))
+    );
+}
+
+/// Checks that snapshot line protection preserves original comments and literal backslashes.
+#[test]
+fn snapshot_line_protection_preserves_original_comments_and_literal_backslashes() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("expansion.h"), &[], None).unwrap();
+    let comment = &frontend.environment().active["EXP_SNAPSHOT_COMMENT"].definition;
+    assert!(comment.tokens.iter().any(|token| token.spelling == "/*__pgrx_c_snapshot_end_0__*/"));
+    let original = &frontend.environment().active["EXP_SNAPSHOT_STRING"].definition;
+    let batch = prepare_expansions(&scanner, &frontend, &["EXP_SNAPSHOT_STRING"]).unwrap();
+    let expansion = expanded(&batch, "EXP_SNAPSHOT_STRING");
+    let old_literal = original.tokens.iter().find(|token| token.spelling.starts_with('"')).unwrap();
+    let new_literal =
+        expansion.definition.tokens.iter().find(|token| token.spelling.starts_with('"')).unwrap();
+    assert_eq!(new_literal, old_literal);
+}

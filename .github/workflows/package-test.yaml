@@ -3,8 +3,7 @@ name: verify package can build
 on:
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+  pull_request: {}
 
 env:
   CARGO_TERM_COLOR: always
@@ -101,6 +100,7 @@ jobs:
               cargo +nightly package \
                   --allow-dirty \
                   -p pgrx-pg-config \
+                  -p pgrx-c-macros \
                   -p pgrx-bindgen \
                   -p pgrx-sql-entity-graph \
                   -p pgrx-macros \

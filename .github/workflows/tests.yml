@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    branches:
-      - develop
+  pull_request: {}
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones

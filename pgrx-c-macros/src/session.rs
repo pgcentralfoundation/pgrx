@@ -1,0 +1,312 @@
+//LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+//! A prepared session connects one inspected environment to one bounded expansion batch.
+//!
+//! Compiler passes establish active dependencies, retained integer symbols, and source-level
+//! zero constants before analysis is exposed to emission. File and environment checks surround
+//! these passes so a session never intentionally combines facts from different header states.
+//! The borrowed frontend owns the profile; the session owns observations specific to its batch.
+
+use crate::{
+    ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, ExpansionBatch, ExpansionLimits,
+    ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, IntegerConstant,
+    MacroAnalysis, MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
+};
+use std::collections::{BTreeMap, BTreeSet};
+
+/// Derive private native-call roots without modifying the compiler's macro environment.
+mod inline;
+
+/// An inspected C environment and compiler-expanded symbolic invocations resolved together.
+///
+/// Preparation uses bounded compiler passes for the whole batch. The input files and
+/// environment must remain stable through preparation; changes require a new inspection.
+/// Emission accepts this session rather than independently assembled syntax or type facts.
+pub struct AnalysisSession<'a> {
+    /// The coherent inspected environment borrowed by this phase; it is never reconstructed from
+    /// snapshots.
+    frontend: &'a FrontendOutput,
+    /// Owned compiler-expanded observations prepared specifically for this selected macro batch.
+    expansions: ExpansionBatch,
+    /// Optional batch-augmented graph; the original frontend graph remains the fallback.
+    dependencies: Option<crate::MacroDependencyGraph>,
+    /// C type/value facts established independently of Rust binding values for referenced object
+    /// macros.
+    integer_constants: BTreeMap<String, IntegerConstant>,
+    /// Per-macro source node IDs proved to be zero-valued C integer constant expressions.
+    integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
+    /// Explicit compiler-owned static-inline calls prepared independently of real macro roots.
+    inline_roots: BTreeMap<String, inline::InlineRoot<'a>>,
+}
+
+/// Prepare and analyze a batch only within the borrowed coherent frontend environment.
+impl<'a> AnalysisSession<'a> {
+    /// Prepare the selected macros with default budgets while preserving one inspected compiler
+    /// environment.
+    pub fn prepare(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        Self::prepare_with_limits(scanner, frontend, names, ExpansionLimits::default())
+    }
+
+    /// Expand the batch, establish retained constants and zero identities, and reject changed inputs
+    /// at phase boundaries.
+    pub fn prepare_with_limits(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+        limits: ExpansionLimits,
+    ) -> Result<Self, FrontendError> {
+        Self::prepare_selected(scanner, frontend, names, &BTreeSet::new(), limits)
+    }
+
+    /// Prepare explicitly selected object-like expression roots as Rust macro invocations.
+    ///
+    /// Original object provenance and C expansion remain authoritative. Ordinary
+    /// discovery and `prepare` continue to select function-style roots only.
+    pub fn prepare_objects(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let objects = names.iter().map(|name| name.as_ref().to_owned()).collect();
+        Self::prepare_selected(scanner, frontend, names, &objects, ExpansionLimits::default())
+    }
+
+    /// Prepare explicit object-expression and function-style roots in one coherent artifact batch.
+    ///
+    /// Separate lists keep ordinary function discovery unchanged while sharing
+    /// dependency proofs and native adapters across both kinds of selected root.
+    pub fn prepare_with_objects(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        functions: &[impl AsRef<str>],
+        objects: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let objects = objects.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
+        let names = functions
+            .iter()
+            .map(|name| name.as_ref().to_owned())
+            .chain(objects.iter().cloned())
+            .collect::<Vec<_>>();
+        Self::prepare_selected(scanner, frontend, &names, &objects, ExpansionLimits::default())
+    }
+
+    /// Prepare real macros and explicitly selected compiler-owned static inline functions together.
+    ///
+    /// Active C macros take precedence over inline adapters. Native calls derive from verified
+    /// original definitions and prototypes; neither inventory nor preprocessing state is changed.
+    pub fn prepare_with_inline_functions(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        functions: &[impl AsRef<str>],
+        objects: &[impl AsRef<str>],
+        inline_functions: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let inlines = inline_functions
+            .iter()
+            .map(|name| name.as_ref().to_owned())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let mut functions =
+            functions.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
+        functions.extend(
+            inlines
+                .iter()
+                .filter(|name| frontend.environment().active.contains_key(*name))
+                .cloned(),
+        );
+        let functions = functions.into_iter().collect::<Vec<_>>();
+        let mut session = Self::prepare_with_objects(scanner, frontend, &functions, objects)?;
+        session.inline_roots = inline::prepare(
+            frontend,
+            &inlines,
+            ExpansionLimits::default(),
+            session.expansions.results.len(),
+        );
+        session.verify_inputs()?;
+        Ok(session)
+    }
+
+    /// Return original C definition source for an explicitly prepared inline invocation root.
+    pub(crate) fn inline_definition(&self, name: &str) -> Option<&crate::InlineFunctionDefinition> {
+        self.inline_roots.get(name).and_then(inline::InlineRoot::source)
+    }
+
+    /// Run shared bounded compiler phases for the explicitly selected root kinds.
+    fn prepare_selected(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+        objects: &BTreeSet<String>,
+        limits: ExpansionLimits,
+    ) -> Result<Self, FrontendError> {
+        crate::expansion::verify_environment(frontend)?;
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        // Adjacent compiler phases share a boundary check. Check failed passes too,
+        // so a changed snapshot takes precedence over their compiler diagnostics.
+        let expansions =
+            crate::expansion::prepare_inner_with_objects(scanner, frontend, names, objects, limits);
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        crate::expansion::verify_environment(frontend)?;
+        let mut expansions = expansions?;
+        let integer_constants =
+            crate::expansion::retain_integer_constants(scanner, frontend, &mut expansions, limits);
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        crate::expansion::verify_environment(frontend)?;
+        let integer_constants = integer_constants?;
+        let dependencies = (!expansions.discovered_dependencies.is_empty()).then(|| {
+            frontend
+                .dependencies()
+                .with_expansions(&expansions, &frontend.declarations().integer_constants)
+        });
+        let mut session = Self {
+            frontend,
+            expansions,
+            dependencies,
+            integer_constants,
+            inline_roots: BTreeMap::new(),
+            integer_zero_constants: BTreeMap::new(),
+        };
+        session.integer_zero_constants = crate::frontend::zero_constants::probe(scanner, &session)?;
+        session.verify_inputs()?;
+        Ok(session)
+    }
+
+    /// Borrow the inspection that supplies authoritative target and declaration facts for this
+    /// session.
+    pub fn frontend(&self) -> &FrontendOutput {
+        self.frontend
+    }
+
+    /// Expose compiler-expanded invocations and explicit preprocessing skips without rerunning the
+    /// driver.
+    pub fn expansions(&self) -> &ExpansionBatch {
+        &self.expansions
+    }
+
+    /// Lexical references augmented with this batch's compiler-resolved references.
+    pub fn dependencies(&self) -> &crate::MacroDependencyGraph {
+        self.dependencies.as_ref().unwrap_or_else(|| self.frontend.dependencies())
+    }
+
+    /// Referenced object macros whose integer types and values were resolved by Clang.
+    /// These facts are independent of the Rust binding representation and include
+    /// constants that had to remain expanded because their C grouping was not atomic.
+    pub fn integer_constants(&self) -> &BTreeMap<String, IntegerConstant> {
+        &self.integer_constants
+    }
+
+    /// Expose the recorded build inputs consumed by preparation for later rebuild tracking.
+    pub fn inputs(&self) -> &BuildInputs {
+        &self.expansions.inputs
+    }
+
+    /// Check that a later generation step consumed the same inspected environment.
+    /// Changes require a fresh inspection and preparation, including C value probes.
+    pub fn verify_inputs(&self) -> Result<(), FrontendError> {
+        crate::expansion::verify_environment(self.frontend)?;
+        crate::frontend::verify_input_files(self.inputs())
+    }
+
+    /// Analyze a prepared invocation, restore original formal names, and translate preprocessing
+    /// failures into structured analysis skips.
+    pub fn analyze(&self, name: &str) -> MacroAnalysis {
+        if let Some(root) = self.inline_roots.get(name) {
+            return root.analyze(self.frontend, name, &self.integer_constants);
+        }
+        match self.expansions.results.get(name) {
+            Some(ExpansionResult::Expanded { expansion }) => {
+                // Marker names stay distinct from captured identifiers introduced by
+                // nested expansion, even when those identifiers match a formal's name.
+                let active = ActiveMacro {
+                    definition: expansion.definition.clone(),
+                    provenance: ActiveProvenance::Resolved,
+                };
+                let mut analysis = crate::analysis::analyze_active_with_constants(
+                    self.frontend,
+                    name,
+                    Some(&active),
+                    &self.integer_constants,
+                    true,
+                );
+                for (parameter, original_name) in
+                    analysis.parameters.iter_mut().zip(&expansion.parameters)
+                {
+                    parameter.name.clone_from(original_name);
+                }
+                if let Some(expression) = &mut analysis.expression {
+                    expression.integer_zero_constants =
+                        self.integer_zero_constants.get(name).cloned().unwrap_or_default();
+                }
+                analysis.dependencies = expansion
+                    .dependencies
+                    .iter()
+                    .map(|dependency| MacroDependency {
+                        name: dependency.name.clone(),
+                        kind: dependency.kind,
+                        provenance: dependency.provenance.clone(),
+                        provenance_resolution: dependency.provenance_resolution.clone(),
+                        // Dependency spans identify possible source origins. The compiler
+                        // token stream does not provide an exact per-token origin map.
+                        uses: Vec::new(),
+                    })
+                    .collect();
+                analysis
+            }
+            Some(ExpansionResult::Skipped { reason }) => {
+                let mut analysis = crate::analyze(self.frontend, name);
+                analysis.expression = None;
+                analysis.status = AnalysisStatus::Skipped {
+                    reason: SkipReason {
+                        code: match reason.code {
+                            ExpansionSkipCode::NotActive => SkipReasonCode::NotActive,
+                            ExpansionSkipCode::NotFunctionLike => SkipReasonCode::NotFunctionLike,
+                            ExpansionSkipCode::NotObjectLike => SkipReasonCode::NotObjectLike,
+                            ExpansionSkipCode::MalformedParameters => {
+                                SkipReasonCode::MalformedParameters
+                            }
+                            ExpansionSkipCode::Variadic => SkipReasonCode::Variadic,
+                            ExpansionSkipCode::TokenPaste => SkipReasonCode::TokenPaste,
+                            ExpansionSkipCode::Stringification => SkipReasonCode::Stringification,
+                            ExpansionSkipCode::DynamicBuiltin => SkipReasonCode::DynamicBuiltin,
+                            ExpansionSkipCode::ProvenanceAmbiguous => {
+                                SkipReasonCode::ProvenanceAmbiguous
+                            }
+                            ExpansionSkipCode::ProvenanceUnresolved => {
+                                SkipReasonCode::ProvenanceUnresolved
+                            }
+                            ExpansionSkipCode::BudgetExceeded => SkipReasonCode::BudgetExceeded,
+                            ExpansionSkipCode::CompilerRejected => SkipReasonCode::CompilerRejected,
+                            ExpansionSkipCode::UnrecognizedOutput => {
+                                SkipReasonCode::UnrecognizedExpansion
+                            }
+                        },
+                        message: reason.message.clone(),
+                        tokens: None,
+                        spans: reason.spans.clone(),
+                    },
+                };
+                analysis
+            }
+            None => {
+                let mut analysis = crate::analyze(self.frontend, name);
+                analysis.expression = None;
+                analysis.status = AnalysisStatus::Skipped {
+                    reason: SkipReason {
+                        code: SkipReasonCode::ExpansionRequired,
+                        message: "macro was not prepared in this analysis session".into(),
+                        tokens: None,
+                        spans: analysis.provenance.iter().cloned().collect(),
+                    },
+                };
+                analysis
+            }
+        }
+    }
+}
