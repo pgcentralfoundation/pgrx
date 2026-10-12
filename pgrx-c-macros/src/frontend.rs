@@ -285,7 +285,9 @@ pub(crate) fn inspect_with_compiler_hint(
         .collect::<Result<BTreeSet<_>, _>>()?;
     // Dependency output also includes successful header-availability searches.
     // Compare actual inclusions separately, retaining every dependency for rebuilds.
-    let driver_identities = parse_header_witness(&witnessed)?
+    let HeaderWitness { included: witnessed_headers, dependencies: extra_dependencies } =
+        split_header_witness(&witnessed, &preprocessing.stderr)?;
+    let driver_identities = witnessed_headers
         .iter()
         .chain(std::iter::once(&header))
         .map(|path| absolute_path(path))
@@ -309,6 +311,7 @@ pub(crate) fn inspect_with_compiler_hint(
         semantic_options(&arguments, &preprocessing.stderr)?;
     let mut input_files = driver_files;
     input_files.extend(driver_identities);
+    input_files.extend(extra_dependencies);
     input_files.insert(requested_header);
     if let Some(library) = clang_sys::get_library() {
         input_files.insert(input_path(library.path())?);
@@ -564,41 +567,72 @@ pub(crate) fn compiler_triple(verbose: &str) -> Result<String, FrontendError> {
     Err(FrontendError::Output("Clang verbose output did not identify its frontend target".into()))
 }
 
-/// Decode the compiler's complete physical inclusion witness, separately from availability searches.
-///
-/// Clang's textual header writer applies Lexer::Stringify without surrounding
-/// quotes: backslashes and double quotes are escaped, but spaces remain literal.
-/// Newline/carriage-return paths have an ambiguous encoding and are refused.
-fn parse_header_witness(witness: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
+/// Distinguish physical inclusions from dependency-only entries prepended by Clang's header writer.
+struct HeaderWitness {
+    /// Actual preprocessing files whose identities must match libclang exactly.
+    included: BTreeSet<PathBuf>,
+    /// Explicit frontend dependency entries, retained for content and symlink invalidation.
+    dependencies: BTreeSet<PathBuf>,
+}
+
+/// Recognize only the leading dependency records declared by this invocation's effective cc1 argv.
+/// Clang prints `-fdepfile-entry` inputs, including Darwin SDKSettings.json, before its inclusion
+/// callbacks even though they are not C headers. Matching that ordered prefix avoids discarding
+/// an actual include of the same file or accepting arbitrary driver-only headers.
+fn split_header_witness(witness: &str, verbose: &str) -> Result<HeaderWitness, FrontendError> {
     if !witness.is_empty() && !witness.ends_with('\n') {
         return Err(FrontendError::Output("unfinished header inclusion witness".into()));
     }
-    let mut included = BTreeSet::new();
-    for line in witness.lines() {
-        let mut path = String::with_capacity(line.len());
-        let mut characters = line.chars();
-        while let Some(character) = characters.next() {
-            match character {
-                '\\' => match characters.next() {
-                    Some(escaped @ ('\\' | '"')) => path.push(escaped),
-                    _ => {
-                        return Err(FrontendError::Output(
-                            "unsupported or unfinished header filename escape".into(),
-                        ));
-                    }
-                },
-                '"' | '\r' | '\0' => {
-                    return Err(FrontendError::Output("invalid header filename witness".into()));
-                }
-                character => path.push(character),
-            }
+    let mut records = witness.lines();
+    let mut dependencies = BTreeSet::new();
+    for argument in frontend_arguments(verbose)? {
+        let Some(path) = argument.strip_prefix("-fdepfile-entry=") else { continue };
+        let dependency = input_path(Path::new(path))?;
+        let record = records
+            .next()
+            .ok_or_else(|| FrontendError::Output("missing frontend dependency witness".into()))?;
+        let witnessed = parse_header_witness_path(record)?;
+        if absolute_path(&dependency)? != absolute_path(&witnessed)? {
+            return Err(FrontendError::Environment(format!(
+                "frontend dependency {} differs from its header-writer prefix {}",
+                dependency.display(),
+                witnessed.display()
+            )));
         }
-        if path.is_empty() {
-            return Err(FrontendError::Output("empty header filename witness".into()));
-        }
-        included.insert(input_path(Path::new(&path))?);
+        // Retain both spellings: either symlink can change. Consume duplicate prefix records
+        // before deduplicating actual inclusions, without retaining a vector of repeated paths.
+        dependencies.extend([dependency, witnessed]);
     }
-    Ok(included)
+    let included = records.map(parse_header_witness_path).collect::<Result<_, _>>()?;
+    Ok(HeaderWitness { included, dependencies })
+}
+
+/// Decode one header-writer path without losing spaces or native path separators.
+/// Clang applies Lexer::Stringify without surrounding quotes: backslashes and double quotes
+/// are escaped. Newline/carriage-return paths have an ambiguous encoding and are refused.
+fn parse_header_witness_path(record: &str) -> Result<PathBuf, FrontendError> {
+    let mut path = String::with_capacity(record.len());
+    let mut characters = record.chars();
+    while let Some(character) = characters.next() {
+        match character {
+            '\\' => match characters.next() {
+                Some(escaped @ ('\\' | '"')) => path.push(escaped),
+                _ => {
+                    return Err(FrontendError::Output(
+                        "unsupported or unfinished header filename escape".into(),
+                    ));
+                }
+            },
+            '"' | '\r' | '\0' => {
+                return Err(FrontendError::Output("invalid header filename witness".into()));
+            }
+            character => path.push(character),
+        }
+    }
+    if path.is_empty() {
+        return Err(FrontendError::Output("empty header filename witness".into()));
+    }
+    input_path(Path::new(&path))
 }
 
 /// Replay the final macro dump through libclang with protected line endings to recover lexical token
@@ -2974,8 +3008,8 @@ mod tests {
             .into_iter()
             .map(|path| input_path(Path::new(path)).unwrap())
             .collect::<BTreeSet<_>>();
-        assert_eq!(parse_header_witness(&witness).unwrap(), expected);
-        assert!(parse_header_witness("").unwrap().is_empty());
+        assert_eq!(split_header_witness(&witness, "clang -cc1").unwrap().included, expected);
+        assert!(split_header_witness("", "clang -cc1").unwrap().included.is_empty());
     }
 
     /// Refuse truncated, malformed and ambiguous newline encodings instead of guessing filenames.
@@ -2991,9 +3025,77 @@ mod tests {
             "\n",
         ] {
             assert!(
-                matches!(parse_header_witness(witness), Err(FrontendError::Output(_))),
+                matches!(
+                    split_header_witness(witness, "clang -cc1"),
+                    Err(FrontendError::Output(_))
+                ),
                 "{witness:?}"
             );
+        }
+    }
+
+    /// Only an argv-proved ordered prefix is dependency-only; repeated entries and a later actual
+    /// include of the same file must not hide a physical inclusion disagreement.
+    #[test]
+    fn inclusion_witness_separates_explicit_dependencies_without_hiding_headers() {
+        let directory = tempfile::tempdir().unwrap();
+        let dependency = directory.path().join("driver metadata.json");
+        let header = directory.path().join("actual.h");
+        for path in [&dependency, &header] {
+            std::fs::write(path, "\n").unwrap();
+        }
+        let argument = format!("-fdepfile-entry={}", dependency.display());
+        let verbose = ["clang", "-cc1", &argument, &argument]
+            .into_iter()
+            .map(|argument| shlex::try_quote(argument).unwrap().into_owned())
+            .collect::<Vec<_>>()
+            .join(" ");
+        let record =
+            |path: &Path| path.to_str().unwrap().replace('\\', "\\\\").replace('"', "\\\"") + "\n";
+        let witness = record(&dependency).repeat(3) + &record(&header);
+        let result = split_header_witness(&witness, &verbose).unwrap();
+        assert_eq!(result.dependencies, BTreeSet::from([dependency.clone()]));
+        assert_eq!(result.included, BTreeSet::from([dependency.clone(), header.clone()]));
+        let inputs =
+            build_inputs(&[], &verbose, result.dependencies, CompilerSearch::default()).unwrap();
+        verify_input_files(&inputs).unwrap();
+        std::fs::write(&dependency, "changed\n").unwrap();
+        assert!(verify_input_files(&inputs).is_err(), "dependency-only changes invalidate facts");
+        assert!(split_header_witness(&record(&header), &verbose).is_err());
+        assert!(split_header_witness("", &verbose).is_err());
+        let undeclared = split_header_witness(&witness, "clang -cc1").unwrap();
+        assert!(undeclared.dependencies.is_empty());
+        assert_eq!(undeclared.included, result.included);
+    }
+
+    /// A real Darwin SDK profile admits agreed C headers and fingerprints every driver dependency,
+    /// including SDK metadata when that installed Clang version reports it.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn native_sdk_metadata_is_tracked_without_being_a_c_header() {
+        let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let directory = tempfile::tempdir().unwrap();
+        let header = directory.path().join("sdk.h");
+        std::fs::write(&header, "#include <stddef.h>\n#define SDK_VALUE(value) ((value) + 1)\n")
+            .unwrap();
+        let sdk = run_compiler(Path::new("xcrun"), &["--show-sdk-path".into()]).unwrap();
+        let sdk = sdk.stdout.trim();
+        let scanner = MacroScanner::new().unwrap();
+        let frontend = inspect(&scanner, &header, &["-isysroot".into(), sdk.into()], None)
+            .expect("the real SDK driver and libclang must agree on actual C headers");
+        let profile = frontend.profile();
+        let dependencies = preprocess(
+            &profile.compiler.executable,
+            &header,
+            &profile.arguments,
+            &["-M", "-MT", "sdk_probe"],
+        )
+        .unwrap();
+        let dependencies = parse_dependencies(&dependencies.stdout).unwrap();
+        assert!(!dependencies.is_empty(), "the original SDK header must have dependencies");
+        for dependency in dependencies {
+            assert!(profile.inputs.fingerprints[&dependency].is_some());
+            assert!(profile.inputs.fingerprints[&dependency.canonicalize().unwrap()].is_some());
         }
     }
 

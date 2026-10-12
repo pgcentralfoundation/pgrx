@@ -220,6 +220,12 @@ system headers enabled. Clang's complete inclusion callback records forced
 omits roots processed before the main file. Bound this witness with the same
 16 MiB output limit, decode Clang's escaped backslashes and double quotes, and
 compare its canonical physical paths plus the main file with libclang exactly.
+The textual writer also prepends dependency-only inputs such as Darwin's
+`SDKSettings.json`. Match only the ordered prefix explicitly declared by
+`-fdepfile-entry` in that same pass's effective cc1 arguments, and retain both
+path spellings and file contents as rebuild inputs. A later actual inclusion
+of the same file still participates in the exact header comparison; unknown
+dependency prefixes remain refused.
 Refuse truncated records or ambiguous newline filename encodings. Neither argv
 filenames nor `-M` availability dependencies establish that a header was included;
 availability dependencies remain separate rebuild inputs. Remove `-include` and
