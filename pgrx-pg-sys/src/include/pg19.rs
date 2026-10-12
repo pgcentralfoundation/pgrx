@@ -156,11 +156,14 @@ pub const ALIGNOF_INT64_T: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const DEF_PGPORT: u32 = 28819;
-pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"28819";
+pub const DEF_PGPORT: u32 = 5432;
+pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"5432";
 pub const DLSUFFIX: &::core::ffi::CStr = c".so";
+pub const ENABLE_GSS: u32 = 1;
+pub const ENABLE_NLS: u32 = 1;
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
+pub const OPENSSL_API_COMPAT: u32 = 269488128;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
 pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta4";
@@ -171,9 +174,9 @@ pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"19";
 pub const PG_MAJORVERSION_NUM: u32 = 19;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"19beta4";
+pub const PG_VERSION: &::core::ffi::CStr = c"19beta4 (Debian 19~beta4-1.pgdg13+1)";
 pub const PG_VERSION_NUM: u32 = 190000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta4 (Debian 19~beta4-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_INTMAX_T: u32 = 8;
 pub const SIZEOF_LONG: u32 = 8;
@@ -182,14 +185,25 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_AVX2_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_AVX512_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_AVX512_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_ICU: u32 = 1;
+pub const USE_LDAP: u32 = 1;
+pub const USE_LIBCURL: u32 = 1;
+pub const USE_LIBNUMA: u32 = 1;
+pub const USE_LIBURING: u32 = 1;
+pub const USE_LIBXML: u32 = 1;
+pub const USE_LIBXSLT: u32 = 1;
+pub const USE_LLVM: u32 = 1;
+pub const USE_LZ4: u32 = 1;
+pub const USE_OPENSSL: u32 = 1;
+pub const USE_PAM: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_SYSTEMD: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
 pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
+pub const USE_ZSTD: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const SLRU_PAGES_PER_SEGMENT: u32 = 32;
@@ -206,7 +220,7 @@ pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
 pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
 pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
-pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/tmp";
+pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/var/run/postgresql";
 pub const DEFAULT_EVENT_SOURCE: &::core::ffi::CStr = c"PostgreSQL";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const PG_IO_ALIGN_SIZE: u32 = 4096;
@@ -254,7 +268,8 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19beta4\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
+    c"postgres (PostgreSQL) 19beta4 (Debian 19~beta4-1.pgdg13+1)\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -290,6 +305,51 @@ pub const MCXT_ALLOC_ZERO: u32 = 4;
 pub const SIZEOF_DATUM: u32 = 8;
 pub const FIELDNO_NULLABLE_DATUM_DATUM: u32 = 0;
 pub const FIELDNO_NULLABLE_DATUM_ISNULL: u32 = 1;
+pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
+pub const MAX_INTERVAL_PRECISION: u32 = 6;
+pub const TS_PREC_INV: f64 = 1000000.0;
+pub const DAYS_PER_YEAR: f64 = 365.25;
+pub const MONTHS_PER_YEAR: u32 = 12;
+pub const DAYS_PER_MONTH: u32 = 30;
+pub const DAYS_PER_WEEK: u32 = 7;
+pub const HOURS_PER_DAY: u32 = 24;
+pub const SECS_PER_YEAR: u32 = 31557600;
+pub const SECS_PER_DAY: u32 = 86400;
+pub const SECS_PER_HOUR: u32 = 3600;
+pub const SECS_PER_MINUTE: u32 = 60;
+pub const MINS_PER_HOUR: u32 = 60;
+pub const MAX_TZDISP_HOUR: u32 = 15;
+pub const TZDISP_LIMIT: u32 = 57600;
+pub const JULIAN_MINYEAR: i32 = -4713;
+pub const JULIAN_MINMONTH: u32 = 11;
+pub const JULIAN_MINDAY: u32 = 24;
+pub const JULIAN_MAXYEAR: u32 = 5874898;
+pub const JULIAN_MAXMONTH: u32 = 6;
+pub const JULIAN_MAXDAY: u32 = 3;
+pub const UNIX_EPOCH_JDATE: u32 = 2440588;
+pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
+pub const DATETIME_MIN_JULIAN: u32 = 0;
+pub const DATE_END_JULIAN: u32 = 2147483494;
+pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
+pub const PG_SHA224_BLOCK_LENGTH: u32 = 64;
+pub const PG_SHA224_DIGEST_LENGTH: u32 = 28;
+pub const PG_SHA224_DIGEST_STRING_LENGTH: u32 = 57;
+pub const PG_SHA256_BLOCK_LENGTH: u32 = 64;
+pub const PG_SHA256_DIGEST_LENGTH: u32 = 32;
+pub const PG_SHA256_DIGEST_STRING_LENGTH: u32 = 65;
+pub const PG_SHA384_BLOCK_LENGTH: u32 = 128;
+pub const PG_SHA384_DIGEST_LENGTH: u32 = 48;
+pub const PG_SHA384_DIGEST_STRING_LENGTH: u32 = 97;
+pub const PG_SHA512_BLOCK_LENGTH: u32 = 128;
+pub const PG_SHA512_DIGEST_LENGTH: u32 = 64;
+pub const PG_SHA512_DIGEST_STRING_LENGTH: u32 = 129;
+pub const SCRAM_SHA_256_NAME: &::core::ffi::CStr = c"SCRAM-SHA-256";
+pub const SCRAM_SHA_256_PLUS_NAME: &::core::ffi::CStr = c"SCRAM-SHA-256-PLUS";
+pub const SCRAM_SHA_256_KEY_LEN: u32 = 32;
+pub const SCRAM_MAX_KEY_LEN: u32 = 32;
+pub const SCRAM_RAW_NONCE_LEN: u32 = 18;
+pub const SCRAM_DEFAULT_SALT_LEN: u32 = 16;
+pub const SCRAM_SHA_256_DEFAULT_ITERATIONS: u32 = 4096;
 pub const LP_UNUSED: u32 = 0;
 pub const LP_NORMAL: u32 = 1;
 pub const LP_REDIRECT: u32 = 2;
@@ -571,32 +631,6 @@ pub const TRANSACTION_STATUS_SUB_COMMITTED: u32 = 3;
 pub const CLOG_ZEROPAGE: u32 = 0;
 pub const CLOG_TRUNCATE: u32 = 16;
 pub const TZ_STRLEN_MAX: u32 = 255;
-pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
-pub const MAX_INTERVAL_PRECISION: u32 = 6;
-pub const TS_PREC_INV: f64 = 1000000.0;
-pub const DAYS_PER_YEAR: f64 = 365.25;
-pub const MONTHS_PER_YEAR: u32 = 12;
-pub const DAYS_PER_MONTH: u32 = 30;
-pub const DAYS_PER_WEEK: u32 = 7;
-pub const HOURS_PER_DAY: u32 = 24;
-pub const SECS_PER_YEAR: u32 = 31557600;
-pub const SECS_PER_DAY: u32 = 86400;
-pub const SECS_PER_HOUR: u32 = 3600;
-pub const SECS_PER_MINUTE: u32 = 60;
-pub const MINS_PER_HOUR: u32 = 60;
-pub const MAX_TZDISP_HOUR: u32 = 15;
-pub const TZDISP_LIMIT: u32 = 57600;
-pub const JULIAN_MINYEAR: i32 = -4713;
-pub const JULIAN_MINMONTH: u32 = 11;
-pub const JULIAN_MINDAY: u32 = 24;
-pub const JULIAN_MAXYEAR: u32 = 5874898;
-pub const JULIAN_MAXMONTH: u32 = 6;
-pub const JULIAN_MAXDAY: u32 = 3;
-pub const UNIX_EPOCH_JDATE: u32 = 2440588;
-pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
-pub const DATETIME_MIN_JULIAN: u32 = 0;
-pub const DATE_END_JULIAN: u32 = 2147483494;
-pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
 pub const CHECKPOINT_IS_SHUTDOWN: u32 = 1;
 pub const CHECKPOINT_END_OF_RECOVERY: u32 = 2;
 pub const CHECKPOINT_FAST: u32 = 4;
@@ -1635,7 +1669,7 @@ pub const XLOG_SPGIST_VACUUM_REDIRECT: u32 = 128;
 pub const TOAST_PGLZ_COMPRESSION: u8 = 112u8;
 pub const TOAST_LZ4_COMPRESSION: u8 = 108u8;
 pub const InvalidCompressionMethod: u8 = 0u8;
-pub const DEFAULT_TOAST_COMPRESSION: u8 = 112u8;
+pub const DEFAULT_TOAST_COMPRESSION: u8 = 108u8;
 pub const TOAST_NEEDS_DELETE_OLD: u32 = 1;
 pub const TOAST_NEEDS_FREE: u32 = 2;
 pub const TOAST_HAS_NULLS: u32 = 4;
@@ -2056,9 +2090,6 @@ pub const GUC_UNIT_S: u32 = 536870912;
 pub const GUC_UNIT_MIN: u32 = 805306368;
 pub const GUC_UNIT_TIME: u32 = 1879048192;
 pub const GUC_UNIT: u32 = 2130706432;
-pub const DEFAULT_DEBUG_COPY_PARSE_PLAN_TREES: u32 = 0;
-pub const DEFAULT_DEBUG_WRITE_READ_PARSE_PLAN_TREES: u32 = 0;
-pub const DEFAULT_DEBUG_RAW_EXPRESSION_COVERAGE_TEST: u32 = 0;
 pub const DefaultAclRelationId: Oid = Oid(826);
 pub const DefaultAclRoleNspObjIndexId: u32 = 827;
 pub const DefaultAclOidIndexId: u32 = 828;
@@ -3006,7 +3037,7 @@ pub const PROGRESS_COPY_TYPE_PIPE: u32 = 3;
 pub const PROGRESS_COPY_TYPE_CALLBACK: u32 = 4;
 pub const MIN_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const DEFAULT_DEBUG_DISCARD_CACHES: u32 = 0;
-pub const MAX_DEBUG_DISCARD_CACHES: u32 = 5;
+pub const MAX_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const MAX_RELCACHE_INVAL_MSGS: u32 = 4096;
 pub const CLUOPT_VERBOSE: u32 = 1;
 pub const CLUOPT_RECHECK: u32 = 2;
@@ -7093,7 +7124,6 @@ pub const TUPLESORT_RANDOMACCESS: u32 = 1;
 pub const TUPLESORT_ALLOWBOUNDED: u32 = 2;
 pub type __uint16_t = ::core::ffi::c_ushort;
 pub type __uint32_t = ::core::ffi::c_uint;
-pub type __uint64_t = ::core::ffi::c_ulong;
 pub type __uint_least16_t = __uint16_t;
 pub type __uint_least32_t = __uint32_t;
 pub type __dev_t = ::core::ffi::c_ulong;
@@ -7157,9 +7187,7 @@ pub struct _IO_FILE {
     pub _freeres_buf: *mut ::core::ffi::c_void,
     pub _prevchain: *mut *mut _IO_FILE,
     pub _mode: ::core::ffi::c_int,
-    pub _unused3: ::core::ffi::c_int,
-    pub _total_written: __uint64_t,
-    pub _unused2: [::core::ffi::c_char; 8usize],
+    pub _unused2: [::core::ffi::c_char; 20usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
@@ -7576,6 +7604,50 @@ pub mod pg_ternary {
     pub const PG_TERNARY_FALSE: Type = 0;
     pub const PG_TERNARY_TRUE: Type = 1;
     pub const PG_TERNARY_UNSET: Type = -1;
+}
+pub type Timestamp = int64;
+pub type TimestampTz = int64;
+pub type TimeOffset = int64;
+pub type fsec_t = int32;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Interval {
+    pub time: TimeOffset,
+    pub day: int32,
+    pub month: int32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm {
+    pub tm_usec: ::core::ffi::c_int,
+    pub tm_sec: ::core::ffi::c_int,
+    pub tm_min: ::core::ffi::c_int,
+    pub tm_hour: int64,
+    pub tm_mday: ::core::ffi::c_int,
+    pub tm_mon: ::core::ffi::c_int,
+    pub tm_year: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm_in {
+    pub tm_usec: int64,
+    pub tm_mday: ::core::ffi::c_int,
+    pub tm_mon: ::core::ffi::c_int,
+    pub tm_year: ::core::ffi::c_int,
+}
+pub mod pg_cryptohash_type {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PG_MD5: Type = 0;
+    pub const PG_SHA1: Type = 1;
+    pub const PG_SHA224: Type = 2;
+    pub const PG_SHA256: Type = 3;
+    pub const PG_SHA384: Type = 4;
+    pub const PG_SHA512: Type = 5;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_cryptohash_ctx {
+    _unused: [u8; 0],
 }
 pub mod CompareType {
     pub type Type = ::core::ffi::c_uint;
@@ -11148,36 +11220,6 @@ impl Default for BackupState {
             s.assume_init()
         }
     }
-}
-pub type Timestamp = int64;
-pub type TimestampTz = int64;
-pub type TimeOffset = int64;
-pub type fsec_t = int32;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct Interval {
-    pub time: TimeOffset,
-    pub day: int32,
-    pub month: int32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_itm {
-    pub tm_usec: ::core::ffi::c_int,
-    pub tm_sec: ::core::ffi::c_int,
-    pub tm_min: ::core::ffi::c_int,
-    pub tm_hour: int64,
-    pub tm_mday: ::core::ffi::c_int,
-    pub tm_mon: ::core::ffi::c_int,
-    pub tm_year: ::core::ffi::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_itm_in {
-    pub tm_usec: int64,
-    pub tm_mday: ::core::ffi::c_int,
-    pub tm_mon: ::core::ffi::c_int,
-    pub tm_year: ::core::ffi::c_int,
 }
 pub mod WalSyncMethod {
     pub type Type = ::core::ffi::c_uint;
@@ -19268,7 +19310,7 @@ impl Default for xl_hash_vacuum_one_page {
     }
 }
 pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_17 {
+pub mod _bindgen_ty_16 {
     pub type Type = ::core::ffi::c_uint;
     pub const SIGEV_SIGNAL: Type = 0;
     pub const SIGEV_NONE: Type = 1;
@@ -31622,7 +31664,6 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
-    pub check: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36025,7 +36066,6 @@ pub struct JumbleState {
     pub highest_extern_param_id: ::core::ffi::c_int,
     pub has_squashed_lists: bool,
     pub pending_nulls: ::core::ffi::c_uint,
-    pub total_jumble_len: Size,
 }
 impl Default for JumbleState {
     fn default() -> Self {
@@ -37529,7 +37569,7 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_27 {
+pub mod _bindgen_ty_26 {
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RC_OK: Type = 0;
     pub const PLPGSQL_RC_EXIT: Type = 1;
@@ -39348,6 +39388,7 @@ pub mod IoMethod {
     pub type Type = ::core::ffi::c_uint;
     pub const IOMETHOD_SYNC: Type = 0;
     pub const IOMETHOD_WORKER: Type = 1;
+    pub const IOMETHOD_IO_URING: Type = 2;
 }
 pub mod PgAioHandleFlags {
     pub type Type = ::core::ffi::c_uint;
@@ -43322,6 +43363,8 @@ unsafe extern "C-unwind" {
     pub fn MemoryContextAllocHuge(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn repalloc_huge(pointer: *mut ::core::ffi::c_void, size: Size)
     -> *mut ::core::ffi::c_void;
+    #[link_name = "MemoryContextSwitchTo__pgrx_cshim"]
+    pub fn MemoryContextSwitchTo(context: MemoryContext) -> MemoryContext;
     pub fn MemoryContextRegisterResetCallback(
         context: MemoryContext,
         cb: *mut MemoryContextCallback,
@@ -43416,6 +43459,60 @@ unsafe extern "C-unwind" {
     pub fn DatumGetFloat8(X: Datum) -> float8;
     #[link_name = "Float8GetDatum__pgrx_cshim"]
     pub fn Float8GetDatum(X: float8) -> Datum;
+    pub fn pg_cryptohash_create(type_: pg_cryptohash_type::Type) -> *mut pg_cryptohash_ctx;
+    pub fn pg_cryptohash_init(ctx: *mut pg_cryptohash_ctx) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_update(
+        ctx: *mut pg_cryptohash_ctx,
+        data: *const uint8,
+        len: usize,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_final(
+        ctx: *mut pg_cryptohash_ctx,
+        dest: *mut uint8,
+        len: usize,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_free(ctx: *mut pg_cryptohash_ctx);
+    pub fn pg_cryptohash_error(ctx: *mut pg_cryptohash_ctx) -> *const ::core::ffi::c_char;
+    pub fn scram_SaltedPassword(
+        password: *const ::core::ffi::c_char,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        salt: *const uint8,
+        saltlen: ::core::ffi::c_int,
+        iterations: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_H(
+        input: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_ClientKey(
+        salted_password: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_ServerKey(
+        salted_password: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_build_secret(
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        salt: *const uint8,
+        saltlen: ::core::ffi::c_int,
+        iterations: ::core::ffi::c_int,
+        password: *const ::core::ffi::c_char,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> *mut ::core::ffi::c_char;
     #[link_name = "BlockNumberIsValid__pgrx_cshim"]
     pub fn BlockNumberIsValid(blockNumber: BlockNumber) -> bool;
     #[link_name = "BlockIdSet__pgrx_cshim"]
@@ -44029,8 +44126,6 @@ unsafe extern "C-unwind" {
     pub fn systable_inplace_update_cancel(state: *mut ::core::ffi::c_void);
     #[link_name = "newNode__pgrx_cshim"]
     pub fn newNode(size: usize, tag: NodeTag) -> *mut Node;
-    #[link_name = "castNodeImpl__pgrx_cshim"]
-    pub fn castNodeImpl(type_: NodeTag, ptr: *mut ::core::ffi::c_void) -> *mut Node;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -44044,7 +44139,6 @@ unsafe extern "C-unwind" {
     pub fn nodeToStringWithLocations(obj: *const ::core::ffi::c_void) -> *mut ::core::ffi::c_char;
     pub fn bmsToString(bms: *const Bitmapset) -> *mut ::core::ffi::c_char;
     pub fn stringToNode(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
-    pub fn stringToNodeWithLocations(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
     pub fn readBitmapset() -> *mut Bitmapset;
     pub fn readDatum(typbyval: bool) -> Datum;
     pub fn readBoolCols(numCols: ::core::ffi::c_int) -> *mut bool;
@@ -44419,6 +44513,7 @@ unsafe extern "C-unwind" {
         key2: *const ::core::ffi::c_void,
         keysize: Size,
     ) -> ::core::ffi::c_int;
+    #[link_name = "AssertCouldGetRelation__pgrx_cshim"]
     pub fn AssertCouldGetRelation();
     pub fn RelationIdGetRelation(relationId: Oid) -> Relation;
     pub fn RelationClose(relation: Relation);
@@ -44476,7 +44571,6 @@ unsafe extern "C-unwind" {
     pub fn RelationForgetRelation(rid: Oid);
     pub fn RelationCacheInvalidateEntry(relationId: Oid);
     pub fn RelationCacheInvalidate(debug_discard: bool);
-    pub fn AssertPendingSyncs_RelationCache();
     pub fn AtEOXact_RelationCache(isCommit: bool);
     pub fn AtEOSubXact_RelationCache(
         isCommit: bool,
@@ -44717,6 +44811,8 @@ unsafe extern "C-unwind" {
     pub fn PageSetPageSizeAndVersion(page: Page, size: Size, version: uint8);
     #[link_name = "PageGetSpecialSize__pgrx_cshim"]
     pub fn PageGetSpecialSize(page: *const PageData) -> uint16;
+    #[link_name = "PageValidateSpecialPointer__pgrx_cshim"]
+    pub fn PageValidateSpecialPointer(page: *const PageData);
     #[link_name = "PageGetItem__pgrx_cshim"]
     pub fn PageGetItem(page: *mut PageData, itemId: *const ItemIdData) -> *mut ::core::ffi::c_void;
     #[link_name = "PageGetMaxOffsetNumber__pgrx_cshim"]
@@ -45142,6 +45238,14 @@ unsafe extern "C-unwind" {
     pub fn FullTransactionIdRetreat(dest: *mut FullTransactionId);
     #[link_name = "FullTransactionIdAdvance__pgrx_cshim"]
     pub fn FullTransactionIdAdvance(dest: *mut FullTransactionId);
+    #[link_name = "TransactionIdPrecedes__pgrx_cshim"]
+    pub fn TransactionIdPrecedes(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdPrecedesOrEquals__pgrx_cshim"]
+    pub fn TransactionIdPrecedesOrEquals(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdFollows__pgrx_cshim"]
+    pub fn TransactionIdFollows(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdFollowsOrEquals__pgrx_cshim"]
+    pub fn TransactionIdFollowsOrEquals(id1: TransactionId, id2: TransactionId) -> bool;
     pub fn TransactionStartedDuringRecovery() -> bool;
     pub static mut TransamVariables: *mut TransamVariablesData;
     pub fn TransactionIdDidCommit(transactionId: TransactionId) -> bool;
@@ -45176,7 +45280,6 @@ unsafe extern "C-unwind" {
     pub fn ForceTransactionIdLimitUpdate() -> bool;
     pub fn GetNewObjectId() -> Oid;
     pub fn StopGeneratingPinnedObjectIds();
-    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
     #[link_name = "ReadNextTransactionId__pgrx_cshim"]
     pub fn ReadNextTransactionId() -> TransactionId;
     #[link_name = "TransactionIdRetreatedBy__pgrx_cshim"]
@@ -45519,7 +45622,6 @@ unsafe extern "C-unwind" {
     ) -> Buffer;
     pub fn InitBufferManagerAccess();
     pub fn AtEOXact_Buffers(isCommit: bool);
-    pub fn AssertBufferLocksPermitCatalogRead();
     pub fn DebugPrintBufferRefcount(buffer: Buffer) -> *mut ::core::ffi::c_char;
     pub fn CheckPointBuffers(flags: ::core::ffi::c_int);
     pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
@@ -46478,6 +46580,8 @@ unsafe extern "C-unwind" {
     pub fn HeapTupleHeaderSetMatch(tup: *mut MinimalTupleData);
     #[link_name = "HeapTupleHeaderClearMatch__pgrx_cshim"]
     pub fn HeapTupleHeaderClearMatch(tup: *mut MinimalTupleData);
+    #[link_name = "GETSTRUCT__pgrx_cshim"]
+    pub fn GETSTRUCT(tuple: *const HeapTupleData) -> *mut ::core::ffi::c_void;
     #[link_name = "HeapTupleHasNulls__pgrx_cshim"]
     pub fn HeapTupleHasNulls(tuple: *const HeapTupleData) -> bool;
     #[link_name = "HeapTupleNoNulls__pgrx_cshim"]
@@ -46572,10 +46676,18 @@ unsafe extern "C-unwind" {
     pub fn heap_copy_minimal_tuple(mtup: MinimalTuple, extra: Size) -> MinimalTuple;
     pub fn heap_tuple_from_minimal_tuple(mtup: MinimalTuple) -> HeapTuple;
     pub fn minimal_tuple_from_heap_tuple(htup: HeapTuple, extra: Size) -> MinimalTuple;
+    pub fn varsize_any(p: *mut ::core::ffi::c_void) -> usize;
     pub fn heap_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> HeapTuple;
     pub fn minimal_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> MinimalTuple;
     #[link_name = "fastgetattr__pgrx_cshim"]
     pub fn fastgetattr(
+        tup: HeapTuple,
+        attnum: ::core::ffi::c_int,
+        tupleDesc: TupleDesc,
+        isnull: *mut bool,
+    ) -> Datum;
+    #[link_name = "heap_getattr__pgrx_cshim"]
+    pub fn heap_getattr(
         tup: HeapTuple,
         attnum: ::core::ffi::c_int,
         tupleDesc: TupleDesc,
@@ -48789,14 +48901,6 @@ unsafe extern "C-unwind" {
         params: *const VacuumParams,
         bstrategy: BufferAccessStrategy,
     );
-    pub fn heap_page_is_all_visible(
-        rel: Relation,
-        buf: Buffer,
-        vistest: *mut GlobalVisState,
-        all_frozen: *mut bool,
-        newest_live_xid: *mut TransactionId,
-        logging_offnum: *mut OffsetNumber,
-    ) -> bool;
     pub fn HeapTupleSatisfiesVisibility(
         htup: HeapTuple,
         snapshot: Snapshot,
@@ -49935,7 +50039,6 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SimpleLruWritePage(ctl: *mut SlruDesc, slotno: ::core::ffi::c_int);
     pub fn SimpleLruWriteAll(ctl: *mut SlruDesc, allow_redirtied: bool);
-    pub fn SlruPagePrecedesUnitTests(ctl: *mut SlruDesc, per_page: ::core::ffi::c_int);
     pub fn SimpleLruTruncate(ctl: *mut SlruDesc, cutoffPage: int64);
     pub fn SimpleLruDoesPhysicalPageExist(ctl: *mut SlruDesc, pageno: int64) -> bool;
     pub fn SlruScanDirectory(
@@ -51964,9 +52067,6 @@ unsafe extern "C-unwind" {
     pub static mut Debug_print_raw_parse: bool;
     pub static mut Debug_print_rewritten: bool;
     pub static mut Debug_pretty_print: bool;
-    pub static mut Debug_copy_parse_plan_trees: bool;
-    pub static mut Debug_write_read_parse_plan_trees: bool;
-    pub static mut Debug_raw_expression_coverage_test: bool;
     pub static mut log_parser_stats: bool;
     pub static mut log_planner_stats: bool;
     pub static mut log_executor_stats: bool;
@@ -53242,6 +53342,7 @@ unsafe extern "C-unwind" {
     pub fn MemoryContextDeleteChildren(context: MemoryContext);
     pub fn MemoryContextSetIdentifier(context: MemoryContext, id: *const ::core::ffi::c_char);
     pub fn MemoryContextSetParent(context: MemoryContext, new_parent: MemoryContext);
+    pub fn GetMemoryChunkContext(pointer: *mut ::core::ffi::c_void) -> MemoryContext;
     pub fn GetMemoryChunkSpace(pointer: *mut ::core::ffi::c_void) -> Size;
     pub fn MemoryContextGetParent(context: MemoryContext) -> MemoryContext;
     pub fn MemoryContextIsEmpty(context: MemoryContext) -> bool;
@@ -53255,7 +53356,6 @@ unsafe extern "C-unwind" {
         print_to_stderr: bool,
     );
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
-    pub fn MemoryContextCheck(context: MemoryContext);
     pub fn HandleLogMemoryContextInterrupt();
     pub fn ProcessLogMemoryContextInterrupt();
     pub fn AllocSetContextCreateInternal(
@@ -56939,6 +57039,8 @@ unsafe extern "C-unwind" {
     pub fn GetDatabaseEncodingName() -> *const ::core::ffi::c_char;
     pub fn SetMessageEncoding(encoding: ::core::ffi::c_int);
     pub fn GetMessageEncoding() -> ::core::ffi::c_int;
+    pub fn pg_bind_textdomain_codeset(domainname: *const ::core::ffi::c_char)
+    -> ::core::ffi::c_int;
     pub fn pg_do_encoding_conversion(
         src: *mut ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
@@ -57435,7 +57537,6 @@ unsafe extern "C-unwind" {
     pub fn JumbleQuery(query: *mut Query) -> *mut JumbleState;
     pub fn EnableQueryId();
     pub static mut query_id_enabled: bool;
-    pub static mut restore_location_fields: bool;
     pub fn pg_strtok(length: *mut ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn debackslash(
         token: *const ::core::ffi::c_char,
@@ -61951,6 +62052,7 @@ unsafe extern "C-unwind" {
     pub fn pgaio_io_get_target_name(ioh: *mut PgAioHandle) -> *const ::core::ffi::c_char;
     pub static pgaio_sync_ops: IoMethodOps;
     pub static pgaio_worker_ops: IoMethodOps;
+    pub static pgaio_uring_ops: IoMethodOps;
     pub static mut pgaio_method_ops: *const IoMethodOps;
     pub static mut pgaio_ctl: *mut PgAioCtl;
     pub static mut pgaio_my_backend: *mut PgAioBackend;
@@ -62357,7 +62459,6 @@ unsafe extern "C-unwind" {
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
     pub fn GetAnyGrantedHeavyweightLock(locktag: *mut LOCKTAG) -> bool;
-    pub fn GetLockMethodLocalHash() -> *mut HTAB;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
         locktag: *const LOCKTAG,
@@ -67998,6 +68099,1394 @@ unsafe extern "C-unwind" {
         nwaitevents: *mut ::core::ffi::c_int,
     ) -> *mut *mut ::core::ffi::c_char;
 }
+#[doc = " Compiler-verified C object macro `ACLITEM_ALL_GOPTION_BITS`, omitted by bindgen."]
+pub const ACLITEM_ALL_GOPTION_BITS: usize = 18446744069414584320;
+#[doc = " Compiler-verified C object macro `ACLITEM_ALL_PRIV_BITS`, omitted by bindgen."]
+pub const ACLITEM_ALL_PRIV_BITS: usize = 4294967295;
+#[doc = " Compiler-verified C object macro `ALLOCSET_DEFAULT_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_DEFAULT_SIZES: i32 = 8388608;
+#[doc = " Compiler-verified C object macro `ALLOCSET_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_SMALL_SIZES: i32 = 8192;
+#[doc = " Compiler-verified C object macro `ALLOCSET_START_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_START_SMALL_SIZES: i32 = 8388608;
+#[doc = " Compiler-verified C object macro `ALL_SET`, omitted by bindgen."]
+pub const ALL_SET: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `ATTRIBUTE_FIXED_PART_SIZE`, omitted by bindgen."]
+pub const ATTRIBUTE_FIXED_PART_SIZE: usize = 100;
+#[doc = " Compiler-verified C object macro `BACKEND_NUM_TYPES`, omitted by bindgen."]
+pub const BACKEND_NUM_TYPES: i32 = 18;
+#[doc = " Compiler-verified C object macro `BM_CHECKPOINT_NEEDED`, omitted by bindgen."]
+pub const BM_CHECKPOINT_NEEDED: usize = 1073741824;
+#[doc = " Compiler-verified C object macro `BM_DIRTY`, omitted by bindgen."]
+pub const BM_DIRTY: usize = 8388608;
+#[doc = " Compiler-verified C object macro `BM_IO_ERROR`, omitted by bindgen."]
+pub const BM_IO_ERROR: usize = 134217728;
+#[doc = " Compiler-verified C object macro `BM_IO_IN_PROGRESS`, omitted by bindgen."]
+pub const BM_IO_IN_PROGRESS: usize = 67108864;
+#[doc = " Compiler-verified C object macro `BM_LOCKED`, omitted by bindgen."]
+pub const BM_LOCKED: usize = 4194304;
+#[doc = " Compiler-verified C object macro `BM_LOCK_HAS_WAITERS`, omitted by bindgen."]
+pub const BM_LOCK_HAS_WAITERS: usize = 4294967296;
+#[doc = " Compiler-verified C object macro `BM_LOCK_MASK`, omitted by bindgen."]
+pub const BM_LOCK_MASK: usize = 18014381329612800;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_EXCLUSIVE`, omitted by bindgen."]
+pub const BM_LOCK_VAL_EXCLUSIVE: usize = 9007199254740992;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_SHARED`, omitted by bindgen."]
+pub const BM_LOCK_VAL_SHARED: usize = 17179869184;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_SHARE_EXCLUSIVE`, omitted by bindgen."]
+pub const BM_LOCK_VAL_SHARE_EXCLUSIVE: usize = 4503599627370496;
+#[doc = " Compiler-verified C object macro `BM_LOCK_WAKE_IN_PROGRESS`, omitted by bindgen."]
+pub const BM_LOCK_WAKE_IN_PROGRESS: usize = 8589934592;
+#[doc = " Compiler-verified C object macro `BM_PERMANENT`, omitted by bindgen."]
+pub const BM_PERMANENT: usize = 2147483648;
+#[doc = " Compiler-verified C object macro `BM_PIN_COUNT_WAITER`, omitted by bindgen."]
+pub const BM_PIN_COUNT_WAITER: usize = 536870912;
+#[doc = " Compiler-verified C object macro `BM_TAG_VALID`, omitted by bindgen."]
+pub const BM_TAG_VALID: usize = 33554432;
+#[doc = " Compiler-verified C object macro `BM_VALID`, omitted by bindgen."]
+pub const BM_VALID: usize = 16777216;
+#[doc = " Compiler-verified C object macro `BTMaxItemSize`, omitted by bindgen."]
+pub const BTMaxItemSize: usize = 2704;
+#[doc = " Compiler-verified C object macro `BTMaxItemSizeNoHeapTid`, omitted by bindgen."]
+pub const BTMaxItemSizeNoHeapTid: usize = 2712;
+#[doc = " Compiler-verified C object macro `BT_READ`, omitted by bindgen."]
+pub const BT_READ: i32 = 1;
+#[doc = " Compiler-verified C object macro `BT_WRITE`, omitted by bindgen."]
+pub const BT_WRITE: i32 = 3;
+#[doc = " Compiler-verified C object macro `BUFFERDESC_PAD_TO_SIZE`, omitted by bindgen."]
+pub const BUFFERDESC_PAD_TO_SIZE: i32 = 64;
+#[doc = " Compiler-verified C object macro `BUFFER_PAGE_DATA_OFFSET`, omitted by bindgen."]
+pub const BUFFER_PAGE_DATA_OFFSET: usize = 8;
+#[doc = " Compiler-verified C object macro `BUF_FLAG_MASK`, omitted by bindgen."]
+pub const BUF_FLAG_MASK: usize = 17175674880;
+#[doc = " Compiler-verified C object macro `BUF_REFCOUNT_MASK`, omitted by bindgen."]
+pub const BUF_REFCOUNT_MASK: usize = 262143;
+#[doc = " Compiler-verified C object macro `BUF_USAGECOUNT_MASK`, omitted by bindgen."]
+pub const BUF_USAGECOUNT_MASK: usize = 3932160;
+#[doc = " Compiler-verified C object macro `BUF_USAGECOUNT_ONE`, omitted by bindgen."]
+pub const BUF_USAGECOUNT_ONE: usize = 262144;
+#[doc = " Compiler-verified C object macro `BootstrapTransactionId`, omitted by bindgen."]
+pub const BootstrapTransactionId: u32 = 1;
+#[doc = " Compiler-verified C object macro `CANCEL_REQUEST_CODE`, omitted by bindgen."]
+pub const CANCEL_REQUEST_CODE: i32 = 80877102;
+#[doc = " Compiler-verified C object macro `CASHOID`, omitted by bindgen."]
+pub const CASHOID: i32 = 790;
+#[doc = " Compiler-verified C object macro `CLASS_TUPLE_SIZE`, omitted by bindgen."]
+pub const CLASS_TUPLE_SIZE: usize = 144;
+#[doc = " Compiler-verified C object macro `CONFLICT_NUM_TYPES`, omitted by bindgen."]
+pub const CONFLICT_NUM_TYPES: i32 = 8;
+#[doc = " Compiler-verified C object macro `CV_MINIMAL_SIZE`, omitted by bindgen."]
+pub const CV_MINIMAL_SIZE: i32 = 16;
+#[doc = " Compiler-verified C object macro `DATAHDRSIZE`, omitted by bindgen."]
+pub const DATAHDRSIZE: usize = 8;
+#[doc = " Compiler-verified C object macro `DATEVAL_NOBEGIN`, omitted by bindgen."]
+pub const DATEVAL_NOBEGIN: i32 = -2147483648;
+#[doc = " Compiler-verified C object macro `DATEVAL_NOEND`, omitted by bindgen."]
+pub const DATEVAL_NOEND: i32 = 2147483647;
+#[doc = " Compiler-verified C object macro `DEFAULT_IO_COMBINE_LIMIT`, omitted by bindgen."]
+pub const DEFAULT_IO_COMBINE_LIMIT: i32 = 16;
+#[doc = " Compiler-verified C object macro `DEFAULT_IO_METHOD`, omitted by bindgen."]
+pub const DEFAULT_IO_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `DEFAULT_SHARED_MEMORY_TYPE`, omitted by bindgen."]
+pub const DEFAULT_SHARED_MEMORY_TYPE: i32 = 2;
+#[doc = " Compiler-verified C object macro `DEFAULT_WAL_SYNC_METHOD`, omitted by bindgen."]
+pub const DEFAULT_WAL_SYNC_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `DSA_DEFAULT_INIT_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_DEFAULT_INIT_SEGMENT_SIZE: usize = 1048576;
+#[doc = " Compiler-verified C object macro `DSA_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSA_HANDLE_INVALID: u32 = 0;
+#[doc = " Compiler-verified C object macro `DSA_MAX_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_MAX_SEGMENT_SIZE: usize = 1099511627776;
+#[doc = " Compiler-verified C object macro `DSA_MIN_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_MIN_SEGMENT_SIZE: usize = 262144;
+#[doc = " Compiler-verified C object macro `DSHASH_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSHASH_HANDLE_INVALID: usize = 0;
+#[doc = " Compiler-verified C object macro `DSM_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSM_HANDLE_INVALID: u32 = 0;
+#[doc = " Compiler-verified C object macro `DTK_ALL_SECS_M`, omitted by bindgen."]
+pub const DTK_ALL_SECS_M: i32 = 28672;
+#[doc = " Compiler-verified C object macro `DTK_DATE_M`, omitted by bindgen."]
+pub const DTK_DATE_M: i32 = 14;
+#[doc = " Compiler-verified C object macro `DTK_TIME_M`, omitted by bindgen."]
+pub const DTK_TIME_M: i32 = 31744;
+#[doc = " Compiler-verified C object macro `DT_NOBEGIN`, omitted by bindgen."]
+pub const DT_NOBEGIN: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `DT_NOEND`, omitted by bindgen."]
+pub const DT_NOEND: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `END_TIMESTAMP`, omitted by bindgen."]
+pub const END_TIMESTAMP: i64 = 9223371331200000000;
+#[doc = " Compiler-verified C object macro `ERRCODE_ACTIVE_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_ACTIVE_SQL_TRANSACTION: i32 = 16777538;
+#[doc = " Compiler-verified C object macro `ERRCODE_ADMIN_SHUTDOWN`, omitted by bindgen."]
+pub const ERRCODE_ADMIN_SHUTDOWN: i32 = 16908741;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_ALIAS`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_ALIAS: i32 = 151126148;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_COLUMN: i32 = 33583236;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_FUNCTION: i32 = 84439172;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_PARAMETER: i32 = 134348932;
+#[doc = " Compiler-verified C object macro `ERRCODE_ARRAY_ELEMENT_ERROR`, omitted by bindgen."]
+pub const ERRCODE_ARRAY_ELEMENT_ERROR: i32 = 352845954;
+#[doc = " Compiler-verified C object macro `ERRCODE_ARRAY_SUBSCRIPT_ERROR`, omitted by bindgen."]
+pub const ERRCODE_ARRAY_SUBSCRIPT_ERROR: i32 = 352845954;
+#[doc = " Compiler-verified C object macro `ERRCODE_ASSERT_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_ASSERT_FAILURE: i32 = 67108896;
+#[doc = " Compiler-verified C object macro `ERRCODE_BAD_COPY_FILE_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_BAD_COPY_FILE_FORMAT: i32 = 67240066;
+#[doc = " Compiler-verified C object macro `ERRCODE_BRANCH_TRANSACTION_ALREADY_ACTIVE`, omitted by bindgen."]
+pub const ERRCODE_BRANCH_TRANSACTION_ALREADY_ACTIVE: i32 = 33554754;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANNOT_COERCE`, omitted by bindgen."]
+pub const ERRCODE_CANNOT_COERCE: i32 = 101744772;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANNOT_CONNECT_NOW`, omitted by bindgen."]
+pub const ERRCODE_CANNOT_CONNECT_NOW: i32 = 50463173;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANT_CHANGE_RUNTIME_PARAM`, omitted by bindgen."]
+pub const ERRCODE_CANT_CHANGE_RUNTIME_PARAM: i32 = 33685829;
+#[doc = " Compiler-verified C object macro `ERRCODE_CARDINALITY_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_CARDINALITY_VIOLATION: i32 = 66;
+#[doc = " Compiler-verified C object macro `ERRCODE_CASE_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_CASE_NOT_FOUND: i32 = 2;
+#[doc = " Compiler-verified C object macro `ERRCODE_CHARACTER_NOT_IN_REPERTOIRE`, omitted by bindgen."]
+pub const ERRCODE_CHARACTER_NOT_IN_REPERTOIRE: i32 = 17301634;
+#[doc = " Compiler-verified C object macro `ERRCODE_CHECK_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_CHECK_VIOLATION: i32 = 67391682;
+#[doc = " Compiler-verified C object macro `ERRCODE_COLLATION_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_COLLATION_MISMATCH: i32 = 17432708;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONFIGURATION_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_CONFIGURATION_LIMIT_EXCEEDED: i32 = 16581;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONFIG_FILE_ERROR`, omitted by bindgen."]
+pub const ERRCODE_CONFIG_FILE_ERROR: i32 = 22;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_DOES_NOT_EXIST`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_DOES_NOT_EXIST: i32 = 50332160;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_EXCEPTION: i32 = 512;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_FAILURE: i32 = 100663808;
+#[doc = " Compiler-verified C object macro `ERRCODE_CRASH_SHUTDOWN`, omitted by bindgen."]
+pub const ERRCODE_CRASH_SHUTDOWN: i32 = 33685957;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATABASE_DROPPED`, omitted by bindgen."]
+pub const ERRCODE_DATABASE_DROPPED: i32 = 67240389;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATATYPE_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_DATATYPE_MISMATCH: i32 = 67141764;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATA_CORRUPTED`, omitted by bindgen."]
+pub const ERRCODE_DATA_CORRUPTED: i32 = 16779816;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATA_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_DATA_EXCEPTION: i32 = 130;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATETIME_FIELD_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_DATETIME_FIELD_OVERFLOW: i32 = 134217858;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATETIME_VALUE_OUT_OF_RANGE`, omitted by bindgen."]
+pub const ERRCODE_DATETIME_VALUE_OUT_OF_RANGE: i32 = 134217858;
+#[doc = " Compiler-verified C object macro `ERRCODE_DEPENDENT_OBJECTS_STILL_EXIST`, omitted by bindgen."]
+pub const ERRCODE_DEPENDENT_OBJECTS_STILL_EXIST: i32 = 16909442;
+#[doc = " Compiler-verified C object macro `ERRCODE_DEPENDENT_PRIVILEGE_DESCRIPTORS_STILL_EXIST`, omitted by bindgen."]
+pub const ERRCODE_DEPENDENT_PRIVILEGE_DESCRIPTORS_STILL_EXIST: i32 = 1154;
+#[doc = " Compiler-verified C object macro `ERRCODE_DIAGNOSTICS_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_DIAGNOSTICS_EXCEPTION: i32 = 2688;
+#[doc = " Compiler-verified C object macro `ERRCODE_DISK_FULL`, omitted by bindgen."]
+pub const ERRCODE_DISK_FULL: i32 = 4293;
+#[doc = " Compiler-verified C object macro `ERRCODE_DIVISION_BY_ZERO`, omitted by bindgen."]
+pub const ERRCODE_DIVISION_BY_ZERO: i32 = 33816706;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_ALIAS`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_ALIAS: i32 = 33845380;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_COLUMN: i32 = 16806020;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_CURSOR`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_CURSOR: i32 = 50462852;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_DATABASE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_DATABASE: i32 = 67240068;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_FILE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_FILE: i32 = 33686021;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_FUNCTION: i32 = 50884740;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE: i32 = 786562;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_OBJECT: i32 = 290948;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_PSTATEMENT`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_PSTATEMENT: i32 = 84017284;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_SCHEMA`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_SCHEMA: i32 = 100794500;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_TABLE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_TABLE: i32 = 117571716;
+#[doc = " Compiler-verified C object macro `ERRCODE_ERROR_IN_ASSIGNMENT`, omitted by bindgen."]
+pub const ERRCODE_ERROR_IN_ASSIGNMENT: i32 = 83886210;
+#[doc = " Compiler-verified C object macro `ERRCODE_ESCAPE_CHARACTER_CONFLICT`, omitted by bindgen."]
+pub const ERRCODE_ESCAPE_CHARACTER_CONFLICT: i32 = 301990018;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXCLUSION_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_EXCLUSION_VIOLATION: i32 = 16908482;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXTERNAL_ROUTINE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_EXTERNAL_ROUTINE_EXCEPTION: i32 = 515;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXTERNAL_ROUTINE_INVOCATION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_EXTERNAL_ROUTINE_INVOCATION_EXCEPTION: i32 = 579;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_CONTAINING_SQL_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_CONTAINING_SQL_NOT_PERMITTED: i32 = 16777731;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED: i32 = 33554947;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED: i32 = 50332163;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_READING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_READING_SQL_DATA_NOT_PERMITTED: i32 = 67109379;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_EVENT_TRIGGER_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_EVENT_TRIGGER_PROTOCOL_VIOLATED: i32 = 50463299;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_INVALID_SQLSTATE_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_INVALID_SQLSTATE_RETURNED: i32 = 16777795;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_NULL_VALUE_NOT_ALLOWED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_NULL_VALUE_NOT_ALLOWED: i32 = 67109443;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_SRF_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_SRF_PROTOCOL_VIOLATED: i32 = 33686083;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_TRIGGER_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_TRIGGER_PROTOCOL_VIOLATED: i32 = 16908867;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_COLUMN_NAME_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_COLUMN_NAME_NOT_FOUND: i32 = 83888536;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_DYNAMIC_PARAMETER_VALUE_NEEDED`, omitted by bindgen."]
+pub const ERRCODE_FDW_DYNAMIC_PARAMETER_VALUE_NEEDED: i32 = 33556888;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_ERROR`, omitted by bindgen."]
+pub const ERRCODE_FDW_ERROR: i32 = 2456;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_FUNCTION_SEQUENCE_ERROR`, omitted by bindgen."]
+pub const ERRCODE_FDW_FUNCTION_SEQUENCE_ERROR: i32 = 264600;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INCONSISTENT_DESCRIPTOR_INFORMATION`, omitted by bindgen."]
+pub const ERRCODE_FDW_INCONSISTENT_DESCRIPTOR_INFORMATION: i32 = 17303960;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_ATTRIBUTE_VALUE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_ATTRIBUTE_VALUE: i32 = 67635608;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_COLUMN_NAME`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_COLUMN_NAME: i32 = 117442968;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_COLUMN_NUMBER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_COLUMN_NUMBER: i32 = 134220184;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DATA_TYPE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DATA_TYPE: i32 = 67111320;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DATA_TYPE_DESCRIPTORS`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DATA_TYPE_DESCRIPTORS: i32 = 100665752;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DESCRIPTOR_FIELD_IDENTIFIER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DESCRIPTOR_FIELD_IDENTIFIER: i32 = 19138968;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_HANDLE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_HANDLE: i32 = 301992344;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_OPTION_INDEX`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_OPTION_INDEX: i32 = 318769560;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_OPTION_NAME`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_OPTION_NAME: i32 = 335546776;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_STRING_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_STRING_FORMAT: i32 = 285215128;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_STRING_LENGTH_OR_BUFFER_LENGTH`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_STRING_LENGTH_OR_BUFFER_LENGTH: i32 = 2361752;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_USE_OF_NULL_POINTER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_USE_OF_NULL_POINTER: i32 = 150997400;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_NO_SCHEMAS`, omitted by bindgen."]
+pub const ERRCODE_FDW_NO_SCHEMAS: i32 = 536873368;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_OPTION_NAME_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_OPTION_NAME_NOT_FOUND: i32 = 436210072;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_OUT_OF_MEMORY`, omitted by bindgen."]
+pub const ERRCODE_FDW_OUT_OF_MEMORY: i32 = 16779672;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_REPLY_HANDLE`, omitted by bindgen."]
+pub const ERRCODE_FDW_REPLY_HANDLE: i32 = 452987288;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_SCHEMA_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_SCHEMA_NOT_FOUND: i32 = 553650584;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_TABLE_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_TABLE_NOT_FOUND: i32 = 570427800;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_TOO_MANY_HANDLES`, omitted by bindgen."]
+pub const ERRCODE_FDW_TOO_MANY_HANDLES: i32 = 67373464;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_CREATE_EXECUTION`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_CREATE_EXECUTION: i32 = 469764504;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_CREATE_REPLY`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_CREATE_REPLY: i32 = 486541720;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_ESTABLISH_CONNECTION`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_ESTABLISH_CONNECTION: i32 = 503318936;
+#[doc = " Compiler-verified C object macro `ERRCODE_FEATURE_NOT_SUPPORTED`, omitted by bindgen."]
+pub const ERRCODE_FEATURE_NOT_SUPPORTED: i32 = 1088;
+#[doc = " Compiler-verified C object macro `ERRCODE_FILE_NAME_TOO_LONG`, omitted by bindgen."]
+pub const ERRCODE_FILE_NAME_TOO_LONG: i32 = 50463237;
+#[doc = " Compiler-verified C object macro `ERRCODE_FLOATING_POINT_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_FLOATING_POINT_EXCEPTION: i32 = 16908418;
+#[doc = " Compiler-verified C object macro `ERRCODE_FOREIGN_KEY_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_FOREIGN_KEY_VIOLATION: i32 = 50352322;
+#[doc = " Compiler-verified C object macro `ERRCODE_GENERATED_ALWAYS`, omitted by bindgen."]
+pub const ERRCODE_GENERATED_ALWAYS: i32 = 156008580;
+#[doc = " Compiler-verified C object macro `ERRCODE_GROUPING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_GROUPING_ERROR: i32 = 50364548;
+#[doc = " Compiler-verified C object macro `ERRCODE_HELD_CURSOR_REQUIRES_SAME_ISOLATION_LEVEL`, omitted by bindgen."]
+pub const ERRCODE_HELD_CURSOR_REQUIRES_SAME_ISOLATION_LEVEL: i32 = 134218050;
+#[doc = " Compiler-verified C object macro `ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: i32 = 50463042;
+#[doc = " Compiler-verified C object macro `ERRCODE_IDLE_SESSION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_IDLE_SESSION_TIMEOUT: i32 = 84017605;
+#[doc = " Compiler-verified C object macro `ERRCODE_INAPPROPRIATE_ACCESS_MODE_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_INAPPROPRIATE_ACCESS_MODE_FOR_BRANCH_TRANSACTION: i32 = 50331970;
+#[doc = " Compiler-verified C object macro `ERRCODE_INAPPROPRIATE_ISOLATION_LEVEL_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_INAPPROPRIATE_ISOLATION_LEVEL_FOR_BRANCH_TRANSACTION: i32 = 67109186;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDETERMINATE_COLLATION`, omitted by bindgen."]
+pub const ERRCODE_INDETERMINATE_COLLATION: i32 = 34209924;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDETERMINATE_DATATYPE`, omitted by bindgen."]
+pub const ERRCODE_INDETERMINATE_DATATYPE: i32 = 134611076;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDEX_CORRUPTED`, omitted by bindgen."]
+pub const ERRCODE_INDEX_CORRUPTED: i32 = 33557032;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDICATOR_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_INDICATOR_OVERFLOW: i32 = 34078850;
+#[doc = " Compiler-verified C object macro `ERRCODE_INSUFFICIENT_PRIVILEGE`, omitted by bindgen."]
+pub const ERRCODE_INSUFFICIENT_PRIVILEGE: i32 = 16797828;
+#[doc = " Compiler-verified C object macro `ERRCODE_INSUFFICIENT_RESOURCES`, omitted by bindgen."]
+pub const ERRCODE_INSUFFICIENT_RESOURCES: i32 = 197;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION: i32 = 194;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTERNAL_ERROR`, omitted by bindgen."]
+pub const ERRCODE_INTERNAL_ERROR: i32 = 2600;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTERVAL_FIELD_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_INTERVAL_FIELD_OVERFLOW: i32 = 84148354;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_LOG`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_LOG: i32 = 352583810;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_NTH_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_NTH_VALUE: i32 = 100925570;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_NTILE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_NTILE: i32 = 67371138;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_POWER_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_POWER_FUNCTION: i32 = 369361026;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION: i32 = 17563778;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_WIDTH_BUCKET_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_WIDTH_BUCKET_FUNCTION: i32 = 386138242;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_XQUERY`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_XQUERY: i32 = 134242305;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_AUTHORIZATION_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_AUTHORIZATION_SPECIFICATION: i32 = 514;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_BINARY_REPRESENTATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_BINARY_REPRESENTATION: i32 = 50462850;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CATALOG_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CATALOG_NAME: i32 = 1283;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CHARACTER_VALUE_FOR_CAST`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CHARACTER_VALUE_FOR_CAST: i32 = 134480002;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_COLUMN_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_COLUMN_DEFINITION: i32 = 17064068;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_COLUMN_REFERENCE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_COLUMN_REFERENCE: i32 = 393348;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_DEFINITION: i32 = 17170564;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_NAME: i32 = 259;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_STATE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_STATE: i32 = 258;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_DATABASE_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_DATABASE_DEFINITION: i32 = 33947780;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_DATETIME_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_DATETIME_FORMAT: i32 = 117440642;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_CHARACTER: i32 = 151257218;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_OCTET`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_OCTET: i32 = 335544450;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_SEQUENCE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_SEQUENCE: i32 = 84410498;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_FOREIGN_KEY`, omitted by bindgen."]
+pub const ERRCODE_INVALID_FOREIGN_KEY: i32 = 819332;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_FUNCTION_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_FUNCTION_DEFINITION: i32 = 50724996;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_GRANTOR`, omitted by bindgen."]
+pub const ERRCODE_INVALID_GRANTOR: i32 = 1792;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_GRANT_OPERATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_GRANT_OPERATION: i32 = 16910080;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_INDICATOR_PARAMETER_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_INDICATOR_PARAMETER_VALUE: i32 = 262274;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_JSON_TEXT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_JSON_TEXT: i32 = 34340994;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_NAME: i32 = 33579140;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_OBJECT_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_OBJECT_DEFINITION: i32 = 117833860;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PARAMETER_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PARAMETER_VALUE: i32 = 50856066;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PASSWORD`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PASSWORD: i32 = 16908802;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PRECEDING_OR_FOLLOWING_SIZE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PRECEDING_OR_FOLLOWING_SIZE: i32 = 50593922;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PSTATEMENT_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PSTATEMENT_DEFINITION: i32 = 67502212;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_RECURSION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_RECURSION: i32 = 151388292;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_REGULAR_EXPRESSION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_REGULAR_EXPRESSION: i32 = 302252162;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROLE_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROLE_SPECIFICATION: i32 = 2048;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROW_COUNT_IN_LIMIT_CLAUSE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROW_COUNT_IN_LIMIT_CLAUSE: i32 = 654573698;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROW_COUNT_IN_RESULT_OFFSET_CLAUSE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROW_COUNT_IN_RESULT_OFFSET_CLAUSE: i32 = 671350914;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SCHEMA_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SCHEMA_DEFINITION: i32 = 84279428;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SCHEMA_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SCHEMA_NAME: i32 = 1411;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SQL_JSON_SUBSCRIPT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SQL_JSON_SUBSCRIPT: i32 = 51118210;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SQL_STATEMENT_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SQL_STATEMENT_NAME: i32 = 386;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLESAMPLE_ARGUMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLESAMPLE_ARGUMENT: i32 = 403177602;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLESAMPLE_REPEAT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLESAMPLE_REPEAT: i32 = 386400386;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLE_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLE_DEFINITION: i32 = 101056644;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TEXT_REPRESENTATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TEXT_REPRESENTATION: i32 = 33685634;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TIME_ZONE_DISPLACEMENT_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TIME_ZONE_DISPLACEMENT_VALUE: i32 = 150995074;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_INITIATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_INITIATION: i32 = 1152;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_STATE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_STATE: i32 = 322;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_TERMINATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_TERMINATION: i32 = 1282;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_USE_OF_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_INVALID_USE_OF_ESCAPE_CHARACTER: i32 = 318767234;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_COMMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_COMMENT: i32 = 587202690;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_CONTENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_CONTENT: i32 = 503316610;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_DOCUMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_DOCUMENT: i32 = 486539394;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_PROCESSING_INSTRUCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_PROCESSING_INSTRUCTION: i32 = 603979906;
+#[doc = " Compiler-verified C object macro `ERRCODE_IN_FAILED_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_IN_FAILED_SQL_TRANSACTION: i32 = 33685826;
+#[doc = " Compiler-verified C object macro `ERRCODE_IO_ERROR`, omitted by bindgen."]
+pub const ERRCODE_IO_ERROR: i32 = 786949;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCATOR_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_LOCATOR_EXCEPTION: i32 = 1408;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCK_FILE_EXISTS`, omitted by bindgen."]
+pub const ERRCODE_LOCK_FILE_EXISTS: i32 = 16777238;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCK_NOT_AVAILABLE`, omitted by bindgen."]
+pub const ERRCODE_LOCK_NOT_AVAILABLE: i32 = 50463045;
+#[doc = " Compiler-verified C object macro `ERRCODE_L_E_INVALID_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_L_E_INVALID_SPECIFICATION: i32 = 16778624;
+#[doc = " Compiler-verified C object macro `ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM: i32 = 67895426;
+#[doc = " Compiler-verified C object macro `ERRCODE_MOST_SPECIFIC_TYPE_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_MOST_SPECIFIC_TYPE_MISMATCH: i32 = 385876098;
+#[doc = " Compiler-verified C object macro `ERRCODE_NAME_TOO_LONG`, omitted by bindgen."]
+pub const ERRCODE_NAME_TOO_LONG: i32 = 34103428;
+#[doc = " Compiler-verified C object macro `ERRCODE_NONSTANDARD_USE_OF_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_NONSTANDARD_USE_OF_ESCAPE_CHARACTER: i32 = 100794498;
+#[doc = " Compiler-verified C object macro `ERRCODE_NON_NUMERIC_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_NON_NUMERIC_SQL_JSON_ITEM: i32 = 101449858;
+#[doc = " Compiler-verified C object macro `ERRCODE_NON_UNIQUE_KEYS_IN_A_JSON_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_NON_UNIQUE_KEYS_IN_A_JSON_OBJECT: i32 = 118227074;
+#[doc = " Compiler-verified C object macro `ERRCODE_NOT_AN_XML_DOCUMENT`, omitted by bindgen."]
+pub const ERRCODE_NOT_AN_XML_DOCUMENT: i32 = 469762178;
+#[doc = " Compiler-verified C object macro `ERRCODE_NOT_NULL_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_NOT_NULL_VIOLATION: i32 = 33575106;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ACTIVE_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_NO_ACTIVE_SQL_TRANSACTION: i32 = 16908610;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ACTIVE_SQL_TRANSACTION_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_NO_ACTIVE_SQL_TRANSACTION_FOR_BRANCH_TRANSACTION: i32 = 83886402;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ADDITIONAL_DYNAMIC_RESULT_SETS_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_NO_ADDITIONAL_DYNAMIC_RESULT_SETS_RETURNED: i32 = 16777344;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_DATA`, omitted by bindgen."]
+pub const ERRCODE_NO_DATA: i32 = 128;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_DATA_FOUND`, omitted by bindgen."]
+pub const ERRCODE_NO_DATA_FOUND: i32 = 33554464;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_NO_SQL_JSON_ITEM: i32 = 84672642;
+#[doc = " Compiler-verified C object macro `ERRCODE_NULL_VALUE_NOT_ALLOWED`, omitted by bindgen."]
+pub const ERRCODE_NULL_VALUE_NOT_ALLOWED: i32 = 67108994;
+#[doc = " Compiler-verified C object macro `ERRCODE_NULL_VALUE_NO_INDICATOR_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_NULL_VALUE_NO_INDICATOR_PARAMETER: i32 = 33554562;
+#[doc = " Compiler-verified C object macro `ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE`, omitted by bindgen."]
+pub const ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE: i32 = 50331778;
+#[doc = " Compiler-verified C object macro `ERRCODE_OBJECT_IN_USE`, omitted by bindgen."]
+pub const ERRCODE_OBJECT_IN_USE: i32 = 100663621;
+#[doc = " Compiler-verified C object macro `ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE`, omitted by bindgen."]
+pub const ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE: i32 = 325;
+#[doc = " Compiler-verified C object macro `ERRCODE_OPERATOR_INTERVENTION`, omitted by bindgen."]
+pub const ERRCODE_OPERATOR_INTERVENTION: i32 = 453;
+#[doc = " Compiler-verified C object macro `ERRCODE_OUT_OF_MEMORY`, omitted by bindgen."]
+pub const ERRCODE_OUT_OF_MEMORY: i32 = 8389;
+#[doc = " Compiler-verified C object macro `ERRCODE_PLPGSQL_ERROR`, omitted by bindgen."]
+pub const ERRCODE_PLPGSQL_ERROR: i32 = 32;
+#[doc = " Compiler-verified C object macro `ERRCODE_PROGRAM_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_PROGRAM_LIMIT_EXCEEDED: i32 = 261;
+#[doc = " Compiler-verified C object macro `ERRCODE_PROTOCOL_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_PROTOCOL_VIOLATION: i32 = 16908800;
+#[doc = " Compiler-verified C object macro `ERRCODE_QUERY_CANCELED`, omitted by bindgen."]
+pub const ERRCODE_QUERY_CANCELED: i32 = 67371461;
+#[doc = " Compiler-verified C object macro `ERRCODE_RAISE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_RAISE_EXCEPTION: i32 = 16777248;
+#[doc = " Compiler-verified C object macro `ERRCODE_READ_ONLY_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_READ_ONLY_SQL_TRANSACTION: i32 = 100663618;
+#[doc = " Compiler-verified C object macro `ERRCODE_RESERVED_NAME`, omitted by bindgen."]
+pub const ERRCODE_RESERVED_NAME: i32 = 151818372;
+#[doc = " Compiler-verified C object macro `ERRCODE_RESTRICT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_RESTRICT_VIOLATION: i32 = 16777410;
+#[doc = " Compiler-verified C object macro `ERRCODE_SAVEPOINT_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_SAVEPOINT_EXCEPTION: i32 = 1155;
+#[doc = " Compiler-verified C object macro `ERRCODE_SCHEMA_AND_DATA_STATEMENT_MIXING_NOT_SUPPORTED`, omitted by bindgen."]
+pub const ERRCODE_SCHEMA_AND_DATA_STATEMENT_MIXING_NOT_SUPPORTED: i32 = 117440834;
+#[doc = " Compiler-verified C object macro `ERRCODE_SEQUENCE_GENERATOR_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_SEQUENCE_GENERATOR_LIMIT_EXCEEDED: i32 = 402653314;
+#[doc = " Compiler-verified C object macro `ERRCODE_SINGLETON_SQL_JSON_ITEM_REQUIRED`, omitted by bindgen."]
+pub const ERRCODE_SINGLETON_SQL_JSON_ITEM_REQUIRED: i32 = 135004290;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQLCLIENT_UNABLE_TO_ESTABLISH_SQLCONNECTION`, omitted by bindgen."]
+pub const ERRCODE_SQLCLIENT_UNABLE_TO_ESTABLISH_SQLCONNECTION: i32 = 16777728;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQLSERVER_REJECTED_ESTABLISHMENT_OF_SQLCONNECTION`, omitted by bindgen."]
+pub const ERRCODE_SQLSERVER_REJECTED_ESTABLISHMENT_OF_SQLCONNECTION: i32 = 67109376;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_ARRAY_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_ARRAY_NOT_FOUND: i32 = 151781506;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE: i32 = 386662530;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_MEMBER_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_MEMBER_NOT_FOUND: i32 = 285999234;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_NUMBER_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_NUMBER_NOT_FOUND: i32 = 302776450;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_OBJECT_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_OBJECT_NOT_FOUND: i32 = 319553666;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_SCALAR_REQUIRED`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_SCALAR_REQUIRED: i32 = 369885314;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_ROUTINE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_SQL_ROUTINE_EXCEPTION: i32 = 1410;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_STATEMENT_NOT_YET_COMPLETE`, omitted by bindgen."]
+pub const ERRCODE_SQL_STATEMENT_NOT_YET_COMPLETE: i32 = 192;
+#[doc = " Compiler-verified C object macro `ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER`, omitted by bindgen."]
+pub const ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER: i32 = 33557120;
+#[doc = " Compiler-verified C object macro `ERRCODE_STATEMENT_TOO_COMPLEX`, omitted by bindgen."]
+pub const ERRCODE_STATEMENT_TOO_COMPLEX: i32 = 16777477;
+#[doc = " Compiler-verified C object macro `ERRCODE_STRING_DATA_LENGTH_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_STRING_DATA_LENGTH_MISMATCH: i32 = 101187714;
+#[doc = " Compiler-verified C object macro `ERRCODE_STRING_DATA_RIGHT_TRUNCATION`, omitted by bindgen."]
+pub const ERRCODE_STRING_DATA_RIGHT_TRUNCATION: i32 = 16777346;
+#[doc = " Compiler-verified C object macro `ERRCODE_SUBSTRING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SUBSTRING_ERROR: i32 = 17039490;
+#[doc = " Compiler-verified C object macro `ERRCODE_SUCCESSFUL_COMPLETION`, omitted by bindgen."]
+pub const ERRCODE_SUCCESSFUL_COMPLETION: i32 = 0;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYNTAX_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SYNTAX_ERROR: i32 = 16801924;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYNTAX_ERROR_OR_ACCESS_RULE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_SYNTAX_ERROR_OR_ACCESS_RULE_VIOLATION: i32 = 132;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYSTEM_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SYSTEM_ERROR: i32 = 517;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_E_INVALID_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_S_E_INVALID_SPECIFICATION: i32 = 16778371;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_FUNCTION_EXECUTED_NO_RETURN_STATEMENT`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_FUNCTION_EXECUTED_NO_RETURN_STATEMENT: i32 = 83887490;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED: i32 = 33555842;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED: i32 = 50333058;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_READING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_READING_SQL_DATA_NOT_PERMITTED: i32 = 67110274;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_ARGUMENTS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_ARGUMENTS: i32 = 50856197;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_COLUMNS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_COLUMNS: i32 = 17039621;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_CONNECTIONS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_CONNECTIONS: i32 = 12485;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS: i32 = 336330882;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS: i32 = 353108098;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_ROWS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_ROWS: i32 = 50331680;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_RESOLUTION_UNKNOWN`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_RESOLUTION_UNKNOWN: i32 = 117441024;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_ROLLBACK`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_ROLLBACK: i32 = 4;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_TIMEOUT: i32 = 67240258;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIGGERED_ACTION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_TRIGGERED_ACTION_EXCEPTION: i32 = 576;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIGGERED_DATA_CHANGE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_TRIGGERED_DATA_CHANGE_VIOLATION: i32 = 450;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIM_ERROR`, omitted by bindgen."]
+pub const ERRCODE_TRIM_ERROR: i32 = 117964930;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_DEADLOCK_DETECTED`, omitted by bindgen."]
+pub const ERRCODE_T_R_DEADLOCK_DETECTED: i32 = 16908292;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_INTEGRITY_CONSTRAINT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_T_R_INTEGRITY_CONSTRAINT_VIOLATION: i32 = 33554436;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_SERIALIZATION_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_T_R_SERIALIZATION_FAILURE: i32 = 16777220;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_STATEMENT_COMPLETION_UNKNOWN`, omitted by bindgen."]
+pub const ERRCODE_T_R_STATEMENT_COMPLETION_UNKNOWN: i32 = 50331652;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_COLUMN: i32 = 50360452;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_CURSOR`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_CURSOR: i32 = 259;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_DATABASE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_DATABASE: i32 = 1283;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_FILE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_FILE: i32 = 16908805;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_FUNCTION: i32 = 52461700;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_OBJECT: i32 = 67137668;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_PARAMETER: i32 = 33685636;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_PSTATEMENT`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_PSTATEMENT: i32 = 386;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_SCHEMA`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_SCHEMA: i32 = 1411;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_TABLE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_TABLE: i32 = 16908420;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNIQUE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_UNIQUE_VIOLATION: i32 = 83906754;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNSAFE_NEW_ENUM_VALUE_USAGE`, omitted by bindgen."]
+pub const ERRCODE_UNSAFE_NEW_ENUM_VALUE_USAGE: i32 = 67240261;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNTERMINATED_C_STRING`, omitted by bindgen."]
+pub const ERRCODE_UNTERMINATED_C_STRING: i32 = 67633282;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNTRANSLATABLE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_UNTRANSLATABLE_CHARACTER: i32 = 84017282;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING`, omitted by bindgen."]
+pub const ERRCODE_WARNING: i32 = 64;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_DEPRECATED_FEATURE`, omitted by bindgen."]
+pub const ERRCODE_WARNING_DEPRECATED_FEATURE: i32 = 16908352;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_DYNAMIC_RESULT_SETS_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_DYNAMIC_RESULT_SETS_RETURNED: i32 = 318767168;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_IMPLICIT_ZERO_BIT_PADDING`, omitted by bindgen."]
+pub const ERRCODE_WARNING_IMPLICIT_ZERO_BIT_PADDING: i32 = 134217792;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_NULL_VALUE_ELIMINATED_IN_SET_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_WARNING_NULL_VALUE_ELIMINATED_IN_SET_FUNCTION: i32 = 50331712;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_PRIVILEGE_NOT_GRANTED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_PRIVILEGE_NOT_GRANTED: i32 = 117440576;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_PRIVILEGE_NOT_REVOKED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_PRIVILEGE_NOT_REVOKED: i32 = 100663360;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_STRING_DATA_RIGHT_TRUNCATION`, omitted by bindgen."]
+pub const ERRCODE_WARNING_STRING_DATA_RIGHT_TRUNCATION: i32 = 67108928;
+#[doc = " Compiler-verified C object macro `ERRCODE_WINDOWING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_WINDOWING_ERROR: i32 = 655492;
+#[doc = " Compiler-verified C object macro `ERRCODE_WITH_CHECK_OPTION_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_WITH_CHECK_OPTION_VIOLATION: i32 = 260;
+#[doc = " Compiler-verified C object macro `ERRCODE_WRONG_OBJECT_TYPE`, omitted by bindgen."]
+pub const ERRCODE_WRONG_OBJECT_TYPE: i32 = 151027844;
+#[doc = " Compiler-verified C object macro `ERRCODE_ZERO_LENGTH_CHARACTER_STRING`, omitted by bindgen."]
+pub const ERRCODE_ZERO_LENGTH_CHARACTER_STRING: i32 = 369098882;
+#[doc = " Compiler-verified C object macro `ERROR`, omitted by bindgen."]
+pub const ERROR: i32 = 21;
+#[doc = " Compiler-verified C object macro `EXPANDED_POINTER_SIZE`, omitted by bindgen."]
+pub const EXPANDED_POINTER_SIZE: usize = 10;
+#[doc = " Compiler-verified C object macro `EXTERN_TUPLE_MAX_SIZE`, omitted by bindgen."]
+pub const EXTERN_TUPLE_MAX_SIZE: usize = 2032;
+#[doc = " Compiler-verified C object macro `FETCH_ALL`, omitted by bindgen."]
+pub const FETCH_ALL: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `FirstCommandId`, omitted by bindgen."]
+pub const FirstCommandId: u32 = 0;
+#[doc = " Compiler-verified C object macro `FirstMultiXactId`, omitted by bindgen."]
+pub const FirstMultiXactId: u32 = 1;
+#[doc = " Compiler-verified C object macro `FirstNormalSerCommitSeqNo`, omitted by bindgen."]
+pub const FirstNormalSerCommitSeqNo: usize = 2;
+#[doc = " Compiler-verified C object macro `FirstNormalTransactionId`, omitted by bindgen."]
+pub const FirstNormalTransactionId: u32 = 3;
+#[doc = " Compiler-verified C object macro `FirstNormalUnloggedLSN`, omitted by bindgen."]
+pub const FirstNormalUnloggedLSN: usize = 1000;
+#[doc = " Compiler-verified C object macro `FirstOffsetNumber`, omitted by bindgen."]
+pub const FirstOffsetNumber: u16 = 1;
+#[doc = " Compiler-verified C object macro `FrozenTransactionId`, omitted by bindgen."]
+pub const FrozenTransactionId: u32 = 2;
+#[doc = " Compiler-verified C object macro `GEVHDRSZ`, omitted by bindgen."]
+pub const GEVHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `GIN_EXCLUSIVE`, omitted by bindgen."]
+pub const GIN_EXCLUSIVE: i32 = 3;
+#[doc = " Compiler-verified C object macro `GIN_NDELETE_AT_ONCE`, omitted by bindgen."]
+pub const GIN_NDELETE_AT_ONCE: i32 = 16;
+#[doc = " Compiler-verified C object macro `GIN_SHARE`, omitted by bindgen."]
+pub const GIN_SHARE: i32 = 1;
+#[doc = " Compiler-verified C object macro `GIN_TREE_POSTING`, omitted by bindgen."]
+pub const GIN_TREE_POSTING: u16 = 65535;
+#[doc = " Compiler-verified C object macro `GIN_UNLOCK`, omitted by bindgen."]
+pub const GIN_UNLOCK: i32 = 0;
+#[doc = " Compiler-verified C object macro `GISTMaxIndexKeySize`, omitted by bindgen."]
+pub const GISTMaxIndexKeySize: usize = 2024;
+#[doc = " Compiler-verified C object macro `GISTMaxIndexTupleSize`, omitted by bindgen."]
+pub const GISTMaxIndexTupleSize: usize = 2032;
+#[doc = " Compiler-verified C object macro `GIST_EXCLUSIVE`, omitted by bindgen."]
+pub const GIST_EXCLUSIVE: i32 = 3;
+#[doc = " Compiler-verified C object macro `GIST_SHARE`, omitted by bindgen."]
+pub const GIST_SHARE: i32 = 1;
+#[doc = " Compiler-verified C object macro `GIST_UNLOCK`, omitted by bindgen."]
+pub const GIST_UNLOCK: i32 = 0;
+#[doc = " Compiler-verified C object macro `GiSTPageSize`, omitted by bindgen."]
+pub const GiSTPageSize: usize = 8152;
+#[doc = " Compiler-verified C object macro `GinDataPageMaxDataSize`, omitted by bindgen."]
+pub const GinDataPageMaxDataSize: usize = 8152;
+#[doc = " Compiler-verified C object macro `GinListPageSize`, omitted by bindgen."]
+pub const GinListPageSize: usize = 8160;
+#[doc = " Compiler-verified C object macro `GinMaxItemSize`, omitted by bindgen."]
+pub const GinMaxItemSize: usize = 2712;
+#[doc = " Compiler-verified C object macro `GistBuildLSN`, omitted by bindgen."]
+pub const GistBuildLSN: usize = 1;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_HEADER_SIZE`, omitted by bindgen."]
+pub const HASH_CHUNK_HEADER_SIZE: usize = 32;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_SIZE`, omitted by bindgen."]
+pub const HASH_CHUNK_SIZE: usize = 32768;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_THRESHOLD`, omitted by bindgen."]
+pub const HASH_CHUNK_THRESHOLD: usize = 8192;
+#[doc = " Compiler-verified C object macro `HASH_MAX_BITMAPS`, omitted by bindgen."]
+pub const HASH_MAX_BITMAPS: i32 = 1024;
+#[doc = " Compiler-verified C object macro `HASH_PARTITION_SEED`, omitted by bindgen."]
+pub const HASH_PARTITION_SEED: usize = 8816678312871386365;
+#[doc = " Compiler-verified C object macro `HASH_READ`, omitted by bindgen."]
+pub const HASH_READ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HASH_WRITE`, omitted by bindgen."]
+pub const HASH_WRITE: i32 = 3;
+#[doc = " Compiler-verified C object macro `HAVE_APPEND_HISTORY`, omitted by bindgen."]
+pub const HAVE_APPEND_HISTORY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_BACKTRACE_SYMBOLS`, omitted by bindgen."]
+pub const HAVE_BACKTRACE_SYMBOLS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_COMPUTED_GOTO`, omitted by bindgen."]
+pub const HAVE_COMPUTED_GOTO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_COPY_FILE_RANGE`, omitted by bindgen."]
+pub const HAVE_COPY_FILE_RANGE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_CXX_TYPEOF`, omitted by bindgen."]
+pub const HAVE_CXX_TYPEOF: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_FDATASYNC`, omitted by bindgen."]
+pub const HAVE_DECL_FDATASYNC: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_F_FULLFSYNC`, omitted by bindgen."]
+pub const HAVE_DECL_F_FULLFSYNC: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_MEMSET_S`, omitted by bindgen."]
+pub const HAVE_DECL_MEMSET_S: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_POSIX_FADVISE`, omitted by bindgen."]
+pub const HAVE_DECL_POSIX_FADVISE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_PREADV`, omitted by bindgen."]
+pub const HAVE_DECL_PREADV: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_PWRITEV`, omitted by bindgen."]
+pub const HAVE_DECL_PWRITEV: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRCHRNUL`, omitted by bindgen."]
+pub const HAVE_DECL_STRCHRNUL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCAT`, omitted by bindgen."]
+pub const HAVE_DECL_STRLCAT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCPY`, omitted by bindgen."]
+pub const HAVE_DECL_STRLCPY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRSEP`, omitted by bindgen."]
+pub const HAVE_DECL_STRSEP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_TIMINGSAFE_BCMP`, omitted by bindgen."]
+pub const HAVE_DECL_TIMINGSAFE_BCMP: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_EXECINFO_H`, omitted by bindgen."]
+pub const HAVE_EXECINFO_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_EXPLICIT_BZERO`, omitted by bindgen."]
+pub const HAVE_EXPLICIT_BZERO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_FSEEKO`, omitted by bindgen."]
+pub const HAVE_FSEEKO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__ATOMIC_INT32_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__ATOMIC_INT32_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__ATOMIC_INT64_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__ATOMIC_INT64_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_CHAR_TAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_CHAR_TAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT32_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT32_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT32_TAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT32_TAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT64_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT64_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETAUXVAL`, omitted by bindgen."]
+pub const HAVE_GETAUXVAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETIFADDRS`, omitted by bindgen."]
+pub const HAVE_GETIFADDRS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT`, omitted by bindgen."]
+pub const HAVE_GETOPT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT_H`, omitted by bindgen."]
+pub const HAVE_GETOPT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT_LONG`, omitted by bindgen."]
+pub const HAVE_GETOPT_LONG: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETRLIMIT`, omitted by bindgen."]
+pub const HAVE_GETRLIMIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_EXT_H`, omitted by bindgen."]
+pub const HAVE_GSSAPI_GSSAPI_EXT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_H`, omitted by bindgen."]
+pub const HAVE_GSSAPI_GSSAPI_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_HISTORY_TRUNCATE_FILE`, omitted by bindgen."]
+pub const HAVE_HISTORY_TRUNCATE_FILE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_IFADDRS_H`, omitted by bindgen."]
+pub const HAVE_IFADDRS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INET_ATON`, omitted by bindgen."]
+pub const HAVE_INET_ATON: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INET_PTON`, omitted by bindgen."]
+pub const HAVE_INET_PTON: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT128`, omitted by bindgen."]
+pub const HAVE_INT128: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INTTYPES_H`, omitted by bindgen."]
+pub const HAVE_INTTYPES_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT_OPTERR`, omitted by bindgen."]
+pub const HAVE_INT_OPTERR: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT_TIMEZONE`, omitted by bindgen."]
+pub const HAVE_INT_TIMEZONE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_IO_URING_QUEUE_INIT_MEM`, omitted by bindgen."]
+pub const HAVE_IO_URING_QUEUE_INIT_MEM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LDAP_INITIALIZE`, omitted by bindgen."]
+pub const HAVE_LDAP_INITIALIZE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBCRYPTO`, omitted by bindgen."]
+pub const HAVE_LIBCRYPTO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBCURL`, omitted by bindgen."]
+pub const HAVE_LIBCURL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBLDAP`, omitted by bindgen."]
+pub const HAVE_LIBLDAP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBLZ4`, omitted by bindgen."]
+pub const HAVE_LIBLZ4: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBM`, omitted by bindgen."]
+pub const HAVE_LIBM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBNUMA`, omitted by bindgen."]
+pub const HAVE_LIBNUMA: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBPAM`, omitted by bindgen."]
+pub const HAVE_LIBPAM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBREADLINE`, omitted by bindgen."]
+pub const HAVE_LIBREADLINE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBSELINUX`, omitted by bindgen."]
+pub const HAVE_LIBSELINUX: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBSSL`, omitted by bindgen."]
+pub const HAVE_LIBSSL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBXML2`, omitted by bindgen."]
+pub const HAVE_LIBXML2: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBXSLT`, omitted by bindgen."]
+pub const HAVE_LIBXSLT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBZ`, omitted by bindgen."]
+pub const HAVE_LIBZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBZSTD`, omitted by bindgen."]
+pub const HAVE_LIBZSTD: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_MKDTEMP`, omitted by bindgen."]
+pub const HAVE_MKDTEMP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POLL`, omitted by bindgen."]
+pub const HAVE_POLL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POLL_H`, omitted by bindgen."]
+pub const HAVE_POLL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POSIX_FADVISE`, omitted by bindgen."]
+pub const HAVE_POSIX_FADVISE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POSIX_FALLOCATE`, omitted by bindgen."]
+pub const HAVE_POSIX_FALLOCATE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PPOLL`, omitted by bindgen."]
+pub const HAVE_PPOLL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PRAGMA_GCC_SYSTEM_HEADER`, omitted by bindgen."]
+pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD`, omitted by bindgen."]
+pub const HAVE_PTHREAD: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD_BARRIER_WAIT`, omitted by bindgen."]
+pub const HAVE_PTHREAD_BARRIER_WAIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD_PRIO_INHERIT`, omitted by bindgen."]
+pub const HAVE_PTHREAD_PRIO_INHERIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINE_HISTORY_H`, omitted by bindgen."]
+pub const HAVE_READLINE_HISTORY_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINE_READLINE_H`, omitted by bindgen."]
+pub const HAVE_READLINE_READLINE_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINK`, omitted by bindgen."]
+pub const HAVE_READLINK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_COMPLETION_MATCHES`, omitted by bindgen."]
+pub const HAVE_RL_COMPLETION_MATCHES: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_COMPLETION_SUPPRESS_QUOTE`, omitted by bindgen."]
+pub const HAVE_RL_COMPLETION_SUPPRESS_QUOTE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_COMPLETION_FUNCTION`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_QUOTE_CHARACTERS`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_QUOTE_CHARACTERS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_QUOTING_FUNCTION`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_QUOTING_FUNCTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_RESET_SCREEN_SIZE`, omitted by bindgen."]
+pub const HAVE_RL_RESET_SCREEN_SIZE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_VARIABLE_BIND`, omitted by bindgen."]
+pub const HAVE_RL_VARIABLE_BIND: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SA_SIGINFO`, omitted by bindgen."]
+pub const HAVE_SA_SIGINFO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SECURITY_PAM_APPL_H`, omitted by bindgen."]
+pub const HAVE_SECURITY_PAM_APPL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SETSID`, omitted by bindgen."]
+pub const HAVE_SETSID: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SHM_OPEN`, omitted by bindgen."]
+pub const HAVE_SHM_OPEN: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SOCKLEN_T`, omitted by bindgen."]
+pub const HAVE_SOCKLEN_T: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CERT_CB`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CERT_CB: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CIPHERSUITES`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CIPHERSUITES: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CLIENT_HELLO_CB`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CLIENT_HELLO_CB: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_KEYLOG_CALLBACK`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_KEYLOG_CALLBACK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_NUM_TICKETS`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_NUM_TICKETS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDINT_H`, omitted by bindgen."]
+pub const HAVE_STDINT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDIO_H`, omitted by bindgen."]
+pub const HAVE_STDIO_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDLIB_H`, omitted by bindgen."]
+pub const HAVE_STDLIB_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRERROR_R`, omitted by bindgen."]
+pub const HAVE_STRERROR_R: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRINGS_H`, omitted by bindgen."]
+pub const HAVE_STRINGS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRING_H`, omitted by bindgen."]
+pub const HAVE_STRING_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCAT`, omitted by bindgen."]
+pub const HAVE_STRLCAT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCPY`, omitted by bindgen."]
+pub const HAVE_STRLCPY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRSEP`, omitted by bindgen."]
+pub const HAVE_STRSEP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRSIGNAL`, omitted by bindgen."]
+pub const HAVE_STRSIGNAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRUCT_OPTION`, omitted by bindgen."]
+pub const HAVE_STRUCT_OPTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRUCT_TM_TM_ZONE`, omitted by bindgen."]
+pub const HAVE_STRUCT_TM_TM_ZONE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYMLINK`, omitted by bindgen."]
+pub const HAVE_SYMLINK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYNCFS`, omitted by bindgen."]
+pub const HAVE_SYNCFS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYNC_FILE_RANGE`, omitted by bindgen."]
+pub const HAVE_SYNC_FILE_RANGE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYSLOG`, omitted by bindgen."]
+pub const HAVE_SYSLOG: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_EPOLL_H`, omitted by bindgen."]
+pub const HAVE_SYS_EPOLL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_PERSONALITY_H`, omitted by bindgen."]
+pub const HAVE_SYS_PERSONALITY_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_PRCTL_H`, omitted by bindgen."]
+pub const HAVE_SYS_PRCTL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_SIGNALFD_H`, omitted by bindgen."]
+pub const HAVE_SYS_SIGNALFD_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_STAT_H`, omitted by bindgen."]
+pub const HAVE_SYS_STAT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_TYPES_H`, omitted by bindgen."]
+pub const HAVE_SYS_TYPES_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TERMIOS_H`, omitted by bindgen."]
+pub const HAVE_TERMIOS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_THREADSAFE_CURL_GLOBAL_INIT`, omitted by bindgen."]
+pub const HAVE_THREADSAFE_CURL_GLOBAL_INIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TYPEOF`, omitted by bindgen."]
+pub const HAVE_TYPEOF: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TYPEOF_UNQUAL`, omitted by bindgen."]
+pub const HAVE_TYPEOF_UNQUAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UCHAR_H`, omitted by bindgen."]
+pub const HAVE_UCHAR_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UNISTD_H`, omitted by bindgen."]
+pub const HAVE_UNISTD_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_USELOCALE`, omitted by bindgen."]
+pub const HAVE_USELOCALE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UUID_E2FS`, omitted by bindgen."]
+pub const HAVE_UUID_E2FS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UUID_UUID_H`, omitted by bindgen."]
+pub const HAVE_UUID_UUID_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_VISIBILITY_ATTRIBUTE`, omitted by bindgen."]
+pub const HAVE_VISIBILITY_ATTRIBUTE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_X509_GET_SIGNATURE_INFO`, omitted by bindgen."]
+pub const HAVE_X509_GET_SIGNATURE_INFO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_X86_64_POPCNTQ`, omitted by bindgen."]
+pub const HAVE_X86_64_POPCNTQ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_XSAVE_INTRINSICS`, omitted by bindgen."]
+pub const HAVE_XSAVE_INTRINSICS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP16`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP16: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP32`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP32: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP64`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP64: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CLZ`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CLZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CONSTANT_P`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CONSTANT_P: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CTZ`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CTZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_FRAME_ADDRESS`, omitted by bindgen."]
+pub const HAVE__BUILTIN_FRAME_ADDRESS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_OP_OVERFLOW`, omitted by bindgen."]
+pub const HAVE__BUILTIN_OP_OVERFLOW: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_TYPES_COMPATIBLE_P`, omitted by bindgen."]
+pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_UNREACHABLE`, omitted by bindgen."]
+pub const HAVE__BUILTIN_UNREACHABLE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__CPUIDEX`, omitted by bindgen."]
+pub const HAVE__CPUIDEX: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__GET_CPUID`, omitted by bindgen."]
+pub const HAVE__GET_CPUID: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__GET_CPUID_COUNT`, omitted by bindgen."]
+pub const HAVE__GET_CPUID_COUNT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HDRSIZETQ`, omitted by bindgen."]
+pub const HDRSIZETQ: usize = 8;
+#[doc = " Compiler-verified C object macro `HEAPTUPLESIZE`, omitted by bindgen."]
+pub const HEAPTUPLESIZE: usize = 24;
+#[doc = " Compiler-verified C object macro `HJTUPLE_OVERHEAD`, omitted by bindgen."]
+pub const HJTUPLE_OVERHEAD: usize = 16;
+#[doc = " Compiler-verified C object macro `INDIRECT_POINTER_SIZE`, omitted by bindgen."]
+pub const INDIRECT_POINTER_SIZE: usize = 10;
+#[doc = " Compiler-verified C object macro `INVALID_TUPLEDESC_IDENTIFIER`, omitted by bindgen."]
+pub const INVALID_TUPLEDESC_IDENTIFIER: usize = 1;
+#[doc = " Compiler-verified C object macro `IOCONTEXT_NUM_TYPES`, omitted by bindgen."]
+pub const IOCONTEXT_NUM_TYPES: i32 = 5;
+#[doc = " Compiler-verified C object macro `IOOBJECT_NUM_TYPES`, omitted by bindgen."]
+pub const IOOBJECT_NUM_TYPES: i32 = 3;
+#[doc = " Compiler-verified C object macro `IOOP_NUM_TYPES`, omitted by bindgen."]
+pub const IOOP_NUM_TYPES: i32 = 8;
+#[doc = " Compiler-verified C object macro `InvalidBlockNumber`, omitted by bindgen."]
+pub const InvalidBlockNumber: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidBucket`, omitted by bindgen."]
+pub const InvalidBucket: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidCommandId`, omitted by bindgen."]
+pub const InvalidCommandId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidDsaPointer`, omitted by bindgen."]
+pub const InvalidDsaPointer: usize = 0;
+#[doc = " Compiler-verified C object macro `InvalidMultiXactId`, omitted by bindgen."]
+pub const InvalidMultiXactId: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOffsetNumber`, omitted by bindgen."]
+pub const InvalidOffsetNumber: u16 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOid`, omitted by bindgen."]
+pub const InvalidOid: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOid8`, omitted by bindgen."]
+pub const InvalidOid8: usize = 0;
+#[doc = " Compiler-verified C object macro `InvalidRelFileNumber`, omitted by bindgen."]
+pub const InvalidRelFileNumber: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidSerCommitSeqNo`, omitted by bindgen."]
+pub const InvalidSerCommitSeqNo: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `InvalidStrategy`, omitted by bindgen."]
+pub const InvalidStrategy: u16 = 0;
+#[doc = " Compiler-verified C object macro `InvalidSubTransactionId`, omitted by bindgen."]
+pub const InvalidSubTransactionId: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidTransactionId`, omitted by bindgen."]
+pub const InvalidTransactionId: u32 = 0;
+#[doc = " Compiler-verified C object macro `LOCKTAG_LAST_TYPE`, omitted by bindgen."]
+pub const LOCKTAG_LAST_TYPE: i32 = 11;
+#[doc = " Compiler-verified C object macro `LSNOID`, omitted by bindgen."]
+pub const LSNOID: i32 = 3220;
+#[doc = " Compiler-verified C object macro `LeafNodesPerPage`, omitted by bindgen."]
+pub const LeafNodesPerPage: usize = 4069;
+#[doc = " Compiler-verified C object macro `MAX_FORKNUM`, omitted by bindgen."]
+pub const MAX_FORKNUM: i32 = 3;
+#[doc = " Compiler-verified C object macro `MAX_IO_COMBINE_LIMIT`, omitted by bindgen."]
+pub const MAX_IO_COMBINE_LIMIT: i32 = 128;
+#[doc = " Compiler-verified C object macro `MAX_KILOBYTES`, omitted by bindgen."]
+pub const MAX_KILOBYTES: i32 = 2147483647;
+#[doc = " Compiler-verified C object macro `MAX_LARGE_OBJECT_SIZE`, omitted by bindgen."]
+pub const MAX_LARGE_OBJECT_SIZE: i64 = 4398046509056;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_DATA_OFFSET`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_DATA_OFFSET: usize = 10;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_OFFSET`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_OFFSET: usize = 8;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_PADDING`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_PADDING: usize = 6;
+#[doc = " Compiler-verified C object macro `MIN_TIMESTAMP`, omitted by bindgen."]
+pub const MIN_TIMESTAMP: i64 = -211813488000000000;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERGROUPS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERGROUPS_PER_PAGE: usize = 409;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERGROUP_SIZE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERGROUP_SIZE: usize = 20;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERS_PER_PAGE: usize = 1636;
+#[doc = " Compiler-verified C object macro `MULTIXACT_OFFSETS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_OFFSETS_PER_PAGE: usize = 1024;
+#[doc = " Compiler-verified C object macro `MaxAllocSize`, omitted by bindgen."]
+pub const MaxAllocSize: usize = 1073741823;
+#[doc = " Compiler-verified C object macro `MaxArraySize`, omitted by bindgen."]
+pub const MaxArraySize: usize = 134217727;
+#[doc = " Compiler-verified C object macro `MaxBlockNumber`, omitted by bindgen."]
+pub const MaxBlockNumber: u32 = 4294967294;
+#[doc = " Compiler-verified C object macro `MaxHeapTupleSize`, omitted by bindgen."]
+pub const MaxHeapTupleSize: usize = 8160;
+#[doc = " Compiler-verified C object macro `MaxHeapTuplesPerPage`, omitted by bindgen."]
+pub const MaxHeapTuplesPerPage: i32 = 291;
+#[doc = " Compiler-verified C object macro `MaxIndexTuplesPerPage`, omitted by bindgen."]
+pub const MaxIndexTuplesPerPage: i32 = 408;
+#[doc = " Compiler-verified C object macro `MaxLockTupleMode`, omitted by bindgen."]
+pub const MaxLockTupleMode: i32 = 3;
+#[doc = " Compiler-verified C object macro `MaxMultiXactId`, omitted by bindgen."]
+pub const MaxMultiXactId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `MaxMultiXactStatus`, omitted by bindgen."]
+pub const MaxMultiXactStatus: i32 = 5;
+#[doc = " Compiler-verified C object macro `MaxOffsetNumber`, omitted by bindgen."]
+pub const MaxOffsetNumber: u16 = 2048;
+#[doc = " Compiler-verified C object macro `MaxSizeOfXLogRecordBlockHeader`, omitted by bindgen."]
+pub const MaxSizeOfXLogRecordBlockHeader: usize = 27;
+#[doc = " Compiler-verified C object macro `MaxTIDsPerBTreePage`, omitted by bindgen."]
+pub const MaxTIDsPerBTreePage: i32 = 1358;
+#[doc = " Compiler-verified C object macro `MaxTransactionId`, omitted by bindgen."]
+pub const MaxTransactionId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `MinHeapTupleSize`, omitted by bindgen."]
+pub const MinHeapTupleSize: usize = 24;
+#[doc = " Compiler-verified C object macro `MinSizeOfDbaseDropRec`, omitted by bindgen."]
+pub const MinSizeOfDbaseDropRec: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfHeapInplace`, omitted by bindgen."]
+pub const MinSizeOfHeapInplace: usize = 20;
+#[doc = " Compiler-verified C object macro `MinSizeOfInvalidations`, omitted by bindgen."]
+pub const MinSizeOfInvalidations: usize = 16;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactAbort`, omitted by bindgen."]
+pub const MinSizeOfXactAbort: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactAssignment`, omitted by bindgen."]
+pub const MinSizeOfXactAssignment: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactCommit`, omitted by bindgen."]
+pub const MinSizeOfXactCommit: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactInvals`, omitted by bindgen."]
+pub const MinSizeOfXactInvals: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactRelfileLocators`, omitted by bindgen."]
+pub const MinSizeOfXactRelfileLocators: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactRunningXacts`, omitted by bindgen."]
+pub const MinSizeOfXactRunningXacts: usize = 24;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactStatsItems`, omitted by bindgen."]
+pub const MinSizeOfXactStatsItems: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactSubxacts`, omitted by bindgen."]
+pub const MinSizeOfXactSubxacts: usize = 4;
+#[doc = " Compiler-verified C object macro `MovedPartitionsBlockNumber`, omitted by bindgen."]
+pub const MovedPartitionsBlockNumber: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `NEGOTIATE_GSS_CODE`, omitted by bindgen."]
+pub const NEGOTIATE_GSS_CODE: i32 = 80877104;
+#[doc = " Compiler-verified C object macro `NEGOTIATE_SSL_CODE`, omitted by bindgen."]
+pub const NEGOTIATE_SSL_CODE: i32 = 80877103;
+#[doc = " Compiler-verified C object macro `NS_PER_MS`, omitted by bindgen."]
+pub const NS_PER_MS: i64 = 1000000;
+#[doc = " Compiler-verified C object macro `NS_PER_S`, omitted by bindgen."]
+pub const NS_PER_S: i64 = 1000000000;
+#[doc = " Compiler-verified C object macro `NS_PER_US`, omitted by bindgen."]
+pub const NS_PER_US: i64 = 1000;
+#[doc = " Compiler-verified C object macro `NUM_MERGE_MATCH_KINDS`, omitted by bindgen."]
+pub const NUM_MERGE_MATCH_KINDS: i32 = 3;
+#[doc = " Compiler-verified C object macro `NUM_PMSIGNALS`, omitted by bindgen."]
+pub const NUM_PMSIGNALS: i32 = 11;
+#[doc = " Compiler-verified C object macro `NUM_PROCSIGNALS`, omitted by bindgen."]
+pub const NUM_PROCSIGNALS: i32 = 10;
+#[doc = " Compiler-verified C object macro `NUM_RECOVERY_CONFLICT_REASONS`, omitted by bindgen."]
+pub const NUM_RECOVERY_CONFLICT_REASONS: i32 = 8;
+#[doc = " Compiler-verified C object macro `NodesPerPage`, omitted by bindgen."]
+pub const NodesPerPage: usize = 8164;
+#[doc = " Compiler-verified C object macro `OID8_MAX`, omitted by bindgen."]
+pub const OID8_MAX: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `OID_MAX`, omitted by bindgen."]
+pub const OID_MAX: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `PARALLEL_KEY_SCAN_INSTRUMENT_OFFSET`, omitted by bindgen."]
+pub const PARALLEL_KEY_SCAN_INSTRUMENT_OFFSET: usize = 14987979559889010688;
+#[doc = " Compiler-verified C object macro `PGAIO_HCB_MAX`, omitted by bindgen."]
+pub const PGAIO_HCB_MAX: i32 = 3;
+#[doc = " Compiler-verified C object macro `PGAIO_OP_COUNT`, omitted by bindgen."]
+pub const PGAIO_OP_COUNT: i32 = 3;
+#[doc = " Compiler-verified C object macro `PGAIO_TID_COUNT`, omitted by bindgen."]
+pub const PGAIO_TID_COUNT: i32 = 2;
+#[doc = " Compiler-verified C object macro `PG_ENCODING_BE_LAST`, omitted by bindgen."]
+pub const PG_ENCODING_BE_LAST: i32 = 34;
+#[doc = " Compiler-verified C object macro `PG_INT64_MAX`, omitted by bindgen."]
+pub const PG_INT64_MAX: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `PG_INT64_MIN`, omitted by bindgen."]
+pub const PG_INT64_MIN: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `PG_IOV_MAX`, omitted by bindgen."]
+pub const PG_IOV_MAX: i32 = 128;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_EARLIEST`, omitted by bindgen."]
+pub const PG_PROTOCOL_EARLIEST: i32 = 196608;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_GREASE`, omitted by bindgen."]
+pub const PG_PROTOCOL_GREASE: i32 = 206607;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_LATEST`, omitted by bindgen."]
+pub const PG_PROTOCOL_LATEST: i32 = 196610;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_RESERVED_31`, omitted by bindgen."]
+pub const PG_PROTOCOL_RESERVED_31: i32 = 196609;
+#[doc = " Compiler-verified C object macro `PG_UINT64_MAX`, omitted by bindgen."]
+pub const PG_UINT64_MAX: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `PIPE_CHUNK_SIZE`, omitted by bindgen."]
+pub const PIPE_CHUNK_SIZE: i32 = 4096;
+#[doc = " Compiler-verified C object macro `PIPE_HEADER_SIZE`, omitted by bindgen."]
+pub const PIPE_HEADER_SIZE: usize = 9;
+#[doc = " Compiler-verified C object macro `PIPE_MAX_PAYLOAD`, omitted by bindgen."]
+pub const PIPE_MAX_PAYLOAD: i32 = 4087;
+#[doc = " Compiler-verified C object macro `PLATFORM_DEFAULT_WAL_SYNC_METHOD`, omitted by bindgen."]
+pub const PLATFORM_DEFAULT_WAL_SYNC_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `PLPGSQL_XCHECK_ALL`, omitted by bindgen."]
+pub const PLPGSQL_XCHECK_ALL: i32 = -1;
+#[doc = " Compiler-verified C object macro `P_FIRSTKEY`, omitted by bindgen."]
+pub const P_FIRSTKEY: u16 = 2;
+#[doc = " Compiler-verified C object macro `P_HIKEY`, omitted by bindgen."]
+pub const P_HIKEY: u16 = 1;
+#[doc = " Compiler-verified C object macro `P_NEW`, omitted by bindgen."]
+pub const P_NEW: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `PredXactListDataSize`, omitted by bindgen."]
+pub const PredXactListDataSize: usize = 88;
+#[doc = " Compiler-verified C object macro `REL_PATH_STR_MAXLEN`, omitted by bindgen."]
+pub const REL_PATH_STR_MAXLEN: usize = 71;
+#[doc = " Compiler-verified C object macro `REVMAP_CONTENT_SIZE`, omitted by bindgen."]
+pub const REVMAP_CONTENT_SIZE: usize = 8160;
+#[doc = " Compiler-verified C object macro `REVMAP_PAGE_MAXITEMS`, omitted by bindgen."]
+pub const REVMAP_PAGE_MAXITEMS: usize = 1360;
+#[doc = " Compiler-verified C object macro `RM_MAX_BUILTIN_ID`, omitted by bindgen."]
+pub const RM_MAX_BUILTIN_ID: i32 = 21;
+#[doc = " Compiler-verified C object macro `RM_N_BUILTIN_IDS`, omitted by bindgen."]
+pub const RM_N_BUILTIN_IDS: i32 = 22;
+#[doc = " Compiler-verified C object macro `RWConflictDataSize`, omitted by bindgen."]
+pub const RWConflictDataSize: usize = 48;
+#[doc = " Compiler-verified C object macro `RWConflictPoolHeaderDataSize`, omitted by bindgen."]
+pub const RWConflictPoolHeaderDataSize: usize = 24;
+#[doc = " Compiler-verified C object macro `RecoverySerCommitSeqNo`, omitted by bindgen."]
+pub const RecoverySerCommitSeqNo: usize = 1;
+#[doc = " Compiler-verified C object macro `SGDTSIZE`, omitted by bindgen."]
+pub const SGDTSIZE: usize = 16;
+#[doc = " Compiler-verified C object macro `SGITHDRSZ`, omitted by bindgen."]
+pub const SGITHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `SGNTHDRSZ`, omitted by bindgen."]
+pub const SGNTHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `SIZE_T_ALIGN_MASK`, omitted by bindgen."]
+pub const SIZE_T_ALIGN_MASK: usize = 7;
+#[doc = " Compiler-verified C object macro `SKEW_BUCKET_OVERHEAD`, omitted by bindgen."]
+pub const SKEW_BUCKET_OVERHEAD: usize = 16;
+#[doc = " Compiler-verified C object macro `SO_INTERNAL_FLAGS`, omitted by bindgen."]
+pub const SO_INTERNAL_FLAGS: i32 = 1023;
+#[doc = " Compiler-verified C object macro `SPGIST_PAGE_CAPACITY`, omitted by bindgen."]
+pub const SPGIST_PAGE_CAPACITY: usize = 8160;
+#[doc = " Compiler-verified C object macro `SYNCHRONOUS_COMMIT_ON`, omitted by bindgen."]
+pub const SYNCHRONOUS_COMMIT_ON: i32 = 3;
+#[doc = " Compiler-verified C object macro `SizeOfBrinCreateIdx`, omitted by bindgen."]
+pub const SizeOfBrinCreateIdx: usize = 6;
+#[doc = " Compiler-verified C object macro `SizeOfBrinDesummarize`, omitted by bindgen."]
+pub const SizeOfBrinDesummarize: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBrinInsert`, omitted by bindgen."]
+pub const SizeOfBrinInsert: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBrinRevmapExtend`, omitted by bindgen."]
+pub const SizeOfBrinRevmapExtend: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfBrinSamepageUpdate`, omitted by bindgen."]
+pub const SizeOfBrinSamepageUpdate: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBrinTuple`, omitted by bindgen."]
+pub const SizeOfBrinTuple: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfBrinUpdate`, omitted by bindgen."]
+pub const SizeOfBrinUpdate: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeDedup`, omitted by bindgen."]
+pub const SizeOfBtreeDedup: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeDelete`, omitted by bindgen."]
+pub const SizeOfBtreeDelete: usize = 9;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeInsert`, omitted by bindgen."]
+pub const SizeOfBtreeInsert: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeMarkPageHalfDead`, omitted by bindgen."]
+pub const SizeOfBtreeMarkPageHalfDead: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeNewroot`, omitted by bindgen."]
+pub const SizeOfBtreeNewroot: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeReusePage`, omitted by bindgen."]
+pub const SizeOfBtreeReusePage: usize = 25;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeSplit`, omitted by bindgen."]
+pub const SizeOfBtreeSplit: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeUnlinkPage`, omitted by bindgen."]
+pub const SizeOfBtreeUnlinkPage: usize = 36;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeUpdate`, omitted by bindgen."]
+pub const SizeOfBtreeUpdate: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeVacuum`, omitted by bindgen."]
+pub const SizeOfBtreeVacuum: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfCommitTsTruncate`, omitted by bindgen."]
+pub const SizeOfCommitTsTruncate: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogDelete`, omitted by bindgen."]
+pub const SizeOfGistxlogDelete: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogPageDelete`, omitted by bindgen."]
+pub const SizeOfGistxlogPageDelete: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogPageReuse`, omitted by bindgen."]
+pub const SizeOfGistxlogPageReuse: usize = 25;
+#[doc = " Compiler-verified C object macro `SizeOfHashAddOvflPage`, omitted by bindgen."]
+pub const SizeOfHashAddOvflPage: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHashDelete`, omitted by bindgen."]
+pub const SizeOfHashDelete: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashInitBitmapPage`, omitted by bindgen."]
+pub const SizeOfHashInitBitmapPage: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashInitMetaPage`, omitted by bindgen."]
+pub const SizeOfHashInitMetaPage: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfHashInsert`, omitted by bindgen."]
+pub const SizeOfHashInsert: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashMovePageContents`, omitted by bindgen."]
+pub const SizeOfHashMovePageContents: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHashSplitAllocPage`, omitted by bindgen."]
+pub const SizeOfHashSplitAllocPage: usize = 9;
+#[doc = " Compiler-verified C object macro `SizeOfHashSplitComplete`, omitted by bindgen."]
+pub const SizeOfHashSplitComplete: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfHashSqueezePage`, omitted by bindgen."]
+pub const SizeOfHashSqueezePage: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfHashUpdateMetaPage`, omitted by bindgen."]
+pub const SizeOfHashUpdateMetaPage: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHashVacuumOnePage`, omitted by bindgen."]
+pub const SizeOfHashVacuumOnePage: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapConfirm`, omitted by bindgen."]
+pub const SizeOfHeapConfirm: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHeapDelete`, omitted by bindgen."]
+pub const SizeOfHeapDelete: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapHeader`, omitted by bindgen."]
+pub const SizeOfHeapHeader: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfHeapInsert`, omitted by bindgen."]
+pub const SizeOfHeapInsert: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHeapLock`, omitted by bindgen."]
+pub const SizeOfHeapLock: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapLockUpdated`, omitted by bindgen."]
+pub const SizeOfHeapLockUpdated: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapMultiInsert`, omitted by bindgen."]
+pub const SizeOfHeapMultiInsert: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfHeapNewCid`, omitted by bindgen."]
+pub const SizeOfHeapNewCid: usize = 34;
+#[doc = " Compiler-verified C object macro `SizeOfHeapPrune`, omitted by bindgen."]
+pub const SizeOfHeapPrune: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHeapTruncate`, omitted by bindgen."]
+pub const SizeOfHeapTruncate: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfHeapUpdate`, omitted by bindgen."]
+pub const SizeOfHeapUpdate: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfLogicalMessage`, omitted by bindgen."]
+pub const SizeOfLogicalMessage: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfMultiInsertTuple`, omitted by bindgen."]
+pub const SizeOfMultiInsertTuple: usize = 7;
+#[doc = " Compiler-verified C object macro `SizeOfMultiXactCreate`, omitted by bindgen."]
+pub const SizeOfMultiXactCreate: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfMultiXactTruncate`, omitted by bindgen."]
+pub const SizeOfMultiXactTruncate: usize = 16;
+#[doc = " Compiler-verified C object macro `SizeOfPageHeaderData`, omitted by bindgen."]
+pub const SizeOfPageHeaderData: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogMoveLeafs`, omitted by bindgen."]
+pub const SizeOfSpgxlogMoveLeafs: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogPickSplit`, omitted by bindgen."]
+pub const SizeOfSpgxlogPickSplit: usize = 28;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumLeaf`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumLeaf: usize = 16;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumRedirect`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumRedirect: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumRoot`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumRoot: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfXLogLongPHD`, omitted by bindgen."]
+pub const SizeOfXLogLongPHD: usize = 40;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecord`, omitted by bindgen."]
+pub const SizeOfXLogRecord: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockCompressHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockCompressHeader: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockHeader: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockImageHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockImageHeader: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordDataHeaderLong`, omitted by bindgen."]
+pub const SizeOfXLogRecordDataHeaderLong: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordDataHeaderShort`, omitted by bindgen."]
+pub const SizeOfXLogRecordDataHeaderShort: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfXLogShortPHD`, omitted by bindgen."]
+pub const SizeOfXLogShortPHD: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeofHeapTupleHeader`, omitted by bindgen."]
+pub const SizeofHeapTupleHeader: usize = 23;
+#[doc = " Compiler-verified C object macro `SizeofMinimalTupleHeader`, omitted by bindgen."]
+pub const SizeofMinimalTupleHeader: usize = 15;
+#[doc = " Compiler-verified C object macro `SlotsPerFSMPage`, omitted by bindgen."]
+pub const SlotsPerFSMPage: usize = 4069;
+#[doc = " Compiler-verified C object macro `SysCacheSize`, omitted by bindgen."]
+pub const SysCacheSize: i32 = 85;
+#[doc = " Compiler-verified C object macro `TBM_MAX_TUPLES_PER_PAGE`, omitted by bindgen."]
+pub const TBM_MAX_TUPLES_PER_PAGE: i32 = 291;
+#[doc = " Compiler-verified C object macro `TIMESTAMP_INFINITY`, omitted by bindgen."]
+pub const TIMESTAMP_INFINITY: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `TIMESTAMP_MINUS_INFINITY`, omitted by bindgen."]
+pub const TIMESTAMP_MINUS_INFINITY: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `TOAST_INDEX_TARGET`, omitted by bindgen."]
+pub const TOAST_INDEX_TARGET: usize = 510;
+#[doc = " Compiler-verified C object macro `TOAST_MAX_CHUNK_SIZE`, omitted by bindgen."]
+pub const TOAST_MAX_CHUNK_SIZE: usize = 1996;
+#[doc = " Compiler-verified C object macro `TOAST_POINTER_SIZE`, omitted by bindgen."]
+pub const TOAST_POINTER_SIZE: usize = 18;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_TARGET`, omitted by bindgen."]
+pub const TOAST_TUPLE_TARGET: usize = 2032;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_TARGET_MAIN`, omitted by bindgen."]
+pub const TOAST_TUPLE_TARGET_MAIN: usize = 8160;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_THRESHOLD`, omitted by bindgen."]
+pub const TOAST_TUPLE_THRESHOLD: usize = 2032;
+#[doc = " Compiler-verified C object macro `TSQS_SIGLEN`, omitted by bindgen."]
+pub const TSQS_SIGLEN: usize = 64;
+#[doc = " Compiler-verified C object macro `TopSubTransactionId`, omitted by bindgen."]
+pub const TopSubTransactionId: u32 = 1;
+#[doc = " Compiler-verified C object macro `UNIXSOCK_PATH_BUFLEN`, omitted by bindgen."]
+pub const UNIXSOCK_PATH_BUFLEN: usize = 108;
+#[doc = " Compiler-verified C object macro `USECS_PER_DAY`, omitted by bindgen."]
+pub const USECS_PER_DAY: i64 = 86400000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_HOUR`, omitted by bindgen."]
+pub const USECS_PER_HOUR: i64 = 3600000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_MINUTE`, omitted by bindgen."]
+pub const USECS_PER_MINUTE: i64 = 60000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_SEC`, omitted by bindgen."]
+pub const USECS_PER_SEC: i64 = 1000000;
+#[doc = " Compiler-verified C object macro `VARHDRSZ`, omitted by bindgen."]
+pub const VARHDRSZ: i32 = 4;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_COMPRESSED`, omitted by bindgen."]
+pub const VARHDRSZ_COMPRESSED: usize = 8;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_EXTERNAL`, omitted by bindgen."]
+pub const VARHDRSZ_EXTERNAL: usize = 2;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_SHORT`, omitted by bindgen."]
+pub const VARHDRSZ_SHORT: usize = 1;
+#[doc = " Compiler-verified C object macro `WAIT_LSN_TYPE_COUNT`, omitted by bindgen."]
+pub const WAIT_LSN_TYPE_COUNT: i32 = 4;
+#[doc = " Compiler-verified C object macro `WAL_COMPRESSION_ON`, omitted by bindgen."]
+pub const WAL_COMPRESSION_ON: i32 = 3;
 impl pg_sys::seal::Sealed for ATAlterConstraint {}
 impl pg_sys::PgNode for ATAlterConstraint {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ATAlterConstraint];

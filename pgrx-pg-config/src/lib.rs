@@ -472,12 +472,41 @@ impl PgConfig {
         Ok(self.run("--cppflags")?.into())
     }
 
+    /// Compiler flags recorded by the selected PostgreSQL installation.
+    /// Macro inspection and native adapter compilation reuse these arithmetic and ABI options
+    /// so generated Rust follows the same C invocation profile as the installed server.
+    pub fn cflags(&self) -> eyre::Result<OsString> {
+        Ok(self.run("--cflags")?.into())
+    }
+
+    /// Read historical compiler flags when the selected metadata actually contains that property.
+    /// Explicit AS_ENV configurations may omit CFLAGS while still describing a usable current
+    /// binding invocation. Only that owned absence returns `None`; subprocess errors remain errors,
+    /// and successful empty or `not recorded` values remain available for callers to classify.
+    pub fn optional_cflags(&self) -> eyre::Result<Option<OsString>> {
+        if let Some(properties) = &self.known_props {
+            return Ok(properties.get("--cflags").map(OsString::from));
+        }
+        let bytes = self.run_subprocess("--cflags")?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::ffi::OsStringExt;
+            Ok(Some(OsString::from_vec(bytes.trim_ascii().to_vec())))
+        }
+        #[cfg(not(unix))]
+        {
+            Ok(Some(decode_from_bytes(&bytes).trim().into()))
+        }
+    }
+
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");
         Ok(path)
     }
 
+    /// Read a pg_config property from recorded metadata or a successful subprocess; reject
+    /// partial stdout on failure so macro profiles cannot use incomplete flags.
     fn run(&self, arg: &str) -> eyre::Result<String> {
         if let Some(known_props) = &self.known_props {
             // we have some known properties, so use them.  We'll return an `ErrorKind::InvalidData`
@@ -492,14 +521,29 @@ impl PgConfig {
                 })
                 .cloned()?)
         } else {
-            // we don't have any known properties, so fall through to asking the `pg_config`
-            // that's either in the environment or on the PATH
-            let pg_config = self.pg_config.clone().unwrap_or_else(|| {
-                std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
-            });
+            let stdout = self.run_subprocess(arg)?;
+            Ok(decode_from_bytes(&stdout).trim().to_string())
+        }
+    }
 
-            match Command::new(&pg_config).arg(arg).output() {
-                Ok(output) => Ok(decode_from_bytes(&output.stdout).trim().to_string()),
+    /// Keep subprocess status handling shared while allowing compiler flags to retain native Unix
+    /// bytes until their consumer explicitly validates the required UTF-8 argument interface.
+    fn run_subprocess(&self, arg: &str) -> eyre::Result<Vec<u8>> {
+        let pg_config = self.pg_config.clone().unwrap_or_else(|| {
+            std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
+        });
+
+        match Command::new(&pg_config).arg(arg).output() {
+                Ok(output) if output.status.success() => {
+                    Ok(output.stdout)
+                }
+                Ok(output) => Err(eyre::eyre!(
+                    "{} {} failed ({}): {}",
+                    pg_config.display(),
+                    arg,
+                    output.status,
+                    decode_from_bytes(&output.stderr).trim(),
+                )),
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => Err(e).wrap_err_with(|| {
                         let pg_config_str = pg_config.display().to_string();
@@ -518,7 +562,6 @@ impl PgConfig {
                     _ => Err(e.into()),
                 },
             }
-        }
     }
 }
 
@@ -655,8 +698,10 @@ impl Pgrx {
     /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
-    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions in `$PGRX_HOME/config.toml`,
-    /// [`PgConfigSelector::Specific`] being that specific version from `$PGRX_HOME/config.toml`, and
+    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions
+    /// in `$PGRX_HOME/config.toml`,
+    /// [`PgConfigSelector::Specific`] being that specific version from
+    /// `$PGRX_HOME/config.toml`, and
     /// [`PgConfigSelector::Environment`] being the one described in the environment.
     pub fn iter(
         &self,
@@ -732,7 +777,8 @@ impl Pgrx {
     /// Get the postmaster stub directory
     ///
     /// We isolate postmaster stubs to an independent directory instead of alongside the postmaster
-    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one managed
+    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one
+    /// managed
     /// by pgrx.
     pub fn postmaster_stub_dir() -> Result<PathBuf, std::io::Error> {
         let mut stub_dir = Self::home()?;
@@ -996,6 +1042,72 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgreSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
         PgConfig::parse_version_str("PostgreSQL .53").expect_err("Parsed invalid version string");
+}
+
+/// Explicitly absent AS_ENV CFLAGS remain distinct from present empty or recorded metadata.
+#[test]
+fn optional_compiler_flags_preserve_owned_property_absence() {
+    let mut config = PgConfig { known_props: Some(BTreeMap::new()), ..PgConfig::default() };
+    assert_eq!(config.optional_cflags().unwrap(), None);
+    for flags in ["", "not recorded", "/IC:\\postgres\\include /O2"] {
+        config.known_props.as_mut().unwrap().insert("--cflags".into(), flags.into());
+        assert_eq!(config.optional_cflags().unwrap(), Some(OsString::from(flags)));
+    }
+}
+
+/// Recorded flags retain their exact quoting, while the strict query still rejects absent metadata.
+#[test]
+fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
+    let flags = "-O2 -fwrapv -isysroot '/sdk with spaces'";
+    let config = PgConfig {
+        known_props: Some(BTreeMap::from([("--cflags".into(), flags.into())])),
+        ..PgConfig::default()
+    };
+    assert_eq!(config.cflags().unwrap(), OsString::from(flags));
+    assert!(
+        PgConfig { known_props: Some(BTreeMap::new()), ..PgConfig::default() }.cflags().is_err()
+    );
+}
+
+/// Preserve invalid native Unix flag bytes for explicit rejection by UTF-8 compiler consumers.
+#[cfg(unix)]
+#[test]
+fn optional_compiler_flags_do_not_lossily_rewrite_native_bytes() {
+    use std::os::unix::fs::PermissionsExt;
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let path =
+        std::env::temp_dir().join(format!("pgrx-pg-config-bytes-{}-{nonce}", std::process::id()));
+    std::fs::write(&path, "#!/bin/sh\nprintf '\\377\\n'\n").unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let flags = PgConfig::new_with_defaults(path.clone()).optional_cflags().unwrap().unwrap();
+    std::fs::remove_file(path).unwrap();
+    assert!(flags.to_str().is_none(), "invalid bytes must remain unavailable as UTF-8 flags");
+}
+
+/// Checks that a failing pg_config reports its status and stderr without accepting partial
+/// stdout as compiler flags.
+#[cfg(unix)]
+#[test]
+fn failed_pg_config_queries_do_not_accept_partial_stdout() {
+    use std::os::unix::fs::PermissionsExt;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let path = std::env::temp_dir().join(format!("pgrx-pg-config-{}-{nonce}", std::process::id()));
+    std::fs::write(
+        &path,
+        "#!/bin/sh\nprintf 'partial flags\\n'\nprintf 'query failed\\n' >&2\nexit 7\n",
+    )
+    .unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let result = PgConfig::new_with_defaults(path.clone()).cflags();
+    std::fs::remove_file(path).unwrap();
+    let error = result.expect_err("nonzero pg_config status must reject its stdout").to_string();
+    assert!(error.contains("--cflags"), "{error}");
+    assert!(error.contains("7"), "{error}");
+    assert!(error.contains("query failed"), "{error}");
+    assert!(!error.contains("partial flags"), "{error}");
 }
 
 #[test]

@@ -7,3 +7,4 @@
 # Preserve LF line endings in golden files during checkout.
 /cargo-pgrx/tests/fixtures/**/*.toml text eol=lf
 /pgrx-pg-sys/src/include/*.rs generated
+/pgrx-pg-sys/src/include/cmacros/**/*.rs generated

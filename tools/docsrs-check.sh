@@ -13,9 +13,9 @@ TOOLCHAIN="${DOCSRS_TOOLCHAIN:-nightly}"
 PACKAGE_DIR="${CARGO_TARGET_DIR:-target}/package"
 
 echo "Checking packaged pgrx-bindgen dependency metadata"
-# Package the local internal dependency too so unpublished release-candidate
+# Package the local internal dependencies too so unpublished release-candidate
 # workspace versions do not force pgrx-bindgen to resolve it from crates.io.
-cargo "+${TOOLCHAIN}" package --allow-dirty --no-verify -p pgrx-pg-config -p pgrx-bindgen
+cargo "+${TOOLCHAIN}" package --allow-dirty --no-verify -p pgrx-pg-config -p pgrx-c-macros -p pgrx-bindgen
 
 shopt -s nullglob
 crates=("${PACKAGE_DIR}"/pgrx-bindgen-*.crate)

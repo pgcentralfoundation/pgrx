@@ -1,0 +1,44 @@
+[package]
+name = "pgrx-c-macros"
+description = "Discover and translate C macros for pgrx binding generation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[features]
+default = ["cli"]
+cli = ["dep:clap"]
+
+[dependencies]
+pgrx-pg-config.workspace = true
+eyre.workspace = true
+shlex.workspace = true
+sha2 = "0.11"
+clang = { version = "2.1", features = ["runtime", "clang_6_0"] }
+clang-sys = { version = "1", features = ["runtime", "clang_6_0"] }
+serde.workspace = true
+thiserror.workspace = true
+clap = { version = "4.4.2", features = ["derive"], optional = true }
+serde_json.workspace = true
+tempfile = "3.27"
+petgraph = "0.8.3"
+proc-macro2.workspace = true
+
+# Use the same SHA-256 identities with an assembly-backed compressor even when a
+# downstream extension compiles its build dependencies without optimization.
+[target.'cfg(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
+ring = { version = "0.17.14", default-features = false }
+
+[dev-dependencies]
+bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
+syn.workspace = true
+quote.workspace = true
+
+[[bin]]
+name = "pgrx-c-macros"
+path = "src/main.rs"
+required-features = ["cli"]

@@ -560,6 +560,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clang"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2ed30b30e1e17966b55ddd0b9dd2758fd824f0a6da6875c8abb17e6aba47c28"
+dependencies = [
+ "clang-sys",
+ "libc",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2248,13 +2258,40 @@ dependencies = [
  "cc",
  "clang-sys",
  "eyre",
+ "pgrx-c-macros",
  "pgrx-pg-config",
  "proc-macro2",
  "quote",
  "regex",
+ "serde",
+ "serde_json",
+ "sha2",
  "shlex 2.0.1",
  "syn",
  "walkdir",
+]
+
+[[package]]
+name = "pgrx-c-macros"
+version = "0.19.3"
+dependencies = [
+ "bindgen",
+ "clang",
+ "clang-sys",
+ "clap",
+ "eyre",
+ "petgraph",
+ "pgrx-pg-config",
+ "proc-macro2",
+ "quote",
+ "ring",
+ "serde",
+ "serde_json",
+ "sha2",
+ "shlex 2.0.1",
+ "syn",
+ "tempfile",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2296,6 +2333,7 @@ dependencies = [
  "pgrx-macros",
  "pgrx-sql-entity-graph",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -11,17 +11,35 @@ use crate::{detect_pg_config, env_tracked, is_for_release};
 use bindgen::NonCopyUnionStyle;
 use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use eyre::{WrapErr, eyre};
+use pgrx_c_macros::{
+    AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
+    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, generate_with_bindings,
+    lower_msvc_runtime_flags, pg_sys_integer_bridges, postgres_function_macro_names,
+    postgres_inline_function_names, postgres_object_macro_names, probe_integer_object_constants,
+};
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
+use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
 use std::rc::Rc;
-use syn::{Item, ItemConst};
+use std::sync::Mutex;
+use std::sync::atomic::{AtomicU64, Ordering};
+use syn::{Item, ItemConst, spanned::Spanned};
 
 const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
+
+// clang's safe wrapper permits one live Clang handle per process. Bindgen's
+// Binding generation shares that inspection's runtime and verified arguments.
+/// Serialize macro inspection and bindgen generation so both share one usable process-wide
+/// Clang runtime.
+static MACRO_SCANNER: Mutex<()> = Mutex::new(());
+/// Allocate unique owned staging paths while formatting different PostgreSQL versions
+/// concurrently.
+static NEXT_MACRO_FORMATTING_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
 // These postgres versions were effectively "yanked" by the community, even tho they still exist
 // in the wild.  pgrx will refuse to compile against them
@@ -34,6 +52,19 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
     PgVersion::new(15, PgMinorVersion::Release(9), None),
 ];
 
+/// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
+/// in production generation.
+mod binding_symbols;
+/// Render provenance-derived header modules and same-scope support fragments for publication.
+mod macro_files;
+/// Compile generated native access helpers under the already verified C invocation profile.
+mod macro_support;
+/// Recover module and function ABI records by invoking PostgreSQL's original declaration macros.
+mod metadata_support;
+/// Carry matching fresh bindings, macro adapters and native code across target builds.
+mod target_artifacts;
+use macro_files::MacroFiles;
+use macro_support::{NativeBuild, compile_macro_support, link_macro_support};
 pub(super) mod clang;
 
 #[derive(Debug)]
@@ -143,8 +174,21 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     }
 }
 
+/// Drive binding generation for configured PostgreSQL versions and register the generated-macro
+/// configuration with Cargo before compiling consumers.
 pub fn main() -> eyre::Result<()> {
     println!("cargo:rustc-check-cfg=cfg(docsrs)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_c_macros)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_c_char_signed)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_c_char_unsigned)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_c_alignment)");
+    println!("cargo:rustc-check-cfg=cfg(pgrx_c_int128_unavailable)");
+    println!(
+        "cargo:rustc-check-cfg=cfg(pgrx_c_size_type, values(\"unsigned_int\", \"unsigned_long\", \"unsigned_long_long\"))"
+    );
+    println!(
+        "cargo:rustc-check-cfg=cfg(pgrx_c_ptrdiff_type, values(\"int\", \"long\", \"long_long\"))"
+    );
     println!("cargo:rerun-if-env-changed=DOCS_RS");
 
     if env_tracked("DOCS_RS").as_deref() == Some("1") {
@@ -181,7 +225,7 @@ pub fn main() -> eyre::Result<()> {
         }
     }
 
-    std::thread::scope(|scope| {
+    let integrated_cshims = std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
         // but in the future if we ever have way more, we should consider
         // chunking `pg_configs` based on `thread::available_parallelism()`.
@@ -196,6 +240,7 @@ pub fn main() -> eyre::Result<()> {
                         is_for_release(),
                         compile_cshim,
                     )
+                    .map(|integrated| (*pg_major_ver, integrated))
                 })
             })
             .collect::<Vec<_>>();
@@ -205,7 +250,7 @@ pub fn main() -> eyre::Result<()> {
             .into_iter()
             .map(|thread| thread.join().expect("thread panicked while generating bindings"))
             .collect::<Vec<eyre::Result<_>>>();
-        results.into_iter().try_for_each(|r| r)
+        results.into_iter().collect::<eyre::Result<Vec<_>>>()
     })?;
 
     if compile_cshim {
@@ -217,7 +262,12 @@ pub fn main() -> eyre::Result<()> {
             .ok_or_else(|| {
                 eyre!("could not find pg_config for active feature pg{active_major_version}")
             })?;
-        build_shim(&build_paths.shim_src, &build_paths.shim_dst, pg_config)?;
+        if !integrated_cshims
+            .iter()
+            .any(|(major, integrated)| *major == active_major_version && *integrated)
+        {
+            build_shim(&build_paths.shim_src, &build_paths.shim_dst, pg_config)?;
+        }
     }
 
     Ok(())
@@ -248,6 +298,8 @@ fn cshim_static_wrapper_name(major_version: u16) -> String {
     format!("pgrx-cshim-static-pg{major_version}")
 }
 
+/// Register binding inputs without tracking an absent configuration file perpetually;
+/// macro-specific tracking additionally follows inspected compiler and header inputs.
 fn emit_rerun_if_changed() {
     // `pgrx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_PATH");
@@ -275,23 +327,34 @@ fn emit_rerun_if_changed() {
     println!("cargo:rerun-if-changed=include");
     println!("cargo:rerun-if-changed=pgrx-cshim.c");
 
-    if let Ok(pgrx_config) = Pgrx::config_toml() {
+    if let Ok(pgrx_config) = Pgrx::config_toml()
+        && pgrx_config.is_file()
+    {
         println!("cargo:rerun-if-changed={}", pgrx_config.display());
     }
 }
 
+/// Write the selected version's bindings, OIDs, macro module tree, and skip report, publishing
+/// documentation snapshots only during release generation. Return whether this
+/// version's native artifact already includes the C shim so it is built only once.
 fn generate_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
     enable_cshim: bool,
-) -> eyre::Result<()> {
+) -> eyre::Result<bool> {
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{major_version}.h"));
 
-    let bindgen_output = get_bindings(major_version, pg_config, &include_h, enable_cshim)
+    let active = env_tracked(&format!("CARGO_FEATURE_PG{major_version}")).is_some();
+    let native = NativeBuild {
+        out_dir: &build_paths.out_dir,
+        active,
+        cshim: (active && enable_cshim).then_some(build_paths.shim_src.as_path()),
+    };
+    let (bindgen_output, macros) = get_bindings(major_version, pg_config, &include_h, native)
         .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -335,12 +398,68 @@ fn generate_bindings(
         })?;
     }
 
+    write_macro_files(
+        &macros.files,
+        &build_paths.out_dir.join(format!("cmacros/pg{major_version}")),
+        false,
+    )?;
+    remove_legacy_macro_file(&build_paths.out_dir, major_version)?;
+    if is_for_release {
+        write_macro_files(
+            &macros.files,
+            &build_paths.src_dir.join(format!("cmacros/pg{major_version}")),
+            true,
+        )?;
+        remove_legacy_macro_file(&build_paths.src_dir, major_version)?;
+    }
+    let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
+    write_content_stable(&report, &macros.report)?;
+    if macro_debug_enabled() {
+        if macros.inspected {
+            println!(
+                "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped; report {}",
+                macros.emitted,
+                macros.skipped,
+                report.display()
+            );
+        } else {
+            println!(
+                "cargo:warning=pg{major_version} C macros unavailable; report {}",
+                report.display()
+            );
+        }
+    }
+    if active {
+        for cfg in &macros.runtime_cfg {
+            // Only the active installation configures the defining runtime;
+            // release generation may inspect other target profiles.
+            println!("cargo:rustc-cfg={cfg}");
+        }
+        if macros.emitted != 0 {
+            println!("cargo:rustc-cfg=pgrx_c_macros");
+        }
+    }
+
     let lib_dir = pg_config.lib_dir()?;
     println!(
         "cargo:rustc-link-search={}",
         lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
-    Ok(())
+    Ok(macros.integrated_cshim)
+}
+
+/// Keep normal binding builds quiet while allowing developers to inspect macro
+/// skip diagnostics. Tracking the switch makes Cargo rerun generation when its
+/// value changes; reports are written independently of this output policy.
+fn macro_debug_enabled() -> bool {
+    env_tracked("PGRX_MACRO_DEBUG").as_deref() == Some("1")
+}
+
+/// Keep a skip diagnostic within one Cargo warning line. Compiler rejection
+/// messages can contain newlines; they must not become additional build-script
+/// directives. The full unmodified reason remains in the JSON report.
+fn macro_skip_warning(major_version: u16, name: &str, message: &str) -> String {
+    format!("pg{major_version}: skipping macro `{name}`: {}", message.replace(['\r', '\n'], " "))
 }
 
 #[derive(Debug, Clone)]
@@ -349,7 +468,7 @@ struct BuildPaths {
     manifest_dir: PathBuf,
     /// OUT_DIR
     out_dir: PathBuf,
-    /// {manifest_dir}/src
+    /// {manifest_dir}/src/include
     src_dir: PathBuf,
     /// {manifest_dir}/pgrx-cshim.c
     shim_src: PathBuf,
@@ -372,6 +491,220 @@ impl BuildPaths {
     }
 }
 
+/// Add documentation-only guards to installation-specific target checks
+/// while preserving original source comments and macro templates.
+fn macro_snapshot(source: &str) -> eyre::Result<String> {
+    let file = syn::parse_file(source).wrap_err("could not parse generated C macros")?;
+    let mut guards = BTreeMap::new();
+    for item in &file.items {
+        if let Item::Macro(item) = item
+            && item.mac.path.is_ident("compile_error")
+        {
+            // Shipped bindings describe the generation installation, which may
+            // differ from docs.rs's target. Keep the original target guard for
+            // anyone including this snapshot outside documentation builds.
+            guards.insert(
+                item.mac.path.span().start().line,
+                ("compile_error!", "C macro target guard"),
+            );
+        }
+    }
+    // Keep the original source: passing through a token stream would discard the
+    // PGRX comments that explain why a named symbol or macro remains expanded.
+    let mut snapshot = String::from(
+        "/* Automatically generated by pgrx-c-macros. Do not hand-edit.\n\nThis code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.\n*/\n",
+    );
+    for (index, line) in source.split_inclusive('\n').enumerate() {
+        if let Some((prefix, item)) = guards.get(&(index + 1)) {
+            if !line.trim_start().starts_with(*prefix) {
+                return Err(eyre!("{item} does not start on its own line"));
+            }
+            snapshot.push_str("#[cfg(not(docsrs))]\n");
+        }
+        snapshot.push_str(line);
+    }
+    Ok(snapshot)
+}
+
+/// Stage and format the complete macro tree before stable writes, then remove only stale Rust
+/// leaves owned by this version.
+fn write_macro_files(
+    files: &MacroFiles,
+    directory: &Path,
+    documentation: bool,
+) -> eyre::Result<()> {
+    fs::create_dir_all(directory)?;
+    let staging = MacroFormattingDirectory::new(directory)?;
+    let mut paths = Vec::with_capacity(files.sources.len());
+    for (relative, source) in &files.sources {
+        let path = staging.0.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        if documentation {
+            fs::write(&path, macro_snapshot(source)?)?;
+        } else {
+            fs::write(&path, source)?;
+        }
+        paths.push(path);
+    }
+    let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+    format_macro_files(&paths, Path::new(&rustfmt))?;
+    for relative in files.sources.keys() {
+        let path = directory.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        // Compare the final representation: formatting after the stable write
+        // would rewrite identical artifacts on every regeneration.
+        let content = fs::read(staging.0.join(relative))?;
+        write_content_stable(&path, &content)?;
+    }
+    // This version directory contains generated Rust only. Retain other files
+    // and versions, and remove empty directories after their stale leaves.
+    for entry in walkdir::WalkDir::new(directory).contents_first(true) {
+        let entry = entry?;
+        let path = entry.path();
+        let relative = path.strip_prefix(directory)?;
+        if entry.file_type().is_file()
+            && path.extension().is_some_and(|extension| extension == "rs")
+            && !files.sources.contains_key(relative)
+        {
+            fs::remove_file(path)?;
+        } else if entry.file_type().is_dir()
+            && path != directory
+            && fs::read_dir(path)?.next().is_none()
+        {
+            fs::remove_dir(path)?;
+        }
+    }
+    Ok(())
+}
+
+/// A sibling keeps the final directory's rustfmt configuration search while
+/// keeping temporary files outside that version's stale-file pruning.
+struct MacroFormattingDirectory(
+    /// Owned fixture path used for isolated inputs and cleanup.
+    PathBuf,
+);
+
+/// Own formatting staging beside the final tree so rustfmt sees its configuration
+/// while stale-file pruning remains confined to generated version output.
+impl MacroFormattingDirectory {
+    /// Create a sibling formatting directory so rustfmt finds the destination configuration
+    /// without stale-file pruning observing the temporary files.
+    fn new(directory: &Path) -> eyre::Result<Self> {
+        let parent = directory.parent().filter(|parent| !parent.as_os_str().is_empty());
+        let parent = parent.unwrap_or_else(|| Path::new("."));
+        for _ in 0..100 {
+            let number = NEXT_MACRO_FORMATTING_DIRECTORY.fetch_add(1, Ordering::Relaxed);
+            let path = parent.join(format!(".pgrx-c-macros-{}-{number}", std::process::id()));
+            match fs::create_dir(&path) {
+                Ok(()) => return Ok(Self(path)),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => {
+                    return Err(error).wrap_err("could not stage C macros for formatting");
+                }
+            }
+        }
+        Err(eyre!("could not create a unique C macro formatting directory"))
+    }
+}
+
+/// Remove only the staging files allocated by this generation attempt on either
+/// successful publication or an earlier formatting error.
+impl Drop for MacroFormattingDirectory {
+    /// Remove only the staging directory owned by this formatter instance after success or
+    /// failure.
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Recognize rustup's missing-component diagnostic separately from Rust source formatting errors.
+///
+/// A rustup proxy can exist even when its selected toolchain has no rustfmt component. Only
+/// that specific leading diagnostic is an availability failure; another error remains fatal.
+fn missing_rustfmt_component(stderr: &[u8]) -> bool {
+    let diagnostic = String::from_utf8_lossy(stderr);
+    let mut lines = diagnostic.lines();
+    let Some(toolchain) = lines.next().and_then(|line| {
+        line.strip_prefix("error: 'rustfmt' is not installed for the toolchain '")
+    }) else {
+        return false;
+    };
+    let toolchain = toolchain.strip_suffix('.').unwrap_or(toolchain);
+    toolchain.strip_suffix('\'').is_some_and(|name| !name.is_empty() && !name.contains('\''))
+        && !lines.any(|line| line.starts_with("error:"))
+}
+
+/// Bound escaped filenames per process, leaving headroom below Windows' 32,767 UTF-16-unit
+/// command-line limit for the formatter executable, options, and terminating null.
+const MACRO_FORMAT_PATH_BUDGET: usize = 16 * 1024;
+
+/// Borrow the largest prefix within the formatter's filename budget without allocating commands.
+/// Double the encoded byte length for Windows quoting/backslash escaping; it also bounds UTF-16
+/// length. Always admit one path so an individually oversized filename yields an OS error.
+fn macro_format_batch_len(paths: &[PathBuf]) -> usize {
+    let mut size = 0usize;
+    for (index, path) in paths.iter().enumerate() {
+        let cost = path.as_os_str().as_encoded_bytes().len().saturating_mul(2).saturating_add(3);
+        if index > 0 && size.saturating_add(cost) > MACRO_FORMAT_PATH_BUDGET {
+            return index;
+        }
+        size = size.saturating_add(cost);
+    }
+    paths.len()
+}
+
+/// Format generated leaves in bounded batches without child traversal; tolerate an absent
+/// executable or rustup component, but propagate actual formatter failures before publication.
+fn format_macro_files(mut paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
+    while !paths.is_empty() {
+        let (batch, remaining) = paths.split_at(macro_format_batch_len(paths));
+        let mut command = Command::new(rustfmt);
+        command.args(batch).args(["--edition", "2024", "--config", "skip_children=true"]);
+        match run_command(&mut command, "C macro formatting") {
+            Ok(output) if output.status.success() => {}
+            Ok(output) if missing_rustfmt_component(&output.stderr) => {
+                // The proxy failed before formatting this batch. Original staged
+                // sources remain suitable for optional unformatted output.
+                return Ok(());
+            }
+            Ok(output) => {
+                return Err(eyre!(
+                    "could not format generated C macros: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                ));
+            }
+            Err(error)
+                if error
+                    .downcast_ref::<std::io::Error>()
+                    .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound) =>
+            {
+                // Rustfmt is optional; untouched staged sources remain usable.
+                return Ok(());
+            }
+            Err(error) => return Err(error).wrap_err("could not start the C macro formatter"),
+        }
+        paths = remaining;
+    }
+    Ok(())
+}
+
+/// Remove the obsolete monolithic macro file after publishing the modular tree, tolerating an
+/// already-absent predecessor.
+fn remove_legacy_macro_file(directory: &Path, major_version: u16) -> eyre::Result<()> {
+    let path = directory.join(format!("pg{major_version}_macros.rs"));
+    match fs::remove_file(&path) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error).wrap_err_with(|| format!("could not remove {}", path.display())),
+    }
+}
+
+/// Write formatted binding source and release documentation snapshots using the
+/// repository edition; modular C macro publication uses its separate stable tree writer.
 fn write_rs_file(
     code: proc_macro2::TokenStream,
     file_path: &Path,
@@ -396,7 +729,7 @@ fn write_rs_file(
         write!(file, " */")
     }?;
     write!(file, "{contents}")?;
-    rust_fmt(file_path)
+    rust_fmt(file_path, "2024")
 }
 
 /// Given a token stream representing a file, apply a series of transformations to munge
@@ -811,26 +1144,58 @@ struct TypeDescriptor<'a> {
     children: Vec<usize>,
 }
 
+/// Generate from original C inputs or import their complete verified target bundle.
+/// Raw bindings alone cannot implement the migrated macro consumers.
 fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
-    enable_cshim: bool,
-) -> eyre::Result<syn::File> {
-    let bindings = if let Some(info_dir) =
+    native: NativeBuild<'_>,
+) -> eyre::Result<(syn::File, MacroOutput)> {
+    let (bindings, macros) = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
     {
-        let bindings_file = format!("{info_dir}/pg{major_version}_raw_bindings.rs");
-        std::fs::read_to_string(&bindings_file)
-            .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?
+        target_artifacts::import(
+            Path::new(&info_dir),
+            target_artifact_domain(major_version)?,
+            native.out_dir,
+            native.active,
+        )?
     } else {
-        let bindings = run_bindgen(major_version, pg_config, include_h, enable_cshim)?;
+        let (bindings, macros) = run_bindgen(major_version, pg_config, include_h, native)?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
             std::fs::write(path, &bindings)?;
         }
-        bindings
+        if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH") {
+            if !native.active {
+                return Err(eyre!(
+                    "target artifact export requires exactly the active PostgreSQL version"
+                ));
+            }
+            target_artifacts::export(
+                Path::new(&path),
+                target_artifact_domain(major_version)?,
+                &bindings,
+                &macros,
+                native.out_dir,
+            )?;
+        }
+        (bindings, macros)
     };
-    syn::parse_file(bindings.as_str()).wrap_err_with(|| "failed to parse generated bindings")
+    let bindings = syn::parse_file(bindings.as_str())
+        .wrap_err_with(|| "failed to parse generated bindings")?;
+    Ok((bindings, macros))
+}
+
+/// Bind imported native archives to Cargo's exact target and selected shim feature.
+fn target_artifact_domain(major: u16) -> eyre::Result<target_artifacts::ArtifactDomain> {
+    Ok(target_artifacts::ArtifactDomain {
+        major,
+        rust_target: env_tracked("TARGET")
+            .ok_or_else(|| eyre!("target artifact needs Cargo TARGET"))?,
+        cshim: env_tracked("CARGO_FEATURE_CSHIM").as_deref() == Some("1"),
+        generator_version: env!("CARGO_PKG_VERSION").to_owned(),
+    })
 }
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
@@ -839,69 +1204,685 @@ fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
-    enable_cshim: bool,
-) -> eyre::Result<String> {
+    native: NativeBuild<'_>,
+) -> eyre::Result<(String, MacroOutput)> {
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
-    let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
-    eprintln!("pg_config --configure CLANG = {preferred_clang:?}");
+    let explicit_clang = env_tracked("CLANG_PATH").map(PathBuf::from);
+    let configured_clang =
+        configure.get("CLANG").filter(|value| !value.is_empty()).map(PathBuf::from);
+    let preferred_clang = explicit_clang.as_deref().or(configured_clang.as_deref());
+    eprintln!("Preferred Clang = {preferred_clang:?}");
     let pg_target_includes = pg_target_includes(major_version, pg_config)?;
     eprintln!("pg_target_includes = {pg_target_includes:?}");
     let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
-    binder = add_blocklists(binder, major_version, enable_cshim);
+    binder = add_blocklists(binder, major_version);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
     binder = add_derives(binder);
-    if !autodetect {
-        let builtin_includes = includes.iter().filter_map(|p| Some(format!("-I{}", p.to_str()?)));
-        binder = binder.clang_args(builtin_includes);
-    };
-    let enum_names = Rc::new(RefCell::new(BTreeMap::new()));
-    let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
     let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let bindings = binder
-        .header(include_h.display().to_string())
-        .clang_args(extra_bindgen_clang_args(pg_config)?)
-        .clang_args(pg_target_includes.iter().map(|x| format!("-I{x}")))
-        .detect_include_paths(autodetect)
-        .parse_callbacks(Box::new(overrides))
-        .default_enum_style(bindgen::EnumVariation::ModuleConsts)
-        // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
-        .rustified_non_exhaustive_enum("NodeTag")
-        .size_t_is_usize(true)
-        .merge_extern_blocks(true)
-        .wrap_unsafe_ops(true)
-        .use_core()
-        .generate_cstr(true)
-        .disable_nested_struct_naming()
-        .formatter(bindgen::Formatter::None)
-        .layout_tests(false)
-        .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
-        .wrap_static_fns(enable_cshim)
-        .wrap_static_fns_path(out_path.join(cshim_static_wrapper_name(major_version)))
-        .wrap_static_fns_suffix("__pgrx_cshim")
-        .generate()
-        .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
+    let mut arguments = Vec::new();
+    if !autodetect {
+        for include in includes {
+            arguments.push(format!(
+                "-I{}",
+                include.to_str().ok_or_else(|| eyre!("Clang include directory is not UTF-8"))?
+            ));
+        }
+    }
+    arguments.extend(extra_bindgen_clang_args(pg_config)?);
+    arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
+    let environment_arguments = bindgen_environment_arguments(env_tracked);
+    // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
+    if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments))
+        && let Some(target) = env_tracked("TARGET")
+    {
+        arguments.insert(0, format!("--target={}", clang_target(&target)));
+    }
+    let enum_names = Rc::new(RefCell::new(BTreeMap::new()));
+    let generate = |arguments: Vec<String>| -> eyre::Result<String> {
+        enum_names.borrow_mut().clear();
+        let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
+        let bindings = binder
+            .clone()
+            .header(include_h.display().to_string())
+            .clang_args(arguments)
+            .detect_include_paths(autodetect)
+            .parse_callbacks(Box::new(overrides))
+            .default_enum_style(bindgen::EnumVariation::ModuleConsts)
+            // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
+            .rustified_non_exhaustive_enum("NodeTag")
+            .size_t_is_usize(true)
+            .merge_extern_blocks(true)
+            .wrap_unsafe_ops(true)
+            .use_core()
+            .generate_cstr(true)
+            .disable_nested_struct_naming()
+            .formatter(bindgen::Formatter::None)
+            .layout_tests(false)
+            .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
+            // PostgreSQL routinely replaces macros with inline functions. Keep
+            // their generated native bindings available with either cshim API
+            // configuration instead of maintaining Rust translations.
+            .wrap_static_fns(true)
+            .wrap_static_fns_path(out_path.join(cshim_static_wrapper_name(major_version)))
+            .wrap_static_fns_suffix("__pgrx_cshim")
+            .generate()
+            .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
 
-    Ok(bindings.to_string())
+        Ok(bindings.to_string())
+    };
+    // The established bindgen invocation is independent of optional macro CFLAGS,
+    // compiler-driver discovery and native support. Inspection still verifies
+    // the fresh Rust storage against the full recorded PostgreSQL C profile.
+    let mut bindings = None;
+    let macros =
+        optional_macro_output(major_version, macro_generation_refusal(env_tracked), || {
+            let (mut macro_arguments, cflags_recorded) = postgres_cflags(pg_config)?;
+            // Ordinary bindings deliberately omit MSVC CPPFLAGS. The separate
+            // macro profile still needs the recorded preprocessing controls.
+            if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows") {
+                let flags = pg_config.cppflags()?;
+                let flags =
+                    flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
+                macro_arguments
+                    .extend(pgrx_c_macros::split_recorded_cflags(flags, true)?.unwrap_or_default());
+            }
+            macro_arguments.extend_from_slice(&arguments);
+            generate_macros(
+                pg_config,
+                include_h,
+                &mut bindings,
+                macro_arguments,
+                &environment_arguments,
+                explicit_clang.as_deref(),
+                native,
+                cflags_recorded,
+                || generate(arguments.clone()),
+            )
+        })?;
+    let bindings = match bindings {
+        Some(bindings) => bindings,
+        None => generate(arguments)?,
+    };
+    // Static bindings are ordinary pg-sys APIs, so an optional macro refusal
+    // must not leave their generated extern declarations without definitions.
+    // The enabled C shim owns this wrapper in the existing main build path.
+    if native.active && !macros.inspected && native.cshim.is_none() {
+        let wrapper =
+            native.out_dir.join(format!("{}.c", cshim_static_wrapper_name(major_version)));
+        if wrapper.is_file() {
+            ordinary_c_support(pg_config)?
+                .file(wrapper)
+                .compile(&format!("pgrx_c_inline_pg{major_version}"));
+        }
+    }
+    Ok((bindings, macros))
 }
 
-fn add_blocklists(
-    bind: bindgen::Builder,
-    major_version: u16,
-    enable_cshim: bool,
-) -> bindgen::Builder {
-    let bind = if major_version >= 19 {
-        // Postgres 19 turned these into `static inline` functions, so without the cshim there's
-        // no symbol to link against.  We implement them ourselves, in Rust, in `port.rs`
-        bind.blocklist_function("TransactionId(Precedes|PrecedesOrEquals|Follows|FollowsOrEquals)")
-    } else {
-        bind
+/// Carry the generated macro tree and audit report from inspection through binding publication.
+struct MacroOutput {
+    /// Versioned macro tree and adapters ready for formatted publication.
+    files: MacroFiles,
+    /// Serialized compiler facts and macro skip diagnostics written alongside the bindings.
+    report: Vec<u8>,
+    /// Successful public definitions counted for the Cargo summary.
+    emitted: usize,
+    /// Rejected candidates counted without treating unsupported syntax as build failure.
+    skipped: usize,
+    /// Whether authoritative C inspection succeeded, distinguishing unavailability from an
+    /// empty selection.
+    inspected: bool,
+    /// Whether the active version's macro artifact owns the C shim as well,
+    /// preventing a second object from defining the same header functions.
+    integrated_cshim: bool,
+    /// Verified scalar identity choices for the active defining runtime; empty
+    /// when inspection or ABI validation failed rather than publishing guesses.
+    runtime_cfg: Vec<String>,
+}
+
+/// Represent unavailable authoritative C inspection without publishing guessed
+/// macro definitions or treating shipped documentation bindings as compiler evidence.
+impl MacroOutput {
+    /// Create an empty macro tree and explicit report when authoritative C inspection is
+    /// unavailable, rather than deriving facts from shipped bindings.
+    fn unavailable(major_version: u16, reason: &str) -> eyre::Result<Self> {
+        let report = serde_json::to_vec_pretty(&serde_json::json!({
+            "postgres_major_version": major_version,
+            "status": "unavailable",
+            "reason": reason,
+        }))?;
+        Ok(Self {
+            files: MacroFiles::empty(),
+            report,
+            emitted: 0,
+            skipped: 0,
+            inspected: false,
+            integrated_cshim: false,
+            runtime_cfg: Vec::new(),
+        })
+    }
+}
+
+/// Serialize the verified C invocation, fresh binding facts, and per-macro results for build
+/// diagnostics and auditing.
+#[derive(Serialize)]
+struct MacroReport<'a> {
+    /// Installation version associated with these compiler and binding facts.
+    postgres_major_version: u16,
+    /// Report status distinguishing generated output from unavailable inspection.
+    status: &'static str,
+    /// Whether the installation recorded historical CFLAGS. When false the
+    /// verified header, target and caller invocation define macro semantics;
+    /// the report makes no claim about unrecorded server build options.
+    cflags_recorded: bool,
+    /// Verified compiler invocation, target, and semantic flags used for this generation.
+    profile: &'a CompilationProfile,
+    /// Header, compiler, search-root, and environment dependencies needed to invalidate output.
+    inputs: &'a BuildInputs,
+    /// Original frontend warnings retained for audit without repairing the source.
+    diagnostics: &'a [Diagnostic],
+    /// Every selected candidate, including provenance and structured emission or skip result.
+    macros: &'a [MacroEmission],
+    /// Compiler-owned constant facts used to verify symbolic binding references.
+    integer_constants: &'a BTreeMap<String, IntegerConstant>,
+    /// Absent bindgen constants independently resolved from the original C definitions.
+    supplemental_constants: &'a pgrx_c_macros::ObjectIntegerConstants,
+    /// Fresh Rust binding paths, storage, and values reconciled with the C catalog.
+    integer_bindings: &'a BindingCatalog,
+    /// Explanation when checked pg_sys integer bridges could not be proved.
+    integer_bridge_unavailable: Option<String>,
+}
+
+/// Inspect the selected installation, reconcile fresh bindings, emit supported macros and
+/// native adapters, verify unchanged C inputs, and serialize structured skips.
+#[allow(clippy::too_many_arguments)] // One inspection owns compiler inputs, binding storage and native publication.
+fn generate_macros(
+    pg_config: &PgConfig,
+    header: &Path,
+    bindings: &mut Option<String>,
+    binder_arguments: Vec<String>,
+    environment_arguments: &[String],
+    preferred_clang: Option<&Path>,
+    native: NativeBuild<'_>,
+    cflags_recorded: bool,
+    generate_bindings: impl FnOnce() -> eyre::Result<String>,
+) -> eyre::Result<MacroOutput> {
+    let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
+    let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
+    let postgres = PostgresConfig::from_pg_config(pg_config.clone())?;
+    let major_version = pg_config.major_version()?;
+    let msvc = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc");
+    // Bindgen appends its original environment tail itself. A CRT selection
+    // there cannot be lowered without changing the tail seen by libclang;
+    // refuse instead of inspecting different flags from the binding parser.
+    if msvc && lower_msvc_runtime_flags(environment_arguments, true)? != environment_arguments {
+        return Err(eyre!(
+            "MSVC runtime selections in BINDGEN_EXTRA_CLANG_ARGS are unsupported; \
+             supply them in the recorded PostgreSQL CFLAGS/CPPFLAGS instead"
+        ));
+    }
+    let mut effective_arguments = binder_arguments.clone();
+    effective_arguments.extend_from_slice(environment_arguments);
+    let frontend = postgres
+        .inspect_with_arguments(&scanner, header, &effective_arguments, preferred_clang)
+        .wrap_err("could not establish the binding generator's C macro compilation profile")?;
+    let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
+    let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
+        .into_iter()
+        .collect::<BTreeSet<_>>();
+    let mut global_roots = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            active
+                .definition
+                .tokens
+                .iter()
+                .any(|token| frontend.declarations().variables.contains_key(&token.spelling))
+                .then_some(name.clone())
+        })
+        .collect::<BTreeSet<_>>();
+    // Propagate declaration references once through caller edges. Integer
+    // constants belong in bindings; only context-bearing object expressions
+    // require a zero-argument macro rather than duplicated constant exports.
+    global_roots.extend(
+        frontend
+            .dependencies()
+            .impacts(&global_roots.iter().collect::<Vec<_>>())
+            .into_iter()
+            .map(|impact| impact.name),
+    );
+    let object_names = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            let definition = &active.definition;
+            (definition.kind == pgrx_c_macros::MacroKind::ObjectLike
+                && definition.tokens.len() > 1
+                && global_roots.contains(name)
+                && owned_objects.contains(name))
+            .then_some(name.clone())
+        })
+        .collect::<Vec<_>>();
+    let inline_names = postgres_inline_function_names(&frontend, postgres.server_include_dir())?;
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &names,
+        &object_names,
+        &inline_names,
+    )?;
+    names.extend(object_names);
+    names.extend(inline_names);
+    emit_macro_rerun_inputs(session.inputs(), native.out_dir)?;
+    let mut source = String::new();
+    let integer_bridge_unavailable = match pg_sys_integer_bridges(&frontend) {
+        Ok(bridges) => {
+            source.push_str(&bridges);
+            None
+        }
+        Err(error) => Some(error.to_string()),
     };
-    let bind = if major_version < 16 || !enable_cshim {
-        // Before Postgres 16 these are macros. Without cshim, Postgres 16+ static inline
-        // functions have no symbol to link against. Use the Rust fallback in both cases.
-        bind.blocklist_function("BufferGetBlock").blocklist_function("BufferGetPage")
+    // Retain ordinary bindings even if a later optional macro phase refuses.
+    // Successful macros require an unchanged input window around generation.
+    *bindings = Some(generate_bindings()?);
+    let bindings = bindings.as_mut().expect("binding generation just succeeded");
+    session.verify_inputs().wrap_err("C inputs changed during binding generation")?;
+    let mut parsed_bindings =
+        syn::parse_file(bindings).wrap_err("could not parse bindings for C symbol references")?;
+    let available =
+        parsed_bindings
+            .items
+            .iter()
+            .filter_map(|item| {
+                if let Item::Const(item) = item { Some(item.ident.to_string()) } else { None }
+            })
+            .collect::<BTreeSet<_>>();
+    let missing_objects = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            let definition = &active.definition;
+            if definition.kind != pgrx_c_macros::MacroKind::ObjectLike
+                || available.contains(name)
+                || !owned_objects.contains(name)
+            {
+                return None;
+            }
+            let body = &definition.tokens[1..];
+            // Empty header guards, strings and declaration fragments are not
+            // numeric binding candidates. The compiler owns the final type proof.
+            let numeric = body.iter().any(|token| {
+                (token.kind == pgrx_c_macros::TokenKind::Literal
+                    && !token.spelling.starts_with('"'))
+                    || matches!(
+                        token.spelling.as_str(),
+                        "sizeof" | "offsetof" | "__builtin_offsetof"
+                    )
+                    || frontend.declarations().integer_constants.contains_key(&token.spelling)
+                    || frontend.environment().active.get(&token.spelling).is_some_and(|active| {
+                        active.definition.kind == pgrx_c_macros::MacroKind::ObjectLike
+                            && active.definition.tokens.len() > 1
+                    })
+            });
+            (numeric
+                && !body.iter().any(|token| matches!(token.spelling.as_str(), "{" | "}" | ";")))
+            .then_some(name.clone())
+        })
+        .collect::<Vec<_>>();
+    let objects = probe_integer_object_constants(&scanner, &frontend, &missing_objects)?;
+    for (name, constant) in &objects.constants {
+        let pgrx_c_macros::TypeCategory::Integer(kind) = constant.ty.category else { continue };
+        let layout = &frontend.profile().target.integers[&kind];
+        let ty = if kind == pgrx_c_macros::IntegerKind::Bool {
+            "bool".to_owned()
+        } else if kind == frontend.profile().target.size_type {
+            "usize".to_owned()
+        } else {
+            format!("{}{}", if layout.signed { "i" } else { "u" }, layout.bits)
+        };
+        let value = match constant.value {
+            pgrx_c_macros::IntegerValue::Signed(value) => value.to_string(),
+            pgrx_c_macros::IntegerValue::Unsigned(value) => value.to_string(),
+        };
+        let value = if kind == pgrx_c_macros::IntegerKind::Bool {
+            (value != "0").to_string()
+        } else {
+            value
+        };
+        let item = syn::parse_str::<syn::ItemConst>(&format!(
+            "/// Compiler-verified C object macro `{name}`, omitted by bindgen.\npub const {name}: {ty} = {value};"
+        ))?;
+        bindings.push_str(&item.to_token_stream().to_string());
+        parsed_bindings.items.push(Item::Const(item));
+    }
+    // Callback storage facts must reflect the same ABI rewrite as the final
+    // bindings, while foreign function guards are still generated afterward.
+    rewrite_c_abi_to_c_unwind(&mut parsed_bindings);
+    let mut symbols = binding_symbols::collect_bindings_at(
+        &parsed_bindings,
+        &session
+            .integer_constants()
+            .iter()
+            .chain(objects.constants.iter())
+            .map(|(name, constant)| (name.clone(), constant.clone()))
+            .collect(),
+        frontend.declarations(),
+        &frontend.profile().target,
+        &["__pgrx_c_bindings".into()],
+    );
+    symbols.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
+    if integer_bridge_unavailable.is_none() {
+        symbols.integer_storage.extend([
+            ("Oid".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+            ("TransactionId".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+            ("MultiXactId".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+        ]);
+        if let Some(pgrx_c_macros::TypeInfo {
+            category: pgrx_c_macros::TypeCategory::Integer(kind),
+            ..
+        }) = frontend.declarations().types.get("Datum")
+        {
+            symbols.integer_storage.insert("Datum".into(), *kind);
+        }
+    }
+    let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
+        generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
+    let metadata = metadata_support::generate(&frontend, &symbols)?;
+    source.push_str(&metadata.rust);
+    source.push_str(&support.rust);
+    let static_wrapper =
+        native.out_dir.join(format!("{}.c", cshim_static_wrapper_name(major_version)));
+    let native_built = native.active
+        && (!support.c_source.is_empty()
+            || !metadata.c_source.is_empty()
+            || static_wrapper.is_file());
+    let integrated_cshim = if native_built {
+        compile_macro_support(
+            major_version,
+            frontend.profile(),
+            &format!("{}\n{}", support.c_source, metadata.c_source),
+            &native,
+        )?
+    } else {
+        false
+    };
+    // Native access primitives reread the original headers. Do not publish Rust
+    // facts from one snapshot alongside C object code compiled from another.
+    session.verify_inputs().wrap_err("C inputs changed during macro support generation")?;
+    let mut emitted = 0;
+    let mut skipped = 0;
+    let macro_debug = macro_debug_enabled();
+    for emission in &emissions {
+        match &emission.status {
+            EmissionStatus::Emitted { .. } => {
+                emitted += 1;
+                symbols.macros.insert(emission.analysis.name.clone());
+            }
+            EmissionStatus::Skipped { reason } => {
+                skipped += 1;
+                if macro_debug {
+                    println!(
+                        "cargo:warning={}",
+                        macro_skip_warning(major_version, &emission.analysis.name, &reason.message)
+                    );
+                }
+            }
+        }
+    }
+    let files = MacroFiles::new(source, &emissions, postgres.server_include_dir())?;
+    let report = serde_json::to_vec_pretty(&MacroReport {
+        postgres_major_version: major_version,
+        status: "generated",
+        cflags_recorded,
+        profile: frontend.profile(),
+        inputs: session.inputs(),
+        diagnostics: &frontend.inventory().diagnostics,
+        macros: &emissions,
+        integer_constants: session.integer_constants(),
+        supplemental_constants: &objects,
+        integer_bindings: &symbols,
+        integer_bridge_unavailable,
+    })?;
+    if native_built {
+        // Publish linkage only after every proof, fingerprint and serialization
+        // succeeds. Failed optional generation must leave no linked C artifact.
+        link_macro_support(major_version, native.out_dir);
+    }
+    Ok(MacroOutput {
+        files,
+        report,
+        emitted,
+        skipped,
+        inspected: true,
+        integrated_cshim,
+        runtime_cfg: pgrx_c_macros::support_rust_cfg(frontend.profile()).unwrap_or_default(),
+    })
+}
+
+/// Honor opt-outs and reject host metadata that cannot describe a cross target.
+/// Supported C representations are proved by inspection rather than an OS list.
+fn macro_generation_refusal(mut lookup: impl FnMut(&str) -> Option<String>) -> Option<String> {
+    if lookup("PGRX_C_MACROS").as_deref() == Some("0") {
+        return Some("disabled by PGRX_C_MACROS=0".into());
+    }
+    if let (Some(host), Some(target)) = (lookup("HOST"), lookup("TARGET"))
+        && host != target
+        && lookup("PGRX_PG_CONFIG_AS_ENV").as_deref() != Some("true")
+    {
+        return Some("cross-compilation requires target PostgreSQL metadata in PGRX_PG_CONFIG_AS_ENV; host CFLAGS are not target evidence".into());
+    }
+    None
+}
+
+/// Preserve successful ordinary bindings when optional macro inspection or
+/// native compilation fails, recording the refusal without inventing C facts.
+fn optional_macro_output(
+    major: u16,
+    refusal: Option<String>,
+    generate: impl FnOnce() -> eyre::Result<MacroOutput>,
+) -> eyre::Result<MacroOutput> {
+    let result = refusal.map_or_else(generate, |reason| Err(eyre!(reason)));
+    match result {
+        Ok(output) => Ok(output),
+        Err(error) => {
+            let reason = format!("{error:#}");
+            if macro_debug_enabled() {
+                println!("cargo:warning=pg{major} C macros unavailable: {reason}");
+            }
+            MacroOutput::unavailable(major, &reason)
+        }
+    }
+}
+
+/// Match bindgen 0.72's target-specific lookup and malformed-quoting fallback.
+fn bindgen_environment_arguments(mut lookup: impl FnMut(&str) -> Option<String>) -> Vec<String> {
+    let target = lookup("TARGET");
+    let value = target
+        .as_ref()
+        .and_then(|target| {
+            lookup(&format!("BINDGEN_EXTRA_CLANG_ARGS_{target}")).or_else(|| {
+                lookup(&format!("BINDGEN_EXTRA_CLANG_ARGS_{}", target.replace('-', "_")))
+            })
+        })
+        .or_else(|| lookup("BINDGEN_EXTRA_CLANG_ARGS"));
+    value.map_or_else(Vec::new, |value| shlex::split(&value).unwrap_or_else(|| vec![value]))
+}
+
+/// Recognize user target flags so Cargo's default target does not override an explicitly
+/// selected Clang ABI.
+fn has_explicit_clang_target<'a>(arguments: impl Iterator<Item = &'a String>) -> bool {
+    let mut arguments = arguments;
+    while let Some(argument) = arguments.next() {
+        if argument.starts_with("--target=")
+            || (argument == "-target" && arguments.next().is_some())
+        {
+            return true;
+        }
+    }
+    false
+}
+
+// Bindgen applies these target spelling conversions before giving Cargo's target
+// to Clang. Pin the same spelling explicitly so macro inspection sees that target.
+/// Apply bindgen's target spelling conversions before inspection so Clang and binding
+/// generation select the same ABI.
+fn clang_target(target: &str) -> String {
+    let mut parts = target.split_terminator('-').collect::<Vec<_>>();
+    parts.resize(4, "");
+    if parts[0].starts_with("riscv32") {
+        parts[0] = "riscv32";
+    } else if parts[0].starts_with("riscv64") {
+        parts[0] = "riscv64";
+    }
+    if parts[1] == "apple" {
+        if parts[0] == "aarch64" {
+            parts[0] = "arm64";
+        }
+        if parts[3] == "sim" {
+            parts[3] = "simulator";
+        }
+    }
+    if parts[2] == "espidf" {
+        parts[2] = "elf";
+    }
+    parts.into_iter().filter(|part| !part.is_empty()).collect::<Vec<_>>().join("-")
+}
+
+/// Publish the verified file, directory, and environment dependencies that must invalidate
+/// generated C macros.
+fn emit_macro_rerun_inputs(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<()> {
+    for path in macro_rerun_paths(inputs, out_dir)? {
+        cargo_input_path(&path)?;
+        println!("cargo:rerun-if-changed={}", path.display());
+    }
+    for name in inputs.environment.keys() {
+        if name.contains(['\n', '\r']) {
+            return Err(eyre!("invalid Cargo environment dependency name"));
+        }
+        println!("cargo:rerun-if-env-changed={name}");
+    }
+    Ok(())
+}
+
+/// Combine present inspected files with safe directory watches for optional inputs and compiler
+/// search roots.
+fn macro_rerun_paths(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<BTreeSet<PathBuf>> {
+    let mut paths = macro_watch_directories(inputs, out_dir)?;
+    paths.extend(
+        inputs
+            .files
+            .iter()
+            .filter(|file| !matches!(inputs.fingerprints.get(*file), Some(None)))
+            .cloned(),
+    );
+    Ok(paths)
+}
+
+/// Watch optional input creation and search-path changes without recursively watching this
+/// build's own outputs.
+fn macro_watch_directories(
+    inputs: &BuildInputs,
+    out_dir: &Path,
+) -> eyre::Result<BTreeSet<PathBuf>> {
+    let mut out_dirs = vec![out_dir.to_owned()];
+    if let Ok(identity) = out_dir.canonicalize() {
+        out_dirs.push(identity);
+    }
+    let mut watched = BTreeSet::new();
+    for directory in &inputs.directories {
+        watch_input_directory(&mut watched, directory, &out_dirs)?;
+    }
+    for file in &inputs.files {
+        if matches!(inputs.fingerprints.get(file), Some(None)) {
+            let parent = file
+                .parent()
+                .ok_or_else(|| eyre!("absent C macro input {} has no parent", file.display()))?;
+            // Cargo marks a missing file perpetually dirty. Watch its nearest
+            // existing parent so creation still invalidates the inspected profile.
+            watch_input_directory(&mut watched, parent, &out_dirs)?;
+        }
+    }
+    for directory in &inputs.executable_search_directories {
+        watch_input_directory(&mut watched, directory, &out_dirs).wrap_err_with(|| {
+            format!(
+                "cannot track compiler PATH search root {} safely; set CLANG_PATH to an absolute compiler path to avoid PATH discovery",
+                directory.display()
+            )
+        })?;
+    }
+    Ok(watched)
+}
+
+/// Track both supplied and canonical directory identities and reject overlap with OUT_DIR to
+/// prevent self-invalidating builds.
+fn watch_input_directory(
+    watched: &mut BTreeSet<PathBuf>,
+    requested: &Path,
+    out_dirs: &[PathBuf],
+) -> eyre::Result<()> {
+    let directory = existing_directory_ancestor(requested)?;
+    let identity = directory.canonicalize().wrap_err_with(|| {
+        format!("could not resolve C macro input directory {}", directory.display())
+    })?;
+    for path in [&directory, &identity] {
+        if out_dirs.iter().any(|out_dir| out_dir.starts_with(path) || path.starts_with(out_dir)) {
+            return Err(eyre!(
+                "C macro input directory {} overlaps this build's OUT_DIR; recursive Cargo tracking would invalidate its own generated output",
+                requested.display()
+            ));
+        }
+        watched.insert(path.to_owned());
+    }
+    Ok(())
+}
+
+/// Find an existing parent to watch when an optional include or compiler-search directory has
+/// not yet been created.
+fn existing_directory_ancestor(directory: &Path) -> eyre::Result<PathBuf> {
+    directory.ancestors().find(|ancestor| ancestor.is_dir()).map(Path::to_owned).ok_or_else(|| {
+        eyre!("no existing ancestor for C macro input directory {}", directory.display())
+    })
+}
+
+/// Require a UTF-8 single-line path before emitting a Cargo dependency directive.
+fn cargo_input_path(path: &Path) -> eyre::Result<()> {
+    let value = path.to_str().ok_or_else(|| eyre!("Cargo input path is not UTF-8: {path:?}"))?;
+    if value.contains(['\n', '\r']) {
+        return Err(eyre!("Cargo input path contains a line break: {path:?}"));
+    }
+    Ok(())
+}
+
+/// Preserve a generated artifact's modification time when its final bytes match, avoiding
+/// unnecessary downstream rebuilds.
+fn write_content_stable(path: &Path, content: &[u8]) -> eyre::Result<()> {
+    match fs::read(path) {
+        Ok(existing) if existing == content => return Ok(()),
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => {
+            return Err(error).wrap_err_with(|| format!("could not read {}", path.display()));
+        }
+    }
+    fs::write(path, content).wrap_err_with(|| format!("could not write {}", path.display()))
+}
+
+fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builder {
+    let bind = if major_version < 16 {
+        // PG15's unprototyped tree callbacks have explicit guarded ABI
+        // declarations. On later versions these names are generated C macros.
+        bind.blocklist_function("expression_tree_walker")
+            .blocklist_function("planstate_tree_walker")
+            .blocklist_function("query_or_expression_tree_walker")
+            .blocklist_function("query_tree_walker")
+            .blocklist_function("range_table_entry_walker")
+            .blocklist_function("range_table_walker")
+            .blocklist_function("raw_expression_tree_walker")
     } else {
         bind
     };
@@ -915,33 +1896,11 @@ fn add_blocklists(
         // It's used by explict `extern "C-unwind"`
         .blocklist_function("pg_re_throw")
         .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
-        // These functions are already ported in Rust
-        .blocklist_function("heap_getattr")
-        .blocklist_function("BufferIsLocal")
-        .blocklist_function("GetMemoryChunkContext")
-        .blocklist_function("GETSTRUCT")
-        .blocklist_function("MAXALIGN")
-        .blocklist_function("MemoryContextIsValid")
-        .blocklist_function("MemoryContextSwitchTo")
-        .blocklist_function("TYPEALIGN")
-        .blocklist_function("TransactionIdIsNormal")
-        .blocklist_function("expression_tree_walker")
+        // Rust version utilities are independent of PostgreSQL declarations.
         .blocklist_function("get_pg_major_minor_version_string")
         .blocklist_function("get_pg_major_version_num")
         .blocklist_function("get_pg_major_version_string")
         .blocklist_function("get_pg_version_string")
-        .blocklist_function("heap_tuple_get_struct")
-        .blocklist_function("planstate_tree_walker")
-        .blocklist_function("query_or_expression_tree_walker")
-        .blocklist_function("query_tree_walker")
-        .blocklist_function("range_table_entry_walker")
-        .blocklist_function("range_table_walker")
-        .blocklist_function("raw_expression_tree_walker")
-        .blocklist_function("type_is_array")
-        .blocklist_function("varsize_any")
-        // we define these ourselves b/c Postgres is schizophrenic about them across versions
-        .blocklist_function("PageValidateSpecialPointer")
-        .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
         // Keep these inline helpers blocklisted for compatibility with Windows linking.
@@ -1015,6 +1974,9 @@ fn pg_target_includes(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Vec
     Ok(result)
 }
 
+/// Compile the ordinary PostgreSQL shim with its established target and CPPFLAGS
+/// invocation, independently of optional macro generation. Native archives must
+/// contain machine code even when an extension enables Rust or C LTO.
 fn build_shim(
     shim_src: &path::Path,
     shim_dst: &path::Path,
@@ -1025,10 +1987,21 @@ fn build_shim(
 
     std::fs::copy(shim_src, shim_dst).unwrap();
 
-    let mut build = cc::Build::new();
+    let mut build = ordinary_c_support(pg_config)?;
     // pgrx-cshim.c includes the generated bindgen wrapper through this macro so
     // each cshim build picks the wrapper that matches its postgres headers
     build.define("PGRX_CSHIM_STATIC", Some(generated_wrapper.as_str()));
+    build.file(shim_dst);
+    build.compile("pgrx-cshim");
+    Ok(())
+}
+
+/// Share the established target compiler and preprocessing settings between
+/// the ordinary C shim and static bindings retained when macro generation refuses.
+/// Historical macro-only CFLAGS never change this independent binding contract.
+fn ordinary_c_support(pg_config: &PgConfig) -> eyre::Result<cc::Build> {
+    let major_version = pg_config.major_version()?;
+    let mut build = cc::Build::new();
     let compiler = build.get_compiler();
     if compiler.is_like_gnu() || compiler.is_like_clang() {
         build.flag("-ffunction-sections");
@@ -1044,11 +2017,29 @@ fn build_shim(
     for flag in extra_bindgen_clang_args(pg_config)? {
         build.flag(&flag);
     }
-    build.file(shim_dst);
-    build.compile("pgrx-cshim");
-    Ok(())
+    if compiler.is_like_gnu() || compiler.is_like_clang() {
+        build.flag("-fno-lto");
+    }
+    Ok(build)
 }
 
+/// Decode the installation's recorded compiler flags without losing shell quoting;
+/// reject malformed or non-UTF-8 profiles before bindgen and native macros can diverge.
+fn postgres_cflags(pg_config: &PgConfig) -> eyre::Result<(Vec<String>, bool)> {
+    let Some(flags) = pg_config.optional_cflags()? else {
+        return Ok((Vec::new(), false));
+    };
+    let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CFLAGS are not UTF-8"))?;
+    let windows = env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows");
+    let flags = pgrx_c_macros::split_recorded_cflags(flags, windows)?;
+    Ok(match flags {
+        Some(flags) => (flags, true),
+        None => (Vec::new(), false),
+    })
+}
+
+/// Preserve the established ordinary binding arguments independently of optional macro
+/// inspection; PostgreSQL's historical CFLAGS belong to the separate verified macro profile.
 fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
     let flags = shlex::split(&pg_config.cppflags()?.to_string_lossy()).unwrap_or_default();
@@ -1199,12 +2190,20 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
     Ok(out)
 }
 
+/// Normalize callback and foreign ABI declarations to the same C-unwind storage used by guarded
+/// pgrx bindings.
 fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     use proc_macro2::Span;
     use syn::LitStr;
     use syn::visit_mut::VisitMut;
+    /// Normalize nested ABI syntax before catalog collection and final pg_guard rewriting share
+    /// callback storage facts.
     pub struct Visitor {}
+    /// Traverse the parsed syntax so nested declarations participate in the same ABI or storage
+    /// checks.
     impl VisitMut for Visitor {
+        /// Rewrite explicit C ABIs throughout the parsed bindings while leaving other calling
+        /// conventions intact.
         fn visit_abi_mut(&mut self, abi: &mut syn::Abi) {
             if let Some(name) = &mut abi.name
                 && name.value() == "C"
@@ -1216,12 +2215,14 @@ fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     Visitor {}.visit_file_mut(file);
 }
 
-fn rust_fmt(path: &Path) -> eyre::Result<()> {
+/// Format generated binding source under the requested edition and report formatter
+/// diagnostics through Cargo; macro leaves use their stricter staged writer instead.
+fn rust_fmt(path: &Path, edition: &str) -> eyre::Result<()> {
     // We shouldn't hit this path in a case where we care about it, but... just
     // in case we probably should respect RUSTFMT.
     let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
     let mut command = Command::new(rustfmt);
-    command.arg(path).args(["--edition", "2021"]).current_dir(".");
+    command.arg(path).args(["--edition", edition]).current_dir(".");
 
     let out = run_command(&mut command, "[bindings_diff]");
     match out {
@@ -1251,5 +2252,595 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
             Err(e).wrap_err("Failed to run `rustfmt`, is it installed?")
         }
         Err(e) => Err(e),
+    }
+}
+
+/// Check catalog, publication, and invalidation invariants directly against the private
+/// binding-build implementation.
+///
+/// The tests inspect real parsed output, generated leaf maps, and compiler dependency
+/// directives. Temporary input trees make success and rejection conditions explicit without
+/// relying on a configured server.
+#[cfg(test)]
+mod macro_build_tests {
+
+    use super::*;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+    /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
+    static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
+
+    /// Prove multiline compiler diagnostics remain one warning rather than
+    /// injecting Cargo directives, without changing the original report text.
+    #[test]
+    fn macro_skip_warnings_keep_compiler_diagnostics_within_one_directive() {
+        let message = "rejected C witness\r\ncargo:rustc-cfg=forged\nsee source:12";
+        let warning = macro_skip_warning(18, "REJECTED", message);
+        assert_eq!(warning.lines().count(), 1);
+        assert!(!warning.contains('\r'));
+        assert_eq!(
+            warning,
+            "pg18: skipping macro `REJECTED`: rejected C witness  cargo:rustc-cfg=forged see source:12"
+        );
+    }
+
+    /// Keep documentation target guards while retaining macro adapters needed by pgrx callers.
+    #[test]
+    fn documentation_snapshots_guard_native_support_and_preserve_macro_templates() {
+        let source = r#"#[cfg(not(target_pointer_width = "64"))]
+compile_error!("C macro target does not match the generation installation");
+pub const PROFILE: usize = 64;
+#[doc(hidden)]
+#[allow(non_snake_case, non_camel_case_types)]
+pub mod __pgrx_c_generated {
+    const _: () = assert!(::core::mem::size_of::<usize>() == 8);
+    pub struct Field;
+}
+pub mod documentation_helpers {}
+/// C macro EXAMPLE from example.h:1
+///
+/// ```text
+/// #define EXAMPLE(x) NESTED(x)
+/// ```
+#[macro_export]
+macro_rules! EXAMPLE {
+    ($argument:expr) => {
+        /* PGRX: NESTED remains expanded because its binding is unavailable. */
+        $crate::__pgrx_c_generated::Field
+    };
+}
+"#;
+        let snapshot = macro_snapshot(source).unwrap();
+        assert!(snapshot.contains("This code is generated for documentation purposes"));
+        assert!(
+            snapshot.contains(
+                "/* PGRX: NESTED remains expanded because its binding is unavailable. */"
+            )
+        );
+        let mut expected = syn::parse_file(source).unwrap();
+        let documentation_guard: syn::Attribute = syn::parse_quote!(#[cfg(not(docsrs))]);
+        let Item::Macro(target_guard) = &mut expected.items[0] else {
+            panic!("fixture target guard must be a macro item");
+        };
+        target_guard.attrs.push(documentation_guard);
+        assert_eq!(syn::parse_file(&snapshot).unwrap(), expected);
+    }
+
+    /// Checks that documentation snapshots require guarded items on their own lines.
+    #[test]
+    fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
+        let source = "const PROFILE: () = (); compile_error!(\"wrong target\");";
+        let error = macro_snapshot(source).unwrap_err().to_string();
+        assert_eq!(error, "C macro target guard does not start on its own line");
+    }
+
+    /// Checks that environment arguments match bindgen priority and shell quoting.
+    #[test]
+    fn environment_arguments_match_bindgen_priority_and_shell_quoting() {
+        let mut values = BTreeMap::from([
+            ("TARGET", "x86_64-unknown-linux-gnu"),
+            ("BINDGEN_EXTRA_CLANG_ARGS", "-DGLOBAL=1"),
+            ("BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu", "-DNORMALIZED=1"),
+            (
+                "BINDGEN_EXTRA_CLANG_ARGS_x86_64-unknown-linux-gnu",
+                "-I'/headers with spaces' -DVALUE=2",
+            ),
+        ]);
+        let resolve = |values: &BTreeMap<&str, &str>| {
+            bindgen_environment_arguments(|name| values.get(name).map(|value| (*value).to_owned()))
+        };
+        assert_eq!(resolve(&values), ["-I/headers with spaces", "-DVALUE=2"]);
+        values.remove("BINDGEN_EXTRA_CLANG_ARGS_x86_64-unknown-linux-gnu");
+        assert_eq!(resolve(&values), ["-DNORMALIZED=1"]);
+        values.remove("BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu");
+        assert_eq!(resolve(&values), ["-DGLOBAL=1"]);
+        values.insert("BINDGEN_EXTRA_CLANG_ARGS_x86_64-unknown-linux-gnu", "");
+        assert!(resolve(&values).is_empty(), "an empty override still takes precedence");
+        values.insert("BINDGEN_EXTRA_CLANG_ARGS_x86_64-unknown-linux-gnu", "-I'unterminated");
+        assert_eq!(
+            resolve(&values),
+            ["-I'unterminated"],
+            "bindgen preserves malformed quoting as one argument"
+        );
+    }
+
+    /// Checks that explicit targets and cargo target spellings are preserved.
+    #[test]
+    fn explicit_targets_and_cargo_target_spellings_are_preserved() {
+        assert_eq!(clang_target("aarch64-apple-darwin"), "arm64-apple-darwin");
+        assert_eq!(clang_target("aarch64-apple-ios-sim"), "arm64-apple-ios-simulator");
+        assert_eq!(clang_target("riscv64gc-unknown-linux-gnu"), "riscv64-unknown-linux-gnu");
+        assert_eq!(clang_target("xtensa-esp32-espidf"), "xtensa-esp32-elf");
+        for arguments in
+            [vec!["--target=x86_64-unknown-linux-gnu"], vec!["-target", "arm64-apple-darwin"]]
+        {
+            let arguments = arguments.into_iter().map(String::from).collect::<Vec<_>>();
+            assert!(has_explicit_clang_target(arguments.iter()));
+        }
+        let missing = ["-target".to_owned()];
+        assert!(!has_explicit_clang_target(missing.iter()));
+    }
+
+    /// A failed compiler inspection leaves an explicit report and all-unavailable
+    /// classifier instead of preventing already generated bindings from building.
+    #[test]
+    fn optional_macro_failures_are_reported_without_guessed_output() {
+        let output =
+            optional_macro_output(18, None, || Err(eyre!("missing matching driver"))).unwrap();
+        assert!(!output.inspected);
+        assert!(!output.integrated_cshim);
+        assert_eq!(output.emitted, 0);
+        let report: serde_json::Value = serde_json::from_slice(&output.report).unwrap();
+        assert_eq!(report["status"], "unavailable");
+        assert_eq!(report["reason"], "missing matching driver");
+    }
+
+    /// Opt-outs and host-only cross metadata avoid optional compiler work;
+    /// target metadata and native Windows profiles permit actual ABI inspection.
+    #[test]
+    fn optional_macro_gates_do_not_inspect_unsupported_targets() {
+        let mut environment = BTreeMap::from([
+            ("CARGO_CFG_TARGET_OS", "linux"),
+            ("CARGO_CFG_TARGET_ARCH", "x86_64"),
+            ("HOST", "x86_64-unknown-linux-gnu"),
+            ("TARGET", "x86_64-unknown-linux-gnu"),
+        ]);
+        let check = |env: &BTreeMap<&str, &str>| {
+            macro_generation_refusal(|name| env.get(name).map(|value| (*value).into()))
+        };
+        assert!(check(&environment).is_none());
+        environment.insert("PGRX_C_MACROS", "0");
+        let refusal = check(&environment);
+        assert!(refusal.is_some());
+        optional_macro_output(18, refusal, || panic!("opt-out ran Clang")).unwrap();
+        environment.remove("PGRX_C_MACROS");
+        environment.insert("CARGO_CFG_TARGET_OS", "windows");
+        assert!(check(&environment).is_none());
+        environment.insert("CARGO_CFG_TARGET_OS", "linux");
+        environment.insert("TARGET", "aarch64-unknown-linux-gnu");
+        assert!(check(&environment).unwrap().contains("host CFLAGS"));
+        environment.insert("PGRX_PG_CONFIG_AS_ENV", "true");
+        assert!(check(&environment).is_none());
+    }
+
+    /// Checks that unchanged generated artifacts keep their modification time.
+    #[test]
+    fn unchanged_generated_artifacts_keep_their_modification_time() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("pg18_macros.rs");
+        write_content_stable(&path, b"original").unwrap();
+        let old = UNIX_EPOCH + Duration::from_secs(1);
+        fs::File::options().write(true).open(&path).unwrap().set_modified(old).unwrap();
+        let before = fs::metadata(&path).unwrap().modified().unwrap();
+        write_content_stable(&path, b"original").unwrap();
+        assert_eq!(fs::metadata(&path).unwrap().modified().unwrap(), before);
+        write_content_stable(&path, b"changed").unwrap();
+        assert_eq!(fs::read(&path).unwrap(), b"changed");
+        assert_ne!(fs::metadata(&path).unwrap().modified().unwrap(), before);
+    }
+
+    /// Checks that macro tree updates preserve unchanged leaves and remove stale Rust only.
+    #[test]
+    fn macro_tree_updates_preserve_unchanged_leaves_and_remove_stale_rust_only() {
+        let directory = TemporaryDirectory::new();
+        let version = directory.0.join("cmacros/pg18");
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (PathBuf::from("c.rs"), "pub const PROFILE: u32 = 18;\n".into()),
+            ]),
+        };
+        write_macro_files(&files, &version, false).unwrap();
+        let leaf = version.join("c.rs");
+        let old = UNIX_EPOCH + Duration::from_secs(1);
+        fs::File::options().write(true).open(&leaf).unwrap().set_modified(old).unwrap();
+        fs::create_dir_all(version.join("obsolete")).unwrap();
+        fs::write(version.join("obsolete/header.rs"), "old generated source").unwrap();
+        fs::write(version.join("notes.txt"), "keep non-Rust files").unwrap();
+        let other_version = directory.0.join("cmacros/pg17/mod.rs");
+        fs::create_dir_all(other_version.parent().unwrap()).unwrap();
+        fs::write(&other_version, "other version").unwrap();
+        write_macro_files(&files, &version, false).unwrap();
+        assert_eq!(fs::metadata(&leaf).unwrap().modified().unwrap(), old);
+        assert!(!version.join("obsolete").exists());
+        assert_eq!(fs::read_to_string(version.join("notes.txt")).unwrap(), "keep non-Rust files");
+        assert_eq!(fs::read_to_string(other_version).unwrap(), "other version");
+        write_macro_files(&MacroFiles::empty(), &version, false).unwrap();
+        assert!(!leaf.exists(), "unavailable generation removes previous macros");
+        assert!(version.join("mod.rs").exists(), "an empty module still loads");
+    }
+
+    /// Checks that macro trees are formatted before stable normal and snapshot writes.
+    #[test]
+    fn macro_trees_are_formatted_before_stable_normal_and_snapshot_writes() {
+        let directory = TemporaryDirectory::new();
+        let original = "/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\npub fn example( value:u32 )->u32{ /* PGRX: preserve this comment */ value+1 }\n";
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (PathBuf::from("c.rs"), original.into()),
+            ]),
+        };
+        for documentation in [false, true] {
+            let version = directory.0.join(if documentation { "snapshot" } else { "normal" });
+            write_macro_files(&files, &version, documentation).unwrap();
+            let leaf = fs::read_to_string(version.join("c.rs")).unwrap();
+            assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
+            assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
+            assert!(leaf.contains("/* PGRX: preserve this comment */"));
+            let expected =
+                if documentation { macro_snapshot(original).unwrap() } else { original.to_owned() };
+            assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(&expected).unwrap());
+            let old = UNIX_EPOCH + Duration::from_secs(1);
+            for relative in files.sources.keys() {
+                fs::File::options()
+                    .write(true)
+                    .open(version.join(relative))
+                    .unwrap()
+                    .set_modified(old)
+                    .unwrap();
+            }
+            write_macro_files(&files, &version, documentation).unwrap();
+            for relative in files.sources.keys() {
+                assert_eq!(fs::metadata(version.join(relative)).unwrap().modified().unwrap(), old);
+            }
+        }
+    }
+
+    /// Format every leaf in a long-path tree that exceeds Windows' aggregate command-line limit,
+    /// preserving source meaning and comments without traversing undeclared child modules.
+    #[test]
+    fn large_macro_trees_are_formatted_without_oversized_commands() {
+        let directory = TemporaryDirectory::new();
+        let leaves = directory
+            .0
+            .join("generated headers with spaces and Unicode λ")
+            .join("a longer directory for the generated macro formatting regression");
+        fs::create_dir_all(&leaves).unwrap();
+        let original = "mod absent;\npub fn value( arg:u32 )->u32{ /* PGRX: keep */ arg+1 }\n";
+        let expected = syn::parse_file(original).unwrap();
+        let paths = (0..256)
+            .map(|index| {
+                let path = leaves.join(format!("header_{index:03}.rs"));
+                fs::write(&path, original).unwrap();
+                path
+            })
+            .collect::<Vec<_>>();
+        assert!(
+            paths.iter().map(|path| path.to_str().unwrap().encode_utf16().count()).sum::<usize>()
+                > 32_767,
+            "the unbatched command must exceed Windows' process limit"
+        );
+        #[cfg(not(unix))]
+        let formatter = PathBuf::from("rustfmt");
+        // A Unix proxy reproduces the process limit locally while still executing the real
+        // formatter. Windows exercises its own command-line limit with rustfmt directly.
+        #[cfg(unix)]
+        let formatter = {
+            use std::os::unix::fs::PermissionsExt;
+
+            let proxy = directory.0.join("bounded-rustfmt");
+            fs::write(
+                &proxy,
+                "#!/bin/sh\nsize=0\nfor arg; do size=$((size + ${#arg} + 1)); done\nif [ \"$size\" -gt 32767 ]; then echo 'formatter command exceeds process limit' >&2; exit 1; fi\nexec rustfmt \"$@\"\n",
+            )
+            .unwrap();
+            fs::set_permissions(&proxy, fs::Permissions::from_mode(0o700)).unwrap();
+            proxy
+        };
+        format_macro_files(&paths, &formatter).unwrap();
+        for path in paths {
+            let source = fs::read_to_string(path).unwrap();
+            assert!(source.contains("pub fn value(arg: u32) -> u32 {"));
+            assert!(source.contains("/* PGRX: keep */"));
+            assert_eq!(syn::parse_file(&source).unwrap(), expected);
+        }
+    }
+
+    /// Bound quoting and Unicode costs without losing progress for empty or individually
+    /// oversized input; a subsequent path must begin a new batch once the budget is exhausted.
+    #[test]
+    fn macro_formatter_batches_account_for_escaped_paths_and_always_progress() {
+        let paths = (0..256)
+            .map(|index| {
+                PathBuf::from(format!("{}λ😀\"\\{index:03}.rs", "path with spaces/".repeat(12)))
+            })
+            .collect::<Vec<_>>();
+        let count = macro_format_batch_len(&paths);
+        assert!(count > 0 && count < paths.len());
+        let size = paths[..count]
+            .iter()
+            .map(|path| 2 * path.as_os_str().as_encoded_bytes().len() + 3)
+            .sum::<usize>();
+        assert!(size <= MACRO_FORMAT_PATH_BUDGET);
+        assert!(
+            size + 2 * paths[count].as_os_str().as_encoded_bytes().len() + 3
+                > MACRO_FORMAT_PATH_BUDGET
+        );
+        assert_eq!(macro_format_batch_len(&[]), 0);
+        assert_eq!(macro_format_batch_len(&paths[..1]), 1);
+        let oversized = [PathBuf::from("x".repeat(MACRO_FORMAT_PATH_BUDGET)), paths[0].clone()];
+        assert_eq!(macro_format_batch_len(&oversized), 1);
+    }
+
+    /// Checks that unavailable macro formatter preserves original sources.
+    #[test]
+    fn unavailable_macro_formatter_preserves_original_sources() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        format_macro_files(std::slice::from_ref(&path), &directory.0.join("missing-rustfmt"))
+            .unwrap();
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    /// Check that only rustup's specific missing-component error permits optional formatting.
+    #[test]
+    fn missing_rustfmt_component_diagnostic_excludes_formatting_errors() {
+        for diagnostic in [
+            "error: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "error: 'rustfmt' is not installed for the toolchain 'nightly-aarch64-apple-darwin'.\nhelp: run `rustup component add rustfmt`\n",
+        ] {
+            assert!(missing_rustfmt_component(diagnostic.as_bytes()), "{diagnostic}");
+        }
+        for diagnostic in [
+            "error: expected expression, found `;`\n",
+            "error: unable to find rustfmt configuration\n",
+            "error: 'clippy' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "warning: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "error: 'rustfmt' is not installed for the toolchain ''\n",
+            "error: 'rustfmt' is not installed for the toolchain 'fixture'\nerror: unrelated failure\n",
+        ] {
+            assert!(!missing_rustfmt_component(diagnostic.as_bytes()), "{diagnostic}");
+        }
+    }
+
+    /// Build an isolated failing formatter proxy whose stderr is independent of source content.
+    #[cfg(unix)]
+    fn failing_macro_formatter(directory: &Path, diagnostic: &str) -> PathBuf {
+        use std::os::unix::fs::PermissionsExt;
+
+        let formatter = directory.join("fixture-rustfmt");
+        fs::write(&formatter, "#!/bin/sh\ncat \"$0.stderr\" >&2\nexit 1\n").unwrap();
+        fs::write(directory.join("fixture-rustfmt.stderr"), diagnostic).unwrap();
+        fs::set_permissions(&formatter, fs::Permissions::from_mode(0o700)).unwrap();
+        formatter
+    }
+
+    /// Check that an executable rustup proxy with a missing component preserves staged sources.
+    #[cfg(unix)]
+    #[test]
+    fn unavailable_rustfmt_component_preserves_original_sources() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        let formatter = failing_macro_formatter(
+            &directory.0,
+            "error: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\nhelp: run `rustup component add rustfmt`\n",
+        );
+        format_macro_files(std::slice::from_ref(&path), &formatter).unwrap();
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    /// Check that real formatter failures remain fatal rather than publishing unformatted sources.
+    #[cfg(unix)]
+    #[test]
+    fn macro_formatter_failure_propagates_its_diagnostic() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        let diagnostic = "error: expected expression, found `;`\n";
+        let formatter = failing_macro_formatter(&directory.0, diagnostic);
+        let error =
+            format_macro_files(std::slice::from_ref(&path), &formatter).unwrap_err().to_string();
+        assert!(error.contains("could not format generated C macros"), "{error}");
+        assert!(error.contains(diagnostic.trim()), "{error}");
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    /// Checks that macro formatting directories are removed after use.
+    #[test]
+    fn macro_formatting_directories_are_removed_after_use() {
+        let directory = TemporaryDirectory::new();
+        let final_directory = directory.0.join("pg18");
+        let staging = MacroFormattingDirectory::new(&final_directory).unwrap();
+        let staging_path = staging.0.clone();
+        assert_eq!(staging_path.parent(), final_directory.parent());
+        fs::write(staging_path.join("fragment.rs"), "pub const VALUE: u32 = 18;\n").unwrap();
+        drop(staging);
+        assert!(!staging_path.exists());
+        assert!(directory.0.exists(), "cleanup only removes its own directory");
+    }
+
+    /// Checks that macro snapshots guard each leaf and do not duplicate native guards.
+    #[test]
+    fn macro_snapshots_guard_each_leaf_and_do_not_duplicate_native_guards() {
+        let directory = TemporaryDirectory::new();
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (
+                    PathBuf::from("c.rs"),
+                    "#[cfg(not(target_pointer_width = \"64\"))]\ncompile_error!(\"wrong target\");\n/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\n#[macro_export]\nmacro_rules! EXAMPLE { ($x:expr) => { $x }; }\n".into(),
+                ),
+            ]),
+        };
+        write_macro_files(&files, &directory.0, true).unwrap();
+        let leaf = fs::read_to_string(directory.0.join("c.rs")).unwrap();
+        assert!(leaf.contains("#[cfg(not(docsrs))]"));
+        assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
+        assert!(!leaf.contains("#[doc ="));
+        let guarded = "#[cfg(not(docsrs))]\n#[doc(hidden)]\npub mod __pgrx_c_generated {}\n";
+        let snapshot = macro_snapshot(guarded).unwrap();
+        assert_eq!(snapshot.matches("#[cfg(not(docsrs))]").count(), 1);
+    }
+
+    /// Checks that absent files watch existing parents without perpetually dirty file
+    /// directives.
+    #[test]
+    fn absent_files_watch_existing_parents_without_perpetually_dirty_file_directives() {
+        let directory = TemporaryDirectory::new();
+        let out_dir = directory.0.join("target/debug/build/pg-sys/out");
+        fs::create_dir_all(&out_dir).unwrap();
+        let isolated_home = directory.0.join("isolated-pgrx-home");
+        fs::create_dir(&isolated_home).unwrap();
+        let present = isolated_home.join("pg_config");
+        fs::write(&present, b"recorded config").unwrap();
+        let missing = isolated_home.join("nested/config.toml");
+        let inputs = BuildInputs {
+            files: vec![present.clone(), missing.clone()],
+            fingerprints: BTreeMap::from([
+                (present.clone(), Some("recorded content identity".to_owned())),
+                (missing.clone(), None),
+            ]),
+            ..BuildInputs::default()
+        };
+        let paths = macro_rerun_paths(&inputs, &out_dir).unwrap();
+        assert!(paths.contains(&present));
+        assert!(!paths.contains(&missing), "Cargo must not receive a missing file directive");
+        assert!(paths.contains(&isolated_home));
+        assert!(paths.contains(&isolated_home.canonicalize().unwrap()));
+        let nested = isolated_home.join("nested");
+        fs::create_dir(&nested).unwrap();
+        let paths = macro_rerun_paths(&inputs, &out_dir).unwrap();
+        assert!(paths.contains(&nested), "newly available parents narrow the tracked root");
+        assert!(!paths.contains(&missing));
+        let unsafe_missing = out_dir.join("missing.toml");
+        let unsafe_inputs = BuildInputs {
+            files: vec![unsafe_missing.clone()],
+            fingerprints: BTreeMap::from([(unsafe_missing, None)]),
+            ..BuildInputs::default()
+        };
+        assert!(macro_rerun_paths(&unsafe_inputs, &out_dir).is_err());
+    }
+
+    /// Checks that missing search directories watch creation without tracking cargo outputs.
+    #[test]
+    fn missing_search_directories_watch_creation_without_tracking_cargo_outputs() {
+        let directory = TemporaryDirectory::new();
+        let out_dir = directory.0.join("target/debug/build/pg-sys/out");
+        fs::create_dir_all(&out_dir).unwrap();
+        let headers = directory.0.join("headers");
+        fs::create_dir(&headers).unwrap();
+        let external_bin = directory.0.join("toolchain/bin");
+        fs::create_dir_all(&external_bin).unwrap();
+        let custom_bin = directory.0.join("target/debug/custom-clang/bin");
+        fs::create_dir_all(&custom_bin).unwrap();
+        let inputs = BuildInputs {
+            directories: vec![headers.join("optional/missing")],
+            executable_search_directories: vec![external_bin.clone(), custom_bin.clone()],
+            ..BuildInputs::default()
+        };
+        let watched = macro_watch_directories(&inputs, &out_dir).unwrap();
+        assert!(watched.contains(&headers));
+        assert!(watched.contains(&headers.canonicalize().unwrap()));
+        assert!(watched.contains(&external_bin));
+        assert!(watched.contains(&custom_bin), "custom Cargo-target descendants are still inputs");
+        let unsafe_inputs =
+            BuildInputs { directories: vec![out_dir.clone()], ..BuildInputs::default() };
+        let error = macro_watch_directories(&unsafe_inputs, &out_dir).unwrap_err().to_string();
+        assert!(error.contains("overlaps this build's OUT_DIR"));
+        let unsafe_search = BuildInputs {
+            executable_search_directories: vec![directory.0.join("missing-toolchain/bin")],
+            ..BuildInputs::default()
+        };
+        let error = macro_watch_directories(&unsafe_search, &out_dir).unwrap_err().to_string();
+        assert!(error.contains("set CLANG_PATH to an absolute compiler path"));
+        let cargo_lookup = BuildInputs {
+            executable_search_directories: vec![directory.0.join("target/debug")],
+            ..BuildInputs::default()
+        };
+        let error = macro_watch_directories(&cargo_lookup, &out_dir).unwrap_err().to_string();
+        assert!(error.contains("set CLANG_PATH to an absolute compiler path"));
+    }
+
+    /// Checks that directory aliases remain watched and cannot hide output overlap.
+    #[cfg(unix)]
+    #[test]
+    fn directory_aliases_remain_watched_and_cannot_hide_output_overlap() {
+        let directory = TemporaryDirectory::new();
+        let out_dir = directory.0.join("target/debug/build/pg-sys/out");
+        fs::create_dir_all(&out_dir).unwrap();
+        let headers = directory.0.join("headers");
+        fs::create_dir(&headers).unwrap();
+        let alias = directory.0.join("header-alias");
+        std::os::unix::fs::symlink(&headers, &alias).unwrap();
+        let inputs = BuildInputs { directories: vec![alias.clone()], ..BuildInputs::default() };
+        let watched = macro_watch_directories(&inputs, &out_dir).unwrap();
+        assert!(watched.contains(&alias), "retargeting the alias must be observable");
+        assert!(watched.contains(&headers.canonicalize().unwrap()));
+        fs::remove_file(&alias).unwrap();
+        std::os::unix::fs::symlink(&out_dir, &alias).unwrap();
+        assert!(macro_watch_directories(&inputs, &out_dir).is_err());
+    }
+
+    /// Checks that unavailable target metadata retains availability queries and an explicit
+    /// report without inventing an inspected compiler profile or publishing C definitions.
+    #[test]
+    fn unavailable_target_metadata_retains_availability_and_explicit_report() {
+        let output = MacroOutput::unavailable(18, "no matching macro target metadata").unwrap();
+        assert_eq!(output.files.sources.len(), 1);
+        assert_eq!(output.files.sources, MacroFiles::empty().sources);
+        assert!(!output.inspected);
+        assert_eq!(output.emitted, 0);
+        let report: serde_json::Value = serde_json::from_slice(&output.report).unwrap();
+        assert_eq!(report["postgres_major_version"], 18);
+        assert_eq!(report["status"], "unavailable");
+        assert_eq!(report["reason"], "no matching macro target metadata");
+        assert!(report.get("profile").is_none(), "host semantics must not be invented");
+    }
+
+    /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
+    /// leave a growing target tree.
+    struct TemporaryDirectory(
+        /// Owned fixture path used for isolated inputs and cleanup.
+        PathBuf,
+    );
+
+    /// Allocate isolated compiler artifacts with process-local uniqueness and deterministic
+    /// cleanup ownership.
+    impl TemporaryDirectory {
+        /// Create an isolated header and output directory owned by this build-publication test.
+        fn new() -> Self {
+            let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+            let number = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
+            let path = std::env::temp_dir()
+                .join(format!("pgrx-macro-build-{}-{nonce}-{number}", std::process::id()));
+            fs::create_dir(&path).unwrap();
+            Self(path)
+        }
+    }
+
+    /// Release only temporary artifacts owned by this fixture, including on failed compiler or
+    /// assertion paths.
+    impl Drop for TemporaryDirectory {
+        /// Remove only the temporary files owned by this test fixture after its assertions.
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
     }
 }

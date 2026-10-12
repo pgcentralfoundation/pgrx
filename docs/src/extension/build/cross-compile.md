@@ -8,7 +8,7 @@ Note that guide is fairly preliminary and does not cover many cases, most notabl
 
 1. This does not (yet) cover cross compiling with `cargo pgrx` (planned). Note that this means this documentation may only be useful to a small set of users.
 
-2. Cross-compiling the `cshim` is not (yet?) supported. You should ensure that the `pgrx/cshim` cargo feature is disabled when you perform the cross-build.
+2. Direct generation needs a C compiler, headers and import libraries for the target. A complete target bundle includes its native inline and macro adapters, plus the optional `cshim` when the producer enabled that feature. Producer and consumer must select the same `cshim` feature.
 
 3. This guide is assuming that you are cross compiling between `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu` (either direction works).
 
@@ -17,6 +17,58 @@ Note that guide is fairly preliminary and does not cover many cases, most notabl
     - Non-`gnu` linux targets have not been investigated at all (this mostly applies to `-musl` targets like Alpine, as I doubt PG will work well under uclibc).
 
     Other cases are encouraged to investigate Docker, QEMU, and so on -- it's honestly probably the easier path for a lot of cases.
+
+C macro generation inspects the target's PostgreSQL headers with its compiler flags
+and ABI. You can generate this support with a matching target C toolchain, or
+import a complete bundle produced by that toolchain. Raw Rust bindings alone and
+documentation snapshots do not supply the target's macro or native semantics.
+
+## Import a complete target bundle
+
+Build `pgrx-pg-sys` on the target machine, or with the target headers and C
+cross compiler configured below. Use the same pgrx release as the consuming
+extension; development builds must also use the same source revision. Set
+`PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` to a dedicated directory for the selected
+PostgreSQL major and Cargo target. For example, on an aarch64 Linux build host:
+
+```sh
+PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH=/tmp/pgrx-pg18-aarch64-info \
+    cargo build -p pgrx-pg-sys --target aarch64-unknown-linux-gnu \
+    --no-default-features --features pg18
+```
+
+The directory contains `pg18_target_artifact.json`, the original raw bindings,
+the complete `cmacros/pg18` Rust tree, the compiler/profile report, original
+native wrapper/support sources and their linked target archive. Module-magic and
+function-info metadata are included in the generated support and archive. The
+manifest records SHA-256 and byte lengths for every member and binds the bundle
+to the PostgreSQL major, exact Rust target, `cshim` feature and generator version.
+These checks detect corruption or mixed builds; obtain the bundle from a trusted
+build. Keep it intact when copying it to the host machine.
+
+To import it, select the same PostgreSQL major and feature set, configure the
+Rust target linker, and point `PGRX_TARGET_INFO_PATH_PG18` at the copied directory:
+
+```sh
+PGRX_TARGET_INFO_PATH_PG18=/opt/pgrx-targets/pg18-aarch64-info \
+    cargo build --target aarch64-unknown-linux-gnu --release \
+    --no-default-features --features pg18
+```
+
+The importer validates all members and the compiler target before publishing
+Rust source or linking the bundled native archive. It rejects missing manifests,
+raw-only imports, changed bytes, extra files, mismatched targets/versions/features,
+and symlinks at the bundle root or within the bundle. Configured ancestor path
+aliases are resolved normally. Members are limited to 128 MiB each, 512 MiB in
+total and 8192 files/directory entries; manifests are limited to 4 MiB. Export
+replaces only an intact bundle of the same domain or an empty directory, preserving
+unrelated files on refusal.
+
+Target PostgreSQL configuration and any system/PostgreSQL import libraries must
+still describe the server where the extension will run. The bundle supplies
+bindings and generated support; it does not install PostgreSQL or a Rust linker.
+The existing `PGRX_PG_SYS_EXTRA_OUTPUT_PATH` remains a raw-binding file export
+and cannot be used by itself as a target bundle.
 
 An additional caveat (one that is unrelated to the document's completeness) is that the cross-compilation process is highly specific to your Linux distribution, unfortunately. This guide covers Debian (where it's easy) and Fedora (where it's hard). The Debian steps should apply to any `apt`-using distribution, and most of the Fedora steps will apply to other distributions with minimal conversion.
 
