@@ -30,8 +30,6 @@ pub mod __pgrx_c_macros;
 /// This namespace is public only because exported macros expand in other crates.
 #[doc(hidden)]
 pub mod __pgrx_c_bindings {
-    //! Preserve fresh bindgen symbol and type identities across crate-root re-exports.
-
     #[cfg(feature = "pg15")]
     pub use crate::include::pg15::*;
     #[cfg(feature = "pg16")]
