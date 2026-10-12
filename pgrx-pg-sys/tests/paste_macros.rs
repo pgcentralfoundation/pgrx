@@ -11,44 +11,15 @@
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-/// Run original C headers through the bounded independent oracle harness.
-#[path = "../../pgrx-c-macros/tests/support/oracle.rs"]
-mod oracle;
+/// Reuse this build's verified compiler profile for independent original-header observations.
+#[path = "support/postgres_oracle.rs"]
+mod postgres_oracle;
 
 use core::cell::Cell;
 use core::mem::MaybeUninit;
 use core::ptr::addr_of_mut;
 use pgrx_pg_sys as pg;
-use std::path::PathBuf;
 use std::sync::OnceLock;
-
-/// Read the selected build's macro audit report to configure an independent original-header C
-/// oracle.
-#[derive(serde::Deserialize)]
-struct BuildReport {
-    /// PostgreSQL version whose fresh macro report selects the original-header oracle.
-    postgres_major_version: u16,
-    /// Compiler invocation used by the actual binding build.
-    profile: OriginalProfile,
-}
-
-/// Retain only the recorded invocation facts needed to recompile the original C definitions.
-#[derive(serde::Deserialize)]
-struct OriginalProfile {
-    /// Original build wrapper whose macros must supply the native expectations.
-    header: PathBuf,
-    /// Compiler executable recorded during verified frontend inspection.
-    compiler: OriginalCompiler,
-    /// Exact flags recorded by this binding build for oracle compilation.
-    arguments: Vec<String>,
-}
-
-/// Identify the exact compiler selected by frontend verification.
-#[derive(serde::Deserialize)]
-struct OriginalCompiler {
-    /// Recorded Clang executable used to generate and validate this version's macros.
-    executable: PathBuf,
-}
 
 /// Pair original-C input, result, and evaluation counts for comparison with public generated
 /// macros.
@@ -260,43 +231,8 @@ fn original_results() -> &'static OriginalResults {
     /// the same verified profile.
     static RESULTS: OnceLock<OriginalResults> = OnceLock::new();
     RESULTS.get_or_init(|| {
-        let major = if cfg!(feature = "pg15") {
-            15
-        } else if cfg!(feature = "pg16") {
-            16
-        } else if cfg!(feature = "pg17") {
-            17
-        } else if cfg!(feature = "pg18") {
-            18
-        } else {
-            assert!(cfg!(feature = "pg19"), "one PostgreSQL major feature is required");
-            19
-        };
-        let path = PathBuf::from(env!("OUT_DIR")).join(format!("pg{major}_macro_report.json"));
-        // Stream and ignore the large macro bodies; only the current build's
-        // original compiler profile is needed, never checked-in bindings.
-        let report: BuildReport = serde_json::from_reader(std::io::BufReader::new(
-            std::fs::File::open(&path).expect("open this build's C macro report"),
-        ))
-        .expect("read this build's original compiler profile");
-        assert_eq!(report.postgres_major_version, major);
-        let arguments = report.profile.arguments;
-        // Remove unused linker sections from the all-header wrapper on Linux.
-        // These codegen flags do not change its preprocessing or target ABI.
-        #[cfg(target_os = "linux")]
-        let arguments = {
-            let mut arguments = arguments;
-            arguments.extend(["-ffunction-sections".into(), "-fdata-sections".into()]);
-            arguments
-        };
-        let arguments = arguments.iter().map(String::as_str).collect::<Vec<_>>();
-        let output = oracle::run_c(
-            &report.profile.compiler.executable,
-            &report.profile.header,
-            ORIGINAL,
-            &arguments,
-            true,
-        );
+        let major = postgres_oracle::postgres_major_version();
+        let output = postgres_oracle::run(ORIGINAL);
         let mut results = OriginalResults::default();
         for line in output.lines() {
             let fields = line.split_whitespace().collect::<Vec<_>>();
