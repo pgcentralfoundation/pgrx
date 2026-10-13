@@ -1,0 +1,5 @@
+comment = 'parallel_scan_lwlock:  Created by pgrx'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'parallel_scan_lwlock'
+relocatable = false
+superuser = false

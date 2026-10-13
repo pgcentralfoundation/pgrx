@@ -1,0 +1,37 @@
+[package]
+name = "parallel_scan_lwlock"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+default = ["pg13"]
+pg13 = ["pgrx/pg13", "pgrx-tests/pg13"]
+pg14 = ["pgrx/pg14", "pgrx-tests/pg14"]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15"]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17"]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
+pg19 = ["pgrx/pg19", "pgrx-tests/pg19"]
+pg_test = []
+
+[dependencies]
+pgrx = { path = "../../pgrx" }
+serde_json = "1.0.150" # inspects EXPLAIN output in tests
+
+[dev-dependencies]
+pgrx-tests = { path = "../../pgrx-tests" }
+
+# uncomment these if compiling outside of 'pgrx'
+# [profile.dev]
+# panic = "unwind"
+
+# [profile.release]
+# panic = "unwind"
+# opt-level = 3
+# lto = "fat"
+# codegen-units = 1
