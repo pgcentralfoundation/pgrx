@@ -183,7 +183,7 @@ However, if the "path to pg_config" is the literal string `download`, then cargo
 and compile that version of Postgres for you. When any `"--pg${VER}"` option is specified,
 these are the **only** versions of Postgres that cargo-pgrx will manage for you.
 
-You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
+You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass options to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
 Once complete, `cargo pgrx init` also creates "${PGRX_HOME}/config.toml" which describes where to
 find each version's `pg_config` tool.
