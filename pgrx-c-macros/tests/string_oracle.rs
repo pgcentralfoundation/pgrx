@@ -7,6 +7,9 @@
 /// Collect fresh bindgen facts using the production binding reconciler.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;
+/// Select installed PostgreSQL header oracles from configured metadata.
+#[path = "support/postgres.rs"]
+mod installed;
 /// Compile and execute original C macro invocations with bounded resources.
 #[path = "support/oracle.rs"]
 mod oracle;
@@ -15,9 +18,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner, PostgresConfig,
-    SkipReasonCode, emit_batch_with_bindings, emit_support_artifact_with_bindings,
-    emit_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner, SkipReasonCode,
+    emit_batch_with_bindings, emit_support_artifact_with_bindings, emit_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -313,18 +315,40 @@ fn main() {{
     );
 }
 
-/// Verify real assertion-enabled PG15–18 varlena macros retain the native failing branch.
+/// Verify each configured installation's real varlena macros retain the native failing branch
+/// under assertion-enabled headers, even when the installation itself omits assertions.
 #[test]
-#[ignore = "requires configured native PostgreSQL 15 through 18 installations"]
 fn postgres_varlena_assertions_match_original_headers() {
+    let installations = installed::configured();
+    if installations.is_empty() {
+        return;
+    }
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let names = ["VARTAG_SIZE", "VARSIZE_EXTERNAL", "VARSIZE_ANY", "VARSIZE_ANY_EXHDR"];
-    for major in 15..=18 {
-        let postgres = PostgresConfig::resolve(&format!("pg{major}")).unwrap();
-        let frontend = postgres
-            .inspect(&scanner, None, &["-DUSE_ASSERT_CHECKING".into(), "-O2".into()], None)
-            .unwrap();
+    for postgres in installations {
+        let major = postgres.pg_config().major_version().unwrap();
+        let arguments = vec!["-DUSE_ASSERT_CHECKING".into(), "-O2".into()];
+        // ELF and COFF link-time garbage collection needs a section for each
+        // unused backend routine; these flags do not change preprocessing.
+        #[cfg(any(target_os = "linux", target_os = "windows"))]
+        let arguments = {
+            let mut arguments = arguments;
+            arguments.extend(["-ffunction-sections".into(), "-fdata-sections".into()]);
+            arguments
+        };
+        let frontend = installed::inspect(&scanner, &postgres, &arguments);
+        let defined =
+            frontend.inventory().macros.iter().any(|definition| definition.name == "VARTAG_SIZE");
+        // PG19 replaced these varlena macros with static inline functions.
+        if major >= 19 {
+            assert!(!defined, "PG{major} VARTAG_SIZE is expected to be a static inline function");
+            continue;
+        }
+        assert!(defined, "PG{major} must define VARTAG_SIZE as a macro");
+        if !installed::supports_rust_comparisons(&scanner, &frontend) {
+            continue;
+        }
         let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
         let header = &frontend.profile().header;
         let bindings = bindgen::Builder::default()

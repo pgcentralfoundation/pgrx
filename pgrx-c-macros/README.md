@@ -665,7 +665,7 @@ an installation fails; without a selection, missing installations are reported
 as omitted coverage. The isolated build/release/docs.rs tests remain explicit:
 
 ```text
-cargo test -p pgrx-c-macros --test postgres_emission --test postgres_handports --test character_literals --test oracle
+cargo test -p pgrx-c-macros --test postgres_emission --test postgres_handports --test character_literals --test oracle --test plain_char --test string_oracle
 cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```

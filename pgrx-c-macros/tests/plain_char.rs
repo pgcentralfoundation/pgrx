@@ -11,6 +11,9 @@
     any(target_os = "linux", target_os = "macos"),
 ))]
 
+/// Select installed PostgreSQL header oracles from configured metadata.
+#[path = "support/postgres.rs"]
+mod installed;
 /// Execute the original C header under the inspected compiler profile.
 #[path = "support/oracle.rs"]
 mod oracle;
@@ -19,7 +22,7 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FunctionBinding, MacroScanner, PostgresConfig,
+    AnalysisSession, BindingCatalog, EmissionStatus, FunctionBinding, MacroScanner,
     RustBindingType, generate_with_bindings, inspect, support_rust_cfg, validate_support_profile,
 };
 use std::path::PathBuf;
@@ -206,15 +209,19 @@ fn rejected_native_transport_does_not_fall_back_to_the_binding() {
     assert!(reason.message.contains("static inline definition"), "{reason:?}");
 }
 
-/// Keep exact installed PG17/18 char-helper coverage independent of generated test expressions.
+/// Keep exact char-helper coverage for each configured installation independent of generated
+/// test expressions.
 #[test]
-#[ignore = "requires configured native PostgreSQL 17 and 18 installations"]
 fn all_plain_char_bytes_match_installed_postgres_helpers() {
+    let installations = installed::configured();
+    if installations.is_empty() {
+        return;
+    }
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
-    for major in [17, 18] {
-        let postgres = PostgresConfig::resolve(&format!("pg{major}")).unwrap();
-        let frontend = postgres.inspect(&scanner, None, &["-O2".into()], None).unwrap();
+    for postgres in installations {
+        let major = postgres.pg_config().major_version().unwrap();
+        let frontend = installed::inspect(&scanner, &postgres, &["-O2".into()]);
         validate_support_profile(frontend.profile()).unwrap();
         let source = generated_source(&scanner, &frontend.profile().arguments);
         let generated = rust_oracle::run_rust_with_cfg(
