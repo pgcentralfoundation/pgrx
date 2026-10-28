@@ -9,8 +9,10 @@ type TransactionId = pg_sys::TransactionId;
 
 /// RAII wrapper for PostgreSQL LWLock to ensure proper release
 ///
-/// This guard acquires a shared lock and releases that acquisition on ordinary
-/// Rust scope exit. PostgreSQL error recovery has its own lock cleanup.
+/// This guard acquires a shared lock and releases it when dropped, including while pgrx
+/// unwinds a PostgreSQL ERROR. `errfinish` has reset `InterruptHoldoffCount` to zero by then,
+/// so that release fails `LWLockRelease`'s `RESUME_INTERRUPTS` assertion on assert-enabled
+/// servers.
 struct PgLwLockGuard {
     lock: *mut pg_sys::LWLock,
 }
@@ -37,8 +39,10 @@ impl PgLwLockGuard {
 
 impl Drop for PgLwLockGuard {
     fn drop(&mut self) {
-        // SAFETY: new_shared acquired this live lock for this guard, which
-        // releases that acquisition once on ordinary scope exit.
+        // SAFETY: new_shared acquired this live lock for this guard on the backend thread,
+        // and this releases that acquisition once. While a PostgreSQL ERROR unwinds, the
+        // release fails an assertion on assert-enabled servers, as the type's documentation
+        // describes.
         unsafe {
             pg_sys::LWLockRelease(self.lock);
         }
