@@ -59,6 +59,7 @@ fn non_atomic_replacements_require_an_explicit_c_invocation_boundary() {
         "BOUND_LVALUE",
         "BOUND_SIZE",
         "BOUND_USE",
+        "BOUND_ZERO",
     ];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
     let generated = generate_with_bindings(&session, &names, &BindingCatalog::default()).unwrap();
@@ -99,7 +100,9 @@ int main(void) {
  int alias=BOUND_ALIAS_GROUP(4);
  unsigned long size=BOUND_SIZE((BOUND_SUM(++effects)));
  int nested=(BOUND_SET((BOUND_LVALUE(&result)),21));
- printf("%d %d %d %d %d %d %d %d %d %d %d %lu %d\n",a,b,c,d,e,f,g,h,result,effects,alias,size,nested);
+ unsigned long checked=BOUND_SIZE(BOUND_USE((BOUND_SUM(++effects))));
+ unsigned long zero=BOUND_SIZE(BOUND_USE((BOUND_ZERO())));
+ printf("%d %d %d %d %d %d %d %d %d %d %d %lu %d %lu %lu\n",a,b,c,d,e,f,g,h,result,effects,alias,size,nested,checked,zero);
 }
 "#;
     let consumer = r#"
@@ -119,7 +122,10 @@ fn main() {
  let size=BOUND_SIZE!(BOUND_SUM!(@__pgrx_c_expression;{effects+=1;2})).get();
  // SAFETY: The nested macro preserves result's same exclusive live place.
  let nested=unsafe{BOUND_SET!(@__pgrx_c_expression;BOUND_LVALUE!(@__pgrx_c_expression;&raw mut result),21).get()};
- println!("{} {} {} {} {} {} {} {} {} {} {} {} {}",a,b,u8::from(c),d,e,f,g,h,result,effects,alias,size,nested);
+ // BOUND_USE's size arm checks its compound operand's safety before taking its size.
+ let checked=BOUND_SIZE!(BOUND_USE!(BOUND_SUM!(@__pgrx_c_expression;{effects+=1;2}))).get();
+ let zero=BOUND_SIZE!(BOUND_USE!(BOUND_ZERO!(@__pgrx_c_expression;))).get();
+ println!("{} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",a,b,u8::from(c),d,e,f,g,h,result,effects,alias,size,nested,checked,zero);
 }
 "#;
     let profile = frontend.profile();
@@ -128,9 +134,11 @@ fn main() {
         rust_oracle::run_rust(&format!("{rust}\n{consumer}")),
         oracle::run_c(&profile.compiler.executable, &header, original, &args, true)
     );
-    let diagnostic =
-        rust_oracle::reject_rust(&format!("{rust}\nfn main(){{let _=BOUND_SUM!(2);}}"));
-    assert!(diagnostic.contains("explicit parenthesized invocation"), "{diagnostic}");
+    for invocation in ["BOUND_SUM!(2)", "BOUND_SIZE!(BOUND_USE!(BOUND_SUM!(2)))"] {
+        let diagnostic =
+            rust_oracle::reject_rust(&format!("{rust}\nfn main(){{let _={invocation};}}"));
+        assert!(diagnostic.contains("explicit parenthesized invocation"), "{diagnostic}");
+    }
     let diagnostic = rust_oracle::reject_rust(&format!(
         "{rust}\nfn main(){{let mut x=0i32;let _=BOUND_SET!(@__pgrx_c_expression;x,3);}}"
     ));

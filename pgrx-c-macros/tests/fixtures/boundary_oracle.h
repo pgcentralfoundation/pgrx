@@ -12,3 +12,4 @@
 #define BOUND_LVALUE(p) *(p)
 #define BOUND_SIZE(x) (sizeof(x))
 #define BOUND_USE(x) ((x) * 3)
+#define BOUND_ZERO() 1 + 2

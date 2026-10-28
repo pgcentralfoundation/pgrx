@@ -1084,9 +1084,15 @@ fn render(
     let safety_checks = arguments::render_safety_checks(analysis);
     writeln!(&mut rust, "(@__pgrx_emit_check_safety; {matcher}) => {{ {safety_checks} }};")
         .expect("String output");
+    // A size context forwards an operand's tokens unchanged for its safety checks,
+    // so an explicit-boundary operand still carries the prefix every mode requires.
+    let expression_prefix = if explicit_boundary { "@__pgrx_c_expression; " } else { "" };
     let safety_call = invoke("__pgrx_emit_check_safety", "");
-    writeln!(&mut rust, "(@__pgrx_c_check_safety; $($raw:tt)*) => {{ {safety_call} }};")
-        .expect("String output");
+    writeln!(
+        &mut rust,
+        "(@__pgrx_c_check_safety; {expression_prefix}$($raw:tt)*) => {{ {safety_call} }};"
+    )
+    .expect("String output");
     let public_body = if statement_body.is_some() {
         value.clone()
     } else if empty {
@@ -1158,11 +1164,10 @@ fn render(
             };
             writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ {body} }};")
                 .expect("String output");
-            let boundary_prefix = if explicit_boundary { "@__pgrx_c_expression; " } else { "" };
             let call = invoke(&format!("__pgrx_emit_{mode}"), "");
             writeln!(
                 &mut rust,
-                "(@__pgrx_c_{mode}; {boundary_prefix}$($raw:tt)*) => {{ {call} }};"
+                "(@__pgrx_c_{mode}; {expression_prefix}$($raw:tt)*) => {{ {call} }};"
             )
             .expect("String output");
             if arguments.is_none()
