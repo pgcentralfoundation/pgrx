@@ -239,11 +239,16 @@ fn popped_names(files: impl IntoIterator<Item = PathBuf>) -> Option<HashSet<Stri
     Some(names)
 }
 
-/// Copy physical original source once per header and retain only bounded definition text.
+/// Read physical original source once per header and retain only bounded definition text.
+///
+/// A header's bytes are read from its file, which need not be UTF-8 and may contain NUL
+/// bytes. Definition text is retained only when it is UTF-8: it is kept as a string, and
+/// libclang spells the body's tokens lossily, which could change a literal. Without that
+/// text, the function gets neither a body nor a native call adapter.
 fn source<'tu>(
     definition: Entity<'tu>,
     directory: &Path,
-    files: &mut BTreeMap<PathBuf, Option<String>>,
+    files: &mut BTreeMap<PathBuf, Option<Vec<u8>>>,
     remaining: &mut usize,
     history: &MacroHistory<'tu, '_>,
 ) -> Option<InlineFunctionDefinition> {
@@ -253,18 +258,23 @@ fn source<'tu>(
     let end = range.get_end().get_spelling_location();
     let file = start.file?;
     let size = usize::try_from(end.offset.checked_sub(start.offset)?).ok()?;
-    let source = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
-        let contents = files.entry(provenance.file.clone()).or_insert_with(|| file.get_contents());
-        let text = contents.as_ref().and_then(|contents| {
-            contents.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)
-        });
-        text.map(|text| {
-            *remaining -= size;
-            text.to_owned()
-        })
+    let contents = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
+        files
+            .entry(provenance.file.clone())
+            .or_insert_with(|| std::fs::read(file.get_path()).ok())
+            .as_deref()
     } else {
         None
     };
+    let source = contents
+        .and_then(|contents| {
+            contents.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)
+        })
+        .and_then(|text| std::str::from_utf8(text).ok())
+        .map(|text| {
+            *remaining -= size;
+            text.to_owned()
+        });
     Some(InlineFunctionDefinition {
         provenance,
         parameters: definition
@@ -273,12 +283,15 @@ fn source<'tu>(
             .into_iter()
             .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
             .collect(),
-        body: source.as_ref().and_then(|_| body_tokens(definition, file, history)),
+        body: contents
+            .filter(|_| source.is_some())
+            .and_then(|contents| body_tokens(definition, file, contents, history)),
         source,
     })
 }
 
 /// Recover the tokens the preprocessor read for a definition's body, without its braces.
+/// `bytes` are the contents of the definition's file.
 ///
 /// Conditional directives, through the end of their logical lines, and the text they
 /// skipped are removed; any other directive makes the body unavailable, as does a trigraph
@@ -292,6 +305,7 @@ fn source<'tu>(
 fn body_tokens<'tu>(
     definition: Entity<'tu>,
     file: File<'tu>,
+    bytes: &[u8],
     history: &MacroHistory<'tu, '_>,
 ) -> Option<Vec<crate::Token>> {
     let body = definition
@@ -313,13 +327,11 @@ fn body_tokens<'tu>(
     if file.get_offset_location(opened.offset) != open.get_location() {
         return None;
     }
-    let contents = file.get_contents()?;
     // The line handling below ends lines only at newlines and splices them only with a
     // backslash. Clang also ends a line at a bare carriage return, and with trigraphs
     // enabled `??/` is a backslash and `??=` a `#`.
     let start = usize::try_from(opened.offset).ok()?;
     let end = usize::try_from(located(close.get_location())?.offset).ok()?;
-    let bytes = contents.as_bytes();
     let text = bytes.get(start..end)?;
     if text.windows(3).any(|window| window[..2] == *b"??" && b"=(/)'<!>-".contains(&window[2]))
         || has_bare_carriage_return(text)

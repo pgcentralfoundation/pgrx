@@ -311,15 +311,17 @@ cannot be inferred from a declaration's name or broad type category:
    definition and agreement on linkage, inline status, result, parameters,
    variadic status, and calling convention. A declaration with braces nearby
    does not establish that the included definition is available. Retain physical
-   source spans, original formals and bounded definition text from that same
-   parse. Header contents are copied once per physical source, rather than once
-   per function. The body's tokens are also retained without conditional
-   directives and the branches they skipped. A directive extends to the end of
-   its logical line, after line splices and comments, including a closing
-   directive at the end of a skipped range. Token spellings are compared without
-   their line splices, which libclang keeps. Any other directive, a `#` that does
-   not start a line, a token outside the compiler's statements other than `;`, a
-   trigraph, or a carriage return outside a CR-LF line end leaves no body. A
+   source spans and original formals from that same parse, and bounded
+   definition text from the header's file, read once per physical source rather
+   than once per function. A header need not be UTF-8, but definition text that
+   is not leaves the function without an adapter. The body's tokens are also
+   retained without conditional directives and the branches they skipped. A
+   directive extends to the end of its logical line, after line splices and
+   comments, including a closing directive at the end of a skipped range. Token
+   spellings are compared without their line splices, which libclang keeps. Any
+   other directive, a `#` that does not start a line, a token outside the
+   compiler's statements other than `;`, a trigraph, or a carriage return
+   outside a CR-LF line end leaves no body. A
    token that names a macro must have a top-level expansion record at that
    position; that macro, and every macro its replacement list names, must have
    its last definition before the expansion and still be active at the end of

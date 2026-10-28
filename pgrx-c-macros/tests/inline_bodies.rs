@@ -268,3 +268,32 @@ fn unmodeled_line_ends_leave_no_macro_bodies() {
         assert!(!retained(name), "{name}");
     }
 }
+
+/// A header need not be UTF-8 and may hold a NUL byte. A definition keeps its body when
+/// only another part of its header, here a comment, has a Latin-1 byte. A definition with
+/// one in its own text keeps neither text nor body, since its text is retained as a string.
+#[test]
+fn latin1_header_keeps_utf8_definitions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().unwrap();
+    let header = directory.path().join("latin1.h");
+    std::fs::write(
+        &header,
+        b"/* Caf\xe9 \0 */\n#define BODY_LATIN_OFFSET 1\n\
+static inline int BODY_LATIN_PLAIN(int value) { return value + BODY_LATIN_OFFSET; }\n\
+static inline int BODY_LATIN_INSIDE(int value) { return value; /* na\xefve */ }\n",
+    )
+    .unwrap();
+    let frontend =
+        inspect(&scanner, &header, &oracle::native_arguments(), None).expect("inspect definitions");
+    let definition = |name: &str| {
+        let function = &frontend.declarations().function_signatures[name];
+        function.definition.clone().expect("proved definition")
+    };
+    let plain = definition("BODY_LATIN_PLAIN");
+    assert!(plain.source.is_some_and(|source| source.ends_with("BODY_LATIN_OFFSET; }")));
+    assert!(plain.body.is_some());
+    let inside = definition("BODY_LATIN_INSIDE");
+    assert!(inside.source.is_none() && inside.body.is_none());
+}
