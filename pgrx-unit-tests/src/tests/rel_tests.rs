@@ -52,7 +52,20 @@ mod tests {
 
         // SPI_finish deletes the memory context that is current inside the closure.
         let namespace = Spi::connect(|_| rel.namespace());
+        // Only assert-enabled servers overwrite freed memory. Otherwise the deleted context keeps
+        // its first block with the old bytes, and the next SPI connection reuses that block, so
+        // fill it to change a name that was left in it.
+        Spi::connect(|_| fill_current_context());
 
         assert_eq!(namespace, "rel_namespace_probe");
+    }
+
+    /// Fill more than the first 8 kB block of CurrentMemoryContext with 32-byte chunks of 'X'.
+    fn fill_current_context() {
+        const CHUNK: usize = 32;
+        for _ in 0..1024 {
+            // SAFETY: palloc returns CHUNK writable bytes or raises an ERROR.
+            unsafe { pg_sys::palloc(CHUNK).cast::<u8>().write_bytes(b'X', CHUNK) };
+        }
     }
 }
