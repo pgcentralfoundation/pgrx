@@ -1683,6 +1683,11 @@ fn check_local_reads(
 
 /// Reject target facts that cannot support the analysis rules used for integer and literal semantics.
 fn validate_target(target: &TargetFacts) -> Result<(), String> {
+    // Literal candidate lists follow C99. C90 instead gives an unsuffixed decimal literal beyond
+    // `long` the type `unsigned long`, which changes values on targets with 32-bit `long`.
+    if target.c_standard.is_none_or(|standard| standard < 199901) {
+        return Err("integer literal and arithmetic rules require a C99-or-later profile".into());
+    }
     if target
         .integers
         .get(&target.size_type)
@@ -2296,7 +2301,7 @@ mod tests {
     #[test]
     fn binary_literal_candidates_require_the_inspected_c23_profile() {
         let mut input = frontend(&["(", "(", "x", ")", "+", "0b10", ")"]);
-        for standard in [None, Some(201112), Some(201710), Some(202000)] {
+        for standard in [Some(199901), Some(201112), Some(201710), Some(202000)] {
             input.profile.target.c_standard = standard;
             let AnalysisStatus::Skipped { reason } = analyze(&input, "F").status else {
                 panic!("pre-C23 binary literals must conservatively skip")
@@ -2304,6 +2309,24 @@ mod tests {
             assert_eq!(reason.code, SkipReasonCode::UnsupportedLiteral);
         }
         input.profile.target.c_standard = Some(202311);
+        assert!(matches!(analyze(&input, "F").status, AnalysisStatus::Candidate));
+    }
+
+    /// C90 types an unsuffixed decimal literal beyond `long` as `unsigned long`, while the
+    /// analyzer's candidate lists follow C99. A pre-C99 profile must skip instead of computing
+    /// `x * 3000000000` in 64 bits where a 32-bit-long C90 target wraps in 32 bits.
+    #[test]
+    fn pre_c99_profiles_are_refused_before_literal_typing() {
+        let mut input = frontend(&["(", "(", "x", ")", "*", "3000000000", ")"]);
+        input.profile.target = target(32);
+        for standard in [None, Some(199409)] {
+            input.profile.target.c_standard = standard;
+            let AnalysisStatus::Skipped { reason } = analyze(&input, "F").status else {
+                panic!("{standard:?} must not use C99 literal types")
+            };
+            assert_eq!(reason.code, SkipReasonCode::InvalidTarget);
+        }
+        input.profile.target.c_standard = Some(199901);
         assert!(matches!(analyze(&input, "F").status, AnalysisStatus::Candidate));
     }
 

@@ -602,7 +602,10 @@ not protect the textual substitution of `x` from other operators.
 Integer literals retain original spelling, radix, magnitude, and `U`/`L`/`LL`
 suffix metadata. Decimal and nondecimal literals have different candidate C
 type lists. Select the first representable C type under the inspected target
-rules. Unary minus is a separate operation, not part of literal magnitude.
+rules. These are the C99 lists; C90 types an unsuffixed decimal beyond `long`
+as `unsigned long`, so analysis refuses a profile without a C99-or-later
+`__STDC_VERSION__`. Unary minus is a separate operation, not part of literal
+magnitude.
 Basic character constants require the established execution-character-set
 contract. Ordinary closed strings decode the verified ASCII subset and modeled
 escapes, concatenate adjacent literals, preserve embedded zero bytes, and append

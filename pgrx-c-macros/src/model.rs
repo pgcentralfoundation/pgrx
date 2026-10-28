@@ -170,7 +170,7 @@ pub struct TargetFacts {
     /// Agreed C endian representation used for downstream target guards and storage operations.
     pub byte_order: ByteOrder,
     /// Effective __STDC_VERSION__ value, when present, used for version-dependent syntax such as
-    /// binary literals.
+    /// binary literals. Analysis refuses profiles before C99, including those without the macro.
     pub c_standard: Option<u64>,
     /// Representation facts keyed by distinct fundamental C integer identities.
     pub integers: BTreeMap<IntegerKind, IntegerType>,
