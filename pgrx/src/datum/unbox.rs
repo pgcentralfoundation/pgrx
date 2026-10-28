@@ -1,7 +1,8 @@
 use super::Datum;
+use super::from::convert_varlena_to_str_memoized;
 use super::uuid::Uuid;
 use crate::prelude::*;
-use crate::varlena::{text_to_rust_str_unchecked, varlena_to_byte_slice};
+use crate::varlena::varlena_to_byte_slice;
 use crate::{Json, JsonB};
 use alloc::ffi::CString;
 use core::ffi::CStr;
@@ -177,6 +178,8 @@ unsafe impl UnboxDatum for f64 {
     }
 }
 
+/// Panics, as `FromDatum` for `&str` does, if the database encoding lets text hold bytes that are
+/// not UTF-8 and the value does.
 unsafe impl UnboxDatum for str {
     type As<'src> = &'src str;
     #[inline]
@@ -184,7 +187,7 @@ unsafe impl UnboxDatum for str {
     where
         Self: 'src,
     {
-        unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
+        unsafe { convert_varlena_to_str_memoized(datum.0.cast_mut_ptr()) }
     }
 }
 
@@ -196,7 +199,7 @@ unsafe impl UnboxDatum for &str {
     where
         Self: 'src,
     {
-        unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
+        unsafe { convert_varlena_to_str_memoized(datum.0.cast_mut_ptr()) }
     }
 }
 

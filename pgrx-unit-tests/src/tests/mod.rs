@@ -71,6 +71,7 @@ mod spi_tests;
 mod sql_translatable_signature_tests;
 mod srf_tests;
 mod struct_type_tests;
+mod text_encoding_tests;
 mod trigger_tests;
 mod tupdesc_tests;
 #[cfg(test)]

@@ -469,9 +469,19 @@ impl<'a> FromDatum for &'a str {
     }
 }
 
+/// Borrow a text value as `str`, panicking if the database encoding lets it hold bytes that are
+/// not UTF-8 and it does.
+///
+/// # Safety
+///
+/// The same as [`text_to_rust_str_unchecked`], except that the payload need not be UTF-8.
+///
+/// [`text_to_rust_str_unchecked`]: crate::varlena::text_to_rust_str_unchecked
 // This is not marked inline on purpose, to allow it to be in a single code section
 // which is then branch-predicted on every time by the CPU.
-unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -> &'a str {
+pub(crate) unsafe fn convert_varlena_to_str_memoized<'a>(
+    varlena: *const pg_sys::varlena,
+) -> &'a str {
     match *crate::UTF8DATABASE {
         crate::Utf8Compat::Yes => varlena::text_to_rust_str_unchecked(varlena),
         crate::Utf8Compat::Maybe => varlena::text_to_rust_str(varlena)
