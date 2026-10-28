@@ -257,7 +257,7 @@ where
         };
 
         unsafe {
-            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+            let fcx = deref_fcx(fcinfo);
             // SAFETY: the initialized SRF context and ReturnSetInfo belong to this call.
             // The macro records the next row before invoking the row's return conversion.
             pg_sys::SRF_RETURN_NEXT!(
@@ -272,7 +272,7 @@ where
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         unsafe {
-            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+            let fcx = deref_fcx(fcinfo);
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
@@ -282,7 +282,7 @@ where
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let iter = unsafe {
-            let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+            let fcx = deref_fcx(fcinfo);
             &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>()
         };
         IterRet(match iter.next() {
@@ -304,10 +304,27 @@ enum Step<T: RetAbi> {
 
 pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
-        let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+        let fcx = deref_fcx(fcinfo);
         // SAFETY: the initialized SRF context belongs to fcinfo and is no longer used.
         pg_sys::SRF_RETURN_DONE!(fcx, fcinfo);
     }
+}
+
+/// Return the SRF's `FuncCallContext`, as `SRF_PERCALL_SETUP` does.
+///
+/// PostgreSQL 15 through 19 define `per_MultiFuncCall` in funcapi.c as
+/// `return (FuncCallContext *) fcinfo->flinfo->fn_extra;`. It is an exported
+/// function, so `SRF_PERCALL_SETUP!` makes a guarded FFI call (a thread check and a
+/// `sigsetjmp`) every time; this runs several times per returned row.
+///
+/// # Safety
+///
+/// `fcinfo` and its `flinfo` must be live. The result is the `FuncCallContext` only
+/// after `SRF_FIRSTCALL_INIT!` has stored it in `fn_extra`.
+#[inline]
+unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    // SAFETY: the caller guarantees that fcinfo and its flinfo are live.
+    unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
 pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
@@ -405,7 +422,7 @@ macro_rules! impl_table_iter {
 
             unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
                 unsafe {
-                    let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+                    let fcx = deref_fcx(fcinfo);
                     let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
                     // C return conversion keeps the tuple pointer's provenance;
                     // `Datum::from(.get() as usize)` would rebuild it from an integer.
@@ -420,7 +437,7 @@ macro_rules! impl_table_iter {
             unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
                 // Pure side effect, leave the value in place.
                 unsafe {
-                    let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
+                    let fcx = deref_fcx(fcinfo);
                     srf_memcx(fcx).switch_to(|_| {
                         let mut tupdesc = ptr::null_mut();
                         let mut oid = pg_sys::Oid::default();
