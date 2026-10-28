@@ -493,12 +493,12 @@ fn type_measurements_keep_earlier_operand_roles_of_the_same_formal() {
         r#"
 long role_value = 10;
 struct RoleRecord role_record = { 3 };
-_Static_assert(sizeof(ROLE_VALUE_THEN_ALIGN(role_value)) == sizeof(unsigned long), "GNU alignment of a value");
-_Static_assert(sizeof(ROLE_ALIGN_THEN_VALUE(role_value)) == sizeof(unsigned long), "GNU alignment of a value");
-_Static_assert(sizeof(ROLE_MEMBER_THEN_SIZE(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
-_Static_assert(sizeof(ROLE_SIZE_THEN_MEMBER(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
-_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(role_value, role_value)) == sizeof(unsigned long), "GNU alignment of a value");
-_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(long, role_value)) == sizeof(unsigned long), "the same replacement casts a type");
+_Static_assert(sizeof(ROLE_VALUE_THEN_ALIGN(role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_THEN_VALUE(role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_MEMBER_THEN_SIZE(&role_record, RoleField)) == sizeof(__SIZE_TYPE__), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_SIZE_THEN_MEMBER(&role_record, RoleField)) == sizeof(__SIZE_TYPE__), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(role_value, role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(long, role_value)) == sizeof(__SIZE_TYPE__), "the same replacement casts a type");
 "#,
         &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
         false,
