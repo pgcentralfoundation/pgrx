@@ -273,8 +273,20 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
     collation: pg_sys::Oid,
     args: &[&dyn FnCallArg],
 ) -> Result<Option<R>> {
+    // Each argument with its kind and, for an Arg::Value, its value's type.  `type_oid` gives the
+    // type of the other kinds, which only selects the function, so each argument's type is looked
+    // up once for both the function lookup and the argument type check.
+    let args = args.iter().map(|&arg| (arg, arg.value_type())).collect::<Vec<_>>();
+    let arg_types = args
+        .iter()
+        .map(|(arg, kind)| match kind {
+            Arg::Value(oid) => *oid,
+            Arg::Null | Arg::Default => arg.type_oid(),
+        })
+        .collect::<Vec<_>>();
+
     // lookup the function by its name
-    let func_oid = lookup_fn(fname, args)?;
+    let func_oid = lookup_fn(fname, &arg_types)?;
 
     // lookup the function's pg_proc entry and do some validation
     let pg_proc = PgProc::new(func_oid).ok_or(FnCallError::UndefinedFunction)?;
@@ -308,10 +320,12 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         return Err(FnCallError::TooManyArguments);
     }
 
-    // fill in the DEFAULT arguments, including any at the end
+    // The value passed for each parameter.  fn_call passes a NULL itself and evaluates each
+    // DEFAULT, including those of omitted arguments at the end, instead of asking
+    // FnCallArg::as_datum, so it can check the DEFAULT's type.
     let passed = (0..argtypes.len())
-        .map(|argnum| match args.get(argnum).map(|&arg| (arg, arg.value_type())) {
-            Some((arg, Arg::Value(oid))) => Ok(PassedArg::Value(arg, oid)),
+        .map(|argnum| match args.get(argnum) {
+            Some(&(arg, Arg::Value(oid))) => Ok(PassedArg::Value(arg, oid)),
             Some((_, Arg::Null)) => Ok(PassedArg::Datum(None)),
             Some((_, Arg::Default)) | None => {
                 create_default_value(&pg_proc, argnum).map(PassedArg::Datum)
@@ -539,7 +553,7 @@ fn without_common_type(param: pg_sys::Oid) -> pg_sys::Oid {
     }
 }
 
-fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
+fn lookup_fn(fname: &str, arg_types: &[pg_sys::Oid]) -> Result<pg_sys::Oid> {
     // ask Postgres to find the function.  This will look for the possibly-qualified named
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
@@ -547,7 +561,6 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
     memcx::current_context(|mcx| {
         let mut parts_list = List::<*mut std::ffi::c_void>::default();
         let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
-            let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
             let nargs: i16 =
                 arg_types.len().try_into().map_err(|_| FnCallError::TooManyArguments)?;
 
