@@ -2894,14 +2894,16 @@ pub fn shr<L: CInteger, R: CInteger>(left: CValue<L>, right: CValue<R>) -> CValu
     super::shr(left, right)
 }
 
-/// Reject offsets that cannot fit the native allocation-address range before pointer arithmetic.
-fn pointer_count<K: CInteger>(value: CValue<K>) -> isize {
+/// Scale a C element offset by the storage stride, rejecting byte distances
+/// that cannot fit the native allocation-address range before pointer arithmetic.
+fn byte_offset<S, K: CInteger>(value: CValue<K>) -> isize {
     let bits = K::encode(value.get());
-    if K::SIGNED {
-        isize::try_from(bits as i128).expect("C pointer offset exceeds addressable allocation")
-    } else {
-        isize::try_from(bits).expect("C pointer offset exceeds addressable allocation")
-    }
+    let count = if K::SIGNED { isize::try_from(bits as i128) } else { isize::try_from(bits) };
+    // A Rust type's size never exceeds isize::MAX, so the stride conversion is exact.
+    count
+        .ok()
+        .and_then(|count| count.checked_mul(core::mem::size_of::<S>() as isize))
+        .expect("C pointer offset exceeds addressable allocation")
 }
 /// Select C scalar common conversion or complete-object pointer stride for addition.
 impl<M: CompleteObject, Q: Qualifier, K: CInteger, P: OverflowPolicy> Add<CValue<K>, P>
@@ -2915,7 +2917,8 @@ impl<M: CompleteObject, Q: Qualifier, K: CInteger, P: OverflowPolicy> Add<CValue
             core::mem::size_of::<M::Storage>() != 0,
             "C pointer arithmetic needs nonempty storage"
         );
-        Pointer::new(Q::from_mut(self.as_mut_address().wrapping_offset(pointer_count(rhs))))
+        let bytes = byte_offset::<M::Storage, K>(rhs);
+        Pointer::new(Q::from_mut(self.as_mut_address().wrapping_byte_offset(bytes)))
             .with_access(self.access())
     }
 }
@@ -2942,10 +2945,11 @@ impl<M: CompleteObject, Q: Qualifier, K: CInteger, P: OverflowPolicy> Subtract<C
             core::mem::size_of::<M::Storage>() != 0,
             "C pointer arithmetic needs nonempty storage"
         );
-        Pointer::new(Q::from_mut(
-            self.as_mut_address().wrapping_offset(pointer_count(rhs).wrapping_neg()),
-        ))
-        .with_access(self.access())
+        let bytes = byte_offset::<M::Storage, K>(rhs)
+            .checked_neg()
+            .expect("C pointer offset exceeds addressable allocation");
+        Pointer::new(Q::from_mut(self.as_mut_address().wrapping_byte_offset(bytes)))
+            .with_access(self.access())
     }
 }
 /// Select the admitted scalar or compatible-pointer subtraction rule.
@@ -3901,6 +3905,32 @@ mod tests {
         let alignment: CValue<super::super::CSize> = align_of::<CInt>();
         assert_eq!(size.get(), 4);
         assert_eq!(alignment.get(), core::mem::align_of::<i32>() as u64);
+    }
+
+    /// Reject element offsets whose scaled byte distance cannot address any
+    /// allocation, instead of wrapping back to an element of this one.
+    #[cfg(target_pointer_width = "64")]
+    #[test]
+    fn pointer_arithmetic_rejects_unrepresentable_byte_offsets() {
+        let mut values = [11_i32, 22, 33, 44];
+        let first = Pointer::<CInt>::new(values.as_mut_ptr());
+        // 2^62 four-byte elements span 2^64 bytes, which wraps to zero.
+        let wrapping = CValue::<CLongLong>::new(1 << 62);
+        type Offset = fn(Pointer<CInt>, CValue<CLongLong>) -> Pointer<CInt>;
+        let rejected = |operation: Offset, offset| {
+            std::panic::catch_unwind(|| operation(first, offset)).is_err()
+        };
+        assert!(rejected(add::<Undefined, _, _>, wrapping), "p + 2^62 must not wrap to p");
+        assert!(rejected(sub::<Undefined, _, _>, wrapping), "p - 2^62 must not wrap to p");
+        assert!(rejected(|p, n| index(p, n).pointer(), wrapping), "p[2^62] must not wrap to p[0]");
+        // Negating the most negative count must not wrap back to that count.
+        let minimum = CValue::<CLongLong>::new(i64::MIN);
+        assert!(rejected(sub::<Undefined, _, _>, minimum), "p - LLONG_MIN must not wrap");
+        // In-range offsets keep exact element strides in both directions.
+        let last = add::<Undefined, _, _>(first, input(3_i32));
+        // SAFETY: last points to the initialized fourth element of this live array.
+        assert_eq!(unsafe { load(pointee(last)) }.get(), 44);
+        assert_eq!(sub::<Undefined, _, _>(last, input(3_i32)).get(), first.get());
     }
 
     /// Preserve all pointer bits through target-size integer casts, including LLP64 high bits.
