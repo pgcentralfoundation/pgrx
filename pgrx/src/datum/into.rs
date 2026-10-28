@@ -138,6 +138,11 @@ impl IntoDatum for bool {
 }
 
 /// for "char"
+///
+/// The Datum holds the byte widened as PostgreSQL's `CharGetDatum` widens plain C `char`:
+/// sign-extended where `char` is signed, and zero-extended where it is unsigned, such as on
+/// Linux AArch64. So `-1_i8` becomes `0xFF` there, not all ones. `FromDatum for i8` reads
+/// either form back as `-1`.
 impl IntoDatum for i8 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // PostgreSQL's SQL "char" uses plain C char, whose signedness is
@@ -455,5 +460,23 @@ impl IntoDatum for pg_sys::Datum {
 
     fn type_oid() -> pg_sys::Oid {
         pg_sys::INT8OID
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::FromDatum;
+
+    /// `CharGetDatum` widens plain C `char`, whose signedness the build inspected.
+    #[test]
+    fn char_datum_follows_c_char_signedness() {
+        let unsigned_char = pg_sys::__pgrx_c_macros::CCharRepr::MIN == 0;
+        let expected = if unsigned_char { 0xFF } else { usize::MAX };
+        let datum = (-1_i8).into_datum().unwrap();
+        assert_eq!(datum.value(), expected);
+        // SAFETY: the datum is a non-null by-value "char".
+        assert_eq!(unsafe { i8::from_datum(datum, false) }, Some(-1));
+        assert_eq!(0x41_i8.into_datum().unwrap().value(), 0x41);
     }
 }
