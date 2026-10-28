@@ -24,4 +24,5 @@ int main(void)
     int mark = 0;
     BODY_MARK(&mark, &(int){0});
     printf("mark\t%d\n", mark);
+    printf("sized\t%d\t%d\t%d\n", BODY_SIZED(1), BODY_SIZED_CALLER(1), BODY_SIZED_MACRO(3));
 }

@@ -328,7 +328,9 @@ impl<'a> Renderer<'a> {
             }
             rust.push_str("] ");
         }
-        rust.push_str("), ");
+        // A witness never delegates, so these are always the real macro's checks.
+        write!(rust, "[{}]), ", arguments::render_safety_checks(self.analysis, false))
+            .expect("String output");
     }
 
     /// Argument substitution can make a callee's dynamic expectation fixed.
@@ -1135,7 +1137,9 @@ impl<'a> Renderer<'a> {
                                 }
                                 // The translation evaluates each argument once and converts it
                                 // to its parameter type, as the call does, using only its value.
+                                // A sizeof in the callee expands each argument's own checks.
                                 const VALUE_ONLY: &str = "::core::compile_error!(\"a translated C function argument is only a value\")";
+                                let checks = arguments::render_safety_checks(analysis, false);
                                 if let Some(result) = &result {
                                     write!(rust, "{EXPRESSION}::implicit::<{}, _>(", result.marker)
                                         .expect("String output");
@@ -1146,7 +1150,7 @@ impl<'a> Renderer<'a> {
                                 tasks.push(text(")"));
                                 for argument in arguments.iter().rev() {
                                     tasks.push(Task::Text(format!(
-                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}]), "
+                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}] [{checks}]), "
                                     )));
                                     tasks.push(value(*argument));
                                     tasks.push(text("(@compiled ["));

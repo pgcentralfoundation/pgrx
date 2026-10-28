@@ -49,7 +49,13 @@ const TRANSLATED: &[&str] = &[
     "BODY_RECURSIVE",
     // Its argument temporaries outlive the body.
     "BODY_MARK",
+    // A sizeof in the callee checks arguments from translated and macro callers.
+    "BODY_SIZED",
+    "BODY_SIZED_CALLER",
 ];
+
+/// Macros that call translated inline functions.
+const MACROS: &[&str] = &["BODY_SIZED_MACRO"];
 
 /// Inline functions that stay native calls, each for a reason the fixture names.
 const NATIVE: &[&str] = &[
@@ -75,7 +81,7 @@ fn translated_bodies_match_their_original_definitions() {
     let mut arguments = oracle::native_arguments();
     arguments.push("-std=c17".into());
     let frontend = inspect(&scanner, &header, &arguments, None).expect("inspect definitions");
-    let names = TRANSLATED.iter().chain(NATIVE).copied().collect::<Vec<_>>();
+    let names = TRANSLATED.iter().chain(NATIVE).chain(MACROS).copied().collect::<Vec<_>>();
     let session = AnalysisSession::prepare_with_inline_functions(
         &scanner,
         &frontend,
@@ -127,6 +133,9 @@ fn translated_bodies_match_their_original_definitions() {
         match name.as_str() {
             "BODY_CALLER" => {
                 assert!(compact.contains("$crate::BODY_LEAF!(@__pgrx_emit_value;(@compiled"));
+            }
+            "BODY_SIZED_CALLER" | "BODY_SIZED_MACRO" => {
+                assert!(compact.contains("$crate::BODY_SIZED!(@__pgrx_emit_value;(@compiled"));
             }
             // Expanding a recursive translation would never terminate.
             "BODY_RECURSIVE" => {

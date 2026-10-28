@@ -1064,12 +1064,18 @@ recover readable calls only when equivalence is proved:
 
 A recovered bare/grouped formal forwards its existing argument descriptor.
 For a composite recovered argument, construct
-`(@compiled [value] [place] [read_place] [size])`: each bracket contains Rust
-*token source*, not a value computed during normalization. The callee selects
+`(@compiled [value] [place] [read_place] [size] [checks])`: each bracket contains
+Rust *token source*, not a value computed during normalization. The callee selects
 only the context demanded by its enclosing C operator. Unsupported alternatives
 contain a context-local `compile_error!`; discard evaluates the value alternative
 for effects and ignores its result. This preserves repeated substitutions,
-places, and unevaluated operands without creating eager temporaries.
+places, and unevaluated operands without creating eager temporaries. A `sizeof`
+witness wraps generated operations in `unsafe`, so it also expands dead checks of
+each caller operand; for a compiled argument those are the checks bracket, the
+producing macro's own checks of its caller operands. They are always well typed
+and do not depend on whether any alternative could be rendered. A call to a
+translated inline function passes the same descriptor with only a value
+alternative.
 
 ```text
  BUFFERALIGN(LEN) --> TYPEALIGN(ALIGNOF_BUFFER, (LEN))

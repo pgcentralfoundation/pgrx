@@ -67,6 +67,12 @@ fn main() {
         // the Witness is dropped.
         BODY_MARK!(MARK.as_ptr(), Witness(0).as_ptr()).get();
         println!("mark\t{}", SEEN.load(SeqCst));
+        println!(
+            "sized\t{}\t{}\t{}",
+            BODY_SIZED!(1_i32).get(),
+            BODY_SIZED_CALLER!(1_i32).get(),
+            BODY_SIZED_MACRO!(3_i32).get()
+        );
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

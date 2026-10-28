@@ -59,3 +59,12 @@ static inline void BODY_MARK(int *out, const int *witness)
 {
 	*out = 7;
 }
+/* A translated callee whose sizeof checks its argument's safety. */
+static inline int BODY_SIZED(int value)
+{
+	int local = value;
+
+	return (int) sizeof(local) + local;
+}
+static inline int BODY_SIZED_CALLER(int value) { return BODY_SIZED(value + 1); }
+#define BODY_SIZED_MACRO(value) BODY_SIZED(value)
