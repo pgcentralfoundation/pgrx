@@ -41,12 +41,8 @@ pub fn item_pointer_to_u64(ctid: pg_sys::ItemPointerData) -> u64 {
 /// Deconstruct a `u64` into an otherwise uninitialized `ItemPointerData` struct
 #[inline]
 pub fn u64_to_item_pointer(value: u64, tid: &mut pg_sys::ItemPointerData) {
-    let blockno = (value >> 32) as pg_sys::BlockNumber;
-    let offno = value as pg_sys::OffsetNumber;
-    // SAFETY: the exclusive reference provides aligned writable ItemPointerData storage.
-    unsafe {
-        pg_sys::ItemPointerSet!(&raw mut *tid, blockno, offno).get();
-    }
+    let (blockno, offno) = u64_to_item_pointer_parts(value);
+    *tid = item_pointer(blockno, offno);
 }
 
 #[inline]
@@ -56,16 +52,36 @@ pub fn u64_to_item_pointer_parts(value: u64) -> (pg_sys::BlockNumber, pg_sys::Of
     (blockno, offno)
 }
 
+/// Build an item pointer with the stores PostgreSQL's `ItemPointerSet` performs.
+///
+/// PG15 defines `ItemPointerSet` and `BlockIdSet` as macros and PG16-19 as static
+/// inline functions, with the same stores in every version:
+/// `bi_hi = blockNumber >> 16`, `bi_lo = blockNumber & 0xffff`, and `ip_posid = offNum`.
+/// The generated `ItemPointerSet!` is a guarded native call on some of those versions,
+/// which would make these safe helpers call into PostgreSQL and panic off the backend
+/// thread, so they build the fields in Rust.
+#[inline]
+fn item_pointer(
+    blockno: pg_sys::BlockNumber,
+    offno: pg_sys::OffsetNumber,
+) -> pg_sys::ItemPointerData {
+    pg_sys::ItemPointerData {
+        ip_blkid: pg_sys::BlockIdData { bi_hi: (blockno >> 16) as u16, bi_lo: blockno as u16 },
+        ip_posid: offno,
+    }
+}
+
 /// Allocate an initialized item pointer in the current PostgreSQL memory context.
 #[inline]
 pub fn new_item_pointer(
     blockno: pg_sys::BlockNumber,
     offno: pg_sys::OffsetNumber,
 ) -> PgBox<pg_sys::ItemPointerData, AllocatedByRust> {
-    // SAFETY: PgBox allocates aligned storage for ItemPointerData; ItemPointerSet initializes all fields.
+    // SAFETY: PgBox::alloc returns live storage aligned for ItemPointerData, and the
+    // raw write initializes all of it without reading the uninitialized bytes.
     unsafe {
         let tid = PgBox::<pg_sys::ItemPointerData>::alloc();
-        pg_sys::ItemPointerSet!(tid.as_ptr(), blockno, offno).get();
+        tid.as_ptr().write(item_pointer(blockno, offno));
         tid
     }
 }
@@ -80,13 +96,10 @@ impl FromDatum for pg_sys::ItemPointerData {
         if is_null {
             None
         } else {
-            // SAFETY: FromDatum's caller provides an initialized ItemPointerData datum.
-            unsafe {
-                let tid = datum.cast_mut_ptr::<pg_sys::ItemPointerData>();
-                let mut tid_copy = pg_sys::ItemPointerData::default();
-                pg_sys::ItemPointerCopy!(tid, &raw mut tid_copy).get();
-                Some(tid_copy)
-            }
+            // SAFETY: FromDatum's caller provides a datum pointing to an initialized
+            // ItemPointerData, which PostgreSQL aligns as `tid` (typalign 's'). The copy
+            // is the struct assignment that PostgreSQL's ItemPointerCopy performs.
+            Some(unsafe { datum.cast_mut_ptr::<pg_sys::ItemPointerData>().read() })
         }
     }
 }
@@ -94,20 +107,37 @@ impl FromDatum for pg_sys::ItemPointerData {
 impl IntoDatum for pg_sys::ItemPointerData {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let tid = self;
         let tid_ptr = unsafe {
             // SAFETY:  CurrentMemoryContext is always valid
             PgMemoryContexts::CurrentMemoryContext.palloc_struct::<pg_sys::ItemPointerData>()
         };
-        // SAFETY: tid is initialized; tid_ptr has aligned writable PostgreSQL allocation bounds.
-        unsafe {
-            pg_sys::ItemPointerCopy!(&raw const tid, tid_ptr).get();
-        }
+        // SAFETY: palloc_struct returns live storage aligned for ItemPointerData; writing the
+        // initialized value is the struct assignment that PostgreSQL's ItemPointerCopy performs.
+        unsafe { tid_ptr.write(self) };
 
         Some(tid_ptr.into())
     }
 
     fn type_oid() -> pg_sys::Oid {
         pg_sys::TIDOID
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn u64_item_pointer_round_trip_needs_no_backend_thread() {
+        let convert = |value: u64| {
+            let mut tid = pg_sys::ItemPointerData::default();
+            u64_to_item_pointer(value, &mut tid);
+            (item_pointer_get_both(tid), item_pointer_to_u64(tid))
+        };
+        let value = (0x1234_5678_u64 << 32) | 0x9abc;
+        assert_eq!(convert(value), ((0x1234_5678, 0x9abc), value));
+        // Guarded native calls panic on any thread but the first one that used them.
+        let other = std::thread::spawn(move || convert(value)).join().unwrap();
+        assert_eq!(other, ((0x1234_5678, 0x9abc), value));
     }
 }
