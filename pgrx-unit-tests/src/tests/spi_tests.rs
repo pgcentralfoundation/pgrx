@@ -443,6 +443,22 @@ mod tests {
         assert!(Spi::get_one::<i32>("SELECT NULL::integer").unwrap().is_none());
     }
 
+    /// PostgreSQL sign-extends a 4-byte value it reads from a tuple into a Datum, so an xid of
+    /// 2^31 or more has its high bits set there, but not when an array element is read.
+    #[pg_test]
+    fn test_xid_above_2_pow_31() -> Result<(), spi::Error> {
+        let xid = pg_sys::TransactionId::from_inner(3_000_000_000);
+        assert_eq!(Spi::get_one::<pg_sys::TransactionId>("SELECT '3000000000'::xid")?, Some(xid));
+        let array =
+            Spi::get_one::<pgrx::AnyArray>("SELECT ARRAY['3000000000'::xid]")?.expect("NULL array");
+        let elements = (&array)
+            .into_iter()
+            .map(|element| element.expect("NULL element").value::<pg_sys::TransactionId>())
+            .collect::<Result<Vec<_>, _>>()?;
+        assert_eq!(elements, vec![Some(xid)]);
+        Ok(())
+    }
+
     #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
     fn test_readwrite_in_readonly() -> Result<(), spi::Error> {
         // This is supposed to run in read-only

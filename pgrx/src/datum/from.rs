@@ -258,7 +258,18 @@ impl FromDatum for pg_sys::TransactionId {
         is_null: bool,
         _typoid: pg_sys::Oid,
     ) -> Option<Self> {
-        if is_null { None } else { datum.value().try_into().ok().map(Self::from_inner) }
+        if is_null {
+            None
+        } else {
+            // A Datum read from a tuple holds the xid sign-extended, and one from
+            // TransactionIdGetDatum holds it zero-extended; both keep it in the low 32 bits.
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
+            let value = unsafe { pg_sys::DatumGetTransactionId!(datum).get() };
+            Some(Self::from_inner(value))
+        }
     }
 }
 
