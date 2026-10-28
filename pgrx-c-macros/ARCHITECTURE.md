@@ -1475,9 +1475,13 @@ reuse facts solely because the major-version number is unchanged.
 There is no persistent disk cache of semantic analysis results. Cargo avoids
 rerunning an unchanged build script; sessions reuse their immutable phase facts,
 indexes, and batched observations. Stable writes compare final formatted bytes
-on a rerun. Track an absent optional path through its nearest existing parent
-so a missing file does not make every build dirty and its later creation is
-still detected.
+on a rerun. Track an absent file through its parent directory so a missing file
+does not make every build dirty and its later creation is still detected. Do
+not climb past a missing parent: the nearest existing ancestor of an absent
+`PATH` root can be `$HOME` or `/`, which Cargo would scan recursively or which
+contains OUT_DIR. The environment values that named such a candidate remain
+tracked instead. An absent include search directory is still tracked through
+its nearest existing ancestor.
 
 Unavailable inspection paths produce an explicit unavailable report and a
 compilable macro index whose classifier answers every availability query as absent.

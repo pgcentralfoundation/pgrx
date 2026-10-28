@@ -1802,9 +1802,15 @@ fn macro_watch_directories(
             let parent = file
                 .parent()
                 .ok_or_else(|| eyre!("absent C macro input {} has no parent", file.display()))?;
-            // Cargo marks a missing file perpetually dirty. Watch its nearest
-            // existing parent so creation still invalidates the inspected profile.
-            watch_input_directory(&mut watched, parent, &out_dirs)?;
+            // Cargo marks a missing file perpetually dirty. Watch its parent so
+            // creation still invalidates the inspected profile. Do not climb past
+            // a missing parent: absent PATH roots and libclang-adjacent bin
+            // directories would otherwise watch $HOME, /usr/lib or / recursively,
+            // or overlap OUT_DIR. PATH, CLANG_PATH and LIBCLANG_PATH remain
+            // tracked environment inputs for the lookups that named them.
+            if parent.is_dir() {
+                watch_input_directory(&mut watched, parent, &out_dirs)?;
+            }
         }
     }
     for directory in &inputs.executable_search_directories {
@@ -2722,12 +2728,12 @@ macro_rules! EXAMPLE {
         let paths = macro_rerun_paths(&inputs, &out_dir).unwrap();
         assert!(paths.contains(&present));
         assert!(!paths.contains(&missing), "Cargo must not receive a missing file directive");
-        assert!(paths.contains(&isolated_home));
-        assert!(paths.contains(&isolated_home.canonicalize().unwrap()));
+        assert!(!paths.contains(&isolated_home), "a missing parent is not escalated");
         let nested = isolated_home.join("nested");
         fs::create_dir(&nested).unwrap();
         let paths = macro_rerun_paths(&inputs, &out_dir).unwrap();
-        assert!(paths.contains(&nested), "newly available parents narrow the tracked root");
+        assert!(paths.contains(&nested), "an existing parent tracks the file's creation");
+        assert!(paths.contains(&nested.canonicalize().unwrap()));
         assert!(!paths.contains(&missing));
         let unsafe_missing = out_dir.join("missing.toml");
         let unsafe_inputs = BuildInputs {
@@ -2736,6 +2742,40 @@ macro_rules! EXAMPLE {
             ..BuildInputs::default()
         };
         assert!(macro_rerun_paths(&unsafe_inputs, &out_dir).is_err());
+    }
+
+    /// Compiler lookup records every absent PATH and libclang-adjacent candidate. A candidate
+    /// under a missing directory must not escalate to a broad existing ancestor: that would
+    /// refuse a project below `$HOME` because the ancestor contains OUT_DIR, or watch `$HOME`
+    /// or `/usr/lib` recursively on every build.
+    #[test]
+    fn absent_candidates_under_missing_directories_do_not_watch_ancestors() {
+        let directory = TemporaryDirectory::new();
+        let home = directory.0.join("home");
+        let out_dir = home.join("extension/target/debug/build/pg-sys/out");
+        fs::create_dir_all(&out_dir).unwrap();
+        let library_dir = directory.0.join("usr/lib");
+        fs::create_dir_all(&library_dir).unwrap();
+        let path_candidate = home.join("go/bin/clang-18");
+        let adjacent_candidate = library_dir.join("bin/clang");
+        let inputs = BuildInputs {
+            files: vec![path_candidate.clone(), adjacent_candidate.clone()],
+            fingerprints: BTreeMap::from([
+                (path_candidate.clone(), None),
+                (adjacent_candidate.clone(), None),
+            ]),
+            ..BuildInputs::default()
+        };
+        let watched = macro_watch_directories(&inputs, &out_dir).unwrap();
+        assert!(!watched.contains(&home), "an ancestor containing OUT_DIR is not an input");
+        assert!(!watched.contains(&library_dir), "a missing bin directory cannot watch lib");
+        assert!(watched.is_empty(), "{watched:?}");
+
+        let path_root = path_candidate.parent().unwrap();
+        fs::create_dir_all(path_root).unwrap();
+        let watched = macro_watch_directories(&inputs, &out_dir).unwrap();
+        assert!(watched.contains(path_root), "an existing parent detects candidate creation");
+        assert!(!watched.contains(&home));
     }
 
     /// Checks that missing search directories watch creation without tracking cargo outputs.
