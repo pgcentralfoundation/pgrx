@@ -973,7 +973,8 @@ mod tests {
         let scritches = NonZeroUsize::new(2).unwrap();
         // SAFETY: `borrowed` views the live Dog row that `tupdesc` describes.
         let attr = unsafe { pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc) };
-        assert_eq!(attr.into_value::<i32>(), 3);
+        // SAFETY: `attr` is the non-NULL int4 `scritches` of the live row.
+        assert_eq!(unsafe { attr.into_value::<i32>() }, 3);
 
         let past_end = NonZeroUsize::new(3).unwrap();
         // SAFETY: as above; the attribute number is checked against `tupdesc`.

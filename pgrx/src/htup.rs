@@ -266,9 +266,26 @@ pub struct DatumWithTypeInfo {
 }
 
 impl DatumWithTypeInfo {
+    /// Convert `datum` to `T`.
+    ///
+    /// # Safety
+    ///
+    /// Unless `is_null` is true, `datum` must be a valid value of type `typoid`, and `T` must be
+    /// able to read it. A pass-by-reference value must still be live: one that
+    /// [`heap_getattr_datum_ex()`] returned can point into the tuple or, on PostgreSQL 15.0
+    /// through 15.4, into its descriptor, and is valid only while both are. `T` must not
+    /// outlive that memory. The call must run on the PostgreSQL backend thread.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `T` converts the value to `None`, which is how [`FromDatum`] reads a NULL.
     #[inline]
-    pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_polymorphic_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+    pub unsafe fn into_value<T: FromDatum>(self) -> T {
+        // SAFETY: the caller guarantees that a non-NULL `datum` is a live value of `typoid` that
+        // `T` can read, on the backend thread.
+        let value =
+            unsafe { T::from_polymorphic_datum(self.datum, self.is_null, self.typoid.value()) };
+        value.unwrap()
     }
 }
 
