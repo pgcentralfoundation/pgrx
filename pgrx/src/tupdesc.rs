@@ -231,8 +231,8 @@ impl<'a> PgTupleDesc<'a> {
         } else {
             let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
             // SAFETY: i is in bounds, and self keeps the descriptor alive for this borrow.
-            let attr = unsafe { pg_sys::TupleDescAttr!(tupdesc, i as i32).get() };
-            // SAFETY: TupleDescAttr returns the initialized in-bounds attribute in this descriptor.
+            let attr = unsafe { tupdesc_attr(tupdesc, i) };
+            // SAFETY: the address is the initialized in-bounds attribute in this descriptor.
             Some(unsafe { &*attr })
         }
     }
@@ -280,6 +280,56 @@ impl Drop for PgTupleDesc<'_> {
                 unsafe { pg_sys::pfree(tupdesc.as_ptr() as void_mut_ptr) }
             }
         }
+    }
+}
+
+/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
+///
+/// PG15-17 define `TupleDescAttr` as the macro `(&(tupdesc)->attrs[(i)])`, which translates to
+/// pure Rust.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[inline]
+pub(crate) unsafe fn tupdesc_attr(
+    tupdesc: pg_sys::TupleDesc,
+    i: usize,
+) -> *mut pg_sys::FormData_pg_attribute {
+    // SAFETY: the caller supplies a live descriptor and an index below natts, a C int.
+    unsafe { pg_sys::TupleDescAttr!(tupdesc, i as core::ffi::c_int).get() }
+}
+
+/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
+///
+/// PG18 and PG19 store the `FormData_pg_attribute` array after `natts` `CompactAttribute`s.
+/// Their static inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
+/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
+/// desc->natts * sizeof(CompactAttribute)`. The header undefines that macro right after the
+/// function, so the generated `TupleDescAttr!` is a guarded native call; this per-attribute
+/// lookup computes the address in Rust instead.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+#[inline]
+pub(crate) unsafe fn tupdesc_attr(
+    tupdesc: pg_sys::TupleDesc,
+    i: usize,
+) -> *mut pg_sys::FormData_pg_attribute {
+    // SAFETY: the caller supplies a live descriptor, whose allocation holds natts compact
+    // attributes followed by natts attributes, and an index below natts. The raw place
+    // projection keeps the descriptor's provenance for those trailing arrays.
+    unsafe {
+        let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
+        let attrs = core::ptr::addr_of_mut!((*tupdesc).compact_attrs)
+            .cast::<pg_sys::CompactAttribute>()
+            .add(natts)
+            .cast::<pg_sys::FormData_pg_attribute>();
+        debug_assert!(attrs.is_aligned());
+        attrs.add(i)
     }
 }
 
