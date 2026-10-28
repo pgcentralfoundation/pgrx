@@ -2,7 +2,7 @@
 // C macros from ps_status.h.
 
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function set_ps_display from ps_status.h:39 (PostgreSQL 16–19)
+/// C inline function set_ps_display from ps_status.h:39 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline void
@@ -13,7 +13,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -25,12 +25,10 @@
 #[macro_export]
 macro_rules! set_ps_display {
     ($activity:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$activity;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$activity;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

@@ -359,8 +359,7 @@ macro_rules! PAGE_IS_EMPTY {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro PAGE_NO_SPACE from gist_private.h:59 (PostgreSQL 15–17)
+/// C macro PAGE_NO_SPACE from gist_private.h:59 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define PAGE_NO_SPACE( nbp , itup ) ( PAGE_FREE_SPACE ( nbp ) < MAXALIGN ( IndexTupleSize ( itup ) ) )
@@ -374,39 +373,6 @@ macro_rules! PAGE_IS_EMPTY {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PAGE_NO_SPACE {
-    ($nbp:expr, $itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$nbp;
-                let _ = &$itup;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro PAGE_NO_SPACE from gist_private.h:59 (PostgreSQL 18–19)
-///
-/// ```text
-/// #define PAGE_NO_SPACE( nbp , itup ) ( PAGE_FREE_SPACE ( nbp ) < MAXALIGN ( IndexTupleSize ( itup ) ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PAGE_NO_SPACE {
     ($nbp:expr, $itup:expr $(,)?) => {

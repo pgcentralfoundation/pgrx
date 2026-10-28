@@ -35,8 +35,8 @@ macro_rules! ExpandedRecordGetDatum {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExpandedRecordGetDatum from expandedrecord.h:142 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function ExpandedRecordGetDatum from expandedrecord.h:142 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -47,7 +47,39 @@ macro_rules! ExpandedRecordGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExpandedRecordGetDatum {
+    ($erh:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function ExpandedRecordGetDatum from expandedrecord.h:142 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// ExpandedRecordGetDatum(const ExpandedRecordHeader *erh)
+/// {
+/// 	return EOHPGetRWDatum(&erh->hdr);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -62,13 +94,7 @@ macro_rules! ExpandedRecordGetDatum {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$erh;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };
@@ -107,8 +133,8 @@ macro_rules! ExpandedRecordGetRODatum {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExpandedRecordGetRODatum from expandedrecord.h:148 (PostgreSQL 16–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function ExpandedRecordGetRODatum from expandedrecord.h:148 (PostgreSQL 16–18)
 ///
 /// ```c
 /// static inline Datum
@@ -119,7 +145,39 @@ macro_rules! ExpandedRecordGetRODatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! ExpandedRecordGetRODatum {
+    ($erh:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function ExpandedRecordGetRODatum from expandedrecord.h:148 (PostgreSQL 19)
+///
+/// ```c
+/// static inline Datum
+/// ExpandedRecordGetRODatum(const ExpandedRecordHeader *erh)
+/// {
+/// 	return EOHPGetRODatum(&erh->hdr);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -134,13 +192,7 @@ macro_rules! ExpandedRecordGetRODatum {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$erh;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };
@@ -235,8 +287,8 @@ macro_rules! PG_GETARG_EXPANDED_RECORD {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro PG_RETURN_EXPANDED_RECORD from expandedrecord.h:145 (PostgreSQL 15)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro PG_RETURN_EXPANDED_RECORD from expandedrecord.h:145 (PostgreSQL 15), expandedrecord.h:155 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define PG_RETURN_EXPANDED_RECORD( x ) PG_RETURN_DATUM ( ExpandedRecordGetDatum ( x ) )
@@ -261,8 +313,8 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_EXPANDED_RECORD from expandedrecord.h:155 (PostgreSQL 16–19)
+#[cfg(feature = "pg19")]
+/// C macro PG_RETURN_EXPANDED_RECORD from expandedrecord.h:155 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PG_RETURN_EXPANDED_RECORD( x ) PG_RETURN_DATUM ( ExpandedRecordGetDatum ( x ) )
@@ -313,7 +365,7 @@ macro_rules! TransferExpandedRecord {
         )
     };
 }
-/// Typed call adapter for C inline function expanded_record_get_field from expandedrecord.h:217 (PostgreSQL 15), expandedrecord.h:227 (PostgreSQL 16–19)
+/// C inline function expanded_record_get_field from expandedrecord.h:217 (PostgreSQL 15), expandedrecord.h:227 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -332,7 +384,7 @@ macro_rules! TransferExpandedRecord {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -340,7 +392,7 @@ macro_rules! TransferExpandedRecord {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! expanded_record_get_field {
     ($erh:expr, $fnumber:expr, $isnull:expr $(,)?) => {
@@ -349,18 +401,13 @@ macro_rules! expanded_record_get_field {
                 let _ = &$erh;
                 let _ = &$fnumber;
                 let _ = &$isnull;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function expanded_record_get_tupdesc from expandedrecord.h:207 (PostgreSQL 15), expandedrecord.h:217 (PostgreSQL 16–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function expanded_record_get_tupdesc from expandedrecord.h:207 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TupleDesc
@@ -398,6 +445,47 @@ macro_rules! expanded_record_get_tupdesc {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function expanded_record_get_tupdesc from expandedrecord.h:217 (PostgreSQL 16–19)
+///
+/// ```c
+/// static inline TupleDesc
+/// expanded_record_get_tupdesc(ExpandedRecordHeader *erh)
+/// {
+/// 	if (likely(erh->er_tupdesc != NULL))
+/// 		return erh->er_tupdesc;
+/// 	else
+/// 		return expanded_record_fetch_tupdesc(erh);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! expanded_record_get_tupdesc {
+    ($erh:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TupleDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };

@@ -156,7 +156,7 @@ macro_rules! GinCategoryOffset {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinCategoryOffset {
     ($itup:expr, $ginstate:expr $(,)?) => {
@@ -273,8 +273,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinDataLeafPageGetPostingList from ginblock.h:279 (PostgreSQL 15)
+/// C macro GinDataLeafPageGetPostingList from ginblock.h:279 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinDataLeafPageGetPostingList( page ) ( GinPostingList * ) ( ( PageGetContents ( page ) + MAXALIGN ( sizeof ( ItemPointerData ) ) ) )
@@ -290,42 +289,6 @@ macro_rules! GinDataLeafPageGetFreeSpace {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinDataLeafPageGetPostingList {
-    (@__pgrx_c_expression; $page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::GinPostingList
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinDataLeafPageGetPostingList from ginblock.h:279 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinDataLeafPageGetPostingList( page ) ( GinPostingList * ) ( ( PageGetContents ( page ) + MAXALIGN ( sizeof ( ItemPointerData ) ) ) )
-/// ```
-///
-///
-/// Call as `GinDataLeafPageGetPostingList!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `(GinDataLeafPageGetPostingList(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataLeafPageGetPostingList {
     (@__pgrx_c_expression; $page:expr $(,)?) => {
@@ -928,7 +891,7 @@ macro_rules! GinDataPageGetData {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataPageGetData {
     ($page:expr $(,)?) => {
@@ -1036,8 +999,7 @@ macro_rules! GinDataPageGetData {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinDataPageGetPostingItem from ginblock.h:299 (PostgreSQL 15)
+/// C macro GinDataPageGetPostingItem from ginblock.h:299 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinDataPageGetPostingItem( page , i ) ( ( PostingItem * ) ( GinDataPageGetData ( page ) + ( ( i ) - 1 ) * sizeof ( PostingItem ) ) )
@@ -1073,45 +1035,7 @@ macro_rules! GinDataPageGetPostingItem {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinDataPageGetPostingItem from ginblock.h:299 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinDataPageGetPostingItem( page , i ) ( ( PostingItem * ) ( GinDataPageGetData ( page ) + ( ( i ) - 1 ) * sizeof ( PostingItem ) ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinDataPageGetPostingItem {
-    ($page:expr, $i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                let _ = &$i;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::PostingItem
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro GinDataPageGetRightBound from ginblock.h:289 (PostgreSQL 15)
+/// C macro GinDataPageGetRightBound from ginblock.h:289 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinDataPageGetRightBound( page ) ( ( ItemPointer ) PageGetContents ( page ) )
@@ -1125,42 +1049,6 @@ macro_rules! GinDataPageGetPostingItem {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinDataPageGetRightBound {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::ItemPointerData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinDataPageGetRightBound from ginblock.h:289 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinDataPageGetRightBound( page ) ( ( ItemPointer ) PageGetContents ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinDataPageGetRightBound {
     ($page:expr $(,)?) => {
@@ -1297,7 +1185,7 @@ macro_rules! GinGetDownlink {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetDownlink {
     ($itup:expr $(,)?) => {
@@ -1390,10 +1278,6 @@ macro_rules! GinGetNPosting {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetNPosting {
     ($itup:expr $(,)?) => {
@@ -1411,8 +1295,7 @@ macro_rules! GinGetNPosting {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinGetNullCategory from ginblock.h:221 (PostgreSQL 15)
+/// C macro GinGetNullCategory from ginblock.h:221 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinGetNullCategory( itup , ginstate ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) )
@@ -1452,49 +1335,8 @@ macro_rules! GinGetNullCategory {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinGetNullCategory from ginblock.h:221 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinGetNullCategory( itup , ginstate ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinGetNullCategory {
-    ($itup:expr, $ginstate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                let _ = &$ginstate;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::dereference(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::CSignedChar,
-                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>()
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro GinGetPosting from ginblock.h:239 (PostgreSQL 15)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro GinGetPosting from ginblock.h:239 (PostgreSQL 15–18)
 ///
 /// ```text
 /// #define GinGetPosting( itup ) ( ( Pointer ) ( ( char * ) ( itup ) + GinGetPostingOffset ( itup ) ) )
@@ -1508,43 +1350,6 @@ macro_rules! GinGetNullCategory {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinGetPosting {
-    ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CChar,
-                                    ::core::ffi::c_char
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro GinGetPosting from ginblock.h:239 (PostgreSQL 16–18)
-///
-/// ```text
-/// #define GinGetPosting( itup ) ( ( Pointer ) ( ( char * ) ( itup ) + GinGetPostingOffset ( itup ) ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPosting {
     ($itup:expr $(,)?) => {
@@ -1581,7 +1386,7 @@ macro_rules! GinGetPosting {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPosting {
     ($itup:expr $(,)?) => {
@@ -1716,7 +1521,7 @@ macro_rules! GinGetPostingOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPostingOffset {
     ($itup:expr $(,)?) => {
@@ -1846,7 +1651,7 @@ macro_rules! GinGetPostingTree {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinGetPostingTree {
     ($itup:expr $(,)?) => {
@@ -1864,8 +1669,7 @@ macro_rules! GinGetPostingTree {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinIsPostingTree from ginblock.h:232 (PostgreSQL 15)
+/// C macro GinIsPostingTree from ginblock.h:232 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinIsPostingTree( itup ) ( GinGetNPosting ( itup ) == GIN_TREE_POSTING )
@@ -1875,38 +1679,6 @@ macro_rules! GinGetPostingTree {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! GinIsPostingTree {
-    ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinIsPostingTree from ginblock.h:232 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinIsPostingTree( itup ) ( GinGetNPosting ( itup ) == GIN_TREE_POSTING )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinIsPostingTree {
     ($itup:expr $(,)?) => {
@@ -2014,7 +1786,7 @@ macro_rules! GinItemPointerGetBlockNumber {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinItemPointerGetBlockNumber {
     ($pointer:expr $(,)?) => {
@@ -2090,10 +1862,6 @@ macro_rules! GinItemPointerGetOffsetNumber {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinItemPointerGetOffsetNumber {
     ($pointer:expr $(,)?) => {
@@ -2354,8 +2122,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinItupIsCompressed from ginblock.h:240 (PostgreSQL 15)
+/// C macro GinItupIsCompressed from ginblock.h:240 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinItupIsCompressed( itup ) ( ( GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid ) & GIN_ITUP_COMPRESSED ) != 0 )
@@ -2369,38 +2136,6 @@ macro_rules! GinItemPointerSetOffsetNumber {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinItupIsCompressed {
-    ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinItupIsCompressed from ginblock.h:240 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinItupIsCompressed( itup ) ( ( GinItemPointerGetBlockNumber ( & ( itup ) -> t_tid ) & GIN_ITUP_COMPRESSED ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinItupIsCompressed {
     ($itup:expr $(,)?) => {
@@ -3221,8 +2956,7 @@ macro_rules! GinPageGetDeleteXid {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinPageGetMeta from ginblock.h:105 (PostgreSQL 15)
+/// C macro GinPageGetMeta from ginblock.h:105 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinPageGetMeta( p ) ( ( GinMetaPageData * ) PageGetContents ( p ) )
@@ -3236,42 +2970,6 @@ macro_rules! GinPageGetDeleteXid {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageGetMeta {
-    ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$p;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::GinMetaPageData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinPageGetMeta from ginblock.h:105 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinPageGetMeta( p ) ( ( GinMetaPageData * ) PageGetContents ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinPageGetMeta {
     ($p:expr $(,)?) => {
@@ -3329,44 +3027,8 @@ macro_rules! GinPageGetOpaque {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageGetOpaque from ginblock.h:111 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageGetOpaque( page ) ( ( GinPageOpaque ) PageGetSpecialPointer ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageGetOpaque {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageGetOpaque from ginblock.h:111 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageGetOpaque from ginblock.h:111 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageGetOpaque( page ) ( ( GinPageOpaque ) PageGetSpecialPointer ( page ) )
@@ -3433,40 +3095,8 @@ macro_rules! GinPageHasFullRow {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageHasFullRow from ginblock.h:120 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageHasFullRow( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LIST_FULLROW ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageHasFullRow {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageHasFullRow from ginblock.h:120 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageHasFullRow from ginblock.h:120 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageHasFullRow( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LIST_FULLROW ) != 0 )
@@ -3529,40 +3159,8 @@ macro_rules! GinPageIsCompressed {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsCompressed from ginblock.h:122 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsCompressed( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_COMPRESSED ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsCompressed {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsCompressed from ginblock.h:122 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsCompressed from ginblock.h:122 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsCompressed( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_COMPRESSED ) != 0 )
@@ -3625,40 +3223,8 @@ macro_rules! GinPageIsData {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsData from ginblock.h:116 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsData( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_DATA ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsData {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsData from ginblock.h:116 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsData from ginblock.h:116 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsData( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_DATA ) != 0 )
@@ -3721,40 +3287,8 @@ macro_rules! GinPageIsDeleted {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsDeleted from ginblock.h:125 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsDeleted( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_DELETED ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsDeleted from ginblock.h:125 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsDeleted from ginblock.h:125 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsDeleted( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_DELETED ) != 0 )
@@ -3817,40 +3351,8 @@ macro_rules! GinPageIsIncompleteSplit {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsIncompleteSplit from ginblock.h:128 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsIncompleteSplit( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_INCOMPLETE_SPLIT ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsIncompleteSplit {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsIncompleteSplit from ginblock.h:128 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsIncompleteSplit from ginblock.h:128 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsIncompleteSplit( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_INCOMPLETE_SPLIT ) != 0 )
@@ -3913,40 +3415,8 @@ macro_rules! GinPageIsLeaf {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsLeaf from ginblock.h:113 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsLeaf( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LEAF ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsLeaf {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsLeaf from ginblock.h:113 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsLeaf from ginblock.h:113 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsLeaf( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LEAF ) != 0 )
@@ -4009,40 +3479,8 @@ macro_rules! GinPageIsList {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageIsList from ginblock.h:118 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageIsList( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LIST ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageIsList {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageIsList from ginblock.h:118 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageIsList from ginblock.h:118 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageIsList( page ) ( ( GinPageGetOpaque ( page ) -> flags & GIN_LIST ) != 0 )
@@ -4105,40 +3543,8 @@ macro_rules! GinPageRightMost {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageRightMost from ginblock.h:130 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageRightMost( page ) ( GinPageGetOpaque ( page ) -> rightlink == InvalidBlockNumber )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageRightMost {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageRightMost from ginblock.h:130 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageRightMost from ginblock.h:130 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageRightMost( page ) ( GinPageGetOpaque ( page ) -> rightlink == InvalidBlockNumber )
@@ -4232,71 +3638,8 @@ macro_rules! GinPageSetCompressed {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetCompressed from ginblock.h:123 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetCompressed( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_COMPRESSED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetCompressed {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetCompressed from ginblock.h:123 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetCompressed from ginblock.h:123 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetCompressed( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_COMPRESSED )
@@ -4421,71 +3764,8 @@ macro_rules! GinPageSetData {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetData from ginblock.h:117 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetData( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_DATA )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetData {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_DATA as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetData from ginblock.h:117 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetData from ginblock.h:117 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetData( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_DATA )
@@ -4665,71 +3945,8 @@ macro_rules! GinPageSetDeleted {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetDeleted from ginblock.h:126 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetDeleted( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_DELETED as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetDeleted from ginblock.h:126 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetDeleted from ginblock.h:126 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetDeleted( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_DELETED )
@@ -4854,71 +4071,8 @@ macro_rules! GinPageSetFullRow {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetFullRow from ginblock.h:121 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetFullRow( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LIST_FULLROW )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetFullRow {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetFullRow from ginblock.h:121 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetFullRow from ginblock.h:121 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetFullRow( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LIST_FULLROW )
@@ -5043,71 +4197,8 @@ macro_rules! GinPageSetLeaf {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetLeaf from ginblock.h:114 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetLeaf( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LEAF )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetLeaf {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_LEAF as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetLeaf from ginblock.h:114 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetLeaf from ginblock.h:114 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetLeaf( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LEAF )
@@ -5232,71 +4323,8 @@ macro_rules! GinPageSetList {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetList from ginblock.h:119 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetList( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LIST )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetList {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::GIN_LIST as i32
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetList from ginblock.h:119 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetList from ginblock.h:119 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetList( page ) ( GinPageGetOpaque ( page ) -> flags |= GIN_LIST )
@@ -5425,75 +4453,8 @@ macro_rules! GinPageSetNonDeleted {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetNonDeleted from ginblock.h:127 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetNonDeleted( page ) ( GinPageGetOpaque ( page ) -> flags &= ~ GIN_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetNonDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::__pgrx_c_bindings::GIN_DELETED as i32)
-                                    )
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetNonDeleted from ginblock.h:127 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetNonDeleted from ginblock.h:127 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetNonDeleted( page ) ( GinPageGetOpaque ( page ) -> flags &= ~ GIN_DELETED )
@@ -5626,75 +4587,8 @@ macro_rules! GinPageSetNonLeaf {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro GinPageSetNonLeaf from ginblock.h:115 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define GinPageSetNonLeaf( page ) ( GinPageGetOpaque ( page ) -> flags &= ~ GIN_LEAF )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinPageSetNonLeaf {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::modify(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >>()
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::__pgrx_c_bindings::GIN_LEAF as i32)
-                                    )
-                                )
-                            ),
-                            |__pgrx_old,
-                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
-                                __pgrx_old,
-                                __pgrx_rhs
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro GinPageSetNonLeaf from ginblock.h:115 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro GinPageSetNonLeaf from ginblock.h:115 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define GinPageSetNonLeaf( page ) ( GinPageGetOpaque ( page ) -> flags &= ~ GIN_LEAF )
@@ -5970,8 +4864,7 @@ macro_rules! GinSetNPosting {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro GinSetNullCategory from ginblock.h:223 (PostgreSQL 15)
+/// C macro GinSetNullCategory from ginblock.h:223 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define GinSetNullCategory( itup , ginstate , c ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) = ( c ) )
@@ -5985,54 +4878,6 @@ macro_rules! GinSetNPosting {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GinSetNullCategory {
-    ($itup:expr, $ginstate:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$itup;
-                let _ = &$ginstate;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::assign(
-                            $crate::__pgrx_c_macros::expression::pointee(
-                                (
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::type_witness::<
-                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::CSignedChar,
-                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                            >>()
-                                    )
-                                )
-                            ),
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$c]))
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro GinSetNullCategory from ginblock.h:223 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define GinSetNullCategory( itup , ginstate , c ) ( * ( ( GinNullCategory * ) ( ( char * ) ( itup ) + GinCategoryOffset ( itup , ginstate ) ) ) = ( c ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GinSetNullCategory {
     ($itup:expr, $ginstate:expr, $c:expr $(,)?) => {
@@ -6414,8 +5259,7 @@ macro_rules! GinSetPostingTree {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro ItemPointerIsLossyPage from ginblock.h:176 (PostgreSQL 15)
+/// C macro ItemPointerIsLossyPage from ginblock.h:176 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define ItemPointerIsLossyPage( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0xffff && GinItemPointerGetBlockNumber ( p ) != InvalidBlockNumber )
@@ -6446,40 +5290,7 @@ macro_rules! ItemPointerIsLossyPage {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro ItemPointerIsLossyPage from ginblock.h:176 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define ItemPointerIsLossyPage( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0xffff && GinItemPointerGetBlockNumber ( p ) != InvalidBlockNumber )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! ItemPointerIsLossyPage {
-    ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$p;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro ItemPointerIsMin from ginblock.h:169 (PostgreSQL 15)
+/// C macro ItemPointerIsMin from ginblock.h:169 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define ItemPointerIsMin( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0 && GinItemPointerGetBlockNumber ( p ) == ( BlockNumber ) 0 )
@@ -6493,38 +5304,6 @@ macro_rules! ItemPointerIsLossyPage {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! ItemPointerIsMin {
-    ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$p;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro ItemPointerIsMin from ginblock.h:169 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define ItemPointerIsMin( p ) ( GinItemPointerGetOffsetNumber ( p ) == ( OffsetNumber ) 0 && GinItemPointerGetBlockNumber ( p ) == ( BlockNumber ) 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ItemPointerIsMin {
     ($p:expr $(,)?) => {
@@ -6887,7 +5666,7 @@ macro_rules! PostingItemGetBlockNumber {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PostingItemGetBlockNumber {
     ($pointer:expr $(,)?) => {
@@ -7014,7 +5793,7 @@ macro_rules! PostingItemSetBlockNumber {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PostingItemSetBlockNumber {
     ($pointer:expr, $blockNumber:expr $(,)?) => {

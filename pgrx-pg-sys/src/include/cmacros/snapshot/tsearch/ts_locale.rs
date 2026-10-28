@@ -72,7 +72,7 @@ macro_rules! t_iseq {
         )
     };
 }
-/// Typed call adapter for C inline function ts_copychar_cstr from ts_locale.h:57 (PostgreSQL 15), ts_locale.h:49 (PostgreSQL 16–19)
+/// C inline function ts_copychar_cstr from ts_locale.h:57 (PostgreSQL 15), ts_locale.h:49 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline int
@@ -83,7 +83,7 @@ macro_rules! t_iseq {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -91,7 +91,7 @@ macro_rules! t_iseq {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ts_copychar_cstr {
     ($dest:expr, $src:expr $(,)?) => {
@@ -99,16 +99,12 @@ macro_rules! ts_copychar_cstr {
             @value {
                 let _ = &$dest;
                 let _ = &$src;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function ts_copychar_with_len from ts_locale.h:49 (PostgreSQL 15), ts_locale.h:41 (PostgreSQL 16–19)
+/// C inline function ts_copychar_with_len from ts_locale.h:49 (PostgreSQL 15), ts_locale.h:41 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline int
@@ -120,7 +116,7 @@ macro_rules! ts_copychar_cstr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -137,11 +133,7 @@ macro_rules! ts_copychar_with_len {
                 let _ = &$dest;
                 let _ = &$src;
                 let _ = &$length;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };

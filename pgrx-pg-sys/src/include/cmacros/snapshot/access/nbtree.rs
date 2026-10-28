@@ -501,7 +501,7 @@ macro_rules! BTMaxItemSize {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTMaxItemSize {
     ($page:expr $(,)?) => {
@@ -632,8 +632,8 @@ macro_rules! BTMaxItemSize {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro BTMaxItemSizeNoHeapTid from nbtree.h:170 (PostgreSQL 15)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+/// C macro BTMaxItemSizeNoHeapTid from nbtree.h:170 (PostgreSQL 15), nbtree.h:169 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define BTMaxItemSizeNoHeapTid( page ) MAXALIGN_DOWN ( ( PageGetPageSize ( page ) - MAXALIGN ( SizeOfPageHeaderData + 3 * sizeof ( ItemIdData ) ) - MAXALIGN ( sizeof ( BTPageOpaqueData ) ) ) / 3 )
@@ -647,58 +647,6 @@ macro_rules! BTMaxItemSize {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTMaxItemSizeNoHeapTid {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
-                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                        $crate::__pgrx_c_types::uintptr_t
-                                    >()
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            false,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_types::uintptr_t
-                                            >()
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro BTMaxItemSizeNoHeapTid from nbtree.h:169 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define BTMaxItemSizeNoHeapTid( page ) MAXALIGN_DOWN ( ( PageGetPageSize ( page ) - MAXALIGN ( SizeOfPageHeaderData + 3 * sizeof ( ItemIdData ) ) - MAXALIGN ( sizeof ( BTPageOpaqueData ) ) ) / 3 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTMaxItemSizeNoHeapTid {
     ($page:expr $(,)?) => {
@@ -838,8 +786,7 @@ macro_rules! BTPageGetDeleteXid {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro BTPageGetMeta from nbtree.h:121 (PostgreSQL 15)
+/// C macro BTPageGetMeta from nbtree.h:121 (PostgreSQL 15–17), nbtree.h:122 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTPageGetMeta( p ) ( ( BTMetaPageData * ) PageGetContents ( p ) )
@@ -853,42 +800,6 @@ macro_rules! BTPageGetDeleteXid {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTPageGetMeta {
-    ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$p;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::BTMetaPageData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro BTPageGetMeta from nbtree.h:121 (PostgreSQL 16–17), nbtree.h:122 (PostgreSQL 18–19)
-///
-/// ```text
-/// #define BTPageGetMeta( p ) ( ( BTMetaPageData * ) PageGetContents ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageGetMeta {
     ($p:expr $(,)?) => {
@@ -946,44 +857,8 @@ macro_rules! BTPageGetOpaque {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro BTPageGetOpaque from nbtree.h:73 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define BTPageGetOpaque( page ) ( ( BTPageOpaque ) PageGetSpecialPointer ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTPageGetOpaque {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::BTPageOpaqueData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro BTPageGetOpaque from nbtree.h:74 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro BTPageGetOpaque from nbtree.h:73 (PostgreSQL 16–17), nbtree.h:74 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTPageGetOpaque( page ) ( ( BTPageOpaque ) PageGetSpecialPointer ( page ) )
@@ -1362,7 +1237,7 @@ macro_rules! BTScanPosIsValid {
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
@@ -1432,7 +1307,7 @@ macro_rules! BTScanPosUnpinIfPinned {
         })
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15), nbtree.h:555 (PostgreSQL 16–17), nbtree.h:556 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15), nbtree.h:555 (PostgreSQL 16–17), nbtree.h:556 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -1443,7 +1318,7 @@ macro_rules! BTScanPosUnpinIfPinned {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1451,23 +1326,22 @@ macro_rules! BTScanPosUnpinIfPinned {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetDownLink {
     ($pivot:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$pivot;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::BlockNumber
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::BlockNumber
+                >()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg15", feature = "pg19"))]
+/// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:638 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -1516,6 +1390,58 @@ macro_rules! BTreeTupleGetHeapTID {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function BTreeTupleGetHeapTID from nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18)
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetHeapTID(IndexTuple itup)
+/// {
+/// 	if (BTreeTupleIsPivot(itup))
+/// 	{
+/// 		/* Pivot tuple heap TID representation? */
+/// 		if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) &
+/// 			 BT_PIVOT_HEAP_TID_ATTR) != 0)
+/// 			return (ItemPointer) ((char *) itup + IndexTupleSize(itup) -
+/// 								  sizeof(ItemPointerData));
+///
+/// 		/* Heap TID attribute was truncated */
+/// 		return NULL;
+/// 	}
+/// 	else if (BTreeTupleIsPosting(itup))
+/// 		return BTreeTupleGetPosting(itup);
+///
+/// 	return &itup->t_tid;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetHeapTID {
+    ($itup:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -1579,10 +1505,6 @@ macro_rules! BTreeTupleGetMaxHeapTID {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetNAtts {
     ($itup:expr, $rel:expr $(,)?) => {
@@ -1737,10 +1659,6 @@ macro_rules! BTreeTupleGetNAtts {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetNAtts {
     ($itup:expr, $rel:expr $(,)?) => {
@@ -1882,7 +1800,7 @@ macro_rules! BTreeTupleGetNPosting {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetPosting from nbtree.h:531 (PostgreSQL 15), nbtree.h:536 (PostgreSQL 16–17), nbtree.h:537 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetPosting from nbtree.h:531 (PostgreSQL 15), nbtree.h:536 (PostgreSQL 16–17), nbtree.h:537 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -1894,7 +1812,7 @@ macro_rules! BTreeTupleGetNPosting {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1902,27 +1820,25 @@ macro_rules! BTreeTupleGetNPosting {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetPosting {
     ($posting:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$posting;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::ItemPointerData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetPostingN from nbtree.h:538 (PostgreSQL 15), nbtree.h:543 (PostgreSQL 16–17), nbtree.h:544 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetPostingN from nbtree.h:538 (PostgreSQL 15), nbtree.h:543 (PostgreSQL 16–17), nbtree.h:544 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -1933,7 +1849,7 @@ macro_rules! BTreeTupleGetPosting {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1941,7 +1857,7 @@ macro_rules! BTreeTupleGetPosting {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetPostingN {
     ($posting:expr, $n:expr $(,)?) => {
@@ -1949,15 +1865,13 @@ macro_rules! BTreeTupleGetPostingN {
             @value {
                 let _ = &$posting;
                 let _ = &$n;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::ItemPointerData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -1999,7 +1913,7 @@ macro_rules! BTreeTupleGetPostingOffset {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15), nbtree.h:619 (PostgreSQL 16–17), nbtree.h:620 (PostgreSQL 18–19)
+/// C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15), nbtree.h:619 (PostgreSQL 16–17), nbtree.h:620 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline BlockNumber
@@ -2010,7 +1924,7 @@ macro_rules! BTreeTupleGetPostingOffset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2018,23 +1932,21 @@ macro_rules! BTreeTupleGetPostingOffset {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleGetTopParent {
     ($leafhikey:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$leafhikey;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::BlockNumber
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::BlockNumber
+                >()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15), nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
+/// C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15), nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -2051,31 +1963,23 @@ macro_rules! BTreeTupleGetTopParent {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleIsPivot {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$itup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15), nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
+/// C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15), nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -2092,31 +1996,24 @@ macro_rules! BTreeTupleIsPivot {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTreeTupleIsPosting {
     ($itup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$itup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15), nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -2146,6 +2043,37 @@ macro_rules! BTreeTupleSetDownLink {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleSetDownLink from nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetDownLink(IndexTuple pivot, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&pivot->t_tid, blkno);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetDownLink {
+    ($pivot:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$pivot;
+            let _ = &$blkno;
+            ()
+        })
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18–19)
@@ -2234,7 +2162,8 @@ macro_rules! BTreeTupleSetPosting {
         )
     };
 }
-/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15), nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -2265,6 +2194,38 @@ macro_rules! BTreeTupleSetTopParent {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function BTreeTupleSetTopParent from nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetTopParent(IndexTuple leafhikey, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&leafhikey->t_tid, blkno);
+/// 	BTreeTupleSetNAtts(leafhikey, 0, false);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetTopParent {
+    ($leafhikey:expr, $blkno:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$leafhikey;
+            let _ = &$blkno;
+            ()
+        })
     };
 }
 /// C macro P_FIRSTDATAKEY from nbtree.h:371 (PostgreSQL 15), nbtree.h:369 (PostgreSQL 16–17), nbtree.h:370 (PostgreSQL 18–19)

@@ -838,7 +838,7 @@ macro_rules! HashGetMaxBitmapSize {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashGetMaxBitmapSize {
     ($page:expr $(,)?) => {
@@ -1178,8 +1178,7 @@ macro_rules! HashGetTargetPageUsage {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro HashMaxItemSize from hash.h:287 (PostgreSQL 15)
+/// C macro HashMaxItemSize from hash.h:287 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define HashMaxItemSize( page ) MAXALIGN_DOWN ( PageGetPageSize ( page ) - SizeOfPageHeaderData - sizeof ( ItemIdData ) - MAXALIGN ( sizeof ( HashPageOpaqueData ) ) )
@@ -1230,60 +1229,7 @@ macro_rules! HashMaxItemSize {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro HashMaxItemSize from hash.h:287 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define HashMaxItemSize( page ) MAXALIGN_DOWN ( PageGetPageSize ( page ) - SizeOfPageHeaderData - sizeof ( ItemIdData ) - MAXALIGN ( sizeof ( HashPageOpaqueData ) ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! HashMaxItemSize {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                        $crate::__pgrx_c_types::uintptr_t
-                                    >()
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::bitnot(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                                $crate::__pgrx_c_types::uintptr_t
-                                            >()
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro HashPageGetBitmap from hash.h:316 (PostgreSQL 15)
+/// C macro HashPageGetBitmap from hash.h:316 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define HashPageGetBitmap( page ) ( ( uint32 * ) PageGetContents ( page ) )
@@ -1316,42 +1262,7 @@ macro_rules! HashPageGetBitmap {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro HashPageGetBitmap from hash.h:316 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define HashPageGetBitmap( page ) ( ( uint32 * ) PageGetContents ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! HashPageGetBitmap {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro HashPageGetMeta from hash.h:323 (PostgreSQL 15)
+/// C macro HashPageGetMeta from hash.h:323 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define HashPageGetMeta( page ) ( ( HashMetaPage ) PageGetContents ( page ) )
@@ -1365,42 +1276,6 @@ macro_rules! HashPageGetBitmap {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! HashPageGetMeta {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::HashMetaPageData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro HashPageGetMeta from hash.h:323 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define HashPageGetMeta( page ) ( ( HashMetaPage ) PageGetContents ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashPageGetMeta {
     ($page:expr $(,)?) => {
@@ -1458,44 +1333,8 @@ macro_rules! HashPageGetOpaque {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HashPageGetOpaque from hash.h:88 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define HashPageGetOpaque( page ) ( ( HashPageOpaque ) PageGetSpecialPointer ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! HashPageGetOpaque {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::HashPageOpaqueData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro HashPageGetOpaque from hash.h:88 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro HashPageGetOpaque from hash.h:88 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define HashPageGetOpaque( page ) ( ( HashPageOpaque ) PageGetSpecialPointer ( page ) )
@@ -1683,7 +1522,7 @@ macro_rules! HashScanPosIsValid {
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HashScanPosIsValid {
     ($scanpos:expr $(,)?) => {

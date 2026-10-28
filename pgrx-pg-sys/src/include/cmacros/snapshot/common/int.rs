@@ -2,7 +2,7 @@
 // C macros from int.h.
 
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_abs_s16 from int.h:136 (PostgreSQL 18–19)
+/// C inline function pg_abs_s16 from int.h:136 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline uint16
@@ -18,7 +18,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -26,24 +26,20 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_abs_s16 {
     ($a:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$a;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint16
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint16>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_abs_s32 from int.h:220 (PostgreSQL 18–19)
+/// C inline function pg_abs_s32 from int.h:220 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline uint32
@@ -59,7 +55,7 @@ macro_rules! pg_abs_s16 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -67,18 +63,14 @@ macro_rules! pg_abs_s16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_abs_s32 {
     ($a:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$a;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint32
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint32>()
             }
         )
     };
@@ -481,7 +473,7 @@ macro_rules! pg_add_u64_overflow {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_s16 from int.h:537 (PostgreSQL 17), int.h:700 (PostgreSQL 18–19)
+/// C inline function pg_cmp_s16 from int.h:537 (PostgreSQL 17), int.h:700 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -492,7 +484,7 @@ macro_rules! pg_add_u64_overflow {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -500,7 +492,7 @@ macro_rules! pg_add_u64_overflow {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_s16 {
     ($a:expr, $b:expr $(,)?) => {
@@ -508,17 +500,13 @@ macro_rules! pg_cmp_s16 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_s32 from int.h:549 (PostgreSQL 17), int.h:712 (PostgreSQL 18–19)
+/// C inline function pg_cmp_s32 from int.h:549 (PostgreSQL 17), int.h:712 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -529,7 +517,7 @@ macro_rules! pg_cmp_s16 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -537,7 +525,7 @@ macro_rules! pg_cmp_s16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_s32 {
     ($a:expr, $b:expr $(,)?) => {
@@ -545,17 +533,13 @@ macro_rules! pg_cmp_s32 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_s64 from int.h:561 (PostgreSQL 17), int.h:724 (PostgreSQL 18–19)
+/// C inline function pg_cmp_s64 from int.h:561 (PostgreSQL 17), int.h:724 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -566,7 +550,7 @@ macro_rules! pg_cmp_s32 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -574,7 +558,7 @@ macro_rules! pg_cmp_s32 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_s64 {
     ($a:expr, $b:expr $(,)?) => {
@@ -582,17 +566,13 @@ macro_rules! pg_cmp_s64 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_size from int.h:573 (PostgreSQL 17), int.h:736 (PostgreSQL 18–19)
+/// C inline function pg_cmp_size from int.h:573 (PostgreSQL 17), int.h:736 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -603,7 +583,7 @@ macro_rules! pg_cmp_s64 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -611,7 +591,7 @@ macro_rules! pg_cmp_s64 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_size {
     ($a:expr, $b:expr $(,)?) => {
@@ -619,17 +599,13 @@ macro_rules! pg_cmp_size {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_u16 from int.h:543 (PostgreSQL 17), int.h:706 (PostgreSQL 18–19)
+/// C inline function pg_cmp_u16 from int.h:543 (PostgreSQL 17), int.h:706 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -640,7 +616,7 @@ macro_rules! pg_cmp_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -648,7 +624,7 @@ macro_rules! pg_cmp_size {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_u16 {
     ($a:expr, $b:expr $(,)?) => {
@@ -656,17 +632,13 @@ macro_rules! pg_cmp_u16 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_u32 from int.h:555 (PostgreSQL 17), int.h:718 (PostgreSQL 18–19)
+/// C inline function pg_cmp_u32 from int.h:555 (PostgreSQL 17), int.h:718 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -677,7 +649,7 @@ macro_rules! pg_cmp_u16 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -685,7 +657,7 @@ macro_rules! pg_cmp_u16 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_u32 {
     ($a:expr, $b:expr $(,)?) => {
@@ -693,17 +665,13 @@ macro_rules! pg_cmp_u32 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pg_cmp_u64 from int.h:567 (PostgreSQL 17), int.h:730 (PostgreSQL 18–19)
+/// C inline function pg_cmp_u64 from int.h:567 (PostgreSQL 17), int.h:730 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline int
@@ -714,7 +682,7 @@ macro_rules! pg_cmp_u32 {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -722,7 +690,7 @@ macro_rules! pg_cmp_u32 {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_cmp_u64 {
     ($a:expr, $b:expr $(,)?) => {
@@ -730,11 +698,7 @@ macro_rules! pg_cmp_u64 {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
