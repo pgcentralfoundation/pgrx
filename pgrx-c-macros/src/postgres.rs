@@ -197,7 +197,8 @@ impl PostgresConfig {
             compiler,
             configured_compiler.as_deref(),
         )?;
-        verify_postgres_configuration(scanner, &inspected, self.major_version)?;
+        verify_postgres_configuration(scanner, &inspected, self.major_version)
+            .map_err(PostgresError::TargetConfiguration)?;
         if let Some(pg_config) = self.pg_config.path() {
             inspected.profile.inputs.files.push(pg_config);
         }
@@ -514,10 +515,12 @@ pub enum PostgresError {
     #[error("PostgreSQL CFLAGS must be UTF-8")]
     InvalidCFlags,
     /// The inspected headers were configured for another machine, ABI or major version.
+    ///
+    /// The message includes the disagreement, which is therefore not also reported as the
+    /// error's source.
     #[error("PostgreSQL headers do not describe the inspected C target: {0}")]
     TargetConfiguration(
         /// The disagreement between the headers and the target.
-        #[from]
         ConfigurationError,
     ),
     /// Compiler inspection or a required probe failed.

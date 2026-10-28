@@ -13,9 +13,10 @@ use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroPa
 use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
-    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, generate_with_bindings,
-    lower_msvc_runtime_flags, pg_sys_integer_bridges, postgres_function_macro_names,
-    postgres_inline_function_names, postgres_object_macro_names, probe_integer_object_constants,
+    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, PostgresError,
+    generate_with_bindings, lower_msvc_runtime_flags, pg_sys_integer_bridges,
+    postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
+    probe_integer_object_constants,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx};
 use quote::{ToTokens, quote};
@@ -1256,6 +1257,7 @@ fn run_bindgen(
         explicit_clang.as_deref(),
         native,
         &cflags,
+        &target,
         generate,
     )
     .wrap_err_with(|| {
@@ -1267,6 +1269,21 @@ fn run_bindgen(
             pg_target_includes[0]
         )
     })
+}
+
+/// Name the supported ways to supply target headers when the selected headers were configured
+/// for another machine, ABI or major version. Other inspection failures keep their general
+/// context.
+fn inspection_error(error: PostgresError, major_version: u16, target: &str) -> eyre::Report {
+    let context = if matches!(error, PostgresError::TargetConfiguration(_)) {
+        format!(
+            "these server headers do not describe {target}; set PGRX_INCLUDEDIR_SERVER_PG{major_version}_{target} (or PGRX_INCLUDEDIR_SERVER_PG{major_version}_{}) to PostgreSQL {major_version} server headers configured for {target}, describe the target with PGRX_PG_CONFIG_AS_ENV, or import a target bundle with PGRX_TARGET_INFO_PATH_PG{major_version}",
+            target.replace('-', "_")
+        )
+    } else {
+        "could not establish the binding generator's C macro compilation profile".into()
+    };
+    eyre::Report::new(error).wrap_err(context)
 }
 
 /// Carry the generated macro tree and audit report from inspection through binding publication.
@@ -1326,6 +1343,7 @@ fn generate_macros(
     preferred_clang: Option<&Path>,
     native: NativeBuild<'_>,
     cflags: &MacroCflags,
+    target: &str,
     generate_bindings: impl FnOnce() -> eyre::Result<String>,
 ) -> eyre::Result<(String, MacroOutput)> {
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
@@ -1348,7 +1366,7 @@ fn generate_macros(
     // needs its inputs tracked.
     let frontend = postgres
         .inspect_with_arguments(&scanner, header, &effective_arguments, preferred_clang)
-        .wrap_err("could not establish the binding generator's C macro compilation profile")?;
+        .map_err(|error| inspection_error(error, major_version, target))?;
     emit_macro_rerun_inputs(&frontend.profile().inputs, native.out_dir)?;
     let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
     let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
@@ -2426,6 +2444,38 @@ macro_rules! EXAMPLE {
             let explicit = arguments(explicit);
             assert_eq!(include_search_arguments("aarch64-unknown-linux-gnu", &explicit), explicit);
         }
+    }
+
+    /// Headers configured for another machine name the variables that supply target headers,
+    /// in both spellings, above the configuration error itself. Other inspection failures keep
+    /// the general context.
+    #[test]
+    fn foreign_headers_name_the_target_header_remedies() {
+        let foreign =
+            PostgresError::TargetConfiguration(pgrx_c_macros::ConfigurationError::Machine {
+                recorded: "x86_64-pc-linux-gnu".into(),
+                target: "aarch64-unknown-linux-gnu".into(),
+            });
+        let chain = inspection_error(foreign, 17, "aarch64-unknown-linux-gnu")
+            .chain()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        assert_eq!(chain.len(), 2, "{chain:?}");
+        for remedy in [
+            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64-unknown-linux-gnu",
+            "PGRX_INCLUDEDIR_SERVER_PG17_aarch64_unknown_linux_gnu",
+            "PGRX_PG_CONFIG_AS_ENV",
+            "PGRX_TARGET_INFO_PATH_PG17",
+        ] {
+            assert!(chain[0].contains(remedy), "{remedy} missing from {chain:?}");
+        }
+        assert!(chain[1].contains("configured for x86_64-pc-linux-gnu"), "{chain:?}");
+        let other = inspection_error(PostgresError::InvalidCFlags, 17, "aarch64-unknown-linux-gnu");
+        assert_eq!(
+            other.to_string(),
+            "could not establish the binding generator's C macro compilation profile"
+        );
+        assert!(!format!("{other:?}").contains("PGRX_INCLUDEDIR_SERVER"));
     }
 
     /// Checks that unchanged generated artifacts keep their modification time.

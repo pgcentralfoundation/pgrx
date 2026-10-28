@@ -72,8 +72,11 @@ fn x86_64_headers_are_refused_for_aarch64_and_x32() {
             if recorded == "x86_64-pc-linux-gnu" && target == "aarch64-unknown-linux-gnu"),
         "{error:?}"
     );
+    // The message carries the disagreement, so an error chain must not repeat it as a source.
+    let error = PostgresError::TargetConfiguration(error);
+    assert!(std::error::Error::source(&error).is_none());
     assert_eq!(
-        PostgresError::from(error).to_string(),
+        error.to_string(),
         "PostgreSQL headers do not describe the inspected C target: pg_config.h was configured \
          for x86_64-pc-linux-gnu (PG_VERSION_STR), but Clang targets aarch64-unknown-linux-gnu"
     );
