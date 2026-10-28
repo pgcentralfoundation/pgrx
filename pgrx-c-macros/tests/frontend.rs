@@ -712,6 +712,11 @@ fn recorded_windows_controls_match_original_clang_cl_c_observations() {
         // Meson-built MSVC PostgreSQL records warning controls in CFLAGS.
         "/W3",
         "/wd4018",
+        // PostgreSQL 19 adds external-header and single-warning levels and errors.
+        "/external:anglebrackets",
+        "/external:W0",
+        "/w24062",
+        "/we4013",
     ]
     .map(str::to_owned);
     let frontend = inspect(&scanner, &header, &arguments, None).unwrap();

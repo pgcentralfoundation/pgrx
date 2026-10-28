@@ -138,6 +138,11 @@ pub(crate) fn translate_msvc_option<'a>(
         "std:c17" => &["-std=c17"],
         // Warning levels, severity, diagnostic format, and the startup
         // banner change reports only, not preprocessing or C semantics.
+        // `/external:anglebrackets` only marks `<...>` includes as external
+        // headers for `/external:W<n>`; it does not change the search order.
+        // Clang's CL driver ignores it and maps `/external:W0` to
+        // `-Wno-system-headers`. `/external:I` adds a search directory and
+        // stays refused.
         "W0"
         | "W1"
         | "W2"
@@ -150,15 +155,14 @@ pub(crate) fn translate_msvc_option<'a>(
         | "nologo"
         | "diagnostics:caret"
         | "diagnostics:column"
-        | "diagnostics:classic" => &[],
-        _ if ["wd", "we", "wo"].into_iter().any(|prefix| {
-            option.strip_prefix(prefix).is_some_and(|number| {
-                !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit())
-            })
-        }) =>
-        {
-            &[]
-        }
+        | "diagnostics:classic"
+        | "external:anglebrackets"
+        | "external:W0"
+        | "external:W1"
+        | "external:W2"
+        | "external:W3"
+        | "external:W4" => &[],
+        _ if single_warning_option(option) => &[],
         _ => return Err(unsupported_msvc_flag(argument)),
     };
     translated.extend(mapped.iter().map(|argument| (*argument).to_owned()));
@@ -331,6 +335,18 @@ fn runtime_companion_has_no_operand(argument: &str) -> bool {
         || (argument.starts_with("-W") && argument.len() > 2 && !argument.starts_with("-Wp,"))
 }
 
+/// Recognize a CL option that changes how one numbered warning is reported: `/wd<n>` disables
+/// it, `/we<n>` makes it an error, `/wo<n>` reports it once, and `/w1<n>` through `/w4<n>`
+/// assign it a warning level. PostgreSQL 19's meson.build records `/w24062` and `/we4013`.
+fn single_warning_option(option: &str) -> bool {
+    option
+        .strip_prefix('w')
+        .and_then(|rest| rest.strip_prefix(['d', 'e', 'o', '1', '2', '3', '4']))
+        .is_some_and(|number| {
+            !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit())
+        })
+}
+
 /// Explain a refused option without silently discarding an unknown compiler mode.
 fn unsupported_msvc_flag(argument: &str) -> FrontendError {
     FrontendError::Arguments(format!(
@@ -450,11 +466,42 @@ mod tests {
             "@options.rsp",
             "\"\"",
             "/wdabc",
+            "/w1",
+            "/w54062",
+            "/w2abc",
+            "/external:I C:\\include",
+            "/external:env:INCLUDE",
+            "/external:W5",
             "/DVALUE=1\n/O2",
         ] {
             assert!(postgres_clang_flags(input, true).is_err(), "{input}");
         }
         assert!(postgres_clang_flags("/DVALUE=1\0/O2", true).is_err());
+    }
+
+    /// The CFLAGS that each meson.build records for MSVC, for its default debugoptimized
+    /// build. PostgreSQL 15 and 16's src/tools/msvc builds record none, which `not recorded`
+    /// covers. Every option here only selects diagnostics, except the C standard and the
+    /// optimization level.
+    #[test]
+    fn meson_msvc_cflags_translate_for_each_supported_version() {
+        let optimized = ["-O3", "-fomit-frame-pointer", "-ffunction-sections"];
+        // PostgreSQL 16 records only its warning switches.
+        let pg16 = "/wd4018 /wd4244 /wd4273 /wd4101 /wd4102 /wd4090 /wd4267";
+        assert!(postgres_clang_flags(pg16, true).unwrap().is_empty());
+        // PostgreSQL 17 and 18 add the flags meson builds in, which CL accepts.
+        let pg17 = format!("-Wall -O2 {pg16}");
+        assert_eq!(postgres_clang_flags(&pg17, true).unwrap(), optimized);
+        // PostgreSQL 19 requires C11, sets warning levels for single warnings and
+        // external headers, and turns C4013 into an error.
+        let pg19 = "/std:c11 -Wall -O2 /external:anglebrackets /external:W0 /wd4244 /w24062 \
+                    /w24102 /w24334 /we4013 /wd4090 /wd4018 /wd4101 /wd4267 /w24255";
+        let mut expected = vec!["-std=c11"];
+        expected.extend(optimized);
+        assert_eq!(postgres_clang_flags(pg19, true).unwrap(), expected);
+        for level in ["/w14062", "/w34062", "/w44062", "/external:W4", "/wo4062"] {
+            assert!(postgres_clang_flags(level, true).unwrap().is_empty(), "{level}");
+        }
     }
 
     /// Resolve the complete recorded/explicit argv once, keeping user overrides last.

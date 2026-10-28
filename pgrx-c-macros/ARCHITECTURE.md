@@ -265,7 +265,10 @@ settings. Classify known semantic flags explicitly. Unknown semantic settings
 remain visible in `unsupported_options`; generation must not guess their effect.
 Recorded MSVC fragments use Windows argument quoting rather than POSIX shell
 escaping. Translate only reviewed options to GNU-style Clang semantics; refuse
-unknown options instead of dropping a potentially relevant mode. The CLI and
+unknown options instead of dropping a potentially relevant mode. Options that
+only select diagnostics translate to nothing: the warning levels, the
+single-warning switches such as `/wd4018` and `/w24062`, and the
+external-header levels that PostgreSQL's meson builds record. The CLI and
 build integration decode recorded fragments with the same function, and raw
 slash-spelled CL switches in an explicit Windows argv use the same table. This
 supports a checked x86_64 Windows/MSVC LLP64 family, not arbitrary Windows

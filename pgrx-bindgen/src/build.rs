@@ -2423,6 +2423,13 @@ macro_rules! EXAMPLE {
         let decoded = recorded_macro_flags(recorded, target("windows", "msvc")).unwrap().unwrap();
         assert_eq!(decoded, ["-O3", "-fomit-frame-pointer", "-ffunction-sections", "-DWIN32"]);
         assert_eq!(decoded, pgrx_c_macros::postgres_clang_flags(recorded, true).unwrap());
+        // PostgreSQL 19's meson.build adds C11 and level and error switches for single warnings.
+        let pg19 = "/std:c11 -Wall -O2 /external:anglebrackets /external:W0 /wd4244 /w24062 \
+                    /w24102 /w24334 /we4013 /wd4090 /wd4018 /wd4101 /wd4267 /w24255";
+        assert_eq!(
+            recorded_macro_flags(pg19, target("windows", "msvc")).unwrap().unwrap(),
+            ["-std=c11", "-O3", "-fomit-frame-pointer", "-ffunction-sections"]
+        );
         assert_eq!(recorded_macro_flags("/W3", target("windows", "msvc")).unwrap(), Some(vec![]));
         assert_eq!(recorded_macro_flags("not recorded", target("windows", "msvc")).unwrap(), None);
         assert!(recorded_macro_flags("/unknown", target("windows", "msvc")).is_err());

@@ -3162,7 +3162,7 @@ mod tests {
     /// switches must use the same reviewed table as recorded flags instead of a narrower copy.
     #[test]
     fn raw_msvc_switches_use_the_recorded_flag_translation() {
-        let recorded = r"/wd4018 /wd4244 /W3 /O2 /Zi /DWIN32 /I C:\pg\include /nologo";
+        let recorded = r"/wd4018 /wd4244 /W3 /O2 /Zi /DWIN32 /I C:\pg\include /nologo /std:c11 /external:anglebrackets /external:W0 /w24062 /we4013";
         let raw = std::iter::once("--target=x86_64-pc-windows-msvc".to_owned())
             .chain(crate::split_recorded_cflags(recorded, true).unwrap().unwrap())
             .collect::<Vec<_>>();
