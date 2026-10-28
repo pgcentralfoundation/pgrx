@@ -76,6 +76,11 @@ const NATIVE: &[&str] = &[
     "BODY_MACRO_ARG",
     // A popped definition, not the last one, is active at the end.
     "BODY_PUSHED",
+    // Their header is entered twice, with different macros and conditionals.
+    "BODY_FIRST_VALUE",
+    "BODY_SECOND_VALUE",
+    "BODY_FIRST_BRANCH",
+    "BODY_SECOND_BRANCH",
 ];
 
 /// Compare translated and native inline roots with the original compiler's results.
@@ -159,7 +164,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 9;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 13;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

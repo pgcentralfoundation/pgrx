@@ -79,6 +79,13 @@ fn main() {
             BODY_DIRECTIVE_SPLICE!(10_i32).get()
         );
         println!("pushed\t{}", BODY_PUSHED!(2_i32).get());
+        println!(
+            "template\t{}\t{}\t{}\t{}",
+            BODY_FIRST_VALUE!().get(),
+            BODY_SECOND_VALUE!().get(),
+            BODY_FIRST_BRANCH!(10_i32).get(),
+            BODY_SECOND_BRANCH!(10_i32).get()
+        );
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

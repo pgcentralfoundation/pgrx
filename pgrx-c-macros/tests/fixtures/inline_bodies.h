@@ -94,3 +94,16 @@ static inline int BODY_DIRECTIVE_SPLICE(int value)
 #define BODY_PUSHED_SCALE 1000
 static inline int BODY_PUSHED(int value) { return value * BODY_PUSHED_SCALE; }
 #pragma pop_macro("BODY_PUSHED_SCALE")
+#define BODY_TEMPLATE_VALUE_NAME BODY_FIRST_VALUE
+#define BODY_TEMPLATE_BRANCH_NAME BODY_FIRST_BRANCH
+#define BODY_TEMPLATE_VALUE 1
+#define BODY_TEMPLATE_PLUS
+#include "inline_bodies_template.h"
+#undef BODY_TEMPLATE_VALUE_NAME
+#undef BODY_TEMPLATE_BRANCH_NAME
+#undef BODY_TEMPLATE_VALUE
+#undef BODY_TEMPLATE_PLUS
+#define BODY_TEMPLATE_VALUE_NAME BODY_SECOND_VALUE
+#define BODY_TEMPLATE_BRANCH_NAME BODY_SECOND_BRANCH
+#define BODY_TEMPLATE_VALUE 2
+#include "inline_bodies_template.h"

@@ -88,7 +88,9 @@ pub(super) fn prove(
         active: &frontend.environment().active,
         last_definition: HashMap::new(),
         expansions: HashMap::new(),
+        reentered: HashSet::new(),
     };
+    let mut inclusions = HashMap::<File<'_>, usize>::new();
     let mut admitted = Vec::new();
     let mut seen = BTreeSet::new();
     // libclang visits the whole preprocessing record, in translation-unit order, before
@@ -97,12 +99,26 @@ pub(super) fn prove(
     unit.get_entity().visit_children(|entity, _| {
         position += 1;
         match entity.get_kind() {
+            EntityKind::InclusionDirective => {
+                if let Some(file) = entity.get_file() {
+                    *inclusions.entry(file).or_default() += 1;
+                }
+                return EntityVisitResult::Continue;
+            }
             EntityKind::MacroDefinition => {
                 if let Some(name) = entity.get_name() {
-                    let location = entity.get_location().and_then(|at| {
-                        let location = at.get_spelling_location();
-                        Some((location.file?, location.offset))
-                    });
+                    let at = entity.get_location();
+                    let location = at.map(|at| at.get_spelling_location());
+                    // Offsets name a place in a file's first entry. A definition elsewhere
+                    // shows that the preprocessor entered its file again.
+                    if let (Some(at), Some(location)) = (at, &location)
+                        && let Some(file) = location.file
+                        && file.get_offset_location(location.offset) != at
+                    {
+                        history.reentered.insert(file);
+                    }
+                    let location =
+                        location.and_then(|location| Some((location.file?, location.offset)));
                     history.last_definition.insert(name, Recorded { position, location });
                 }
                 return EntityVisitResult::Continue;
@@ -166,6 +182,16 @@ pub(super) fn prove(
         }
         EntityVisitResult::Continue
     });
+    // A header without a recognized include guard that is included more than once, or the
+    // main file included again, was entered more than once. The guard check assumes the
+    // controlling macro stayed defined; a guarded file entered again redefines it, which
+    // the definition check above records.
+    let main = unit.get_file(&profile.header);
+    for (file, count) in inclusions {
+        if count + usize::from(Some(file) == main) > 1 && !file.is_include_guarded() {
+            history.reentered.insert(file);
+        }
+    }
     let mut definitions = BTreeMap::new();
     let mut files = BTreeMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
@@ -231,12 +257,16 @@ fn source<'tu>(
 /// skipped are removed; any other directive makes the body unavailable. Every remaining
 /// token must belong to one of the compiler's statements or be a `;` between them, so a
 /// statement that ends inside a macro argument cannot leave a fragment behind. The tokens
-/// must expand at the end of the translation unit as they did in the definition.
+/// must expand at the end of the translation unit as they did in the definition, which
+/// the records of a file entered more than once cannot show.
 fn body_tokens<'tu>(
     definition: Entity<'tu>,
     file: File<'tu>,
     history: &MacroHistory<'tu, '_>,
 ) -> Option<Vec<crate::Token>> {
+    if history.reentered.contains(&file) {
+        return None;
+    }
     let body = definition
         .get_children()
         .into_iter()
@@ -425,6 +455,9 @@ struct MacroHistory<'tu, 'a> {
     /// Each top-level macro expansion, by file and offset of its name, with the location
     /// of the definition it used.
     expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
+    /// Files the preprocessor entered more than once. Their offsets, skipped ranges and
+    /// expansion records cannot identify one entry, so their bodies are not retained.
+    reentered: HashSet<File<'tu>>,
 }
 
 /// A preprocessing record's position in the translation unit and a macro definition's
