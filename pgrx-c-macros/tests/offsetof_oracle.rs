@@ -32,7 +32,7 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, MacroScanner, generate_with_bindings, inspect,
+    AnalysisSession, EmissionStatus, MacroScanner, SkipReasonCode, generate_with_bindings, inspect,
 };
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -82,6 +82,7 @@ const CASES: &[(&str, &str)] = &[
     ("OFFSET_GENERIC", "OffsetQualified, frozen.value"),
     ("OFFSET_GENERIC", "OffsetQualified, changed.value"),
     ("OFFSET_FORWARD", "nested.value"),
+    ("OFFSET_NULL_SIZE", ""),
 ];
 /// Supporting fixture operations required to exercise the selected macro cases.
 const AUXILIARY: &[&str] = &[
@@ -91,6 +92,7 @@ const AUXILIARY: &[&str] = &[
     "OFFSET_NULL_SELECT",
     "OFFSET_NULL_CALL",
     "OFFSET_RUNTIME_NULL",
+    "OFFSET_NULL_CANCEL",
 ];
 /// Fixture candidates deliberately outside the supported contract; each must retain an
 /// explained skip.
@@ -104,6 +106,18 @@ const REJECTED: &[&str] = &[
     "OFFSET_CALL_PATH",
     "OFFSET_ARROW_PATH",
     "OFFSET_PATH_BUDGET",
+];
+/// Evaluated accesses through a null pointer constant, including the null-pointer
+/// offsetof form. No invocation could supply the object they designate.
+const NULL_ACCESS: &[&str] = &[
+    "OFFSET_NULL_FORM",
+    "OFFSET_NULL_FORM_NESTED",
+    "OFFSET_NULL_FORM_GENERIC",
+    "OFFSET_NULL_VOID_MEMBER",
+    "OFFSET_NULL_DEREFERENCE",
+    "OFFSET_NULL_INDEX",
+    "OFFSET_NULL_INDEX_REVERSED",
+    "OFFSET_NULL_ELEMENT_ADDRESS",
 ];
 /// Fixture binding or native-support source paired with the unchanged C oracle.
 const NATIVE: &str = r#"
@@ -134,6 +148,7 @@ fn record_offsets_preserve_original_c_layout_type_identity_and_unevaluated_opera
         .map(|(name, _)| *name)
         .chain(AUXILIARY.iter().copied())
         .chain(REJECTED.iter().copied())
+        .chain(NULL_ACCESS.iter().copied())
         .collect::<BTreeSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
@@ -178,7 +193,13 @@ fn record_offsets_preserve_original_c_layout_type_identity_and_unevaluated_opera
     let mut emitted = 0;
     let mut skipped = 0;
     for emission in &generated.macros {
-        if REJECTED.contains(&emission.analysis.name.as_str()) {
+        if NULL_ACCESS.contains(&emission.analysis.name.as_str()) {
+            let EmissionStatus::Skipped { reason } = &emission.status else {
+                panic!("an access through a null pointer constant must be skipped: {emission:?}");
+            };
+            assert_eq!(reason.code, SkipReasonCode::PointerOperation, "{emission:?}");
+            assert!(reason.message.contains("null pointer constant"), "{emission:?}");
+        } else if REJECTED.contains(&emission.analysis.name.as_str()) {
             let EmissionStatus::Skipped { reason } = &emission.status else {
                 panic!("unsupported offsetof designator must be skipped: {emission:?}");
             };
@@ -192,7 +213,7 @@ fn record_offsets_preserve_original_c_layout_type_identity_and_unevaluated_opera
             emitted += 1;
         }
     }
-    assert_eq!(emitted, 30, "every fixture offset family must be represented");
+    assert_eq!(emitted, 32, "every fixture offset family must be represented");
     assert_eq!(skipped, REJECTED.len());
     let mut original = String::from(
         "#include <stdio.h>\n#define C_RANK(value) _Generic((value), unsigned long:4, unsigned long long:5, default:0)\nint main(void) {\n",

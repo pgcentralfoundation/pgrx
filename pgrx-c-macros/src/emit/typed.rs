@@ -1398,6 +1398,124 @@ fn proved_integer_zero(
     }
 }
 
+/// Find an evaluated member access, subscript or dereference through a null
+/// pointer constant, such as `((T *) 0)->m` in the null-pointer offsetof form
+/// some C libraries use instead of `__builtin_offsetof`.
+///
+/// Such an access designates no object. The generated place would offset or
+/// load through a pointer that belongs to no allocation, and no caller operand
+/// can make that valid. An unevaluated sizeof operand and C's `&*`
+/// cancellation access nothing, so they remain admitted.
+pub(super) fn null_pointer_access(
+    frontend: &FrontendOutput,
+    analysis: &MacroAnalysis,
+    constants: &[Option<&ResolvedConstant>],
+) -> Option<NodeId> {
+    let nodes = &analysis.expression.as_ref().expect("candidate expression").syntax.nodes;
+    let ungroup = |mut node: NodeId| {
+        while let ExpressionKind::Group { operand } = nodes[node].kind {
+            node = operand;
+        }
+        node
+    };
+    // C converts an integer constant zero to a null pointer only through a
+    // pointer cast. Requiring one keeps the integer operand of `p[0]` admitted.
+    let null = |mut node: NodeId| {
+        let mut pointer = false;
+        loop {
+            match &nodes[node].kind {
+                ExpressionKind::Group { operand } => node = *operand,
+                ExpressionKind::TypeParameterCast { operand, .. } => {
+                    pointer = true;
+                    node = *operand;
+                }
+                ExpressionKind::Cast { type_name, operand }
+                    if crate::analysis::resolve_type_info(
+                        type_name,
+                        frontend.declarations(),
+                        &frontend.profile().target,
+                    )
+                    .is_some_and(|ty| ty.category == TypeCategory::Pointer) =>
+                {
+                    pointer = true;
+                    node = *operand;
+                }
+                _ => return pointer && proved_integer_zero(frontend, analysis, constants, node),
+            }
+        }
+    };
+    // Parents follow their children in the arena, so one reverse pass carries
+    // unevaluated and `&*` status down before any child is examined.
+    let mut unevaluated = vec![false; nodes.len()];
+    let mut cancelled = vec![false; nodes.len()];
+    for (index, node) in nodes.iter().enumerate().rev() {
+        let hidden =
+            unevaluated[index] || matches!(node.kind, ExpressionKind::SizeOfExpression { .. });
+        // Exhaustive, so a new node kind must decide whether it evaluates its children.
+        let mut hide = |child: NodeId| unevaluated[child] |= hidden;
+        match &node.kind {
+            ExpressionKind::Group { operand }
+            | ExpressionKind::Unary { operand, .. }
+            | ExpressionKind::Cast { operand, .. }
+            | ExpressionKind::TypeParameterCast { operand, .. }
+            | ExpressionKind::Dereference { operand }
+            | ExpressionKind::AddressOf { operand }
+            | ExpressionKind::Update { operand, .. }
+            | ExpressionKind::SizeOfExpression { operand }
+            | ExpressionKind::Member { base: operand, .. } => hide(*operand),
+            ExpressionKind::Binary { left, right, .. }
+            | ExpressionKind::Comma { left, right }
+            | ExpressionKind::Index { base: left, index: right }
+            | ExpressionKind::Assignment { place: left, value: right, .. } => {
+                hide(*left);
+                hide(*right);
+            }
+            ExpressionKind::Conditional { condition, then_value, else_value } => {
+                hide(*condition);
+                hide(*then_value);
+                hide(*else_value);
+            }
+            ExpressionKind::Call { callee, arguments } => {
+                hide(*callee);
+                arguments.iter().copied().for_each(hide);
+            }
+            ExpressionKind::Empty
+            | ExpressionKind::Parameter { .. }
+            | ExpressionKind::IntegerLiteral { .. }
+            | ExpressionKind::StringLiteral { .. }
+            | ExpressionKind::Stringification { .. }
+            | ExpressionKind::InvocationFile
+            | ExpressionKind::InvocationLine
+            | ExpressionKind::Identifier { .. }
+            | ExpressionKind::SizeOfType { .. }
+            | ExpressionKind::AlignOfType { .. }
+            | ExpressionKind::SizeOfTypeParameter { .. }
+            | ExpressionKind::AlignOfTypeParameter { .. }
+            | ExpressionKind::OffsetOf { .. } => {}
+        }
+        if hidden {
+            continue;
+        }
+        let access = match &node.kind {
+            ExpressionKind::Member { base, indirect: true, .. } => null(*base),
+            ExpressionKind::Dereference { operand } => !cancelled[index] && null(*operand),
+            ExpressionKind::Index { base, index: offset } => null(*base) || null(*offset),
+            ExpressionKind::AddressOf { operand } => {
+                let operand = ungroup(*operand);
+                if matches!(nodes[operand].kind, ExpressionKind::Dereference { .. }) {
+                    cancelled[operand] = true;
+                }
+                false
+            }
+            _ => false,
+        };
+        if access {
+            return Some(index);
+        }
+    }
+    None
+}
+
 /// Recognize the unqualified void-pointer target relevant to C pointer conversion rules.
 fn is_unqualified_void_pointer(frontend: &FrontendOutput, ty: &crate::TypeInfo) -> bool {
     if ty.category != TypeCategory::Pointer {

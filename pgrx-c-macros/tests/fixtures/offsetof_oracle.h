@@ -87,3 +87,19 @@ int *offset_take_pointer(int *value);
 #define OFFSET_CALL_PATH() offsetof(OffsetRecord, nested.value())
 #define OFFSET_ARROW_PATH() offsetof(OffsetRecord, nested->value)
 #define OFFSET_PATH_BUDGET() offsetof(OffsetRecord, nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.nested.value)
+
+/* Some C libraries, such as Microsoft's headers without
+ * _CRT_USE_BUILTIN_OFFSETOF, define offsetof as a projection through a null
+ * pointer instead of the builtin. */
+#define NULL_FORM_OFFSETOF(type, member) ((size_t)&(((type *)0)->member))
+#define OFFSET_NULL_FORM() NULL_FORM_OFFSETOF(OffsetRecord, aligned)
+#define OFFSET_NULL_FORM_NESTED() NULL_FORM_OFFSETOF(OffsetRecord, nested.value)
+#define OFFSET_NULL_FORM_GENERIC(type, member) NULL_FORM_OFFSETOF(type, member)
+#define OFFSET_NULL_VOID_MEMBER() (((OffsetRecord *)(void *)0)->aligned)
+#define OFFSET_NULL_DEREFERENCE() (*(unsigned int *)0)
+#define OFFSET_NULL_INDEX() (((unsigned int *)0)[1])
+#define OFFSET_NULL_INDEX_REVERSED() (1[(unsigned int *)0])
+#define OFFSET_NULL_ELEMENT_ADDRESS() (&((OffsetRecord *)0)->values[1])
+/* Neither an unevaluated sizeof operand nor C's &* cancellation accesses an object. */
+#define OFFSET_NULL_SIZE() (sizeof(((OffsetRecord *)0)->nested.value))
+#define OFFSET_NULL_CANCEL() (&*(OffsetRecord *)0)

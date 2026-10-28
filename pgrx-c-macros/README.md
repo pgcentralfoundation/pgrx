@@ -378,6 +378,11 @@ The typed expression support also covers:
   including member-path parameters. Offset metadata checks Clang's layouts
   against the actual bindings without accessing memory or requiring a loadable
   field value. Bitfields, array indices, and indirect member paths are rejected.
+  A C library `offsetof` spelled as `((size_t)&(((s*)0)->m))`, as in Microsoft's
+  C runtime headers without `_CRT_USE_BUILTIN_OFFSETOF`, is refused. So is every
+  other evaluated member access, subscript or dereference through a null pointer
+  constant, which designates no object; only `sizeof` operands and `&*` remain
+  allowed.
 - Direct `__builtin_expect` calls with a compiler-verified `long(long, long)`
   prototype and result identity. Both operands are evaluated and converted as
   in C, and the generated expression returns the first unchanged. Fixed expected

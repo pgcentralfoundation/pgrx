@@ -899,6 +899,14 @@ fn render(
     for constant in &expression.constants {
         constants[constant.node] = Some(constant);
     }
+    if let Some(node) = typed::null_pointer_access(session.frontend(), analysis, &constants) {
+        return Err(skip(
+            analysis,
+            SkipReasonCode::PointerOperation,
+            "an evaluated member access, subscript or dereference through a null pointer constant designates no object",
+            Some(expression.syntax.nodes[node].tokens),
+        ));
+    }
     let renderer =
         typed::Renderer::new(session.frontend(), analysis, bindings, &constants, lowering);
     let statement_body = expression.syntax.statement_body.as_ref();
