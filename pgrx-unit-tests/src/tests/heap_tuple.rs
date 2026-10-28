@@ -1054,7 +1054,8 @@ mod tests {
 
     /// A row stored before `ALTER TYPE ... DROP ATTRIBUTE` still holds the dropped attribute,
     /// and the descriptor keeps its length, alignment, and pass-by-value flag, so the
-    /// attributes after it read correctly.
+    /// attributes after it read correctly. `heap_getattr_datum_ex` reads the dropped attribute
+    /// itself without looking up its cleared type.
     #[pg_test]
     fn test_heap_getattr_reads_row_stored_before_a_drop() -> Result<(), spi::Error> {
         Spi::run(
@@ -1081,6 +1082,24 @@ mod tests {
             // attribute in that position of `tupdesc`.
             let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
             assert_eq!(read, Some(7));
+
+            // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
+            let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
+            let dropped = NonZeroUsize::new(2).unwrap();
+            // SAFETY: as for heap_getattr above.
+            let (collar, scritches) = unsafe {
+                (
+                    pgrx::htup::heap_getattr_datum_ex(&borrowed, dropped, &tupdesc),
+                    pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc),
+                )
+            };
+            // The dropped attribute has no type, but keeps its stored value's layout.
+            assert!(!collar.is_null);
+            assert_eq!(collar.typoid, PgOid::Invalid);
+            assert_eq!((collar.typlen, collar.typbyval), (-1, false));
+            assert_eq!((scritches.typlen, scritches.typbyval), (4, true));
+            // SAFETY: `scritches` is the non-NULL int4 attribute of the live stored row.
+            assert_eq!(unsafe { scritches.into_value::<i32>() }, 7);
             Ok(())
         })
     }

@@ -292,6 +292,12 @@ impl DatumWithTypeInfo {
 /// Similar to [`heap_getattr()`], but returns extended information about the requested
 /// attribute. `attno` is 1-based.
 ///
+/// `typlen` and `typbyval` are the descriptor's `attlen` and `attbyval` for the attribute,
+/// which for a live attribute equal its type's length and pass-by-value flag. PostgreSQL
+/// clears a dropped attribute's type but keeps those two, so a dropped attribute reports
+/// `typoid` as [`PgOid::Invalid`] along with its stored length and pass-by-value flag. Its
+/// value has no type that [`DatumWithTypeInfo::into_value`] could read.
+///
 /// # Safety
 ///
 /// `tuple` must point to a live heap tuple, and each attribute it stores must have the same
@@ -311,21 +317,16 @@ pub unsafe fn heap_getattr_datum_ex(
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
-    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
+    let (typoid, typlen, typbyval) = tupdesc
+        .get(attno.get() - 1)
+        .map(|att| (att.type_oid(), att.attlen, att.attbyval))
+        .expect("no attribute");
     // SAFETY: the caller supplies a live tuple whose stored attributes match `tupdesc`'s in
     // length, alignment, and pass-by-value flag, and holds no reference to its attribute
     // entries. The lookup above bounds `attno`, and its reference ends with that statement.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) };
     let is_null = datum.is_none();
     let datum = datum.unwrap_or_else(pg_sys::Datum::null);
-
-    let mut typlen = 0;
-    let mut typbyval = false;
-    let mut typalign = 0 as std::os::raw::c_char; // unused
-
-    unsafe {
-        pg_sys::get_typlenbyvalalign(typoid.value(), &mut typlen, &mut typbyval, &mut typalign);
-    }
 
     DatumWithTypeInfo { datum, is_null, typoid, typlen, typbyval }
 }
