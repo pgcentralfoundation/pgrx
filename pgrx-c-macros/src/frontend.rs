@@ -547,16 +547,16 @@ struct CompilerSearch {
 
 /// The chosen compatible executable together with the lookup dependencies that establish its
 /// preference.
-struct CompilerSelection {
+pub(crate) struct CompilerSelection {
     /// The compatible Clang driver chosen for preprocessing and typed probe checks.
-    executable: PathBuf,
+    pub(crate) executable: PathBuf,
     /// Lookup dependencies needed to invalidate the selected driver when preference changes.
     search: CompilerSearch,
 }
 
 /// Combine explicit overrides, PostgreSQL hints, adjacent tools, and PATH roots into a compatible
 /// driver search.
-fn find_compiler(
+pub(crate) fn find_compiler(
     preferred: Option<&Path>,
     configured: Option<&Path>,
     library_version: &str,

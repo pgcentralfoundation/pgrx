@@ -558,11 +558,24 @@ mod tests {
         }
     }
 
+    /// The driver inspection selects for the loaded libclang. A host may install only versioned
+    /// `clang-<major>` executables, as Debian's packages do.
+    fn compiler() -> PathBuf {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let _scanner = crate::MacroScanner::new().expect("libclang must be available");
+        crate::frontend::find_compiler(None, None, &clang::get_version())
+            .expect("a Clang driver matching the loaded libclang")
+            .executable
+    }
+
     /// Run a header-free Windows target probe through the frontend's bounded driver runner.
-    fn run_windows_driver(flags: &str, cl: bool, source: &Path, dump: bool) -> String {
-        let compiler = std::env::var_os("CLANG_PATH")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from(if cfg!(windows) { "clang.exe" } else { "clang" }));
+    fn run_windows_driver(
+        compiler: &Path,
+        flags: &str,
+        cl: bool,
+        source: &Path,
+        dump: bool,
+    ) -> String {
         let mut arguments = vec!["--target=x86_64-pc-windows-msvc".into()];
         if cl {
             arguments.push("--driver-mode=cl".into());
@@ -586,7 +599,7 @@ mod tests {
             arguments.extend(["-x".into(), "c".into()]);
         }
         arguments.push(source.to_str().expect("temporary fixture path must be UTF-8").into());
-        crate::frontend::run_compiler(&compiler, &arguments)
+        crate::frontend::run_compiler(compiler, &arguments)
             .expect("actual Clang Windows target probe must succeed")
             .stdout
     }
@@ -594,6 +607,7 @@ mod tests {
     /// Compare observable predefines from explicit MSVC options against their translations.
     #[test]
     fn translated_flags_preserve_windows_driver_predefines() {
+        let compiler = compiler();
         let directory = tempfile::tempdir().unwrap();
         let source = directory.path().join("flags.c");
         std::fs::write(&source, "/* No platform SDK is needed for predefined macros. */\n")
@@ -640,17 +654,20 @@ mod tests {
             "/MD /std:c17",
             r#"/MD /DDECODED_VALUE="\"a b\"" /U_DEBUG"#,
         ] {
-            let original = selected(run_windows_driver(flags, true, &source, true));
-            let translated = selected(run_windows_driver(flags, false, &source, true));
+            let original = selected(run_windows_driver(&compiler, flags, true, &source, true));
+            let translated = selected(run_windows_driver(&compiler, flags, false, &source, true));
             assert_eq!(translated, original, "{flags}");
         }
     }
 
     /// Compile real COFF objects without Windows headers, a Windows linker, or llvm-lib.
-    fn windows_object(flags: &str, cl: bool, source: &Path, object: &Path) -> Vec<u8> {
-        let compiler = std::env::var_os("CLANG_PATH")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from(if cfg!(windows) { "clang.exe" } else { "clang" }));
+    fn windows_object(
+        compiler: &Path,
+        flags: &str,
+        cl: bool,
+        source: &Path,
+        object: &Path,
+    ) -> Vec<u8> {
         let mut arguments = vec!["--target=x86_64-pc-windows-msvc19.20.0".into()];
         if cl {
             arguments.extend(["--driver-mode=cl".into(), "/TC".into(), "/c".into()]);
@@ -670,7 +687,7 @@ mod tests {
             ]);
         }
         arguments.push(source.to_str().unwrap().into());
-        crate::frontend::run_compiler(&compiler, &arguments)
+        crate::frontend::run_compiler(compiler, &arguments)
             .expect("SDK-free COFF compilation must succeed");
         std::fs::read(object).unwrap()
     }
@@ -697,6 +714,7 @@ mod tests {
     /// Match /MD[d] and /MT[d] libraries in actual objects, including last-wins runtime modes.
     #[test]
     fn translated_runtime_preserves_coff_linker_directives() {
+        let compiler = compiler();
         let directory = tempfile::tempdir().unwrap();
         let source = directory.path().join("runtime.c");
         std::fs::write(&source, "int runtime_probe(void) { return 42; }\n").unwrap();
@@ -709,9 +727,10 @@ mod tests {
             ("/MT /MDd", "msvcrtd"),
             ("/MDd /U_DEBUG /D_DLL=7", "msvcrtd"),
         ] {
-            let original = windows_object(flags, true, &source, &directory.path().join("cl.obj"));
+            let original =
+                windows_object(&compiler, flags, true, &source, &directory.path().join("cl.obj"));
             let translated =
-                windows_object(flags, false, &source, &directory.path().join("gnu.obj"));
+                windows_object(&compiler, flags, false, &source, &directory.path().join("gnu.obj"));
             let expected =
                 vec![format!("/DEFAULTLIB:{library}.lib"), "/DEFAULTLIB:oldnames.lib".into()];
             assert_eq!(coff_directives(&original), expected, "CL driver: {flags}");
@@ -722,6 +741,7 @@ mod tests {
     /// Verify translated packing preserves actual Windows record offsets, size, and alignment.
     #[test]
     fn translated_packing_preserves_windows_driver_layout() {
+        let compiler = compiler();
         let directory = tempfile::tempdir().unwrap();
         let source = directory.path().join("packing.c");
         for (flags, alignment, size) in [
@@ -738,8 +758,8 @@ mod tests {
                  _Static_assert(_Alignof(struct FlagRecord) == {alignment}, \"record alignment\");\n\
                  _Static_assert(__builtin_offsetof(struct FlagRecord, value) == {alignment}, \"member offset\");\n"
             )).unwrap();
-            run_windows_driver(flags, true, &source, false);
-            run_windows_driver(flags, false, &source, false);
+            run_windows_driver(&compiler, flags, true, &source, false);
+            run_windows_driver(&compiler, flags, false, &source, false);
         }
     }
 }

@@ -18,8 +18,22 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
+use pgrx_c_macros::{MacroScanner, inspect};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
+use std::sync::{Mutex, PoisonError};
+
+/// Serialize libclang use: its runtime permits one live scanner per process.
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+
+/// The Clang driver that inspection selects for `header` under `arguments`. Observations use it
+/// rather than a `clang` on PATH, which hosts with only versioned `clang-<major>` lack.
+fn selected_compiler(header: &Path, arguments: &[String]) -> PathBuf {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, header, arguments, None).expect("inspect the oracle header");
+    frontend.profile().compiler.executable.clone()
+}
 
 /// Represent one independent C result together with its type and evaluation count.
 #[derive(Debug, PartialEq, Eq)]
@@ -55,7 +69,7 @@ fn original_c_text_observations_preserve_record_contents() {
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
     let arguments = oracle::native_arguments();
     let output = oracle::run_c(
-        Path::new("clang"),
+        &selected_compiler(&header, &arguments),
         &header,
         r#"
 #include <stdio.h>
@@ -88,7 +102,7 @@ fn main() {
     print!("rust_end\r\n\n");
 }
 "#,
-        Path::new("clang"),
+        &selected_compiler(&header, &arguments),
         &header,
         r#"
 #include <stdio.h>
@@ -109,8 +123,9 @@ void record_c(void) {
 #[test]
 fn original_c_integer_macros_establish_types_values_and_evaluation_counts() {
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/oracle_integer.h");
+    let arguments = oracle::native_arguments();
     let output = oracle::run_c(
-        Path::new("clang"),
+        &selected_compiler(&header, &arguments),
         &header,
         r#"
 #include <inttypes.h>
@@ -196,7 +211,7 @@ int main(void) {
 }
 
 "#,
-        &[],
+        &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
         true,
     );
     let records = observations(&output);
@@ -249,12 +264,11 @@ int main(void) {
 /// defined wrapping boundaries, and repeated argument evaluations assumed by the corpus.
 #[test]
 fn configured_postgres_original_headers_establish_scalar_semantics() {
-    use pgrx_c_macros::MacroScanner;
-
     let installations = installed::configured();
     if installations.is_empty() {
         return;
     }
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     for postgres in installations {
         let frontend = installed::inspect(&scanner, &postgres, &[]);

@@ -4517,6 +4517,32 @@ mod tests {
         }
     }
 
+    /// Run the Clang driver that this build's macro inspection selected, as its report records,
+    /// for the host. A host may install only versioned `clang-<major>` executables, and on
+    /// macOS that driver finds `<stdio.h>` only in the SDK.
+    fn original_c_compiler() -> std::process::Command {
+        let report = std::fs::read_dir(env!("OUT_DIR"))
+            .expect("read the build's OUT_DIR")
+            .filter_map(|entry| Some(entry.ok()?.path()))
+            .find(|path| path.to_str().is_some_and(|path| path.ends_with("_macro_report.json")))
+            .expect("the build wrote a C macro report");
+        let report: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(report).expect("read the C macro report"))
+                .expect("parse the C macro report");
+        let mut command = std::process::Command::new(
+            report["profile"]["compiler"]["executable"].as_str().expect("the report names Clang"),
+        );
+        if cfg!(target_os = "macos") {
+            let sdk = std::process::Command::new("xcrun")
+                .arg("--show-sdk-path")
+                .output()
+                .expect("run xcrun for the macOS SDK");
+            assert!(sdk.status.success(), "xcrun --show-sdk-path failed");
+            command.arg("-isysroot").arg(String::from_utf8(sdk.stdout).unwrap().trim());
+        }
+        command
+    }
+
     /// Compare runtime expression types, values, mutations, and scalar bit patterns with an independently compiled C oracle.
     /// This native comparison requires the generator's supported LP64 targets;
     /// frontend tests separately prove rejection of incompatible target profiles.
@@ -4606,7 +4632,7 @@ int main(void) {
 "#,
         )
         .expect("write original C expression fixture");
-        let compiler = std::process::Command::new("clang")
+        let compiler = original_c_compiler()
             .args(["-std=c11", "-fwrapv", "-Wno-constant-conversion"])
             .arg(&source)
             .arg("-o")
@@ -4853,7 +4879,7 @@ int main(void) {
                 format!("typedef int Fn(int); void fixture(Fn *function) {{{body}}}\n"),
             )
             .unwrap();
-            let output = std::process::Command::new("clang")
+            let output = original_c_compiler()
                 .args(["-std=c11", "-Werror", "-pedantic-errors", "-Wnewline-eof", "-fsyntax-only"])
                 .arg(&source)
                 .output()
