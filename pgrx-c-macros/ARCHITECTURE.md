@@ -329,12 +329,10 @@ cannot be inferred from a declaration's name or broad type category:
    only inside the arguments of such an expanded function-like invocation, which
    dropped or stringified it, and only when it is unchanged since that invocation.
    Token pasting and invocation-dependent builtins such as `__LINE__` leave no
-   body. Expansion records and skipped ranges identify a position by file and
-   offset, which cannot tell two entries of one file apart; libclang reports
-   skipped ranges for the first entry only. A file entered more than once leaves
-   no bodies: one included more than once without a recognized include guard, or
-   the main file included again, or one with a macro definition outside its first
-   entry, as when its guard was undefined.
+   body. A file and offset name a place in the file's first entry, and libclang
+   reports skipped ranges for that entry only. Expansion records from a later
+   entry of a file are ignored, and a definition in a later entry leaves no body,
+   whether or not Clang considers the file include-guarded.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and

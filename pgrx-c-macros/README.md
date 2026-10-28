@@ -182,9 +182,10 @@ An inline adapter evaluates each argument once and preserves C conversions,
 pointer qualifiers and the actual return type. When the analyzer supports every
 statement of the definition's body, and every macro the body uses expands at the
 end of the headers as it did in the definition, the adapter translates that body;
-otherwise it calls the original function through its verified prototype. Functions
-in a header the preprocessor entered more than once, such as a template included
-twice, are never translated. A translation evaluates every argument before its
+otherwise it calls the original function through its verified prototype. When the
+preprocessor enters a header more than once, as for a template included twice,
+only functions its first entry defines are translated. A translation evaluates
+every argument before its
 body runs, and the arguments' temporaries live until it finishes, as they do for a
 call. Generated calls to a translated function expand its translation. `.get()`
 extracts native storage, including `()` for a void return. When a macro becomes

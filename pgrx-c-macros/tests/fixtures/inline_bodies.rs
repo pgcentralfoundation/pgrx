@@ -89,6 +89,7 @@ fn main() {
             BODY_FIRST_BRANCH!(10_i32).get(),
             BODY_SECOND_BRANCH!(10_i32).get()
         );
+        println!("guarded\t{}\t{}", BODY_GUARDED_FIRST!().get(), BODY_GUARDED_SECOND!().get());
         let mut carriage = 0_i32;
         BODY_CR_STORE!(&raw mut carriage, 0_i32).get();
         println!(

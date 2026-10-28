@@ -59,6 +59,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_BRACE_SPLICE",
     "BODY_SPLICED_HASH",
     "BODY_SPLICED_DIGRAPH",
+    // Defined by the first of two entries of its header, as that entry's conditionals select.
+    "BODY_FIRST_BRANCH",
 ];
 
 /// Macros that call translated inline functions.
@@ -87,11 +89,13 @@ const NATIVE: &[&str] = &[
     "BODY_DROPPED_LATER",
     // An argument's enum constant later becomes a macro.
     "BODY_ARGUMENT_LATE",
-    // Their header is entered twice, with different macros and conditionals.
+    // Their header is entered twice, with different macros and conditionals. The first
+    // entry's macro is redefined before the second; the others are in the second entry.
     "BODY_FIRST_VALUE",
     "BODY_SECOND_VALUE",
-    "BODY_FIRST_BRANCH",
     "BODY_SECOND_BRANCH",
+    "BODY_GUARDED_FIRST",
+    "BODY_GUARDED_SECOND",
     // Trigraphs and bare carriage returns are not modeled.
     "BODY_TRIGRAPH_SPLICE",
     "BODY_TRIGRAPH_HASH",
@@ -179,7 +183,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 19;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 20;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

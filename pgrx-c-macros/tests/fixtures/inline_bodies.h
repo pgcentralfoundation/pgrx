@@ -119,6 +119,15 @@ static inline int BODY_ARGUMENT_LATE(int value) { return BODY_ID(BODY_ARGUMENT) 
 #define BODY_TEMPLATE_BRANCH_NAME BODY_SECOND_BRANCH
 #define BODY_TEMPLATE_VALUE 2
 #include "inline_bodies_template.h"
+#define BODY_GUARDED_NAME BODY_GUARDED_FIRST
+#define BODY_GUARDED_VALUE 1
+#include "inline_bodies_guarded.h"
+#undef INLINE_BODIES_GUARDED_H
+#undef BODY_GUARDED_NAME
+#undef BODY_GUARDED_VALUE
+#define BODY_GUARDED_NAME BODY_GUARDED_SECOND
+#define BODY_GUARDED_VALUE 2
+#include "inline_bodies_guarded.h"
 /* PostgreSQL 18 continues a signature onto the line of its opening brace, whose
  * spelling then begins with the splice. */
 static inline int BODY_BRACE_SPLICE(int value) \
