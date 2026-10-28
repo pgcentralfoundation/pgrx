@@ -400,17 +400,30 @@ mod tests {
         }
     }
 
-    /// A PostgreSQL ERROR while the guard holds the lock resets InterruptHoldoffCount, so
-    /// LWLockRelease in Drop would fail its RESUME_INTERRUPTS assertion on assert-enabled
-    /// servers. The guard must leave the lock to transaction abort.
+    /// A PostgreSQL ERROR while the guard holds the lock resets InterruptHoldoffCount to 0.
+    /// LWLockRelease in Drop would then decrement it past 0, which assert-enabled servers stop
+    /// in RESUME_INTERRUPTS and other servers let wrap. The guard must leave the lock held for
+    /// transaction abort, so the test checks both before it rethrows the ERROR.
     #[pg_test(error = "cache lookup failed for type 0")]
     fn truncation_lock_guard_survives_a_postgres_error() {
         // SAFETY: pg_test runs in an initialized backend, and the generated pointer names the
-        // permanent XactTruncationLock. format_type_extended raises an ERROR for type 0.
-        unsafe {
-            let _guard = super::PgLwLockGuard::new_shared(pg_sys::XactTruncationLock!().get());
-            pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0);
-        }
+        // permanent XactTruncationLock.
+        let lock = unsafe { pg_sys::XactTruncationLock!().get() };
+        PgTryBuilder::new(|| {
+            // SAFETY: as above. format_type_extended raises an ERROR for type 0, which unwinds
+            // through the guard.
+            unsafe {
+                let _guard = super::PgLwLockGuard::new_shared(lock);
+                pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0);
+            }
+        })
+        .catch_others(|error| {
+            // SAFETY: both reads run on the backend thread, and the lock is permanent.
+            let state = unsafe { (pg_sys::InterruptHoldoffCount, pg_sys::LWLockHeldByMe(lock)) };
+            assert_eq!(state, (0, true), "(InterruptHoldoffCount, LWLockHeldByMe) after the ERROR");
+            error.rethrow()
+        })
+        .execute();
     }
 
     /// Test basic functionality with current transaction ID
