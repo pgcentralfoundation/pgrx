@@ -502,13 +502,28 @@ whose cast and hexadecimal mask it implements:
 preserving a symbol or nested macro call.
 
 The checked-in `pgrx-pg-sys/src/include/cmacros/snapshot/` files are a documentation
-snapshot made with the release-generation installations and target. They hold each
-supported PostgreSQL version's macro documentation, gated by the `pgNN` features, with
-arms that only show the accepted invocations. docs.rs uses them because it cannot
-generate macros; ordinary builds never do. A definition that changed between versions
-appears once per version range, next to its other versions. Use your build's `OUT_DIR`
-bindings, macros, and report when checking actual platform values or diagnosing a
-missing macro.
+snapshot made with the release-generation installations on docs.rs's target,
+`x86_64-unknown-linux-gnu`. They hold each supported PostgreSQL version's macro
+documentation and generated Rust support, gated by the `pgNN` features. docs.rs uses
+them because it cannot generate macros; ordinary builds never do. A definition that
+changed between versions appears once per version range, next to its other versions.
+Use your build's `OUT_DIR` bindings, macros, and report when checking actual platform
+values or diagnosing a missing macro.
+
+Each snapshot macro is a typed shell. Its arms accept the real macro's invocations and
+have its result type, so an extension that docs.rs compiles can call `.get()` or
+`.into_value()` on a result, but running a shell panics. Documentation builds of other
+targets fail, because the snapshot describes only docs.rs's target. A shell never
+rejects a result type its real macro accepts. It can accept code that the real macro
+rejects, and differs in these rare cases, each a documentation-only type error:
+
+- a literal `0` passed as a null pointer through an operand-dependent expression is not
+  a null constant;
+- large unsuffixed or `i64`-suffixed literals there can have a different type;
+- an operand like `*pointer` read through a raw `*mut` pointer can decay to a `*const`
+  pointer instead of `*mut`;
+- a generated macro passed as an operand loses its bitfield and null-constant facts;
+- the internal `(@__pgrx_c_native [...])` operand form is not accepted.
 
 ## Understand refusals and runtime limits
 
