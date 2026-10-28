@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::{ArrayIntoIterator, TryFromDatumError};
-use crate::{AnyElement, Array, FromDatum, IntoDatum, pg_sys};
+use crate::{AnyElement, Array, FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 use core::ptr::NonNull;
 use std::iter::FusedIterator;
 
@@ -19,13 +19,13 @@ use std::iter::FusedIterator;
 /// `&AnyArray` yields each element as an [`AnyElement`], which points into the array or into an
 /// untoasted copy of it that the iteration allocates in `CurrentMemoryContext`.
 ///
-/// The handle does not borrow the memory that holds the array: the arguments of the call that
-/// received it, or the result of the SPI query that returned it. That memory may be freed once
-/// the call returns or the SPI connection closes, so a handle from
-/// [`Spi::get_one`](crate::spi::Spi::get_one) already refers to freed memory. `AnyArray` is
-/// `Copy` and `'static`, and the compiler does not stop it, its elements, or a borrowed value
-/// read from them, from outliving that memory. Use them only while that memory is live, and read
-/// into a type that owns its data, such as `Vec<i32>` or `Vec<String>`, to keep a value longer.
+/// The handle does not borrow the memory that holds the array, which may be freed once the call
+/// that received the handle returns. [SPI](crate::spi) copies an `AnyArray` that a query returns
+/// out of the query's results, which it frees when the connection closes. `AnyArray` is `Copy`
+/// and `'static`, and the compiler does not stop it, its elements, or a borrowed value read from
+/// them, from outliving the memory they point into, for example when one is kept for a later
+/// call. Use them only while that memory is live, and read into a type that owns its data, such
+/// as `Vec<i32>` or `Vec<String>`, to keep a value longer.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call
@@ -122,6 +122,33 @@ impl FromDatum for AnyArray {
         typoid: pg_sys::Oid,
     ) -> Option<AnyArray> {
         if is_null { None } else { Some(AnyArray { datum, typoid }) }
+    }
+
+    /// Copies the array into `memory_context`, detoasting it, so that the handle stays valid
+    /// after the memory that holds `datum` is freed, as SPI frees a query's results when its
+    /// connection closes.
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<AnyArray> {
+        if is_null {
+            return None;
+        }
+        let datum = match NonNull::new(datum.cast_mut_ptr::<pg_sys::varlena>()) {
+            // SAFETY: the caller passes a live array value and a memory context to copy it into.
+            // pg_detoast_datum_copy pallocs an untoasted copy of the array in the current context,
+            // which switch_to sets to `memory_context` and restores when the closure returns.
+            Some(array) => unsafe {
+                memory_context.switch_to(|_| {
+                    pg_sys::Datum::from(pg_sys::pg_detoast_datum_copy(array.as_ptr()))
+                })
+            },
+            // There is nothing to copy; reading the handle treats a null pointer as no array.
+            None => datum,
+        };
+        Some(AnyArray { datum, typoid })
     }
 }
 

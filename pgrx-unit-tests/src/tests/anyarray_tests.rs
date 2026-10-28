@@ -195,6 +195,22 @@ mod tests {
         Ok(())
     }
 
+    /// SPI frees a query's results when its connection closes, before `get_one` returns, so it
+    /// must copy the array out of them.
+    #[pg_test]
+    fn test_anyarray_from_spi_outlives_connection() -> std::result::Result<(), pgrx::spi::Error> {
+        let array =
+            Spi::get_one::<AnyArray>("SELECT ARRAY[repeat('x', 40), 'y']")?.expect("array is NULL");
+        let expected = vec!["x".repeat(40), "y".to_owned()];
+        assert_eq!(array.value::<Vec<String>>(), Ok(Some(expected.clone())));
+        let elements = (&array)
+            .into_iter()
+            .map(|element| element.expect("element is NULL").value::<String>())
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        assert_eq!(elements, expected.into_iter().map(Some).collect::<Vec<_>>());
+        Ok(())
+    }
+
     /// A call coerces a domain over an array to its base type before an anyarray parameter, but an
     /// SPI result keeps the domain.
     #[pg_test]

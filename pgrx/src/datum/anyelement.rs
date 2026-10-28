@@ -8,22 +8,22 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::TryFromDatumError;
-use crate::{FromDatum, IntoDatum, pg_sys};
+use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 
 /// The [`anyelement` polymorphic pseudo-type][anyelement].
 ///
 /// An `AnyElement` holds a value and the type PostgreSQL resolved for it. Read the value with
 /// [`AnyElement::value`], which checks that the Rust type can read that type.
 ///
-/// The handle does not borrow the memory that holds a pass-by-reference value: the arguments of
-/// the call that received it, the array that [`AnyArray`](crate::AnyArray) iteration read it
-/// from or that array's untoasted copy in `CurrentMemoryContext`, or the result of the SPI query
-/// that returned it. That memory may be freed once the call returns, the memory context is reset,
-/// or the SPI connection closes, so a handle from
-/// [`Spi::get_one`](crate::spi::Spi::get_one) already refers to freed memory. `AnyElement` is
-/// `Copy` and `'static`, and the compiler does not stop it, or a borrowed value read from it,
-/// from outliving that memory. Use both only while that memory is live, and read into a type
-/// that owns its data, such as `String`, to keep a value longer.
+/// The handle does not borrow the memory that holds a pass-by-reference value, which may be
+/// freed once the call that received the handle returns. An element that
+/// [`AnyArray`](crate::AnyArray) iteration yields points into the array, or into an untoasted copy
+/// of it in the `CurrentMemoryContext` of the iteration, which may be freed when that context is
+/// reset. [SPI](crate::spi) copies an `AnyElement` that a query returns out of the query's
+/// results, which it frees when the connection closes. `AnyElement` is `Copy` and `'static`, and
+/// the compiler does not stop it, or a borrowed value read from it, from outliving the memory it
+/// points into, for example when it is kept for a later call. Use both only while that memory is
+/// live, and read into a type that owns its data, such as `String`, to keep a value longer.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call
@@ -120,6 +120,47 @@ impl FromDatum for AnyElement {
         typoid: pg_sys::Oid,
     ) -> Option<AnyElement> {
         if is_null { None } else { Some(AnyElement { datum, typoid }) }
+    }
+
+    /// Copies a pass-by-reference value into `memory_context`, detoasting a varlena, so that the
+    /// handle stays valid after the memory that holds `datum` is freed, as SPI frees a query's
+    /// results when its connection closes.
+    ///
+    /// Raises an ERROR if no type has the OID `typoid`, including InvalidOid, because the value's
+    /// size is then unknown.
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<AnyElement> {
+        if is_null {
+            return None;
+        }
+        let mut typlen = 0;
+        let mut typbyval = false;
+        // SAFETY: get_typlenbyval takes the OID by value and writes both out-parameters, or
+        // raises an ERROR if no type has that OID.
+        unsafe { pg_sys::get_typlenbyval(typoid, &mut typlen, &mut typbyval) };
+        if typbyval || datum.is_null() {
+            // The value is in the Datum itself, or there is nothing to copy.
+            return Some(AnyElement { datum, typoid });
+        }
+        // SAFETY: the caller passes a live value of type `typoid` and a memory context to copy it
+        // into. A pass-by-reference value is a pointer to `typlen` bytes, to a varlena if
+        // `typlen` is -1, or to a C string if it is -2. pg_detoast_datum_copy and datumCopy palloc
+        // the copy in the current context, which switch_to sets to `memory_context` and restores
+        // when the closure returns.
+        let datum = unsafe {
+            memory_context.switch_to(|_| {
+                if typlen == -1 {
+                    pg_sys::Datum::from(pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr()))
+                } else {
+                    pg_sys::datumCopy(datum, false, typlen.into())
+                }
+            })
+        };
+        Some(AnyElement { datum, typoid })
     }
 }
 

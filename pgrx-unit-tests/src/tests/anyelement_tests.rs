@@ -43,7 +43,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
 
-    use pgrx::{AnyElement, datum::DatumWithOid, prelude::*};
+    use pgrx::{AllocatedByRust, AnyElement, datum::DatumWithOid, prelude::*};
+    use std::num::NonZeroUsize;
 
     #[pg_test]
     fn test_anyelement_arg() -> Result<(), pgrx::spi::Error> {
@@ -75,6 +76,26 @@ mod tests {
             )?,
             "Some([4, 5])"
         );
+        Ok(())
+    }
+
+    /// SPI frees a query's results when its connection closes, before `get_one` returns, so it
+    /// must copy a pass-by-reference value out of them.
+    #[pg_test]
+    fn test_anyelement_from_spi_outlives_connection() -> Result<(), pgrx::spi::Error> {
+        let text = Spi::get_one::<AnyElement>("SELECT repeat('x', 40)")?.expect("text is NULL");
+        assert_eq!(text.value::<String>(), Ok(Some("x".repeat(40))));
+
+        let point = Spi::get_one::<AnyElement>("SELECT point(1, 2)")?.expect("point is NULL");
+        let point = point.value::<pg_sys::Point>()?.expect("point is NULL");
+        assert_eq!((point.x, point.y), (1.0, 2.0));
+
+        let record = Spi::get_one::<AnyElement>("SELECT ROW(3, 'x')")?.expect("record is NULL");
+        let record = record.value::<PgHeapTuple<AllocatedByRust>>()?.expect("record is NULL");
+        assert_eq!(record.get_by_index::<i32>(NonZeroUsize::MIN)?, Some(3));
+
+        let int = Spi::get_one::<AnyElement>("SELECT 7")?.expect("int is NULL");
+        assert_eq!(int.value::<i32>(), Ok(Some(7)));
         Ok(())
     }
 
