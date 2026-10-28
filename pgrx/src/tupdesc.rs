@@ -97,12 +97,18 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// ## Safety
     ///
-    /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
-    /// or requires reference counting.
+    /// `ptr` must be NULL or point to a live tuple descriptor.
+    ///
+    /// ## Panics
+    ///
+    /// Panics if `ptr` is NULL, before reading it.
     pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+        let src = non_null(ptr);
         PgTupleDesc {
-            // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
-            tupdesc: non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(ptr) }),
+            // SAFETY: the caller passes a live descriptor, which non_null checked is not NULL.
+            // CreateTupleDescCopyConstr reads it and returns a new copy palloc'd in
+            // CurrentMemoryContext, which this value owns and frees when it drops.
+            tupdesc: non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(src.as_ptr()) }),
             parent: None,
             need_release: false,
             need_pfree: true,

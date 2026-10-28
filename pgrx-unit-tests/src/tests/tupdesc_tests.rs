@@ -63,4 +63,11 @@ mod tests {
         }
         Ok(())
     }
+
+    /// `from_pg_copy` checks for NULL before CreateTupleDescCopyConstr reads the descriptor.
+    #[pg_test(error = "tuple descriptor pointer must not be null")]
+    fn test_from_pg_copy_panics_on_null() {
+        // SAFETY: from_pg_copy accepts NULL and panics without reading it.
+        let _ = unsafe { PgTupleDesc::from_pg_copy(std::ptr::null_mut()) };
+    }
 }
