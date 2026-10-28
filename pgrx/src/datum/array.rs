@@ -981,7 +981,7 @@ where
     }
 
     unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
+        mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -989,8 +989,21 @@ where
     where
         Self: Sized,
     {
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+        // Unbox in `memory_context` too: an element such as a `PgBox` copies itself into
+        // CurrentMemoryContext.
+        // SAFETY: the caller passes a live `memory_context` and a Datum this type can read, on
+        // the backend thread. Nothing here resets the context that `switch_to` restores.
+        unsafe {
+            memory_context.switch_to(|_| {
+                Array::<T>::from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    is_null,
+                    typoid,
+                )
+                .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+            })
+        }
     }
 }
 
@@ -1009,7 +1022,7 @@ where
     }
 
     unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
+        mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -1017,8 +1030,18 @@ where
     where
         Self: Sized,
     {
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter().collect::<Vec<_>>())
+        // SAFETY: as for `Vec<T>`, which this matches except that it keeps NULL elements.
+        unsafe {
+            memory_context.switch_to(|_| {
+                Array::<T>::from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    is_null,
+                    typoid,
+                )
+                .map(|array| array.iter().collect::<Vec<_>>())
+            })
+        }
     }
 }
 

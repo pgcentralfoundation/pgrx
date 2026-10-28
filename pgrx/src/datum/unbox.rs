@@ -24,6 +24,10 @@ use core::ffi::CStr;
 /// are implementing this in the way that satisfies that lifetime constraint. There isn't really
 /// a good way to constrain lifetimes correctly without forcing from-Datum types to go through a
 /// wrapper type bound by the lifetime of the Datum. And what would you use as the bound, hmm?
+///
+/// If `As<'src>` does not name `'src`, `unbox` must return a value that does not point into the
+/// Datum's memory. `Vec<T>` and `Array::into_iter` keep such values after they free the array
+/// they unboxed them from.
 pub unsafe trait UnboxDatum {
     // TODO: Currently, this doesn't actually get used to identify all the cases where the Datum
     // is actually a pointer type. However, it has been noted that Postgres does yield nullptr
@@ -416,6 +420,14 @@ unsafe impl<const P: u32, const S: u32> UnboxDatum for Numeric<P, S> {
     }
 }
 
+/// Unboxing copies `size_of::<T>()` bytes into a new allocation in `CurrentMemoryContext`.
+///
+/// The Datum points to a value inside its source, such as an element of an [`Array`], and a
+/// `PgBox` has no lifetime to keep that source alive. An `Array` frees its detoasted copy when it
+/// drops, so `Vec<PgBox<T>>` and `Array::into_iter` would otherwise return dangling boxes. Each
+/// unbox, including each `Array::get`, makes a new copy that lives until its memory context is
+/// reset or deleted. Writing through the box does not change the source.
+// SAFETY: the returned box points to its own allocation, not into the Datum's memory.
 unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
     #[rustfmt::skip]
     type As<'src> = PgBox<T> where Self: 'src;
@@ -424,7 +436,15 @@ unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
     where
         Self: 'src,
     {
-        PgBox::from_datum(d.0, false).unwrap()
+        // SAFETY: the caller passes a Datum that points to an initialized `T`, so its
+        // `size_of::<T>()` bytes are readable; `copy_ptr_into` panics on a null pointer. The copy
+        // is a palloc chunk holding those bytes, which `from_pg` may box. palloc aligns it to
+        // MAXALIGN, at least as strictly as PostgreSQL aligned the source.
+        unsafe {
+            let copy = crate::PgMemoryContexts::CurrentMemoryContext
+                .copy_ptr_into(d.0.cast_mut_ptr::<T>(), size_of::<T>());
+            PgBox::from_pg(copy)
+        }
     }
 }
 
