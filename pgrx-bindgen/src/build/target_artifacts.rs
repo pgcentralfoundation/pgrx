@@ -263,6 +263,8 @@ pub(super) fn import(
             report,
             emitted: manifest.emitted,
             skipped: manifest.skipped,
+            // An import compiles no C, so this build applies and drops no CFLAGS.
+            cflags_dropped: Vec::new(),
             runtime_cfg: manifest.runtime_cfg,
         },
     ))
@@ -691,6 +693,7 @@ mod tests {
             report,
             emitted: 3,
             skipped: 2,
+            cflags_dropped: Vec::new(),
             runtime_cfg: vec![
                 "pgrx_c_char_unsigned".into(),
                 "pgrx_c_size_type=\"unsigned_long\"".into(),

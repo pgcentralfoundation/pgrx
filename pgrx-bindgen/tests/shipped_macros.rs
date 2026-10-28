@@ -158,8 +158,19 @@ impl Fixture {
                 status => panic!("unexpected macro status {status}"),
             }
         }
+        let dropped = report["cflags_dropped"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|flag| flag.as_str().unwrap())
+            .collect::<Vec<_>>();
+        let dropped = if dropped.is_empty() {
+            String::new()
+        } else {
+            format!("; dropped host CFLAGS {dropped:?}")
+        };
         expected.insert(format!(
-            "pg18 C macros: {emitted} emitted, {skipped} skipped; report {}",
+            "pg18 C macros: {emitted} emitted, {skipped} skipped{dropped}; report {}",
             out_dir.join("pg18_macro_report.json").display()
         ));
         let actual = build_output

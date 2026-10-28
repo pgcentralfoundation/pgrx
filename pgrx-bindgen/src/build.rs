@@ -377,8 +377,14 @@ fn generate_bindings(
     let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
     write_content_stable(&report, &macros.report)?;
     if macro_debug_enabled() {
+        // Debug formatting escapes line breaks that recorded flags may contain.
+        let dropped = if macros.cflags_dropped.is_empty() {
+            String::new()
+        } else {
+            format!("; dropped host CFLAGS {:?}", macros.cflags_dropped)
+        };
         println!(
-            "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped; report {}",
+            "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped{dropped}; report {}",
             macros.emitted,
             macros.skipped,
             report.display()
@@ -1198,7 +1204,8 @@ fn run_bindgen(
     if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments)) {
         arguments.insert(0, format!("--target={}", clang_target(&target)));
     }
-    let (mut macro_arguments, cflags_recorded) = postgres_cflags(pg_config)?;
+    let cflags = macro_cflags(pg_config, env_tracked)?;
+    let mut macro_arguments = cflags.applied.clone();
     // Ordinary bindings deliberately omit MSVC CPPFLAGS. The separate
     // macro profile still needs the recorded preprocessing controls.
     if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows") {
@@ -1248,7 +1255,7 @@ fn run_bindgen(
         &environment_arguments,
         explicit_clang.as_deref(),
         native,
-        cflags_recorded,
+        &cflags,
         generate,
     )
     .wrap_err_with(|| {
@@ -1272,6 +1279,8 @@ struct MacroOutput {
     emitted: usize,
     /// Rejected candidates counted without treating unsupported syntax as build failure.
     skipped: usize,
+    /// Host CFLAGS this build left out of the macro profile, for the Cargo summary.
+    cflags_dropped: Vec<String>,
     /// Verified scalar identity choices for the active defining runtime.
     runtime_cfg: Vec<String>,
 }
@@ -1288,6 +1297,8 @@ struct MacroReport<'a> {
     /// verified header, target and caller invocation define macro semantics;
     /// the report makes no claim about unrecorded server build options.
     cflags_recorded: bool,
+    /// Recorded host CFLAGS left out because a host `pg_config` described a cross target.
+    cflags_dropped: &'a [String],
     /// Verified compiler invocation, target, and semantic flags used for this generation.
     profile: &'a CompilationProfile,
     /// Header, compiler, search-root, and environment dependencies needed to invalidate output.
@@ -1314,7 +1325,7 @@ fn generate_macros(
     environment_arguments: &[String],
     preferred_clang: Option<&Path>,
     native: NativeBuild<'_>,
-    cflags_recorded: bool,
+    cflags: &MacroCflags,
     generate_bindings: impl FnOnce() -> eyre::Result<String>,
 ) -> eyre::Result<(String, MacroOutput)> {
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
@@ -1533,7 +1544,8 @@ fn generate_macros(
     let report = serde_json::to_vec_pretty(&MacroReport {
         postgres_major_version: major_version,
         status: "generated",
-        cflags_recorded,
+        cflags_recorded: cflags.recorded,
+        cflags_dropped: &cflags.dropped,
         profile: frontend.profile(),
         inputs: session.inputs(),
         diagnostics: &frontend.inventory().diagnostics,
@@ -1547,7 +1559,8 @@ fn generate_macros(
         // Publish linkage only after every proof, fingerprint and serialization succeeds.
         link_macro_support(major_version, native.out_dir);
     }
-    Ok((bindings, MacroOutput { files, report, emitted, skipped, runtime_cfg }))
+    let cflags_dropped = cflags.dropped.clone();
+    Ok((bindings, MacroOutput { files, report, emitted, skipped, cflags_dropped, runtime_cfg }))
 }
 
 /// Match bindgen 0.72's target-specific lookup and malformed-quoting fallback.
@@ -1856,17 +1869,55 @@ fn pg_target_includes(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Vec
     Ok(result)
 }
 
+/// PostgreSQL's machine-independent semantic flags (meson's `common_functional_flags` and the
+/// configure.ac equivalents). They are the only host CFLAGS that also describe a cross target.
+const POSTGRES_FUNCTIONAL_CFLAGS: [&str; 3] =
+    ["-fno-strict-aliasing", "-fwrapv", "-fexcess-precision=standard"];
+
+/// The installation's recorded CFLAGS, split by whether they apply to the macro profile.
+#[derive(Debug, Default, PartialEq)]
+struct MacroCflags {
+    /// Flags applied to macro inspection and native compilation, in recorded order.
+    applied: Vec<String>,
+    /// Host flags left out of a cross target's profile, in recorded order.
+    dropped: Vec<String>,
+    /// Whether the installation recorded CFLAGS at all.
+    recorded: bool,
+}
+
 /// Decode the installation's recorded compiler flags without losing shell quoting;
 /// reject malformed or non-UTF-8 profiles before bindgen and native macros can diverge.
-fn postgres_cflags(pg_config: &PgConfig) -> eyre::Result<(Vec<String>, bool)> {
-    let Some(flags) = pg_config.optional_cflags()? else {
-        return Ok((Vec::new(), false));
+fn macro_cflags(
+    pg_config: &PgConfig,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> eyre::Result<MacroCflags> {
+    let flags = pg_config.optional_cflags()?;
+    let flags = flags
+        .as_deref()
+        .map(|flags| flags.to_str().ok_or_else(|| eyre!("PostgreSQL CFLAGS are not UTF-8")))
+        .transpose()?;
+    scope_macro_cflags(flags, pg_config.is_real(), lookup)
+}
+
+/// A `pg_config` program describes the machine it runs on, so in a cross build its codegen and
+/// ISA flags describe the host server rather than the target. Keep only PostgreSQL's functional
+/// flags there. AS_ENV metadata and native builds describe the target and apply in full.
+fn scope_macro_cflags(
+    flags: Option<&str>,
+    host_program: bool,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> eyre::Result<MacroCflags> {
+    let Some(flags) =
+        flags.map(|flags| recorded_macro_flags(flags, &lookup)).transpose()?.flatten()
+    else {
+        return Ok(MacroCflags::default());
     };
-    let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CFLAGS are not UTF-8"))?;
-    Ok(match recorded_macro_flags(flags, env_tracked)? {
-        Some(flags) => (flags, true),
-        None => (Vec::new(), false),
-    })
+    let (applied, dropped) = if host_program && lookup("HOST") != lookup("TARGET") {
+        flags.into_iter().partition(|flag| POSTGRES_FUNCTIONAL_CFLAGS.contains(&flag.as_str()))
+    } else {
+        (flags, Vec::new())
+    };
+    Ok(MacroCflags { applied, dropped, recorded: true })
 }
 
 /// Decode one recorded CFLAGS or CPPFLAGS fragment for the macro profile; `None` means the
@@ -2236,6 +2287,51 @@ macro_rules! EXAMPLE {
             recorded_macro_flags("-I'/a b' -O2", target("linux", "gnu")).unwrap().unwrap(),
             ["-I/a b", "-O2"]
         );
+    }
+
+    /// A `pg_config` program reports the host server's flags. A cross build keeps only
+    /// PostgreSQL's functional flags from it, in recorded order, so host ISA options such as
+    /// `-fcf-protection` never reach the target; native builds and AS_ENV keep every flag.
+    #[test]
+    fn macro_cflags_scope_host_metadata_in_cross_builds() {
+        let recorded = "-O2 -fno-strict-aliasing -fcf-protection -fwrapv \
+                        -mno-omit-leaf-frame-pointer -fexcess-precision=standard";
+        let environment = |target: &'static str| {
+            move |name: &str| match name {
+                "HOST" => Some("x86_64-unknown-linux-gnu".to_owned()),
+                "TARGET" => Some(target.to_owned()),
+                "CARGO_CFG_TARGET_OS" => Some("linux".to_owned()),
+                "CARGO_CFG_TARGET_ENV" => Some("gnu".to_owned()),
+                _ => None,
+            }
+        };
+        let native =
+            scope_macro_cflags(Some(recorded), true, environment("x86_64-unknown-linux-gnu"))
+                .unwrap();
+        assert_eq!(
+            native,
+            MacroCflags {
+                applied: recorded.split_whitespace().map(String::from).collect(),
+                dropped: Vec::new(),
+                recorded: true,
+            }
+        );
+        let cross = environment("aarch64-unknown-linux-gnu");
+        assert_eq!(
+            scope_macro_cflags(Some(recorded), false, cross).unwrap(),
+            native,
+            "AS_ENV metadata describes the target"
+        );
+        let scoped = scope_macro_cflags(Some(recorded), true, cross).unwrap();
+        assert_eq!(
+            scoped.applied,
+            ["-fno-strict-aliasing", "-fwrapv", "-fexcess-precision=standard"]
+        );
+        assert_eq!(scoped.dropped, ["-O2", "-fcf-protection", "-mno-omit-leaf-frame-pointer"]);
+        assert!(scoped.recorded);
+        for absent in [None, Some(""), Some("not recorded")] {
+            assert_eq!(scope_macro_cflags(absent, true, cross).unwrap(), MacroCflags::default());
+        }
     }
 
     /// Checks that explicit targets and cargo target spellings are preserved.
