@@ -62,6 +62,7 @@ typedef struct BodyArrayMaker { BodyArray (*make)(int); } BodyArrayMaker;
 static inline int BODY_MADE_COUNT(const BodyArrayMaker *maker, int value) { return value + maker->make(value).count; }
 static inline int BODY_LEAF(int value) { return value + 10; }
 static inline int BODY_CALLER(int value) { return BODY_LEAF(value) * 2; }
+#define BODY_LEAF_PLUS(value) (BODY_LEAF(value) + 1)
 static inline int BODY_RECURSIVE(int value) { return value <= 0 ? 0 : BODY_RECURSIVE(value - 1) + 1; }
 enum { BODY_LATE = 5 };
 static inline int BODY_LATE_USE(int value) { return value + BODY_LATE; }

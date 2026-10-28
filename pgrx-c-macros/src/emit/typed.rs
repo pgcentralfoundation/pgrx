@@ -11,7 +11,7 @@
 //! copying large rendered subtrees.
 
 use super::arguments::{self, ArgumentContext};
-use super::types::{EXPRESSION, Lowering, rust_path};
+use super::types::{EXPRESSION, LoweredType, Lowering, rust_path};
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
 use crate::syntax::{
@@ -255,6 +255,19 @@ impl<'a> Renderer<'a> {
             .filter(|marker| lowered == format!("{SUPPORT}::{marker}"))
             .and_then(|_| super::rust_identifier(spelling))
             .map_or_else(|| lowered.to_owned(), |name| format!("$crate::__pgrx_c_types::{name}"))
+    }
+
+    /// A witness of a value of the C type `declared`, whose runtime marker is `marker`.
+    pub(super) fn value_witness(&self, declared: &TypeInfo, marker: &str) -> String {
+        let mut rust = String::new();
+        write_witness(&mut rust, &self.witness_marker(&declared.spelling, marker));
+        rust
+    }
+
+    /// A witness of a call's result, of the C type `declared` lowered to `result`, or `()`
+    /// for a void call.
+    fn call_witness(&self, declared: &TypeInfo, result: Option<&LoweredType>) -> String {
+        result.map_or_else(|| "()".into(), |result| self.value_witness(declared, &result.marker))
     }
 
     /// Dead checks of the caller's operands, for a size witness that wraps generated
@@ -1248,10 +1261,18 @@ impl<'a> Renderer<'a> {
                             if bindings.inline_translations.contains(name.as_str())
                                 && let Some(callee) = super::macro_identifier(name)
                             {
+                                // The real call below converts the translation's value with
+                                // `implicit`, or is `()` for a void function.
+                                if self.collapses(context) {
+                                    rust.push_str(
+                                        &self.call_witness(&declared.result, result.as_ref()),
+                                    );
+                                    continue;
+                                }
                                 // A witness names no other generated macro's internal arms.
                                 if self.mode == RenderMode::Witness {
                                     return Err(failure(
-                                        "a type witness does not render a translated inline call"
+                                        "a type witness renders a translated inline call only as a value"
                                             .into(),
                                     ));
                                 }
@@ -1294,16 +1315,9 @@ impl<'a> Renderer<'a> {
                                 .collect::<Result<Vec<_>, _>>()
                                 .map_err(failure)?;
                             if self.collapses(context) {
-                                match &result {
-                                    Some(result) => write_witness(
-                                        rust,
-                                        &self.witness_marker(
-                                            &declared.result.spelling,
-                                            &result.marker,
-                                        ),
-                                    ),
-                                    None => rust.push_str("()"),
-                                }
+                                rust.push_str(
+                                    &self.call_witness(&declared.result, result.as_ref()),
+                                );
                                 continue;
                             }
                             if let Some(result) = &result {

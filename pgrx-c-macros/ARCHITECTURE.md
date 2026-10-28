@@ -1733,12 +1733,17 @@ like every evaluated operand, it is an `expr`. Every arm expands to the hidden
   node whose runtime helper fixes the result type by its signature becomes
   `type_witness::<M>()` without rendering its operands. These nodes are casts,
   comparisons and logical operators, the `sizeof`/`alignof`/`offsetof` family,
-  direct native calls, byte swaps and branch hints. Every other node renders as
-  in the real arm, so member, load and array-decay types still come from the
-  runtime's traits. A comma renders only its right operand, and the witness never
-  delegates to another macro's internal arms. The shell evaluates
-  `if false { finish(witness) } else { panic }`, which has the real macro's
-  `CExpression<V>` type.
+  direct native calls, calls to translated inline functions, byte swaps and
+  branch hints. A call's witness is its declared result, or `()` for a void
+  function. Every other node renders as in the real arm, so member, load and
+  array-decay types still come from the runtime's traits. A comma renders only
+  its right operand, and the witness never delegates to another macro's
+  internal arms, so it never names a translated callee's value arm. The shell
+  evaluates `if false { finish(witness) } else { panic }`, which has the real
+  macro's `CExpression<V>` type.
+- A translated inline function body passes `type_witness::<M>()` for its result
+  marker `M`, or `()` for a void function, in a block that borrows every
+  argument, which the real body evaluates once before it runs.
 - A statement or empty macro passes a block of type `()`.
 - A body whose every path returns from the caller, and a witness that could not
   be rendered, keep the diverging placeholder.
@@ -1758,16 +1763,17 @@ never mention spelling, type, identifier or unused operands. The dead generic
 proof in [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs)
 compiles in every build and ties each collapsed helper's result type to
 `type_witness`, so changing such a signature breaks the build until the collapse
-rule changes. A typedef cast whose lowered marker is exactly its kind's marker
-names the typedef's `__pgrx_c_types` alias, which keeps the witness equal in
-versions where only the typedef's rank changes.
+rule changes. A typedef cast, or a call or translated body whose declared
+result is a typedef, whose lowered marker is exactly its kind's marker names the
+typedef's `__pgrx_c_types` alias, which keeps the witness equal in versions
+where only the typedef's rank changes.
 
 A shell can accept more than its real macro: collapsed operands' trait bounds are
 not checked, local-name guards are absent, and dropped operands are only borrowed.
 A shell also needs no `unsafe` block where every unsafe operation of its real
 macro is collapsed or dropped, such as a native call, a comparison of a member
-read through a pointer, or a statement body; an `unsafe` block around such a call
-warns as unused in docs builds. The oracle pins examples of each.
+read through a pointer, a statement body or a translated inline function body;
+an `unsafe` block around such a call warns as unused in docs builds. The oracle pins examples of each.
 It can reject an invocation that its real macro accepts, or give it another type,
 only where its `expr` fragments and the `@native` descriptor replace the argument
 normalizer and classifier:

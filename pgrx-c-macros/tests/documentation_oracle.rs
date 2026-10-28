@@ -138,6 +138,22 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_SWAP", Kind::Unit, "unsafe { DOC_SWAP!(pointer, other) }"),
     ("DOC_MAYBE_RETURN", Kind::Unit, "-> CValue<CInt> { DOC_MAYBE_RETURN!(flag); CValue::new(1) }"),
     ("DOC_RETURN", Kind::Diverges, "-> CValue<CInt> { DOC_RETURN!(@__pgrx_c_statement; flag) }"),
+    // Translated static inline functions yield their converted result, or `()`, and a
+    // translated call, as a macro's root or in its spine, has the callee's result type.
+    ("DOC_INLINE_VALUE", Kind::Value, "DOC_INLINE_VALUE!(value)"),
+    ("DOC_INLINE_WORD", Kind::Value, "DOC_INLINE_WORD!(word)"),
+    ("DOC_INLINE_STORE", Kind::Value, "unsafe { DOC_INLINE_STORE!(pointer, value) }"),
+    ("DOC_INLINE_REAL", Kind::Value, "DOC_INLINE_REAL!(value)"),
+    ("DOC_INLINE_STATE", Kind::Value, "unsafe { DOC_INLINE_STATE!(record) }"),
+    ("DOC_INLINE_NAME", Kind::Value, "unsafe { DOC_INLINE_NAME!(name) }"),
+    ("DOC_INLINE_BUSY", Kind::Value, "unsafe { DOC_INLINE_BUSY!(record) }"),
+    ("DOC_INLINE_NESTED", Kind::Value, "DOC_INLINE_NESTED!(value)"),
+    ("DOC_INLINE_STORE_CALL", Kind::Value, "unsafe { DOC_INLINE_STORE_CALL!(pointer, value) }"),
+    ("DOC_INLINE_WORD_CALL", Kind::Value, "DOC_INLINE_WORD_CALL!(word)"),
+    ("DOC_INLINE_REAL_CALL", Kind::Value, "DOC_INLINE_REAL_CALL!(value)"),
+    ("DOC_INLINE_STATE_CALL", Kind::Value, "unsafe { DOC_INLINE_STATE_CALL!(record) }"),
+    ("DOC_INLINE_NAME_CALL", Kind::Value, "unsafe { DOC_INLINE_NAME_CALL!(name) }"),
+    ("DOC_INLINE_BUSY_CALL", Kind::Value, "unsafe { DOC_INLINE_BUSY_CALL!(record) }"),
 ];
 
 /// Invocations that a real macro accepts and its shell rejects, where the shell's
@@ -195,8 +211,12 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
 ///
 /// The main program compiles each with shells outside `unsafe`, and the same statement
 /// with the real macros must fail, so the documented case stays accurate.
-const UNSAFE_DROPPED: &[&str] =
-    &["let _ = DOC_NATIVE!(value);", "let _ = DOC_IS_BUSY!(record);", "DOC_SWAP!(pointer, other);"];
+const UNSAFE_DROPPED: &[&str] = &[
+    "let _ = DOC_NATIVE!(value);",
+    "let _ = DOC_IS_BUSY!(record);",
+    "DOC_SWAP!(pointer, other);",
+    "let _ = DOC_INLINE_STORE!(pointer, value);",
+];
 
 /// Parameters of the functions holding compared invocations.
 const OPERANDS: &str = "record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, name: *mut DocName, cname: *const DocName, holder: *mut DocHolder, counter: *mut DocCounter, bits: *mut DocBits, slot: *mut *mut DocRecord, value: i32, word: u32, flag: i32";
@@ -262,7 +282,14 @@ fn documentation_shells_have_the_real_result_types() {
     let mut names = MACROS.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
     // A macro compared through several adjacent invocations is analyzed once.
     names.dedup();
-    let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("analyze");
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &[] as &[&str],
+        &[] as &[&str],
+        &names,
+    )
+    .expect("analyze");
     let bindings = bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
         .rust_edition(bindgen::RustEdition::Edition2024)
@@ -295,11 +322,13 @@ fn documentation_shells_have_the_real_result_types() {
     let mut macros = String::new();
     let mut shells = documentation_shell_support();
     let mut results = BTreeMap::new();
+    let mut sources = BTreeMap::new();
     for emission in &generated.macros {
         let name = emission.analysis.name.as_str();
         let EmissionStatus::Emitted { rust, documentation, .. } = &emission.status else {
             panic!("{name} must emit: {emission:?}");
         };
+        sources.insert(name, rust.split_whitespace().collect::<String>());
         macros.push_str(rust);
         let mut shell = (**documentation).clone();
         shell.identifier = format!("__doc_{name}");
@@ -358,6 +387,69 @@ fn documentation_shells_have_the_real_result_types() {
         DocumentedResult::Unit { body: "{ let _ = &$left; let _ = &$right; }".into() }
     );
     assert_eq!(results["DOC_EMPTY"], DocumentedResult::Unit { body: "{ }".into() });
+    // A translated body's witness is its result, or `()` for a void function, and it
+    // borrows every argument. A translated call collapses like a native one, so no
+    // witness names the callee's internal value arm, which the real macro expands. A
+    // call root keeps the floating-profile wrapper of the real value arm. The markers
+    // are pinned exactly, since a Rust alias such as `DocWord` has its target's type.
+    const C: &str = "$crate::__pgrx_c_macros";
+    const STATE: &str = "$crate::__pgrx_c_generated::EnumIdentity_enum__DocState";
+    let name = format!("{C}::expression::CPointer<{C}::CChar, {C}::expression::ReadWrite>");
+    // The body converts to the declared C enum's Rust enum. The call converts to the
+    // integer storage that the native binding returns, as a native call does.
+    let state =
+        format!("{C}::expression::CEnumObject<{STATE}, {C}::CUnsignedInt, $crate::DocState>");
+    let state_call = format!("{C}::expression::CEnumObject<{STATE}, {C}::CUnsignedInt, u32>");
+    for (macro_name, borrows, marker) in [
+        ("DOC_INLINE_VALUE", "$value", format!("{C}::CUnsignedShort")),
+        ("DOC_INLINE_WORD", "$word", "$crate::__pgrx_c_types::DocWord".into()),
+        ("DOC_INLINE_REAL", "$value", format!("{C}::expression::CDouble")),
+        ("DOC_INLINE_STATE", "$record", state),
+        ("DOC_INLINE_NAME", "$name", name.clone()),
+        ("DOC_INLINE_BUSY", "$record", format!("{C}::CBool")),
+        ("DOC_INLINE_WORD_CALL", "$word", "$crate::__pgrx_c_types::DocWord".into()),
+        ("DOC_INLINE_REAL_CALL", "$value", format!("{C}::expression::CDouble")),
+        ("DOC_INLINE_STATE_CALL", "$record", state_call),
+        ("DOC_INLINE_NAME_CALL", "$name", name),
+        ("DOC_INLINE_BUSY_CALL", "$record", format!("{C}::CBool")),
+    ] {
+        let value = format!("{C}::expression::type_witness::<{marker}>()");
+        let value = if macro_name.ends_with("_CALL") {
+            format!("{C}::expression::profile_value::<true, _>({value})")
+        } else {
+            value
+        };
+        assert_eq!(
+            results[macro_name],
+            DocumentedResult::Value { witness: format!("{{ let _ = &{borrows}; {value} }}") },
+            "{macro_name}"
+        );
+    }
+    for (macro_name, value) in [
+        ("DOC_INLINE_STORE", "()".to_owned()),
+        ("DOC_INLINE_STORE_CALL", format!("{C}::expression::profile_value::<true, _>(())")),
+    ] {
+        assert_eq!(
+            results[macro_name],
+            DocumentedResult::Value {
+                witness: format!("{{ let _ = &$pointer; let _ = &$value; {value} }}")
+            },
+            "{macro_name}"
+        );
+    }
+    let DocumentedResult::Value { witness } = &results["DOC_INLINE_NESTED"] else { unreachable!() };
+    assert!(witness.starts_with("{ let _ = &$value; "), "{witness}");
+    assert!(witness.contains(&format!("type_witness::<{C}::CUnsignedShort>()")), "{witness}");
+    // The real macros expand the translation with compiled operands.
+    for (name, ..) in MACROS {
+        let callee = match name.strip_suffix("_CALL") {
+            Some(callee) if callee.starts_with("DOC_INLINE_") => callee,
+            _ if *name == "DOC_INLINE_NESTED" => "DOC_INLINE_VALUE",
+            _ => continue,
+        };
+        let call = format!("$crate::{callee}!(@__pgrx_emit_value;(@compiled");
+        assert!(sources[name].contains(&call), "{name} must expand {callee}'s translation");
+    }
 
     let mut comparisons = String::new();
     for (_, _, invocation) in MACROS {
@@ -420,6 +512,10 @@ fn main() {{
         __doc_DOC_SWAP!({{ evaluated += 1; &raw mut left }}, &raw mut right)
     }}));
     assert!(unit.is_err() && evaluated == 0 && (left, right) == (1, 2));
+    let inline = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {{
+        __doc_DOC_INLINE_VALUE!({{ evaluated += 1; 1 }}).get()
+    }}));
+    assert!(inline.is_err() && evaluated == 0);
     let _ = (compare, divergences, safe_shells);
     println!("shells match");
 }}

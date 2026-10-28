@@ -1101,11 +1101,7 @@ fn render(
         }
     };
     let value = if let Some(result) = &inline_body {
-        let marker = match result {
-            InlineResult::Void => None,
-            InlineResult::Value(marker) => Some(marker.as_str()),
-        };
-        statements::render_inline(session, analysis, &renderer, marker)?
+        statements::render_inline(session, analysis, &renderer, result.marker())?
     } else if statement_body.is_some() {
         statements::render(session, analysis, bindings, &renderer, None)?
     } else if empty {
@@ -1362,7 +1358,7 @@ fn render(
                     (typed::Context::Size, InlineResult::Void) => {
                         "compile_error!(\"a void C function call has no size\")".into()
                     }
-                    (typed::Context::Size, InlineResult::Value(marker)) => {
+                    (typed::Context::Size, InlineResult::Value { marker, .. }) => {
                         format!("{SUPPORT}::expression::size_of::<{marker}>()")
                     }
                     _ => "compile_error!(\"a C function call result is not an lvalue\")".into(),
@@ -1439,25 +1435,40 @@ fn render(
             explicit_boundary,
         ),
         hidden,
-        result: documentation::result(analysis, renderer, inline_body.is_some()),
+        result: documentation::result(analysis, renderer, inline_body.as_ref()),
     };
     Ok((rust, documentation))
 }
 
 /// The C result of a translated inline function body.
-enum InlineResult {
+enum InlineResult<'a> {
     /// A void function, whose body evaluates to `()`.
     Void,
-    /// The runtime marker of the function's C return type.
-    Value(String),
+    /// A function that returns a value of its declared C type.
+    Value {
+        /// The function's declared C return type.
+        declared: &'a crate::TypeInfo,
+        /// The runtime marker of that type.
+        marker: String,
+    },
+}
+
+impl InlineResult<'_> {
+    /// The runtime marker of the returned value, or `None` for a void function.
+    fn marker(&self) -> Option<&str> {
+        match self {
+            Self::Void => None,
+            Self::Value { marker, .. } => Some(marker),
+        }
+    }
 }
 
 /// Resolve a translated inline function's C return type.
-fn inline_result(
-    session: &AnalysisSession<'_>,
+fn inline_result<'a>(
+    session: &'a AnalysisSession<'_>,
     analysis: &MacroAnalysis,
     lowering: &types::Lowering<'_>,
-) -> Result<InlineResult, SkipReason> {
+) -> Result<InlineResult<'a>, SkipReason> {
     let refuse = |message: String| skip(analysis, SkipReasonCode::UnsupportedType, message, None);
     let function = session
         .frontend()
@@ -1468,9 +1479,10 @@ fn inline_result(
     if function.signature.result.category == crate::TypeCategory::Void {
         return Ok(InlineResult::Void);
     }
+    let declared = &function.signature.result;
     lowering
-        .resolve(&function.signature.result)
-        .map(|lowered| InlineResult::Value(lowered.marker))
+        .resolve(declared)
+        .map(|lowered| InlineResult::Value { declared, marker: lowered.marker })
         .map_err(refuse)
 }
 

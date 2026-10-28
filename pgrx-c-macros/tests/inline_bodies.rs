@@ -24,8 +24,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit_batch_with_bindings,
-    emit_support_artifact_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, DocumentedResult, EmissionStatus, MacroScanner,
+    emit_batch_with_bindings, emit_support_artifact_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -75,8 +75,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_ARRAY_COUNT",
 ];
 
-/// Macros that call translated inline functions.
-const MACROS: &[&str] = &["BODY_SIZED_MACRO"];
+/// Macros that call translated inline functions, as their root and inside their spine.
+const MACROS: &[&str] = &["BODY_SIZED_MACRO", "BODY_LEAF_PLUS"];
 
 /// Inline functions that stay native calls, each for a reason the fixture names.
 const NATIVE: &[&str] = &[
@@ -140,6 +140,11 @@ const NATIVE: &[&str] = &[
     "BODY_TRIGRAPH_HASH",
 ];
 
+/// The runtime support path in generated code.
+const C: &str = "$crate::__pgrx_c_macros";
+/// The documentation type witness, before its marker.
+const WITNESS: &str = "$crate::__pgrx_c_macros::expression::type_witness::";
+
 /// Compare translated and native inline roots with the original compiler's results.
 #[test]
 fn translated_bodies_match_their_original_definitions() {
@@ -189,7 +194,8 @@ fn translated_bodies_match_their_original_definitions() {
     );
     for emission in emit_batch_with_bindings(&session, &names, &catalog).unwrap() {
         let name = emission.analysis.name.clone();
-        let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
+        let EmissionStatus::Emitted { rust: definition, documentation, .. } = emission.status
+        else {
             panic!("root {name} must emit: {emission:?}");
         };
         assert_eq!(
@@ -199,7 +205,7 @@ fn translated_bodies_match_their_original_definitions() {
         );
         let compact = definition.split_whitespace().collect::<String>();
         match name.as_str() {
-            "BODY_CALLER" => {
+            "BODY_CALLER" | "BODY_LEAF_PLUS" => {
                 assert!(compact.contains("$crate::BODY_LEAF!(@__pgrx_emit_value;(@compiled"));
             }
             "BODY_SIZED_CALLER" | "BODY_SIZED_MACRO" => {
@@ -220,6 +226,39 @@ fn translated_bodies_match_their_original_definitions() {
                 compact.matches("@check_safety").count(),
                 emission.analysis.parameters.len(),
                 "{name}"
+            );
+        }
+        // A translated body's documentation witness borrows every argument and names the
+        // marker of its declared result, or is `()` for a void function. A translated call
+        // collapses to its result like a native call, so no witness names another macro's
+        // internal arm. The documentation oracle compares these types with the real macros'.
+        let DocumentedResult::Value { witness } = &documentation.result else {
+            panic!("{name} has no value witness: {:?}", documentation.result);
+        };
+        assert!(!witness.contains("@__pgrx_emit_value"), "{name}: {witness}");
+        if TRANSLATED.contains(&name.as_str()) {
+            let borrows = emission
+                .analysis
+                .parameters
+                .iter()
+                .map(|parameter| format!("let _ = &${}; ", parameter.name))
+                .collect::<String>();
+            let result = &frontend.declarations().function_signatures[&name].signature.result;
+            let value = match result.spelling.as_str() {
+                "void" => "()".into(),
+                "int" => format!("{WITNESS}<{C}::CInt>()"),
+                "double" => format!("{WITNESS}<{C}::expression::CDouble>()"),
+                "BodyColor" => format!(
+                    "{WITNESS}<{C}::expression::CEnumObject<$crate::__pgrx_c_generated::EnumIdentity_enum__BodyColor, {C}::CUnsignedInt, u32>>()"
+                ),
+                other => panic!("{name}: no expected marker for {other}"),
+            };
+            assert_eq!(*witness, format!("{{ {borrows}{value} }}"), "{name}");
+        }
+        if MACROS.contains(&name.as_str()) {
+            assert!(
+                witness.contains("type_witness::<$crate::__pgrx_c_macros::CInt>()"),
+                "{name}: {witness}"
             );
         }
         rust.push_str(&definition);

@@ -11,7 +11,7 @@
 //! Dependents of a documentation build therefore type-check against the same
 //! result types as ordinary builds.
 
-use super::{arguments, typed, write_doc_comments};
+use super::{InlineResult, arguments, typed, write_doc_comments};
 use crate::{MacroAnalysis, ParameterRole};
 use std::fmt::Write;
 
@@ -307,19 +307,22 @@ pub(super) fn documentation_forms(
 
 /// Classify what a successfully emitted macro yields and render its shell's block.
 ///
-/// Statement bodies yield `()` unless every path returns from the caller, and an
-/// empty macro yields `()`. Any other expression renders its value root as a
-/// witness; a witness that cannot be rendered never affects the real macro. A
-/// translated inline function body has no witness yet.
+/// A translated inline function body yields its converted result, or `()` for a void
+/// function, after evaluating every argument. Other statement bodies yield `()` unless
+/// every path returns from the caller, and an empty macro yields `()`. Any other
+/// expression renders its value root as a witness; a witness that cannot be rendered
+/// never affects the real macro.
 pub(super) fn result(
     analysis: &MacroAnalysis,
     renderer: typed::Renderer<'_>,
-    inline_body: bool,
+    inline_body: Option<&InlineResult<'_>>,
 ) -> DocumentedResult {
-    if inline_body {
-        return DocumentedResult::Untyped {
-            reason: "a translated inline function body has no type witness".into(),
+    if let Some(inline_body) = inline_body {
+        let spine = match inline_body {
+            InlineResult::Void => "()".to_owned(),
+            InlineResult::Value { declared, marker } => renderer.value_witness(declared, marker),
         };
+        return DocumentedResult::Value { witness: block(analysis, &spine) };
     }
     let expression = analysis.expression.as_ref().expect("emitted macros have an expression");
     if let Some(statements) = &expression.syntax.statement_body {
