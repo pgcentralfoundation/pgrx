@@ -1739,7 +1739,9 @@ Release generation keeps the committed bindings and snapshot coherent:
   file count as Cargo warnings, which the release scripts' `cargo -q` hides.
 - `tools/docsrs-typecheck.sh` type-checks pgrx-pg-sys's docs build of each
   version against the committed tree and keeps the packaged crate within 5 MiB.
-  A pgrx-bindgen unit test keeps the snapshot within 24 MiB raw.
+  Like `tools/docsrs-check.sh`, it builds for the docs.rs target, so another host
+  needs that target's standard library and a C compiler for it. A pgrx-bindgen
+  unit test keeps the snapshot within 24 MiB raw.
 
 `pgrx-pg-sys/src/include.rs` exposes the `cmacros` selector in
 `src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or, for

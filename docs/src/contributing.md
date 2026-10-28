@@ -103,6 +103,8 @@ Do this *in order*:
 - [ ] Run `./upgrade-deps.sh`
 - [ ] Push the resulting diffs to *develop*
 - [ ] Run `./publish.sh` to push the new version to [pgrx@crates.io]
+    - Off `x86_64-unknown-linux-gnu`, its docs.rs checks need that target's standard library
+      and a C compiler for it; see [Releases](./contributing/release.md)
     - If there was an error during publishing:
     - [ ] fix the error source
     - [ ] push any resulting diffs to *develop*

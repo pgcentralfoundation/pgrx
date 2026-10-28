@@ -7,23 +7,20 @@
 
 # Type-check pgrx-pg-sys as docs.rs builds it, against the committed bindings and
 # C macro documentation snapshot, for each PostgreSQL version. Then check that the
-# packaged crate stays within its size budget. No PostgreSQL or Clang is needed.
+# packaged crate stays within its size budget. This needs no PostgreSQL or libclang,
+# but it builds for the docs.rs target: on another host, that target's Rust standard
+# library and a C compiler for it are required (see tools/docsrs-target.sh).
 
 set -euo pipefail
+source tools/docsrs-target.sh
 
 VERSIONS="${DOCSRS_PG_VERSIONS:-15 16 17 18 19}"
 MAX_CRATE_BYTES=$((5 * 1024 * 1024))
 PACKAGE_DIR="${CARGO_TARGET_DIR:-target}/package"
 
 # The single docs.rs target that release generation documents.
-target="$(awk '
-    /^\[/ { section = $0; next }
-    section == "[package.metadata.docs.rs]" && $1 == "targets" { print }
-' pgrx-pg-sys/Cargo.toml | sed -n 's/^targets *= *\["\([^"]*\)"\] *$/\1/p')"
-if [[ -z "${target}" ]]; then
-    echo "pgrx-pg-sys/Cargo.toml must name exactly one [package.metadata.docs.rs] target" >&2
-    exit 1
-fi
+target="$(documented_target)"
+require_target_toolchain "" "${target}"
 
 for version in ${VERSIONS}; do
     major="${version#pg}"
@@ -38,7 +35,15 @@ for version in ${VERSIONS}; do
 done
 
 echo "Checking the packaged size of pgrx-pg-sys"
-cargo package -p pgrx-pg-sys --no-verify --allow-dirty
+# Package the internal dependencies too, so a release's new, unpublished versions of
+# them are not resolved from crates.io.
+cargo package --no-verify --allow-dirty \
+    -p pgrx-pg-config \
+    -p pgrx-c-macros \
+    -p pgrx-bindgen \
+    -p pgrx-sql-entity-graph \
+    -p pgrx-macros \
+    -p pgrx-pg-sys
 shopt -s nullglob
 crates=("${PACKAGE_DIR}"/pgrx-pg-sys-*.crate)
 if (( ${#crates[@]} == 0 )); then
