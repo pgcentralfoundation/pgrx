@@ -35,12 +35,14 @@ Application-level ownership and error adapters retain their Rust contracts.
 
 PostgreSQL sometimes changes a macro into a static inline function. The
 generator keeps the `NAME!(...)` interface available in both cases, so callers
-do not need version checks merely because the C name became a function. For example, `VARDATA_ANY!(ptr).get()` works across PG15–19.
-When a value-returning function's body uses no C macros and only constructs the
-generator supports, the generated macro translates that body to Rust, as it
-would a macro's. Otherwise it calls the original C function through the checked
-native binding. Native wrappers are built even when the public `cshim` feature
-is disabled.
+do not need version checks merely because the C name became a function. For
+example, `VARDATA_ANY!(ptr).get()` works across PG15–19. When a function's body
+uses only constructs the generator supports, and any macros it uses are
+unchanged by the rest of the headers, the generated macro translates that body
+to Rust, as it would a macro's. Otherwise it calls the original C function
+through the checked native binding. Generated macros that call a translated
+function run its translation too. Native wrappers are built even when the
+public `cshim` feature is disabled.
 
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C

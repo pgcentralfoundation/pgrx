@@ -107,8 +107,14 @@ pub(super) fn plan(
             })
             .collect::<BTreeMap<_, _>>();
         // Rendering writes each local's marker at its declaration and every use,
-        // so the declared type needs support even when no other node names it.
-        for ty in locals.values() {
+        // so the declared type needs support even when no other node names it. A
+        // translated inline function also lowers its result, and its parameters as
+        // locals, without a call that would request their types.
+        let result = super::translated_inline(session, &analysis)
+            .then(|| &frontend.declarations().function_signatures[&analysis.name].signature.result);
+        for ty in
+            result.into_iter().chain(locals.values()).filter(|ty| ty.category != TypeCategory::Void)
+        {
             requests.types.insert(ty.canonical_spelling.clone(), ty.clone());
         }
         let objects = typed::declared_objects(frontend, &analysis, &lowering, &locals);
