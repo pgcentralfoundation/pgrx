@@ -17,7 +17,13 @@ use std::fs::{self, File};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+/// Distinguish fixtures created by concurrent tests. The clock alone does not: macOS reports
+/// microseconds, so two tests starting together can name the same directory, and the first to
+/// finish removes the other's files.
+static NEXT: AtomicU64 = AtomicU64::new(0);
 
 /// Own an isolated consumer or header tree whose generated artifacts can be inspected without
 /// mutating the repository.
@@ -33,8 +39,11 @@ impl Fixture {
     /// the checkout's snapshots.
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-        let root = std::env::temp_dir()
-            .join(format!("pgrx-shipped-macros-{}-{nonce}", std::process::id()));
+        let root = std::env::temp_dir().join(format!(
+            "pgrx-shipped-macros-{}-{nonce}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
         for directory in ["src/include/cmacros", "include", "server", "pgrx-home"] {
             fs::create_dir_all(root.join(directory)).unwrap();
         }
