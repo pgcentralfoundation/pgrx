@@ -27,11 +27,11 @@ impl PgVarlenaInOutFuncs for VarlenaType {
         let mut iter = input.to_str().unwrap().split(',');
         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 
-        let mut result = PgVarlena::<VarlenaType>::new();
-        result.a = f32::from_str(a.unwrap()).expect("a is not a valid f32");
-        result.b = f32::from_str(b.unwrap()).expect("b is not a valid f32");
-        result.c = i64::from_str(c.unwrap()).expect("c is not a valid i64");
-        result
+        PgVarlena::from(VarlenaType {
+            a: f32::from_str(a.unwrap()).expect("a is not a valid f32"),
+            b: f32::from_str(b.unwrap()).expect("b is not a valid f32"),
+            c: i64::from_str(c.unwrap()).expect("c is not a valid i64"),
+        })
     }
 
     fn output(&self, buffer: &mut StringInfo) {
@@ -49,18 +49,11 @@ pub enum VarlenaEnumType {
 
 impl PgVarlenaInOutFuncs for VarlenaEnumType {
     fn input(input: &CStr) -> PgVarlena<Self> where {
-        let mut result = PgVarlena::<Self>::new();
-        let s = input.to_str().unwrap();
-        match s {
-            "A" => {
-                *result = VarlenaEnumType::A;
-            }
-            "B" => {
-                *result = VarlenaEnumType::B;
-            }
+        PgVarlena::from(match input.to_str().unwrap() {
+            "A" => VarlenaEnumType::A,
+            "B" => VarlenaEnumType::B,
             _ => panic!("unexpected input"),
-        }
-        result
+        })
     }
 
     fn output(&self, buffer: &mut StringInfo) {

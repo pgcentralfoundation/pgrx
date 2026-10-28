@@ -45,11 +45,7 @@ impl PgVarlenaInOutFuncs for Rgb {
         let r = u8::from_str_radix(&hex[0..2], 16).expect("bad red");
         let g = u8::from_str_radix(&hex[2..4], 16).expect("bad green");
         let b = u8::from_str_radix(&hex[4..6], 16).expect("bad blue");
-        let mut v = PgVarlena::<Self>::new();
-        v.r = r;
-        v.g = g;
-        v.b = b;
-        v
+        PgVarlena::from(Rgb { r, g, b })
     }
 
     fn output(&self, buffer: &mut StringInfo) {

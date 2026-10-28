@@ -14,7 +14,7 @@ use pgrx::{PgVarlenaInOutFuncs, StringInfo};
 
 /// Too large for a one-byte varlena header, so its Datums have the four-byte header that
 /// detoasting leaves in place.
-#[derive(Copy, Clone, PostgresType)]
+#[derive(Copy, Clone, Default, PostgresType)]
 #[bikeshed_postgres_type_manually_impl_from_into_datum]
 #[pgvarlena_inoutfuncs]
 pub struct PgVarlenaCounter {
@@ -61,7 +61,7 @@ mod tests {
     use pgrx::prelude::*;
 
     /// Fits a one-byte varlena header, whose payload starts one byte into a MAXALIGN allocation.
-    #[derive(Copy, Clone, Debug, PartialEq)]
+    #[derive(Copy, Clone, Debug, Default, PartialEq)]
     #[repr(C)]
     struct Align8 {
         a: f32,
@@ -77,7 +77,7 @@ mod tests {
     }
 
     /// Too large for a one-byte header, so its payload starts four bytes into the allocation.
-    #[derive(Copy, Clone, Debug, PartialEq)]
+    #[derive(Copy, Clone, Debug, Default, PartialEq)]
     #[repr(C)]
     struct Large {
         words: [u64; 32],

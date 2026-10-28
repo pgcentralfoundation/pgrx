@@ -53,12 +53,11 @@ use std::{ptr, slice};
 ///         let mut iter = input.to_str().unwrap().split(',');
 ///         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 ///
-///         let mut result = PgVarlena::<MyType>::new();
-///         result.a = f32::from_str(a.unwrap()).expect("a is not a valid f32");
-///         result.b = f32::from_str(b.unwrap()).expect("b is not a valid f32");
-///         result.c = i64::from_str(c.unwrap()).expect("c is not a valid i64");
-///
-///         result
+///         PgVarlena::from(MyType {
+///             a: f32::from_str(a.unwrap()).expect("a is not a valid f32"),
+///             b: f32::from_str(b.unwrap()).expect("b is not a valid f32"),
+///             c: i64::from_str(c.unwrap()).expect("c is not a valid i64"),
+///         })
 ///     }
 ///
 ///     fn output(&self, buffer: &mut pgrx::StringInfo) {
@@ -87,16 +86,15 @@ impl<T> PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    /// Create a new `PgVarlena` representing a Rust type. Its value starts as all zero bytes.
-    ///
-    /// The initial value is all zero bytes, so `T` must accept all-zero bytes as a valid value.
+    /// Create a new `PgVarlena` holding `T::default()`. For a type without a `Default`
+    /// implementation, build the value and convert it with `PgVarlena::from` instead.
     ///
     /// ## Example
     ///
     /// ```rust,no_run
     /// use pgrx::prelude::*;
     ///
-    /// #[derive(Copy, Clone)]
+    /// #[derive(Copy, Clone, Default)]
     /// struct MyType {
     ///    a: f32,
     ///    b: f32,
@@ -108,7 +106,23 @@ where
     /// v.b = 0.424242;
     /// v.c = 42;
     /// ```
-    pub fn new() -> Self {
+    pub fn new() -> Self
+    where
+        T: Default,
+    {
+        Self::from(T::default())
+    }
+
+    /// Create a new `PgVarlena` whose value is all zero bytes, as `PgVarlena::new` did before
+    /// it required `T: Default`.
+    ///
+    /// ## Safety
+    ///
+    /// All-zero bytes must be a valid value of `T`. That holds for integers, floats, `bool`, and
+    /// raw pointers, and for arrays and structs made only of them. It does not hold for
+    /// references, `NonZero` integers, function pointers, or an enum without a zero
+    /// discriminant, among others.
+    pub unsafe fn new_zeroed() -> Self {
         PgVarlena { value: MaybeUninit::zeroed(), tail: Box::default() }
     }
 
@@ -314,9 +328,16 @@ where
     T: Default + Copy,
 {
     fn default() -> Self {
-        let mut ptr = Self::new();
-        *ptr = T::default();
-        ptr
+        Self::new()
+    }
+}
+
+impl<T> From<T> for PgVarlena<T>
+where
+    T: Copy + Sized,
+{
+    fn from(value: T) -> Self {
+        PgVarlena { value: MaybeUninit::new(value), tail: Box::default() }
     }
 }
 
@@ -419,4 +440,20 @@ where
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PgVarlena;
+    use core::num::NonZeroU32;
+
+    #[test]
+    fn constructors_hold_valid_values() {
+        // A type whose all-zero bytes are not a valid value.
+        assert_eq!(*PgVarlena::from(NonZeroU32::MIN), NonZeroU32::MIN);
+        assert_eq!(*PgVarlena::<&str>::default(), "");
+        assert_eq!(*PgVarlena::<(u8, i64)>::new(), (0, 0));
+        // SAFETY: all-zero bytes are a valid [u32; 4].
+        assert_eq!(*unsafe { PgVarlena::<[u32; 4]>::new_zeroed() }, [0; 4]);
+    }
 }

@@ -70,21 +70,19 @@ impl PgVarlenaInOutFuncs for PgVarlenaThing {
         Self: Copy + Sized,
     {
         let s = input.to_str().unwrap();
-        let mut result: PgVarlena<PgVarlenaThing> = PgVarlena::new();
 
         // parsing a string in this format:  1;2;3;[1,2,3,4,5]
 
         let mut parts = s.split(';');
-        result.a = parts.next().unwrap().parse().unwrap();
-        result.b = parts.next().unwrap().parse().unwrap();
-        result.c = parts.next().unwrap().parse().unwrap();
+        let a = parts.next().unwrap().parse().unwrap();
+        let b = parts.next().unwrap().parse().unwrap();
+        let c = parts.next().unwrap().parse().unwrap();
 
         let d = parts.next().unwrap();
         let d = d.trim_start_matches('[');
         let d = d.trim_end_matches(']');
         let d = d.split(',').map(|e| e.parse().unwrap()).collect::<Vec<u8>>();
-        result.d = [d[0], d[1], d[2], d[3], d[4]];
-        result
+        PgVarlena::from(PgVarlenaThing { a, b, c, d: [d[0], d[1], d[2], d[3], d[4]] })
     }
 
     fn output(&self, buffer: &mut StringInfo) {
