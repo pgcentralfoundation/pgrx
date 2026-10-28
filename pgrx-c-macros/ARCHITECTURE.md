@@ -890,6 +890,11 @@ Do not first capture an operand as an opaque `expr` fragment when later macro
 stages need to recognize a generated invocation and request its place or size
 context. That would erase precisely the structure needed to compose C macros.
 Generated helper names use `$crate` paths; user tokens retain caller context.
+Standard names such as `Option::Some`, `Option::None`, `assert!`, and
+`compile_error!` use absolute `::core` paths, because `macro_rules!` resolves
+them where the macro is invoked. A caller's glob-imported enum variant or own
+`assert!` or `compile_error!` macro could otherwise break a size witness or turn
+a refusal into an accepted invocation.
 Expression macros expose value, place, read-place, size, and discard entry points.
 An unsupported context contains `compile_error!` rather than removing otherwise
 useful value behavior. Zero-argument macros omit argument normalization, but can

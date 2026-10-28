@@ -167,8 +167,15 @@ fn generated_strings_and_assertion_diagnostics_match_original_c() {
     let (rust, adapters) = emitted_source(&session, &bindings, &catalog, SUPPORTED);
     let profile = frontend.profile();
     let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
+    // Exported macro bodies resolve standard macro names where they are invoked.
+    // This uncalled caller compiles with the consumer only if the emitted const
+    // checks for operand spelling and the invocation line ignore its `assert!`.
+    let consulted = "#[allow(unused_macros)] macro_rules! assert { ($($tokens:tt)*) => { ::core::compile_error!(\"caller assert! was consulted\") } }";
+    let accepted = format!(
+        "mod accepted {{ {consulted}\npub fn invoke() -> i32 {{\n// SAFETY: The native recorder only borrows static zero-terminated strings.\nunsafe {{ STRING_DIAGNOSTIC!(identifier); STRING_LINE!().get() }} }} }}"
+    );
     let generated = rust_oracle::run_rust_linked(
-        &format!("{rust}\n{}", include_str!("fixtures/string_oracle.rs")),
+        &format!("{rust}\n{}\n{accepted}", include_str!("fixtures/string_oracle.rs")),
         &profile.compiler.executable,
         &header(),
         &format!("{}\n{adapters}", include_str!("fixtures/string_oracle.c")),
@@ -200,6 +207,14 @@ fn generated_strings_and_assertion_diagnostics_match_original_c() {
     assert!(
         non_ascii.contains("C diagnostic operand spelling requires ASCII tokens"),
         "non-ASCII diagnostic token spelling must reject: {non_ascii}"
+    );
+    let ignored = "#[allow(unused_macros)] macro_rules! assert { ($($tokens:tt)*) => { () } }";
+    let shadowed = rust_oracle::reject_rust(&format!(
+        "{rust}\nmod caller {{ {ignored}\npub fn refused() {{ unsafe {{ STRING_DIAGNOSTIC!(café); }} }} }}\nfn main() {{}}\n"
+    ));
+    assert!(
+        shadowed.contains("C diagnostic operand spelling requires ASCII tokens"),
+        "a caller's own assert! must not accept non-ASCII diagnostic spelling: {shadowed}"
     );
 }
 

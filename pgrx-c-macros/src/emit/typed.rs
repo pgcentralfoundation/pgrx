@@ -236,9 +236,8 @@ impl<'a> Renderer<'a> {
             let mut argument = String::new();
             match self.render(root, context, &mut argument) {
                 Ok(()) => rust.push_str(&argument),
-                Err(reason) => {
-                    write!(rust, "compile_error!({:?})", reason.message).expect("String output")
-                }
+                Err(reason) => write!(rust, "::core::compile_error!({:?})", reason.message)
+                    .expect("String output"),
             }
             rust.push_str("] ");
         }
@@ -336,13 +335,13 @@ impl<'a> Renderer<'a> {
                             let raw = format!("{EXPRESSION}::CRawRecord<{}>", lowered.storage);
                             write!(
                                 rust,
-                                "{{ let _ = {EXPRESSION}::size_of_place_type(if false {{ Some("
+                                "{{ let _ = {EXPRESSION}::size_of_place_type(if false {{ ::core::option::Option::Some("
                             )
                             .expect("String output");
                             tasks.extend([
-                                text(")) } else { None }) }"),
+                                text(")) } else { ::core::option::Option::None }) }"),
                                 value(source),
-                                Task::Text(format!(" ) }} else {{ None }}); {EXPRESSION}::size_of_value_type(if false {{ Some({EXPRESSION}::implicit::<{raw}, _>(")),
+                                Task::Text(format!(" ) }} else {{ ::core::option::Option::None }}); {EXPRESSION}::size_of_value_type(if false {{ ::core::option::Option::Some({EXPRESSION}::implicit::<{raw}, _>(")),
                                 place(destination),
                             ]);
                             continue;
@@ -378,20 +377,23 @@ impl<'a> Renderer<'a> {
                                     None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| failure(format!("{field}: no compiler-checked field adapter is available")))?,
                                 };
                                 let checks = arguments::render_safety_checks(analysis);
-                                write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} Some(unsafe {{ ").expect("String output");
-                                tasks.extend([text(" }) } else { None })"), value(*base)]);
+                                write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
+                                tasks.extend([
+                                    text(" }) } else { ::core::option::Option::None })"),
+                                    value(*base),
+                                ]);
                                 continue;
                             }
                             let known = self.places[index];
                             let checks = arguments::render_safety_checks(analysis);
                             write!(
                                 rust,
-                                "{EXPRESSION}::{}(if false {{ {checks} Some(unsafe {{ ",
+                                "{EXPRESSION}::{}(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ",
                                 if known { "size_of_place_type" } else { "size_of_value_type" }
                             )
                             .expect("String output");
                             tasks.extend([
-                                text(" }) } else { None })"),
+                                text(" }) } else { ::core::option::Option::None })"),
                                 Task::Node(
                                     index,
                                     if known { Context::ReadPlace } else { Context::Value },
@@ -516,7 +518,7 @@ impl<'a> Renderer<'a> {
                                     }
                                 }
                             }
-                            write!(rust, "\"\\0\"); const __PGRX_C_BYTES: [u8; __PGRX_C_DIAGNOSTIC.len()] = {{ assert!(__PGRX_C_DIAGNOSTIC.is_ascii(), \"C diagnostic operand spelling requires ASCII tokens\"); {EXPRESSION}::invocation_file_bytes(__PGRX_C_DIAGNOSTIC) }}; {EXPRESSION}::decay({EXPRESSION}::string_literal(&__PGRX_C_BYTES)) }}").expect("String output");
+                            write!(rust, "\"\\0\"); const __PGRX_C_BYTES: [u8; __PGRX_C_DIAGNOSTIC.len()] = {{ ::core::assert!(__PGRX_C_DIAGNOSTIC.is_ascii(), \"C diagnostic operand spelling requires ASCII tokens\"); {EXPRESSION}::invocation_file_bytes(__PGRX_C_DIAGNOSTIC) }}; {EXPRESSION}::decay({EXPRESSION}::string_literal(&__PGRX_C_BYTES)) }}").expect("String output");
                         }
                         ExpressionKind::InvocationFile => {
                             if matches!(context, Context::Value) {
@@ -537,7 +539,7 @@ impl<'a> Renderer<'a> {
                             // Const evaluation refuses an unrepresentable Rust line.
                             let bits =
                                 frontend.profile().target.integers[&crate::IntegerKind::Int].bits;
-                            write!(rust, "{{ const __PGRX_C_LINE: i{bits} = {{ assert!((::core::line!() as u128) <= (i{bits}::MAX as u128), \"Rust invocation line exceeds C int\"); ::core::line!() as i{bits} }}; {SUPPORT}::CValue::<{SUPPORT}::CInt>::new(__PGRX_C_LINE) }}").expect("String output");
+                            write!(rust, "{{ const __PGRX_C_LINE: i{bits} = {{ ::core::assert!((::core::line!() as u128) <= (i{bits}::MAX as u128), \"Rust invocation line exceeds C int\"); ::core::line!() as i{bits} }}; {SUPPORT}::CValue::<{SUPPORT}::CInt>::new(__PGRX_C_LINE) }}").expect("String output");
                         }
                         ExpressionKind::IntegerLiteral { .. }
                         | ExpressionKind::Identifier { .. } => {

@@ -160,7 +160,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                 writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] $budget:tt;) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@unused),];) }};").expect("String output");
             }
             writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {{ $crate::{normalizer}!(@ignore{index} $mode [$($done)*] [$($budget)*]; $($rest)*) }};").expect("String output");
-            writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {{ compile_error!(\"unused C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
+            writeln!(rust, "(@ignore{index} $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {{ ::core::compile_error!(\"unused C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
             continue;
         }
         if parameter.roles.contains(&ParameterRole::Type)
@@ -212,12 +212,12 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                 writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt $budget:tt;) => {{ $crate::{normalizer}!(@spelled{index} $mode $done [] $original) }};").expect("String output");
             }
             writeln!(rust, "(@spelling{index} $mode:ident $done:tt [$($original:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {{ $crate::{normalizer}!(@spelling{index} $mode $done [$($original)* $token] [$($budget)*]; $($rest)*) }};").expect("String output");
-            writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt []; $($raw:tt)+) => {{ compile_error!(\"diagnostic C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
+            writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt []; $($raw:tt)+) => {{ ::core::compile_error!(\"diagnostic C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
             let original = if atomic { "$argument:tt" } else { "$($argument:tt)+" };
             let forwarded = if atomic { "$argument" } else { "$($argument)+" };
             writeln!(rust, "(@spelled{index} $mode:ident [$($done:tt)*] $rest:tt [{original}]) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] [p{next} $mode [$($done)*] $rest] [{forwarded}]) }};").expect("String output");
             if atomic {
-                writeln!(rust, "(@spelled{index} $mode:ident $done:tt $rest:tt [$($argument:tt)+]) => {{ compile_error!(\"an ungrouped C parameter requires one token tree\") }};").expect("String output");
+                writeln!(rust, "(@spelled{index} $mode:ident $done:tt $rest:tt [$($argument:tt)+]) => {{ ::core::compile_error!(\"an ungrouped C parameter requires one token tree\") }};").expect("String output");
             }
             continue;
         }
@@ -230,7 +230,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
             for ending in &endings {
                 let rest = if ending.is_empty() { "" } else { "$($rest)*" };
                 let negative = if atomic {
-                    "compile_error!(\"an ungrouped C parameter requires a parenthesized negative literal\")".into()
+                    "::core::compile_error!(\"an ungrouped C parameter requires a parenthesized negative literal\")".into()
                 } else {
                     format!(
                         "$crate::{normalizer}!(@p{next} $mode [$($done)* (@original [- $argument] (@literal [- $argument])),]; {rest})"
@@ -240,7 +240,8 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                 writeln!(rust, "(@negative{index} $mode:ident [$($done:tt)*]; $argument:expr{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@native [$argument])),]; {rest}) }};").expect("String output");
             }
             let negative = if atomic {
-                "compile_error!(\"an ungrouped C parameter requires one token tree\")".into()
+                "::core::compile_error!(\"an ungrouped C parameter requires one token tree\")"
+                    .into()
             } else {
                 format!("$crate::{normalizer}!(@negative{index} $mode [$($done)*]; - $($raw)*)")
             };
@@ -283,7 +284,7 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
         "(@p{count} $mode:ident [$($done:tt)*];) => {{ $crate::{identifier}!(@$mode; $($done)*) }};"
     )
     .expect("String output");
-    rust.push_str("($($invalid:tt)*) => { compile_error!(\"arguments do not satisfy this C macro's invocation contract\") };\n}\n");
+    rust.push_str("($($invalid:tt)*) => { ::core::compile_error!(\"arguments do not satisfy this C macro's invocation contract\") };\n}\n");
     if rust.len() > MAX_EMISSION_BYTES {
         return Err(skip(
             analysis,
@@ -314,7 +315,7 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [$argument:literal]) => {{ $crate::$callback!(@classified $state (@literal [$argument])) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [$head:ident $(::$tail:ident)* ! $group:tt]) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original [$head $(::$tail)*] $group $budget; $head $(::$tail)*) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [::$head:ident $(::$tail:ident)* ! $group:tt]) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original [::$head $(::$tail)*] $group $budget; $head $(::$tail)*) }};\n\
-         (@walk [$callback:ident] $state:tt [$($original:tt)*] []; [$($raw:tt)*]) => {{ compile_error!(\"C macro argument exceeds the 64-group normalization bound\") }};\n\
+         (@walk [$callback:ident] $state:tt [$($original:tt)*] []; [$($raw:tt)*]) => {{ ::core::compile_error!(\"C macro argument exceeds the 64-group normalization bound\") }};\n\
          (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [$($raw:tt)*]) => {{ $crate::$callback!(@classified $state (@native [$($original)*])) }};\n\
          (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt [@ $($budget:tt)*]; $head:ident :: $($tail:tt)+) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original $path $group [$($budget)*]; $($tail)+) }};\n",
             "@ ".repeat(TOKEN_BUDGET)
@@ -346,11 +347,11 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
     }
     rust.push_str(
         "(@path [$callback:ident] $state:tt [$($original:tt)*] $path:tt $group:tt $budget:tt; $last:ident) => { $crate::$callback!(@classified $state (@native [$($original)*])) };\n\
-         (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt []; $($raw:tt)+) => { compile_error!(\"C macro path exceeds the 64-component normalization bound\") };\n\
+         (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt []; $($raw:tt)+) => { ::core::compile_error!(\"C macro path exceeds the 64-component normalization bound\") };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; ($($inner:tt)*)) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; [$($inner:tt)*]) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; {$($inner:tt)*}) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
-         ($($invalid:tt)*) => { compile_error!(\"invalid generated C macro argument descriptor\") };\n}\n\
+         ($($invalid:tt)*) => { ::core::compile_error!(\"invalid generated C macro argument descriptor\") };\n}\n\
          #[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_original {\n\
          (@classified [$callback:ident $state:tt [$($original:tt)*]] $descriptor:tt) => { $crate::$callback!(@classified $state (@original [$($original)*] $descriptor)) };\n}\n\
          #[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_operand {\n\
@@ -366,7 +367,7 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@value [$floats:tt]; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression) };\n\
          (@place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_place(::core::ptr::addr_of_mut!($expression)) };\n\
          (@read_place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_const_place(::core::ptr::addr_of!($expression)) };\n\
-         (@size; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { Some($crate::__pgrx_c_macros::expression::input($expression)) } else { None }) };\n\
+         (@size; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { ::core::option::Option::Some($crate::__pgrx_c_macros::expression::input($expression)) } else { ::core::option::Option::None }) };\n\
          (@discard [$floats:tt]; (@native [$expression:expr])) => { { let _ = $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression); } };\n\
          (@read_place; (@deref [$($original:tt)*] [$pointer:expr])) => { { use $crate::__pgrx_c_macros::expression::NativeDerefRead as _; (&$pointer).__pgrx_c_read_deref_place() } };\n\
          (@value [$floats:tt]; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@value [$floats]; (@native [$($original)*])) };\n\
@@ -374,9 +375,9 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@size; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@size; (@native [$($original)*])) };\n\
          (@discard [$floats:tt]; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@discard [$floats]; (@native [$($original)*])) };\n\
          (@value [$floats:tt]; (@literal [$argument:expr])) => { $crate::__pgrx_c_macros::expression::profile_value::<$floats, _>($crate::__pgrx_c_macros::expression::literal::value::<{ let __pgrx_c_literal = $argument; (__pgrx_c_literal as u128) == 0 }, _>($argument)) };\n\
-         (@place; (@literal [$argument:expr])) => { compile_error!(\"a C literal is not an object place\") };\n\
-         (@read_place; (@literal [$argument:expr])) => { compile_error!(\"a C literal is not an object place\") };\n\
-         (@size; (@literal [$argument:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { Some($crate::__pgrx_c_macros::expression::literal::value::<{ let __pgrx_c_literal = $argument; (__pgrx_c_literal as u128) == 0 }, _>($argument)) } else { None }) };\n\
+         (@place; (@literal [$argument:expr])) => { ::core::compile_error!(\"a C literal is not an object place\") };\n\
+         (@read_place; (@literal [$argument:expr])) => { ::core::compile_error!(\"a C literal is not an object place\") };\n\
+         (@size; (@literal [$argument:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { ::core::option::Option::Some($crate::__pgrx_c_macros::expression::literal::value::<{ let __pgrx_c_literal = $argument; (__pgrx_c_literal as u128) == 0 }, _>($argument)) } else { ::core::option::Option::None }) };\n\
          (@discard [$floats:tt]; (@literal [$argument:expr])) => { { let _ = $crate::__pgrx_c_operand!(@value [$floats]; (@literal [$argument])); } };\n\
          (@value [$floats:tt]; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_value; $($arguments)*) };\n\
          (@place; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_place; $($arguments)*) };\n\
@@ -388,7 +389,7 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@read_place; (@compiled $value:tt $place:tt [$($read:tt)*] $size:tt)) => { $($read)* };\n\
          (@size; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => { $($size)* };\n\
          (@discard [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt)) => { { let _ = $($value)*; } };\n\
-         ($($invalid:tt)*) => { compile_error!(\"invalid C macro operand context\") };\n}\n"
+         ($($invalid:tt)*) => { ::core::compile_error!(\"invalid C macro operand context\") };\n}\n"
     );
     if rust.len() > MAX_EMISSION_BYTES {
         return Err("generated macro argument support exceeds the output bound".into());

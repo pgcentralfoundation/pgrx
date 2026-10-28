@@ -147,4 +147,17 @@ fn main() {
         "{rust}\nfn main(){{let _=BOUND_ATOMIC!(@__pgrx_c_expression;1+2);}}"
     ));
     assert!(diagnostic.contains("argument"), "{diagnostic}");
+
+    // Exported macro bodies resolve paths other than locals and `$crate` where they
+    // are invoked. A caller's own `None`, `Some`, or `compile_error!` must not change
+    // an unevaluated size witness or turn a refusal into an accepted invocation.
+    let shadowing = "#[allow(dead_code)] enum Slot { None, Some(u32) }\nuse Slot::*;\n#[allow(unused_macros)] macro_rules! compile_error { ($($tokens:tt)*) => { 0 } }";
+    let consumer = format!(
+        "{rust}\nmod caller {{ {shadowing}\npub fn sizes() -> String {{ let byte=7_u8; format!(\"{{}} {{}} {{}}\", BOUND_SIZE!(byte).get(), BOUND_SIZE!(2).get(), BOUND_SIZE!(BOUND_USE!(BOUND_SUM!(@__pgrx_c_expression;byte))).get()) }} }}\nfn main(){{println!(\"{{}}\", caller::sizes());}}"
+    );
+    assert_eq!(rust_oracle::run_rust(&consumer), "1 4 4\n");
+    let diagnostic = rust_oracle::reject_rust(&format!(
+        "{rust}\nmod caller {{ {shadowing}\npub fn refused() -> i32 {{ BOUND_SUM!(2) }} }}\nfn main(){{}}"
+    ));
+    assert!(diagnostic.contains("explicit parenthesized invocation"), "{diagnostic}");
 }

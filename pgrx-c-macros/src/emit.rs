@@ -753,7 +753,7 @@ fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> 
          (@walk [@ $($budget:tt)*]; ($($inner:tt)+)) => {{ $crate::__pgrx_c_field_marker!(@walk [@ $($budget)*]; $($inner)+) }};\n\
          (@walk [@ $($budget:tt)*]; $field:ident . $($rest:tt)+) => {{ $crate::__pgrx_c_macros::expression::OffsetStep<$crate::__pgrx_c_field_marker!($field), $crate::__pgrx_c_field_marker!(@walk [$($budget)*]; $($rest)+)> }};\n\
          (@walk [@ $($budget:tt)*]; $field:ident) => {{ $crate::__pgrx_c_macros::expression::OffsetStep<$crate::__pgrx_c_field_marker!($field), $crate::__pgrx_c_macros::expression::OffsetEnd> }};\n\
-         (@walk []; $($rest:tt)+) => {{ compile_error!(\"offsetof member path exceeds the 64-component bound\") }};\n",
+         (@walk []; $($rest:tt)+) => {{ ::core::compile_error!(\"offsetof member path exceeds the 64-component bound\") }};\n",
         "@ ".repeat(64)
     ));
     for (field, marker) in markers {
@@ -767,7 +767,7 @@ fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> 
             return Err("generated C field registry exceeds its source budget".into());
         }
     }
-    rust.push_str("($($unknown:tt)*) => { compile_error!(\"field has no compiler-verified PostgreSQL binding capability\") };\n}\n");
+    rust.push_str("($($unknown:tt)*) => { ::core::compile_error!(\"field has no compiler-verified PostgreSQL binding capability\") };\n}\n");
     Ok(rust)
 }
 
@@ -1133,17 +1133,17 @@ fn render(
             for mode in
                 if returning { &["public", "return_as"][..] } else { &["public", "discard"][..] }
             {
-                writeln!(&mut rust, "(@__pgrx_emit_{mode}; $($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
+                writeln!(&mut rust, "(@__pgrx_emit_{mode}; $($invalid:tt)*) => {{ ::core::compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
             }
         }
         if !returning && let Some(message) = boundary_error {
             writeln!(
                 &mut rust,
-                "(@__pgrx_c_discard; $($raw:tt)*) => {{ compile_error!({message:?}) }};"
+                "(@__pgrx_c_discard; $($raw:tt)*) => {{ ::core::compile_error!({message:?}) }};"
             )
             .expect("String output");
         }
-        writeln!(&mut rust, "(@$mode:ident; $($raw:tt)*) => {{ compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
+        writeln!(&mut rust, "(@$mode:ident; $($raw:tt)*) => {{ ::core::compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
     } else {
         for (mode, context) in [
             ("value", typed::Context::Value),
@@ -1153,13 +1153,13 @@ fn render(
             ("discard", typed::Context::Discard),
         ] {
             let body = if empty {
-                "compile_error!(\"an empty C macro has no expression operand\")".into()
+                "::core::compile_error!(\"an empty C macro has no expression operand\")".into()
             } else if mode == "value" {
                 value.clone()
             } else {
                 match render_body(session, analysis, bindings, &renderer, context) {
                     Ok(body) => body,
-                    Err(reason) => format!("compile_error!({:?})", reason.message),
+                    Err(reason) => format!("::core::compile_error!({:?})", reason.message),
                 }
             };
             writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ {body} }};")
@@ -1175,7 +1175,7 @@ fn render(
             {
                 writeln!(
                     &mut rust,
-                    "(@__pgrx_c_{mode}; $($raw:tt)*) => {{ compile_error!({message:?}) }};"
+                    "(@__pgrx_c_{mode}; $($raw:tt)*) => {{ ::core::compile_error!({message:?}) }};"
                 )
                 .expect("String output");
             }
@@ -1186,14 +1186,14 @@ fn render(
                 .expect("String output");
         }
         if arguments.is_none() {
-            writeln!(&mut rust, "(@$mode:ident; $($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
+            writeln!(&mut rust, "(@$mode:ident; $($invalid:tt)*) => {{ ::core::compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
         }
     }
     if let Some(message) = boundary_error {
-        writeln!(&mut rust, "($($raw:tt)*) => {{ compile_error!({message:?}) }};\n}}")
+        writeln!(&mut rust, "($($raw:tt)*) => {{ ::core::compile_error!({message:?}) }};\n}}")
             .expect("String output");
     } else if arguments.is_none() {
-        writeln!(&mut rust, "() => {{ $crate::{identifier}!(@__pgrx_emit_public;) }};\n($($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};\n}}").expect("String output");
+        writeln!(&mut rust, "() => {{ $crate::{identifier}!(@__pgrx_emit_public;) }};\n($($invalid:tt)*) => {{ ::core::compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};\n}}").expect("String output");
     } else {
         let call = invoke("__pgrx_emit_public", "");
         writeln!(&mut rust, "($($raw:tt)*) => {{ {call} }};\n}}").expect("String output");
