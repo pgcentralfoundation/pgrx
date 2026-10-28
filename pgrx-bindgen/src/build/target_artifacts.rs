@@ -463,7 +463,7 @@ fn integrity(files: &BTreeMap<String, Vec<u8>>) -> eyre::Result<BTreeMap<String,
 }
 
 /// Render a content digest without platform-dependent or randomized hasher behavior.
-fn sha256(bytes: &[u8]) -> String {
+pub(super) fn sha256(bytes: &[u8]) -> String {
     let mut digest = String::with_capacity(64);
     for byte in Sha256::digest(bytes) {
         write!(&mut digest, "{byte:02x}").expect("String formatting");

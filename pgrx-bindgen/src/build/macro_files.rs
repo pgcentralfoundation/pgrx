@@ -519,78 +519,182 @@ impl<'a> Fragments<'a> {
     }
 }
 
+/// One complete item of generated support, with the text before it.
+///
+/// Text runs from the previous item's end, so each item keeps its `// SAFETY:` and
+/// other comments. Concatenating the texts of a source's items reproduces it.
+pub(super) enum SupportItem<'a> {
+    /// Any item other than an inline module, or the text after a scope's last item.
+    Item {
+        /// The item's source, including leading comments and attributes.
+        text: &'a str,
+        /// The name the item declares in the type or value namespace.
+        name: Option<String>,
+        /// The name of a `macro_rules!` definition.
+        macro_name: Option<String>,
+    },
+    /// An inline module.
+    Module {
+        /// The module's identifier.
+        name: String,
+        /// The module's whole source, `open` through `close`.
+        text: &'a str,
+        /// Leading comments and attributes through the opening brace.
+        open: &'a str,
+        /// The module's items.
+        items: Vec<SupportItem<'a>>,
+        /// Text after the last item, through the closing brace.
+        close: &'a str,
+    },
+}
+
+/// Read one support item's source.
+impl<'a> SupportItem<'a> {
+    /// The item's whole source, including its leading comments.
+    pub(super) fn text(&self) -> &'a str {
+        match self {
+            Self::Item { text, .. } | Self::Module { text, .. } => text,
+        }
+    }
+}
+
+/// Split generated support into its items, recursively through inline modules.
+///
+/// Inner attributes are rejected: support is published in fragments included into
+/// the defining crate, and an inner attribute cannot follow other items there.
+pub(super) fn support_items(source: &str) -> eyre::Result<Vec<SupportItem<'_>>> {
+    let parsed = syn::parse_file(source).wrap_err("generated C macro support is invalid Rust")?;
+    if !parsed.attrs.is_empty() {
+        return Err(eyre!("generated C macro support must not contain inner attributes"));
+    }
+    let offsets = SourceOffsets::new(source);
+    let (mut items, end) = scope_items(&offsets, &parsed.items, 0)?;
+    if end < source.len() {
+        items.push(SupportItem::Item { text: &source[end..], name: None, macro_name: None });
+    }
+    Ok(items)
+}
+
+/// Split one scope's items starting at `cursor`, returning them and the last item's end.
+fn scope_items<'a>(
+    offsets: &SourceOffsets<'a>,
+    items: &[Item],
+    mut cursor: usize,
+) -> eyre::Result<(Vec<SupportItem<'a>>, usize)> {
+    let source = offsets.source;
+    let mut result = Vec::with_capacity(items.len());
+    for item in items {
+        let end = offsets.position(item.span().end())?;
+        let support = match item {
+            Item::Mod(module) if module.content.is_some() => {
+                if module
+                    .attrs
+                    .iter()
+                    .any(|attribute| matches!(attribute.style, syn::AttrStyle::Inner(_)))
+                {
+                    return Err(eyre!(
+                        "generated support module {} must not contain inner attributes",
+                        module.ident
+                    ));
+                }
+                let (brace, body) = module.content.as_ref().expect("checked inline module");
+                let opening = offsets.position(brace.span.open().end())?;
+                let (items, last) = scope_items(offsets, body, opening)?;
+                SupportItem::Module {
+                    name: module.ident.to_string(),
+                    text: &source[cursor..end],
+                    open: &source[cursor..opening],
+                    items,
+                    close: &source[last..end],
+                }
+            }
+            item => SupportItem::Item {
+                text: &source[cursor..end],
+                name: item_name(item),
+                macro_name: match item {
+                    Item::Macro(definition) if definition.mac.path.is_ident("macro_rules") => {
+                        definition.ident.as_ref().map(ToString::to_string)
+                    }
+                    _ => None,
+                },
+            },
+        };
+        result.push(support);
+        cursor = end;
+    }
+    Ok((result, cursor))
+}
+
+/// The name an item declares in the type or value namespace, without a raw prefix.
+fn item_name(item: &Item) -> Option<String> {
+    let ident = match item {
+        Item::Const(item) => &item.ident,
+        Item::Enum(item) => &item.ident,
+        Item::Fn(item) => &item.sig.ident,
+        Item::Mod(item) => &item.ident,
+        Item::Static(item) => &item.ident,
+        Item::Struct(item) => &item.ident,
+        Item::Trait(item) => &item.ident,
+        Item::Type(item) => &item.ident,
+        Item::Union(item) => &item.ident,
+        _ => return None,
+    };
+    let ident = ident.to_string();
+    Some(ident.strip_prefix("r#").map(str::to_owned).unwrap_or(ident))
+}
+
 /// Split shared and private-native support at parsed item boundaries, preserving comments and
 /// same-scope includes. Documentation builds also need these adapters because
 /// pgrx itself now invokes generated macros in ordinary library code.
-fn partition_support(
+pub(super) fn partition_support(
     source: &str,
     files: &mut BTreeMap<PathBuf, String>,
 ) -> eyre::Result<Vec<PathBuf>> {
     if source.is_empty() {
         return Ok(Vec::new());
     }
-    let parsed = syn::parse_file(source).wrap_err("generated C macro support is invalid Rust")?;
-    if !parsed.attrs.is_empty() {
-        return Err(eyre!("generated C macro support must not contain inner attributes"));
-    }
-    let offsets = SourceOffsets::new(source);
-    let mut pieces = Vec::with_capacity(parsed.items.len());
-    let mut cursor = 0;
+    let mut pieces = Vec::new();
     let mut native_seen = false;
-    for item in &parsed.items {
-        let end = offsets.position(item.span().end())?;
-        if let Item::Mod(module) = item
-            && module.ident == "__pgrx_c_generated"
-        {
-            if native_seen {
-                return Err(eyre!("generated native support module occurs more than once"));
-            }
-            native_seen = true;
-            let (brace, body) = module
-                .content
-                .as_ref()
-                .ok_or_else(|| eyre!("native support module must have an inline body"))?;
-            if module
-                .attrs
-                .iter()
-                .any(|attribute| matches!(attribute.style, syn::AttrStyle::Inner(_)))
+    for item in support_items(source)? {
+        match item {
+            SupportItem::Module { name, open, items, close, .. }
+                if name == "__pgrx_c_generated" =>
             {
-                return Err(eyre!("native support module must not contain inner attributes"));
+                if native_seen {
+                    return Err(eyre!("generated native support module occurs more than once"));
+                }
+                native_seen = true;
+                let mut native = Fragments::new("native", files);
+                for item in &items {
+                    native.push(item.text())?;
+                }
+                // The module's closing brace stays with its declaration.
+                let trailing = close
+                    .strip_suffix('}')
+                    .ok_or_else(|| eyre!("native support module has no closing brace"))?;
+                native.push(trailing)?;
+                let mut shell = open.to_owned();
+                shell.push('\n');
+                for fragment in native.finish()? {
+                    let filename = fragment
+                        .file_name()
+                        .and_then(|name| name.to_str())
+                        .ok_or_else(|| eyre!("native support fragment has no UTF-8 filename"))?;
+                    writeln!(shell, "include!({filename:?});").expect("String output");
+                }
+                shell.push('}');
+                pieces.push(shell);
             }
-            let start = offsets.position(item.span().start())?;
-            let opening = offsets.position(brace.span.open().end())?;
-            let closing = offsets.position(brace.span.close().start())?;
-            let mut native = Fragments::new("native", files);
-            let mut previous = opening;
-            for item in body {
-                let item_end = offsets.position(item.span().end())?;
-                native.push(&source[previous..item_end])?;
-                previous = item_end;
+            SupportItem::Item { name: Some(name), .. } if name == "__pgrx_c_generated" => {
+                return Err(eyre!("native support module must have an inline body"));
             }
-            native.push(&source[previous..closing])?;
-            let fragments = native.finish()?;
-            let mut shell = source[cursor..start].to_owned();
-            shell.push_str(&source[start..opening]);
-            shell.push('\n');
-            for fragment in fragments {
-                let filename = fragment
-                    .file_name()
-                    .and_then(|name| name.to_str())
-                    .ok_or_else(|| eyre!("native support fragment has no UTF-8 filename"))?;
-                writeln!(shell, "include!({filename:?});").expect("String output");
-            }
-            shell.push_str(&source[closing..end]);
-            pieces.push(shell);
-        } else {
-            pieces.push(source[cursor..end].to_owned());
+            item => pieces.push(item.text().to_owned()),
         }
-        cursor = end;
     }
     let mut shared = Fragments::new("shared", files);
     for piece in pieces {
         shared.push(&piece)?;
     }
-    shared.push(&source[cursor..])?;
     shared.finish()
 }
 
@@ -605,8 +709,8 @@ mod tests {
 
     use super::*;
     use pgrx_c_macros::{
-        AnalysisStatus, ConstCapability, EvaluationContract, InvocationContract, MacroAnalysis,
-        MacroDocumentation, SignedOverflow, SourceSpan,
+        AnalysisStatus, ConstCapability, DocumentedResult, EvaluationContract, InvocationContract,
+        MacroAnalysis, MacroDocumentation, SignedOverflow, SourceSpan,
     };
     use std::fs;
     use std::sync::atomic::{AtomicU64, Ordering};
@@ -676,6 +780,7 @@ mod tests {
             body: String::new(),
             forms: vec!["$x:expr".into()],
             hidden: false,
+            result: DocumentedResult::Unit { body: "{ }".into() },
         }
     }
 

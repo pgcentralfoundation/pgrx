@@ -302,26 +302,31 @@ pub fn support_alignment_profile(
 }
 
 /// List the C integer typedefs published in `__pgrx_c_types` with their runtime marker names.
+fn integer_typedef_markers(
+    frontend: &FrontendOutput,
+) -> impl Iterator<Item = (&str, &'static str)> {
+    frontend.declarations().types.keys().filter_map(|name| {
+        integer_typedef_marker(frontend, name).map(|marker| (name.as_str(), marker))
+    })
+}
+
+/// The runtime marker of `name`'s `__pgrx_c_types` alias, if it has one.
 ///
 /// Only typedef names that form Rust identifiers and whose size matches the
-/// target's layout for their integer kind are included.
-pub fn integer_typedef_markers(frontend: &FrontendOutput) -> Vec<(&str, &'static str)> {
-    let mut markers = Vec::new();
-    for (name, ty) in &frontend.declarations().types {
-        let TypeCategory::Integer(kind) = ty.category else { continue };
-        // C type spellings with spaces or declarator syntax are not typedef
-        // identifiers and cannot form a Rust alias. Share the emitter's checks
-        // for names, including special tokens that raw identifiers cannot fix.
-        if crate::emit::rust_identifier(name).is_none() {
-            continue;
-        }
-        let Some(layout) = frontend.profile().target.integers.get(&kind) else { continue };
-        if ty.size != Some(u64::from(layout.bits / 8)) || ty.is_const || ty.is_volatile {
-            continue;
-        }
-        markers.push((name.as_str(), crate::emit::marker(kind)));
-    }
-    markers
+/// target's layout for their integer kind have an alias.
+pub(crate) fn integer_typedef_marker(
+    frontend: &FrontendOutput,
+    name: &str,
+) -> Option<&'static str> {
+    let ty = frontend.declarations().types.get(name)?;
+    let TypeCategory::Integer(kind) = ty.category else { return None };
+    // C type spellings with spaces or declarator syntax are not typedef
+    // identifiers and cannot form a Rust alias. Share the emitter's checks
+    // for names, including special tokens that raw identifiers cannot fix.
+    crate::emit::rust_identifier(name)?;
+    let layout = frontend.profile().target.integers.get(&kind)?;
+    (ty.size == Some(u64::from(layout.bits / 8)) && !ty.is_const && !ty.is_volatile)
+        .then(|| crate::emit::marker(kind))
 }
 
 /// Generate numeric input adapters for pg-sys's own opaque integer types.

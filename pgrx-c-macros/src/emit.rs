@@ -55,6 +55,9 @@ mod bitfields;
 mod callbacks;
 /// Batch capability selection derived from C expression constraints.
 mod demands;
+/// Documentation shells: each macro's docs, invocation forms and result type.
+mod documentation;
+pub use documentation::{DocumentedResult, MacroDocumentation, documentation_shell_support};
 /// Nominal enum identities and checked bridges to actual binding storage.
 mod enumerations;
 /// Optimization-hint planning that preserves C values and operand effects.
@@ -505,8 +508,6 @@ pub struct MacroSupportArtifact {
     pub rust: String,
     /// Same-profile C primitives that the caller must compile when nonempty.
     pub c_source: String,
-    /// Binding-relative paths of the `__pgrx_c_callbacks` typedef aliases in `rust`.
-    pub callback_typedefs: BTreeSet<Vec<String>>,
 }
 
 /// One preparation supplies both the macros and their shared native capabilities.
@@ -583,7 +584,7 @@ fn render_adapters(
     adapters: GeneratedAdapters,
     macros: &[MacroEmission],
 ) -> Result<MacroSupportArtifact, String> {
-    let callback_typedefs = adapters.callbacks.typedefs;
+    let callbacks = !adapters.callbacks.typedefs.is_empty();
     let body = format!(
         "{}\n{}\n{}\n{}\n{}",
         adapters.callbacks.rust,
@@ -599,7 +600,7 @@ fn render_adapters(
             "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\nuse crate::__pgrx_c_macros as c;\n{body}\n}}\n"
         )
     };
-    if !callback_typedefs.is_empty() {
+    if callbacks {
         rust.push_str(
             "/// Explicit callback typedef identities validated against the current C profile.\n\
              #[doc(hidden)]\npub use self::__pgrx_c_generated::__pgrx_c_callbacks;\n",
@@ -629,7 +630,6 @@ fn render_adapters(
         )
         .trim()
         .into(),
-        callback_typedefs,
     })
 }
 
@@ -990,13 +990,13 @@ fn render(
     })?);
     if matches!(original, InvocationSource::Inline(_)) {
         comment.push_str("\n\n");
-        comment.push_str(INLINE_CALL);
+        comment.push_str(documentation::INLINE_CALL);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::InvocationFile | ExpressionKind::InvocationLine)
     }) {
         comment.push_str("\n\n");
-        comment.push_str(INVOCATION_DIAGNOSTICS);
+        comment.push_str(documentation::INVOCATION_DIAGNOSTICS);
     }
     if expression
         .syntax
@@ -1005,7 +1005,7 @@ fn render(
         .any(|node| matches!(node.kind, ExpressionKind::Stringification { .. }))
     {
         comment.push_str("\n\n");
-        comment.push_str(STRINGIFICATION);
+        comment.push_str(documentation::STRINGIFICATION);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::StringLiteral { .. } | ExpressionKind::InvocationFile)
@@ -1014,10 +1014,10 @@ fn render(
     }
     if returning {
         comment.push_str("\n\n");
-        comment.push_str(CALLER_RETURNS);
+        comment.push_str(documentation::CALLER_RETURNS);
     } else if statement_body.is_some() {
         comment.push_str("\n\n");
-        comment.push_str(STATEMENTS);
+        comment.push_str(documentation::STATEMENTS);
     }
     if local_guard.is_some() {
         comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
@@ -1060,7 +1060,7 @@ fn render(
         comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
     comment.push_str("\n\n# Safety\n\n");
-    comment.push_str(SAFETY);
+    comment.push_str(documentation::SAFETY);
     let mut failures = std::collections::BTreeSet::new();
     for node in &expression.syntax.nodes {
         match &node.kind {
@@ -1101,23 +1101,15 @@ fn render(
         comment.push_str("These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.");
     }
     let hidden = matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate");
-    let documentation = MacroDocumentation {
-        identifier: identifier.clone(),
-        title,
-        location,
-        body: comment,
-        forms: documentation_forms(analysis, returning, statement_boundary, explicit_boundary),
-        hidden,
-    };
-    write_doc_comments(&mut rust, &documentation.comment(documentation.location.as_deref()))
+    write_doc_comments(&mut rust, &documentation::comment(&title, location.as_deref(), &comment))
         .ok_or_else(|| {
-            skip(
-                analysis,
-                SkipReasonCode::BudgetExceeded,
-                "original C macro source comment exceeds the bounded output size",
-                None,
-            )
-        })?;
+        skip(
+            analysis,
+            SkipReasonCode::BudgetExceeded,
+            "original C macro source comment exceeds the bounded output size",
+            None,
+        )
+    })?;
     if hidden {
         rust.push_str("#[doc(hidden)]\n");
     }
@@ -1127,7 +1119,7 @@ fn render(
         .map(|index| format!("${}", arguments::name(analysis, index)))
         .collect::<Vec<_>>()
         .join(", ");
-    let safety_checks = arguments::render_safety_checks(analysis);
+    let safety_checks = arguments::render_safety_checks(analysis, false);
     writeln!(&mut rust, "(@__pgrx_emit_check_safety; {matcher}) => {{ {safety_checks} }};")
         .expect("String output");
     // A size context forwards an operand's tokens unchanged for its safety checks,
@@ -1262,175 +1254,21 @@ fn render(
             None,
         ));
     }
-    Ok((rust, documentation))
-}
-
-/// Rustdoc-facing parts of one emitted macro.
-///
-/// A documentation snapshot shows these instead of the generated implementation.
-/// The defining location is kept apart from the rest of the comment, so identical
-/// definitions from several PostgreSQL versions can share one documented macro.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MacroDocumentation {
-    /// Exported Rust macro identifier.
-    pub identifier: String,
-    /// First documentation line before the location, such as `C macro TYPEALIGN`.
-    pub title: String,
-    /// Defining header filename and first line, such as `c.h:801`.
-    pub location: Option<String>,
-    /// Documentation after the title line: original definition and invocation contract.
-    pub body: String,
-    /// Invocation matchers for the forms the generated macro accepts.
-    pub forms: Vec<String>,
-    /// Whether the generated macro is hidden from documentation.
-    pub hidden: bool,
-}
-
-/// Documentation paragraphs that many generated macros repeat verbatim.
-///
-/// Documentation shells refer to each one through the macro named here instead of
-/// repeating its text; [`documentation_shell_support`] defines those macros.
-const SHARED_PARAGRAPHS: [(&str, &str); 6] = [
-    ("__pgrx_c_doc_inline_call", INLINE_CALL),
-    ("__pgrx_c_doc_invocation_diagnostics", INVOCATION_DIAGNOSTICS),
-    ("__pgrx_c_doc_stringification", STRINGIFICATION),
-    ("__pgrx_c_doc_caller_returns", CALLER_RETURNS),
-    ("__pgrx_c_doc_statements", STATEMENTS),
-    ("__pgrx_c_doc_safety", SAFETY),
-];
-/// How a typed inline-function adapter calls and converts.
-const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
-/// How `__FILE__` and `__LINE__` translate.
-const INVOCATION_DIAGNOSTICS: &str = "Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.";
-/// How dependency stringification translates.
-const STRINGIFICATION: &str = "Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips.";
-/// How C `return` statements behave in the caller.
-const CALLER_RETURNS: &str = "C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.";
-/// How statement macros execute.
-const STATEMENTS: &str = "This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.";
-/// Caller obligations shared by every generated macro.
-const SAFETY: &str = "Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.";
-
-/// Shared expansion of every documentation-shell arm, defined by
-/// [`documentation_shell_support`]. Rustdoc shows arm bodies as `{ ... }`.
-const DOCUMENTATION_SHELL_BODY: &str = "$crate::__pgrx_c_documentation_shell!()";
-
-/// Define the macros that documentation shells use.
-///
-/// Every shell arm expands to one macro, and each paragraph in [`SHARED_PARAGRAPHS`]
-/// is defined once for shell doc comments. Include this once in the crate that defines
-/// the shells rendered by [`MacroDocumentation::render_shell`].
-pub fn documentation_shell_support() -> String {
-    let mut rust = String::from(
-        "/// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.\n\
-         #[doc(hidden)]\n\
-         #[macro_export]\n\
-         macro_rules! __pgrx_c_documentation_shell {\n    \
-             () => {\n        \
-                 ::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")\n    \
-             };\n\
-         }\n",
-    );
-    for (name, paragraph) in SHARED_PARAGRAPHS {
-        // Doc comments keep the space after `///`; the shared line keeps it too.
-        writeln!(
-            rust,
-            "/// One documentation paragraph shared by snapshot shells.\n#[doc(hidden)]\n#[macro_export]\nmacro_rules! {name} {{\n    () => {{\n        {:?}\n    }};\n}}",
-            format!(" {paragraph}")
-        )
-        .expect("String output");
-    }
-    rust
-}
-
-/// Render documentation comments and shell macros for snapshots.
-impl MacroDocumentation {
-    /// Complete doc comment, using `location` in place of this macro's own location.
-    pub fn comment(&self, location: Option<&str>) -> String {
-        match location {
-            Some(location) => format!("{} from {location}{}", self.title, self.body),
-            None => format!("{}{}", self.title, self.body),
-        }
-    }
-
-    /// Render a documentation-only macro that shows the supported invocation forms.
-    ///
-    /// Each arm expands to the defining crate's [`documentation_shell_support`] macro,
-    /// which calls `unimplemented!()`, so a documentation build of a crate that calls
-    /// the macro inside a function body still succeeds. Doc lines that repeat a shared
-    /// paragraph name its macro instead of repeating the text. `attributes` is written
-    /// before the doc comment, for example a `#[cfg(...)]` line.
-    pub fn render_shell(&self, location: Option<&str>, attributes: &str) -> Option<String> {
-        let mut comment = String::new();
-        write_doc_comments(&mut comment, &self.comment(location))?;
-        let mut rust = String::from(attributes);
-        for line in comment.lines() {
-            match SHARED_PARAGRAPHS
-                .iter()
-                .find(|(_, paragraph)| line.strip_prefix("/// ") == Some(paragraph))
-            {
-                Some((name, _)) => writeln!(rust, "#[doc = crate::{name}!()]"),
-                None => writeln!(rust, "{line}"),
-            }
-            .expect("String output");
-        }
-        if self.hidden {
-            rust.push_str("#[doc(hidden)]\n");
-        }
-        writeln!(rust, "#[macro_export]\nmacro_rules! {} {{", self.identifier)
-            .expect("String output");
-        for form in &self.forms {
-            writeln!(rust, "    ({form}) => {{ {DOCUMENTATION_SHELL_BODY} }};")
-                .expect("String output");
-        }
-        rust.push_str("}\n");
-        Some(rust)
-    }
-}
-
-/// Invocation matchers matching the public arms of the generated macro.
-///
-/// Required boundary markers and the explicit return-type form are shown as in
-/// the generated macro; ordinary operands are shown as expressions.
-fn documentation_forms(
-    analysis: &MacroAnalysis,
-    returning: bool,
-    statement_boundary: bool,
-    explicit_boundary: bool,
-) -> Vec<String> {
-    let mut operands = String::new();
-    for (index, parameter) in analysis.parameters.iter().enumerate() {
-        if index != 0 {
-            operands.push_str(", ");
-        }
-        let fragment = match parameter.roles.as_slice() {
-            [crate::ParameterRole::Type] => "ty",
-            [crate::ParameterRole::Identifier] => "ident",
-            _ => "expr",
-        };
-        write!(operands, "${}:{fragment}", arguments::name(analysis, index))
-            .expect("String output");
-    }
-    if !analysis.parameters.is_empty() {
-        operands.push_str(" $(,)?");
-    }
-    let boundary = if statement_boundary {
-        "@__pgrx_c_statement; "
-    } else if explicit_boundary {
-        "@__pgrx_c_expression; "
-    } else {
-        ""
+    let documentation = MacroDocumentation {
+        identifier,
+        title,
+        location,
+        body: comment,
+        forms: documentation::documentation_forms(
+            analysis,
+            returning,
+            statement_boundary,
+            explicit_boundary,
+        ),
+        hidden,
+        result: documentation::result(analysis, renderer),
     };
-    let mut forms = vec![format!("{boundary}{operands}").trim_end().to_owned()];
-    if returning {
-        let marker = arguments::return_marker(analysis);
-        forms.push(
-            format!("{boundary}@__pgrx_c_return_as [${marker}:ty]; {operands}")
-                .trim_end()
-                .to_owned(),
-        );
-    }
-    forms
+    Ok((rust, documentation))
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.

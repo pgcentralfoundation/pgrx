@@ -94,15 +94,29 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
     matcher
 }
 
+/// Name one parameter occurrence's operand descriptor.
+///
+/// Real macros receive the descriptor their argument normalizer classified.
+/// Documentation shells receive plain `expr` fragments, which are described as
+/// native expressions, the classifier's descriptor for any non-literal operand.
+pub(super) fn descriptor(analysis: &MacroAnalysis, index: usize, shell: bool) -> String {
+    let name = name(analysis, index);
+    if shell { format!("(@native [${name}])") } else { format!("${name}") }
+}
+
 /// Check caller-authored unsafe operations separately from generated unevaluated C operations.
 /// The checks remain dead and borrow no operand beyond each local closure, so
 /// they neither evaluate nor move caller values at runtime.
-pub(super) fn render_safety_checks(analysis: &MacroAnalysis) -> String {
+pub(super) fn render_safety_checks(analysis: &MacroAnalysis, shell: bool) -> String {
     let mut rust = String::from("{ if false { ");
     for (index, parameter) in analysis.parameters.iter().enumerate() {
         if parameter.roles.iter().any(|role| matches!(role, ParameterRole::Value)) {
-            write!(rust, "$crate::__pgrx_c_operand!(@check_safety; ${});", name(analysis, index))
-                .expect("String output");
+            write!(
+                rust,
+                "$crate::__pgrx_c_operand!(@check_safety; {});",
+                descriptor(analysis, index, shell)
+            )
+            .expect("String output");
         }
     }
     rust.push_str(" } }");
@@ -402,12 +416,11 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
     Ok(rust)
 }
 
-/// Consume one normalized descriptor in the requested context at this C parameter occurrence.
+/// Consume one operand descriptor in the requested context at this C parameter occurrence.
 pub(super) fn render_operand(
-    analysis: &MacroAnalysis,
-    parameter: usize,
     context: ArgumentContext,
     floats: bool,
+    descriptor: &str,
     rust: &mut String,
 ) {
     let mode = match context {
@@ -417,8 +430,7 @@ pub(super) fn render_operand(
         ArgumentContext::Size => "@size".into(),
         ArgumentContext::Discard => format!("@discard [{floats}]"),
     };
-    write!(rust, "$crate::__pgrx_c_operand!({mode}; ${})", name(analysis, parameter))
-        .expect("String output");
+    write!(rust, "$crate::__pgrx_c_operand!({mode}; {descriptor})").expect("String output");
 }
 
 /// Check availability-only support's completed output bound without invoking a compiler.
