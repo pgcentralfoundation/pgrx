@@ -19,7 +19,8 @@ const WIDTH: usize = 100;
 
 /// Indent macro definitions while preserving their tokens, literals and comments.
 ///
-/// Other Rust source is retained for the binding writer's final rustfmt pass.
+/// Other Rust source is left as emitted; the binding build runs rustfmt over it only for
+/// documentation snapshots.
 pub fn format_rust_macros(source: &str) -> Result<String, String> {
     let tokens: TokenStream =
         source.parse().map_err(|error| format!("invalid generated Rust: {error}"))?;

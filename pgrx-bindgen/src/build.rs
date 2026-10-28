@@ -527,39 +527,47 @@ fn macro_snapshot(source: &str) -> eyre::Result<String> {
     Ok(snapshot)
 }
 
-/// Stage and format the complete macro tree before stable writes, then remove only stale Rust
-/// leaves owned by this version.
+/// Publish the macro tree with stable writes, then remove only stale Rust leaves owned by this
+/// version. Documentation snapshots are staged and formatted first because they are checked in.
 fn write_macro_files(
     files: &MacroFiles,
     directory: &Path,
     documentation: bool,
 ) -> eyre::Result<()> {
     fs::create_dir_all(directory)?;
-    let staging = MacroFormattingDirectory::new(directory)?;
-    let mut paths = Vec::with_capacity(files.sources.len());
-    for (relative, source) in &files.sources {
-        let path = staging.0.join(relative);
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        if documentation {
-            fs::write(&path, macro_snapshot(source)?)?;
-        } else {
-            fs::write(&path, source)?;
-        }
-        paths.push(path);
-    }
-    let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
-    format_macro_files(&paths, Path::new(&rustfmt))?;
-    for relative in files.sources.keys() {
+    let publish = |relative: &Path, content: &[u8]| -> eyre::Result<()> {
         let path = directory.join(relative);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        // Compare the final representation: formatting after the stable write
-        // would rewrite identical artifacts on every regeneration.
-        let content = fs::read(staging.0.join(relative))?;
-        write_content_stable(&path, &content)?;
+        write_content_stable(&path, content)
+    };
+    if documentation {
+        let staging = MacroFormattingDirectory::new(directory)?;
+        let mut paths = Vec::with_capacity(files.sources.len());
+        for (relative, source) in &files.sources {
+            let path = staging.0.join(relative);
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            fs::write(&path, macro_snapshot(source)?)?;
+            paths.push(path);
+        }
+        let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+        format_macro_files(&paths, Path::new(&rustfmt))?;
+        for relative in files.sources.keys() {
+            // Compare the final representation: formatting after the stable write
+            // would rewrite identical artifacts on every regeneration.
+            publish(relative, &fs::read(staging.0.join(relative))?)?;
+        }
+    } else {
+        // OUT_DIR trees are compiler input that nobody edits, and the generator
+        // already lays out macro bodies. Rustfmt over their tens of megabytes
+        // cost seconds per build-script run and made the bytes depend on any
+        // rustfmt.toml above the target directory.
+        for (relative, source) in &files.sources {
+            publish(relative, source.as_bytes())?;
+        }
     }
     // This version directory contains generated Rust only. Retain other files
     // and versions, and remove empty directories after their stale leaves.
@@ -1323,7 +1331,7 @@ fn run_bindgen(
 
 /// Carry the generated macro tree and audit report from inspection through binding publication.
 struct MacroOutput {
-    /// Versioned macro tree and adapters ready for formatted publication.
+    /// Versioned macro tree and adapters ready for stable publication.
     files: MacroFiles,
     /// Serialized compiler facts and macro skip diagnostics written alongside the bindings.
     report: Vec<u8>,
@@ -2499,9 +2507,11 @@ macro_rules! EXAMPLE {
         assert!(version.join("mod.rs").exists(), "an empty module still loads");
     }
 
-    /// Checks that macro trees are formatted before stable normal and snapshot writes.
+    /// Checked-in documentation snapshots are formatted before their stable writes. OUT_DIR
+    /// trees are compiler input that nobody edits: formatting tens of megabytes there cost
+    /// seconds per build-script run for cosmetic changes, so they keep the generator's bytes.
     #[test]
-    fn macro_trees_are_formatted_before_stable_normal_and_snapshot_writes() {
+    fn only_documentation_snapshots_are_formatted_before_stable_writes() {
         let directory = TemporaryDirectory::new();
         let original = "/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\npub fn example( value:u32 )->u32{ /* PGRX: preserve this comment */ value+1 }\n";
         let files = MacroFiles {
@@ -2514,12 +2524,15 @@ macro_rules! EXAMPLE {
             let version = directory.0.join(if documentation { "snapshot" } else { "normal" });
             write_macro_files(&files, &version, documentation).unwrap();
             let leaf = fs::read_to_string(version.join("c.rs")).unwrap();
-            assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
-            assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
-            assert!(leaf.contains("/* PGRX: preserve this comment */"));
-            let expected =
-                if documentation { macro_snapshot(original).unwrap() } else { original.to_owned() };
-            assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(&expected).unwrap());
+            if documentation {
+                assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
+                assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
+                assert!(leaf.contains("/* PGRX: preserve this comment */"));
+                let expected = macro_snapshot(original).unwrap();
+                assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(&expected).unwrap());
+            } else {
+                assert_eq!(leaf, original, "OUT_DIR trees are published as generated");
+            }
             let old = UNIX_EPOCH + Duration::from_secs(1);
             for relative in files.sources.keys() {
                 fs::File::options()

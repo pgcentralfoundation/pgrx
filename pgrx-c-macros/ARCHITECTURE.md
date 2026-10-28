@@ -71,7 +71,7 @@ survive deletion of handwritten Rust ports and confer no production signature.
                  |                |                 |
                  +--------+-------+           compile + archive
                           |                         |
-                 formatted module tree              |
+                      module tree                   |
                           |                         |
                      pgrx-pg-sys <-------------------+
                           |
@@ -1432,13 +1432,16 @@ allowances.
 Format macro token trees with the source-preserving formatter first. Rustfmt
 can leave repetition-heavy macro transcribers on one line; the custom layout
 handles delimiters, punctuation, and generic groups with a preferred width of
-100 while retaining spellings and comments. Then stage the tree and run
-rustfmt over generated leaves when accessible, batching filenames within a
-16 KiB conservative quoting budget to avoid an aggregate command-line overflow
-on Windows. Each batch retains the edition, configuration search, and
-`skip_children=true`; publish only after all formatting succeeds. A missing
-executable or precise rustup missing-component diagnostic permits unformatted
-output; genuine formatting/source failures remain errors.
+100 while retaining spellings and comments. OUT_DIR trees are published with
+that layout and no rustfmt pass: rustc is their only reader, and formatting
+tens of megabytes cost seconds per build-script run for cosmetic changes.
+Documentation snapshots are checked in, so stage them and run rustfmt over
+their leaves when accessible, batching filenames within a 16 KiB conservative
+quoting budget to avoid an aggregate command-line overflow on Windows. Each
+batch retains the edition, configuration search, and `skip_children=true`;
+publish only after all formatting succeeds. A missing executable or precise
+rustup missing-component diagnostic permits unformatted output; genuine
+formatting/source failures remain errors.
 
 Write changed content stably and remove obsolete files only within the owned
 version's generated macro tree. Publish documentation snapshots when
@@ -1487,8 +1490,8 @@ reuse facts solely because the major-version number is unchanged.
 
 There is no persistent disk cache of semantic analysis results. Cargo avoids
 rerunning an unchanged build script; sessions reuse their immutable phase facts,
-indexes, and batched observations. Stable writes compare final formatted bytes
-on a rerun. Track an absent file through its parent directory so a missing file
+indexes, and batched observations. Stable writes compare final bytes on a
+rerun. Track an absent file through its parent directory so a missing file
 does not make every build dirty and its later creation is still detected. Do
 not climb past a missing parent: the nearest existing ancestor of an absent
 `PATH` root can be `$HOME` or `/`, which Cargo would scan recursively or which
@@ -1605,7 +1608,7 @@ generate(version, extra_arguments):
     final_rust = apply_existing_guards_and_binding_rewrites(fresh_rust)
     record = report(frontend, emissions)
     publish_verified_native_linkage_if_present(support)
-    format_stage_and_publish(files, final_rust, record)
+    publish_stably(files, final_rust, record)
     export_complete_target_bundle_if_requested(fresh_rust, files, record, native)
 ```
 

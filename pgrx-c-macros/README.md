@@ -203,8 +203,8 @@ support is split into fragments under `__pgrx_c_support/`, included in the same
 module scope to preserve private adapter access. Macro definitions receive
 multiline layout before rustfmt, including repetitions and internal token syntax
 that rustfmt leaves untouched. This preserves literal spellings and source comments
-in both library and CLI output. When available, rustfmt formats
-every generated Rust file, including the documentation snapshots.
+in both library and CLI output. When available, rustfmt also formats the
+documentation snapshots; build output keeps the generator's layout.
 The report records the C profile, input dependencies, emitted source and explicit
 skip reasons, along with independently resolved constants and their Rust binding
 paths. The active version's macros are exported from `pgrx-pg-sys` and reexported
