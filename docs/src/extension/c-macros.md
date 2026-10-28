@@ -514,9 +514,12 @@ Each snapshot macro is a typed shell. Its arms accept the real macro's invocatio
 have its result type, so an extension that docs.rs compiles can call `.get()` or
 `.into_value()` on a result, but running a shell panics. Documentation builds of other
 targets fail, because the snapshot describes only docs.rs's target. A shell can accept
-code that its real macro rejects. It accepts every invocation its real macro accepts,
-with the same result type, except in these rare cases, where a documentation build can
-report a type error that an ordinary build does not:
+code that its real macro rejects. For example, a shell does not require `unsafe` where
+the real macro only calls a native function or compares a value read through a pointer,
+so an `unsafe` block around such a call can warn as unused in a documentation build. A
+shell accepts every invocation its real macro accepts, with the same result type, except
+in these rare cases, where a documentation build can report a type error that an
+ordinary build does not:
 
 - a literal `0` passed as a null pointer through an operand-dependent expression is not
   a null constant;

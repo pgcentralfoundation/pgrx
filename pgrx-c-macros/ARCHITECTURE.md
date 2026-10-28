@@ -1663,6 +1663,10 @@ versions where only the typedef's rank changes.
 
 A shell can accept more than its real macro: collapsed operands' trait bounds are
 not checked, local-name guards are absent, and dropped operands are only borrowed.
+A shell also needs no `unsafe` block where every unsafe operation of its real
+macro is collapsed or dropped, such as a native call, a comparison of a member
+read through a pointer, or a statement body; an `unsafe` block around such a call
+warns as unused in docs builds. The oracle pins examples of each.
 It can reject an invocation that its real macro accepts, or give it another type,
 only where its `expr` fragments and the `@native` descriptor replace the argument
 normalizer and classifier:

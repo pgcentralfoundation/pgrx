@@ -9,7 +9,7 @@
 //! the real macro and its shell have one type. The program then runs shells with
 //! side-effecting operands and checks that they panic without evaluating them.
 //! Separate programs pin the documented cases where a shell rejects an invocation
-//! that its real macro accepts.
+//! that its real macro accepts, and where only the real macro needs `unsafe`.
 //!
 //! These generated consumers use the runtime's Linux/macOS host family.
 
@@ -190,6 +190,14 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
     ),
 ];
 
+/// Statements that need `unsafe` with the real macros but not with shells, because
+/// every unsafe operation in them is collapsed or dropped from the witness.
+///
+/// The main program compiles each with shells outside `unsafe`, and the same statement
+/// with the real macros must fail, so the documented case stays accurate.
+const UNSAFE_DROPPED: &[&str] =
+    &["let _ = DOC_NATIVE!(value);", "let _ = DOC_IS_BUSY!(record);", "DOC_SWAP!(pointer, other);"];
+
 /// Parameters of the functions holding compared invocations.
 const OPERANDS: &str = "record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, name: *mut DocName, cname: *const DocName, holder: *mut DocHolder, counter: *mut DocCounter, bits: *mut DocBits, slot: *mut *mut DocRecord, value: i32, word: u32, flag: i32";
 
@@ -364,6 +372,10 @@ fn documentation_shells_have_the_real_result_types() {
     for (_, invocation, _) in DIVERGENCES {
         writeln!(divergences, "    {invocation}").unwrap();
     }
+    let mut safe_shells = String::new();
+    for statement in UNSAFE_DROPPED {
+        writeln!(safe_shells, "    {}", shell_invocation(statement)).unwrap();
+    }
     let prelude = format!(
         r#"#![allow(non_snake_case, non_camel_case_types, non_upper_case_globals, dead_code, unused_parens, unused_unsafe, unreachable_code, clippy::all)]
 #[path = {runtime:?}] pub mod __pgrx_c_macros;
@@ -393,6 +405,9 @@ fn compare({OPERANDS}) {{
 /// The real macros accept every documented divergence; nothing here runs.
 fn divergences({OPERANDS}) {{
 {divergences}}}
+/// These shells need no `unsafe`; nothing here runs.
+fn safe_shells({OPERANDS}) {{
+{safe_shells}}}
 fn main() {{
     std::panic::set_hook(Box::new(|_| {{}}));
     let mut evaluated = 0;
@@ -405,7 +420,7 @@ fn main() {{
         __doc_DOC_SWAP!({{ evaluated += 1; &raw mut left }}, &raw mut right)
     }}));
     assert!(unit.is_err() && evaluated == 0 && (left, right) == (1, 2));
-    let _ = (compare, divergences);
+    let _ = (compare, divergences, safe_shells);
     println!("shells match");
 }}
 "#,
@@ -429,6 +444,13 @@ fn main() {{
         );
         let stderr = rust_oracle::reject_rust_with_cfg(&rejected, &configurations);
         assert!(stderr.contains(diagnostic), "{case}: expected {diagnostic}:\n{stderr}");
+    }
+    for statement in UNSAFE_DROPPED {
+        let rejected = format!(
+            "{prelude}\nfn real({OPERANDS}) {{\n    {statement}\n}}\nfn main() {{ let _ = real; }}\n"
+        );
+        let stderr = rust_oracle::reject_rust_with_cfg(&rejected, &configurations);
+        assert!(stderr.contains("E0133"), "{statement} needs unsafe:\n{stderr}");
     }
 }
 
