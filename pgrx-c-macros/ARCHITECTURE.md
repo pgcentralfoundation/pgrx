@@ -1657,10 +1657,10 @@ rule changes. A typedef cast whose lowered marker is exactly its kind's marker
 names the typedef's `__pgrx_c_types` alias, which keeps the witness equal in
 versions where only the typedef's rank changes.
 
-A shell never rejects a result type that its real macro accepts, but it can
-accept more: collapsed operands' trait bounds are not checked, local-name guards
-are absent, and dropped operands are only borrowed. It differs only where the
-`@native` descriptor replaces the classifier:
+A shell can accept more than its real macro: collapsed operands' trait bounds are
+not checked, local-name guards are absent, and dropped operands are only borrowed.
+It can reject an invocation that its real macro accepts, or give it another type,
+only where the `@native` descriptor replaces the classifier:
 
 - a literal `0` passed as a null pointer to an operand-dependent spine is not a
   null constant;
@@ -2054,8 +2054,12 @@ cargo test -p pgrx-pg-sys --lib --no-default-features --features pg18,cshim
 The `macro_build` harness also needs the standard library of the cross target
 it picks for the host, as the [crate README](README.md#validation) lists.
 
-The documentation snapshot requires its own release/docs.rs validation. It is
-not a substitute for current-platform generation. Tests demonstrate
+The documentation snapshot requires its own release/docs.rs validation.
+`tests/documentation_oracle.rs` compiles real macros and their renamed shells in
+one program, requires one result type for each invocation, and checks that a
+shell panics without evaluating its operands. `tools/docsrs-typecheck.sh` checks
+each version's committed snapshot on the docs.rs target. The snapshot is not a
+substitute for current-platform generation. Tests demonstrate
 specific properties; neither successful emission nor a finite oracle sample
 proves every possible invocation correct. The type and safety arguments must
 stand independently.
