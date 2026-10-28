@@ -35,11 +35,18 @@ Application-level ownership and error adapters retain their Rust contracts.
 
 PostgreSQL sometimes changes a macro into a static inline function. The
 generator keeps the `NAME!(...)` interface available in both cases, so callers
-do not need version checks or an extra pointer cast merely because the C name
-became a function. For example, `VARDATA_ANY!(ptr).get()` works across PG15–19.
+do not need version checks merely because the C name became a function. For
+example, `VARDATA_ANY!(ptr).get()` works across PG15–19.
 The adapter calls the original C function through the checked native binding;
 it does not translate or copy the function's body. Native wrappers are built
 even when the public `cshim` feature is disabled.
+
+A function parameter applies C's assignment rules, which are stricter than the
+explicit casts inside many macros. Pass each operand with the parameter's C
+type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
+`Pointer::<CChar>`, as described [below](#choose-the-c-identity-of-an-input);
+`PageGetItem!(Pointer::<CChar>::new(page), item_id)` then works whether
+`PageGetItem` is a macro (PG15) or a function taking `Page` (PG16 and later).
 
 The selected header still determines argument and result types. A size result
 can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
@@ -150,6 +157,35 @@ assert_eq!(grant_options, 0x1_0000_0000_u64);
 from its magnitude. Select a marker from the C declaration or the macro's
 documented invocation requirements. The public input vocabulary lives in
 `pgrx::cmacros::c` (also `pg_sys::cmacros::c`).
+
+Plain-char pointers need a tag as well. Bindgen stores C `char *`, including
+`Page` and C strings, as `*mut c_char`, which Rust cannot distinguish from
+`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::<CChar>`, or with
+`Pointer::<CChar, ReadOnly>` for a `*const c_char`. The tag reads nothing and
+grants no access. Unlike a cast, it still requires a plain-char pointee, so a
+pointer to another type is rejected:
+
+```rust
+use core::ffi::c_void;
+use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
+
+/// Locate an item's tuple data on a page.
+///
+/// # Safety
+/// page must be a live, pinned, initialized page that contains item_id, and the
+/// caller must run on the PostgreSQL backend thread.
+unsafe fn item_data(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut c_void {
+    // SAFETY: the caller establishes the page, item, and backend-thread contract.
+    // PG19 returns void * instead of Item, so the result is cast for both.
+    unsafe { pgrx::PageGetItem!(Pointer::<CChar>::new(page), item_id).get().cast() }
+}
+```
+
+A pointer extracted with `.get()` needs the same tag before it is passed back to
+a generated macro; `.into_value()` keeps it. `Pointer::<CChar>::new` takes the
+inspected plain-char storage. If build flags give plain `char` a different
+signedness from Rust's `c_char`, that storage is the other byte type, and the
+binding pointer needs `.cast()` before tagging.
 
 Binding constants need the same care: bindgen can store a positive C `int`
 constant in a Rust `u32`. A direct caller operand follows that Rust storage

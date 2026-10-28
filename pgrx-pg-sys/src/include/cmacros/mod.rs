@@ -11,11 +11,17 @@
 // Documentation uses the versioned snapshots alongside this module.
 #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 
-/// Label Rust operands with their original C scalar identity before generated
-/// macros apply C promotion and conversion rules. A Rust alias or binding
-/// constant's storage type alone cannot establish that identity.
+/// Label Rust operands with their original C scalar or pointee identity before
+/// generated macros apply C promotion and conversion rules. A Rust alias or
+/// binding constant's storage type alone cannot establish that identity.
+///
+/// Bindgen stores C `char *` as `*mut c_char`, which is the same Rust type as
+/// `*mut i8` or `*mut u8`. Those raw pointers keep the `signed char *` or
+/// `unsigned char *` identity, so tag a plain-char pointer such as `Page` with
+/// `Pointer::<CChar>::new(page)`, or `Pointer::<CChar, ReadOnly>` for a
+/// `*const c_char`. Tagging reads nothing and grants no access.
 pub mod c {
-    pub use crate::__pgrx_c_macros::expression::{CDouble, CFloat};
+    pub use crate::__pgrx_c_macros::expression::{CDouble, CFloat, Pointer, ReadOnly, ReadWrite};
     pub use crate::__pgrx_c_macros::{
         CBool, CChar, CInt, CInt128, CLong, CLongLong, CPtrDiff, CShort, CSignedChar, CSize,
         CUnsignedChar, CUnsignedInt, CUnsignedInt128, CUnsignedLong, CUnsignedLongLong,
