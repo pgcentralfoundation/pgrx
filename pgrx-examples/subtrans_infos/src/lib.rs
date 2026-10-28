@@ -400,6 +400,19 @@ mod tests {
         }
     }
 
+    /// A PostgreSQL ERROR while the guard holds the lock resets InterruptHoldoffCount, so
+    /// LWLockRelease in Drop would fail its RESUME_INTERRUPTS assertion on assert-enabled
+    /// servers. The guard must leave the lock to transaction abort.
+    #[pg_test(error = "cache lookup failed for type 0")]
+    fn truncation_lock_guard_survives_a_postgres_error() {
+        // SAFETY: pg_test runs in an initialized backend, and the generated pointer names the
+        // permanent XactTruncationLock. format_type_extended raises an ERROR for type 0.
+        unsafe {
+            let _guard = super::PgLwLockGuard::new_shared(pg_sys::XactTruncationLock!().get());
+            pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0);
+        }
+    }
+
     /// Test basic functionality with current transaction ID
     #[pg_test]
     fn test_basic_function() {
