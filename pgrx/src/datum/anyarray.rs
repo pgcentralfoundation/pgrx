@@ -23,12 +23,16 @@ use std::iter::FusedIterator;
 /// into `CurrentMemoryContext`, and that copy stays allocated until the context is reset.
 ///
 /// The handle does not borrow the memory that holds the array, which may be freed once the call
-/// that received the handle returns. [SPI](crate::spi) copies an `AnyArray` that a query returns
-/// out of the query's results, which it frees when the connection closes. `AnyArray` is `Copy`
-/// and `'static`, and the compiler does not stop it, its elements, or a borrowed value read from
-/// them, from outliving the memory they point into, for example when one is kept for a later
-/// call. Use them only while that memory is live, and read into a type that owns its data, such
-/// as `Vec<i32>` or `Vec<String>`, to keep a value longer.
+/// that received the handle returns. `AnyArray` is `Copy` and `'static`, and the compiler does
+/// not stop it, its elements, or a borrowed value read from them, from outliving the memory they
+/// point into, for example when one is kept for a later call. Use them only while that memory is
+/// live, and read into a type that owns its data, such as `Vec<i32>` or `Vec<String>`, to keep a
+/// value longer.
+///
+/// [SPI](crate::spi) frees a query's results when the connection closes, so it copies an
+/// `AnyArray` that it returns into the parent of the memory context that is current when the
+/// value is read. Inside [`Spi::connect`](crate::spi::Spi::connect), that parent is
+/// `TopTransactionContext`, so the copy stays allocated until the transaction ends.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call

@@ -19,11 +19,16 @@ use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 /// freed once the call that received the handle returns. An element that
 /// [`AnyArray`](crate::AnyArray) iteration yields points into the array that the `AnyArray`
 /// holds, which may be a detoasted copy in the `CurrentMemoryContext` in which that handle was
-/// made, freed when that context is reset. [SPI](crate::spi) copies an `AnyElement` that a query returns out of the query's
-/// results, which it frees when the connection closes. `AnyElement` is `Copy` and `'static`, and
-/// the compiler does not stop it, or a borrowed value read from it, from outliving the memory it
-/// points into, for example when it is kept for a later call. Use both only while that memory is
-/// live, and read into a type that owns its data, such as `String`, to keep a value longer.
+/// made, freed when that context is reset. `AnyElement` is `Copy` and `'static`, and the compiler
+/// does not stop it, or a borrowed value read from it, from outliving the memory it points into,
+/// for example when it is kept for a later call. Use both only while that memory is live, and
+/// read into a type that owns its data, such as `String`, to keep a value longer.
+///
+/// [SPI](crate::spi) frees a query's results when the connection closes, so it copies an
+/// `AnyElement` that it returns into the parent of the memory context that is current when the
+/// value is read. Inside [`Spi::connect`](crate::spi::Spi::connect), that parent is
+/// `TopTransactionContext`, so the copy stays allocated until the transaction ends. To read many
+/// values in one transaction, read them as an owned type such as `String`, which keeps no copy.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call

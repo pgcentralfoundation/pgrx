@@ -354,9 +354,11 @@ impl Spi {
     /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
     /// and Postgres will completely free that context when this function is finished.
     ///
-    /// pgrx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
-    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
-    /// function call.
+    /// Values that functions like `::get_one()` return outlive the connection. A value that
+    /// would point into the query's results, such as a `&str`, an `Array`, a `PgBox<T>`, an
+    /// `AnyElement`, or an `AnyArray`, is copied into the parent of the memory context that is
+    /// current when it is read. Inside the closure that parent is `TopTransactionContext`, so
+    /// each such copy stays allocated until the transaction ends.
     ///
     /// # Examples
     ///
@@ -396,9 +398,11 @@ impl Spi {
     /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
     /// and Postgres will completely free that context when this function is finished.
     ///
-    /// pgrx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
-    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
-    /// function call.
+    /// Values that functions like `::get_one()` return outlive the connection. A value that
+    /// would point into the query's results, such as a `&str`, an `Array`, a `PgBox<T>`, an
+    /// `AnyElement`, or an `AnyArray`, is copied into the parent of the memory context that is
+    /// current when it is read. Inside the closure that parent is `TopTransactionContext`, so
+    /// each such copy stays allocated until the transaction ends.
     ///
     /// # Examples
     ///
