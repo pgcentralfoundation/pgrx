@@ -109,10 +109,12 @@ pub struct BindingCatalog {
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
-    /// Static inline functions emitted as translated bodies in this defining crate. Calls
-    /// to them expand that translation instead of calling the native binding.
+    /// Static inline functions emitted as translated bodies in this defining crate, with the
+    /// Rust panic conditions their translation can raise, including those of the
+    /// translations it expands. Calls to them expand that translation instead of calling
+    /// the native binding.
     #[serde(skip)]
-    pub inline_translations: BTreeSet<String>,
+    pub inline_translations: BTreeMap<String, BTreeSet<&'static str>>,
 }
 
 impl BindingCatalog {
@@ -439,7 +441,8 @@ fn emit_prepared_batch(
     for name in roots.keys().map(String::as_str).chain(impacted.keys().copied()) {
         available.macros.remove(name);
     }
-    available.inline_translations = translated_callees(session, &initial, &available.macros);
+    let mut translated = translated_callees(session, &initial, &available.macros);
+    available.inline_translations = translation_panics(&initial, &translated);
     let finish = |available: &BindingCatalog| {
         let mut available_lowering = None;
         let mut emissions = initial
@@ -520,7 +523,7 @@ fn emit_prepared_batch(
     loop {
         let lost = available
             .inline_translations
-            .iter()
+            .keys()
             .filter(|name| {
                 !emissions.iter().any(|emission| {
                     emission.analysis.name == **name
@@ -533,9 +536,8 @@ fn emit_prepared_batch(
         if lost.is_empty() {
             return emissions;
         }
-        for name in &lost {
-            available.inline_translations.remove(name);
-        }
+        translated.retain(|name| !lost.contains(name));
+        available.inline_translations = translation_panics(&initial, &translated);
         emissions = finish(&available);
     }
 }
@@ -566,7 +568,8 @@ fn translated_inline(session: &AnalysisSession<'_>, analysis: &MacroAnalysis) ->
             .is_some_and(|expression| expression.syntax.statement_body.is_some())
 }
 
-/// Translated inline functions whose calls can expand their translation.
+/// Translated inline functions whose calls can expand their translation, each after the
+/// functions it calls.
 ///
 /// A function that reaches itself through such calls keeps its native binding for them,
 /// since expanding it would never terminate.
@@ -574,7 +577,7 @@ fn translated_callees(
     session: &AnalysisSession<'_>,
     emissions: &[MacroEmission],
     available: &BTreeSet<String>,
-) -> BTreeSet<String> {
+) -> Vec<String> {
     let translated = emissions
         .iter()
         .filter(|emission| {
@@ -598,6 +601,7 @@ fn translated_callees(
             }
         }
     }
+    // Components come in reverse topological order, so callees precede their callers.
     petgraph::algo::tarjan_scc(&graph)
         .into_iter()
         .filter(|component| {
@@ -607,20 +611,89 @@ fn translated_callees(
         .collect()
 }
 
+/// The panic conditions of each translation in `translated`, which lists every function
+/// after the translated functions it calls.
+fn translation_panics(
+    emissions: &[MacroEmission],
+    translated: &[String],
+) -> BTreeMap<String, BTreeSet<&'static str>> {
+    let analyses = emissions
+        .iter()
+        .map(|emission| (emission.analysis.name.as_str(), &emission.analysis))
+        .collect::<BTreeMap<_, _>>();
+    let mut panics = BTreeMap::new();
+    for name in translated {
+        let conditions = panic_conditions(analyses[name.as_str()], &panics);
+        panics.insert(name.clone(), conditions);
+    }
+    panics
+}
+
+/// Rust panic conditions of an analyzed expression's operations, as documentation text.
+///
+/// A call that expands a translation has that translation's conditions; any other call
+/// is an indirect or guarded native call.
+fn panic_conditions(
+    analysis: &MacroAnalysis,
+    translations: &BTreeMap<String, BTreeSet<&'static str>>,
+) -> BTreeSet<&'static str> {
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    let mut conditions = BTreeSet::new();
+    for node in nodes {
+        match &node.kind {
+            ExpressionKind::Binary { operator, .. }
+            | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
+                BinaryOperator::Divide | BinaryOperator::Remainder => {
+                    conditions.insert("Integer division/remainder rejects zero divisors and signed MIN / -1 overflow.");
+                }
+                BinaryOperator::ShiftLeft | BinaryOperator::ShiftRight => {
+                    conditions.insert("Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain.");
+                }
+                BinaryOperator::Add | BinaryOperator::Subtract | BinaryOperator::Multiply => {
+                    conditions.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds.");
+                }
+                _ => {}
+            },
+            ExpressionKind::Unary { operator: UnaryOperator::Negate, .. }
+            | ExpressionKind::Update { .. } => {
+                conditions.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping.");
+            }
+            ExpressionKind::Cast { .. } | ExpressionKind::TypeParameterCast { .. } => {
+                conditions.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
+            }
+            ExpressionKind::Call { callee, .. } => {
+                match direct_callee(nodes, *callee).and_then(|name| translations.get(name)) {
+                    Some(translation) => conditions.extend(translation),
+                    None => {
+                        conditions.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    conditions
+}
+
 /// Names of the functions an analyzed expression calls directly.
 fn direct_calls(analysis: &MacroAnalysis) -> impl Iterator<Item = &str> {
     let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
     nodes.iter().filter_map(move |node| {
         let ExpressionKind::Call { callee, .. } = node.kind else { return None };
-        let mut callee = callee;
-        while let ExpressionKind::Group { operand } = nodes[callee].kind {
-            callee = operand;
-        }
-        match &nodes[callee].kind {
-            ExpressionKind::Identifier { name } => Some(name.as_str()),
-            _ => None,
-        }
+        direct_callee(nodes, callee)
     })
+}
+
+/// The name of the function a call's callee names, through any grouping.
+fn direct_callee(nodes: &[crate::syntax::ExpressionNode], callee: NodeId) -> Option<&str> {
+    let mut callee = callee;
+    while let ExpressionKind::Group { operand } = nodes[callee].kind {
+        callee = operand;
+    }
+    match &nodes[callee].kind {
+        ExpressionKind::Identifier { name } => Some(name.as_str()),
+        _ => None,
+    }
 }
 
 /// Generate Rust support when the selected macros need no native C artifact.
@@ -1219,37 +1292,7 @@ fn render(
     }
     comment.push_str("\n\n# Safety\n\n");
     comment.push_str(documentation::SAFETY);
-    let mut failures = std::collections::BTreeSet::new();
-    for node in &expression.syntax.nodes {
-        match &node.kind {
-            ExpressionKind::Binary { operator, .. }
-            | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
-                crate::BinaryOperator::Divide | crate::BinaryOperator::Remainder => {
-                    failures.insert("Integer division/remainder rejects zero divisors and signed MIN / -1 overflow.");
-                }
-                crate::BinaryOperator::ShiftLeft | crate::BinaryOperator::ShiftRight => {
-                    failures.insert("Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain.");
-                }
-                crate::BinaryOperator::Add
-                | crate::BinaryOperator::Subtract
-                | crate::BinaryOperator::Multiply => {
-                    failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds.");
-                }
-                _ => {}
-            },
-            ExpressionKind::Unary { operator: crate::UnaryOperator::Negate, .. }
-            | ExpressionKind::Update { .. } => {
-                failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping.");
-            }
-            ExpressionKind::Cast { .. } | ExpressionKind::TypeParameterCast { .. } => {
-                failures.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
-            }
-            ExpressionKind::Call { .. } => {
-                failures.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
-            }
-            _ => {}
-        }
-    }
+    let failures = panic_conditions(analysis, &bindings.inline_translations);
     if !failures.is_empty() {
         comment.push_str("\n\n# Panics\n\n");
         for failure in failures {

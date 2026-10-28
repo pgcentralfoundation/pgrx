@@ -1258,7 +1258,7 @@ impl<'a> Renderer<'a> {
                                         .map_err(failure)?,
                                 )
                             };
-                            if bindings.inline_translations.contains(name.as_str())
+                            if bindings.inline_translations.contains_key(name.as_str())
                                 && let Some(callee) = super::macro_identifier(name)
                             {
                                 // The real call below converts the translation's value with

@@ -518,7 +518,9 @@ A generated call to a translated function expands its macro with compiled value
 operands instead of calling the native binding. Functions that reach themselves
 through such calls keep the binding, since the expansion would not terminate. If
 a callee's final rendering is not a translation, its callers are rendered again
-with the binding.
+with the binding. A caller's documented panic conditions include those of each
+translation it expands, and only a native or indirect call adds the guarded call
+conditions.
 
 The normal native capability path preserves prototype conversions, qualifiers,
 original C result identity and guard boundaries. Function operands evaluate once;

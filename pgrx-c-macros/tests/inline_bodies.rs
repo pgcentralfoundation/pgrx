@@ -140,6 +140,9 @@ const NATIVE: &[&str] = &[
     "BODY_TRIGRAPH_HASH",
 ];
 
+/// Documented panic conditions of a cast, and of a native or indirect call.
+const CAST_PANICS: &str = "Conversions involving floats reject nonfinite";
+const CALL_PANICS: &str = "guarded native calls reject the wrong PostgreSQL thread";
 /// The runtime support path in generated code.
 const C: &str = "$crate::__pgrx_c_macros";
 /// The documentation type witness, before its marker.
@@ -208,12 +211,15 @@ fn translated_bodies_match_their_original_definitions() {
             "BODY_CALLER" | "BODY_LEAF_PLUS" => {
                 assert!(compact.contains("$crate::BODY_LEAF!(@__pgrx_emit_value;(@compiled"));
             }
+            // The callee's cast can panic, and these calls make no native call.
             "BODY_SIZED_CALLER" | "BODY_SIZED_MACRO" => {
                 assert!(compact.contains("$crate::BODY_SIZED!(@__pgrx_emit_value;(@compiled"));
+                assert!(definition.contains(CAST_PANICS) && !definition.contains(CALL_PANICS));
             }
             // Expanding a recursive translation would never terminate.
             "BODY_RECURSIVE" => {
                 assert!(!compact.contains("BODY_RECURSIVE!(@__pgrx_emit_value;(@compiled"));
+                assert!(definition.contains(CALL_PANICS));
             }
             _ => {}
         }
