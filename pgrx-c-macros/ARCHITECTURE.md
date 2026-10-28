@@ -1738,8 +1738,9 @@ Release generation keeps the committed bindings and snapshot coherent:
   version's count of value, unit, diverging and untyped shells, naming up to 20
   untyped ones. Every run also reports those counts and the snapshot's bytes and
   file count as Cargo warnings, which the release scripts' `cargo -q` hides.
-- `tools/docsrs-typecheck.sh` type-checks pgrx-pg-sys's docs build of each
-  version against the committed tree and keeps the packaged crate within 5 MiB.
+- `tools/docsrs-typecheck.sh` type-checks the docs builds of pgrx-pg-sys and pgrx
+  for each `pgNN` feature of pgrx-pg-sys against the committed tree, and keeps the
+  packaged pgrx-pg-sys within 5 MiB.
   Like `tools/docsrs-check.sh`, it builds for the docs.rs target, so another host
   needs that target's standard library and a C compiler for it. A pgrx-bindgen
   unit test keeps the snapshot within 24 MiB raw.
@@ -2078,7 +2079,7 @@ The documentation snapshot requires its own release/docs.rs validation.
 `tests/documentation_oracle.rs` compiles real macros and their renamed shells in
 one program, requires one result type for each invocation, and checks that a
 shell panics without evaluating its operands. `tools/docsrs-typecheck.sh` checks
-each version's committed snapshot on the docs.rs target. The snapshot is not a
+pgrx-pg-sys and pgrx against each version's committed snapshot on the docs.rs target. The snapshot is not a
 substitute for current-platform generation. Tests demonstrate
 specific properties; neither successful emission nor a finite oracle sample
 proves every possible invocation correct. The type and safety arguments must

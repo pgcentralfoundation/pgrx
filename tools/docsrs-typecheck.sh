@@ -5,16 +5,25 @@
 #LICENSE
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-# Type-check pgrx-pg-sys as docs.rs builds it, against the committed bindings and
-# C macro documentation snapshot, for each PostgreSQL version. Then check that the
-# packaged crate stays within its size budget. This needs no PostgreSQL or libclang,
-# but it builds for the docs.rs target: on another host, that target's Rust standard
-# library and a C compiler for it are required (see tools/docsrs-target.sh).
+# Type-check pgrx-pg-sys and pgrx as docs.rs builds them, against the committed
+# bindings and C macro documentation snapshot, for each PostgreSQL version. Then check
+# that the packaged pgrx-pg-sys stays within its size budget. This needs no PostgreSQL
+# or libclang, but it builds for the docs.rs target: on another host, that target's
+# Rust standard library and a C compiler for it are required (see
+# tools/docsrs-target.sh).
 
 set -euo pipefail
 source tools/docsrs-target.sh
 
-VERSIONS="${DOCSRS_PG_VERSIONS:-15 16 17 18 19}"
+# Every PostgreSQL version that pgrx-pg-sys builds has a `pgNN` feature.
+VERSIONS="${DOCSRS_PG_VERSIONS:-$(awk '
+    /^\[/ { section = $0; next }
+    section == "[features]" && $1 ~ /^pg[0-9]+$/ { print $1 }
+' pgrx-pg-sys/Cargo.toml)}"
+if [[ -z "${VERSIONS//[[:space:]]/}" ]]; then
+    echo "pgrx-pg-sys/Cargo.toml declares no pgNN feature" >&2
+    exit 1
+fi
 MAX_CRATE_BYTES=$((5 * 1024 * 1024))
 PACKAGE_DIR="${CARGO_TARGET_DIR:-target}/package"
 
@@ -24,11 +33,18 @@ require_target_toolchain "" "${target}"
 
 for version in ${VERSIONS}; do
     major="${version#pg}"
-    echo "Type-checking the docs.rs build of pgrx-pg-sys for pg${major} on ${target}"
+    echo "Type-checking the docs.rs builds of pgrx-pg-sys and pgrx for pg${major} on ${target}"
     DOCS_RS=1 CLANG_PATH=/nonexistent LIBCLANG_PATH=/nonexistent cargo check \
         -p pgrx-pg-sys \
         --lib \
         --test generated_c_macros \
+        --no-default-features \
+        --features "pg${major} cshim" \
+        --target "${target}"
+    # Extensions documented for this version compile pgrx against its shells.
+    DOCS_RS=1 CLANG_PATH=/nonexistent LIBCLANG_PATH=/nonexistent cargo check \
+        -p pgrx \
+        --lib \
         --no-default-features \
         --features "pg${major} cshim" \
         --target "${target}"

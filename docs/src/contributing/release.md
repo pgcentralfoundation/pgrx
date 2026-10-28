@@ -22,7 +22,7 @@ git pull origin/develop
 ```
 
 Before publishing, `publish.sh` type-checks pgrx and pgrx-pg-sys as docs.rs builds them
-for `x86_64-unknown-linux-gnu`. On another host, this needs that target's standard
+for `x86_64-unknown-linux-gnu`, for every PostgreSQL version. On another host, this needs that target's standard
 library for both the default and nightly toolchains, and a C compiler for it, because
 cee-scape compiles C. For example, on macOS run
 `rustup target add x86_64-unknown-linux-gnu` and

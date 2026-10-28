@@ -228,8 +228,8 @@ and bindings before writing anything to `src/include`. Each `pgNN.rs` records a
 generation id that the snapshot asserts, so commit the bindings and the snapshot from
 the same run, with every supported version configured;
 `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1` makes a run that misses one fail.
-`tools/docsrs-typecheck.sh` type-checks the committed tree's docs build for each
-version and checks the packaged crate size.
+`tools/docsrs-typecheck.sh` type-checks the docs builds of pgrx-pg-sys and pgrx
+against the committed tree for each version and checks the packaged crate size.
 
 Ordinary bindgen retains its established target, CPPFLAGS and server include
 directories. Its system include directories come from the Clang driver that
