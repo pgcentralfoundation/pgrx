@@ -179,7 +179,7 @@ pub(super) fn prove(
         }
         EntityVisitResult::Continue
     });
-    history.popped = popped_names(files.iter().map(|file| file.get_path()));
+    history.popped = popped_names(files.iter().map(|file| file.get_path()), &profile.arguments);
     let mut definitions = BTreeMap::new();
     let mut sources = HashMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
@@ -200,21 +200,40 @@ pub(super) fn prove(
     Ok(definitions)
 }
 
-/// The names that `pop_macro` pragmas in these files restore, or `None` when a file cannot
-/// be read, a pragma's operand is not a plain string literal, or a file has a `??/`
-/// trigraph or a carriage return outside a CR-LF line end.
+/// The names that `pop_macro` pragmas in these files and in the `-D` definitions among
+/// `arguments` restore, or `None` when a file cannot be read, a pragma's operand is not a
+/// plain string literal, or a text has a `??/` trigraph or a carriage return outside a CR-LF
+/// line end.
 ///
 /// libclang records neither pragma, so the files' text is searched, including text the
-/// preprocessor skipped, comments and `_Pragma` strings. Line splices are removed first, as
-/// Clang removes them before it reads a pragma. With trigraphs enabled, `??/` is a
-/// backslash, and Clang also ends a line at a bare carriage return, so such a file could
-/// splice a name in a way the search does not model. A pragma whose name is formed by
-/// token pasting cannot be seen.
-fn popped_names(files: impl IntoIterator<Item = PathBuf>) -> Option<HashSet<String>> {
+/// preprocessor skipped, comments and `_Pragma` strings. Clang writes each `-D` definition
+/// into its predefines text, where a `_Pragma` in the replacement list pops a macro
+/// wherever the definition is expanded, so those definitions are searched too. Line splices
+/// are removed first, as Clang removes them before it reads a pragma. With trigraphs
+/// enabled, `??/` is a backslash, and Clang also ends a line at a bare carriage return, so
+/// such a text could splice a name in a way the search does not model. A pragma whose name
+/// is formed by token pasting cannot be seen.
+fn popped_names(
+    files: impl IntoIterator<Item = PathBuf>,
+    arguments: &[String],
+) -> Option<HashSet<String>> {
     const POP: &[u8] = b"pop_macro";
+    // A `-D` operand is joined to the option or follows it.
+    let previous = std::iter::once(None).chain(arguments.iter().map(Some));
+    let definitions = arguments.iter().zip(previous).filter_map(|(argument, previous)| {
+        if previous.is_some_and(|previous| previous == "-D") {
+            Some(argument.as_str())
+        } else {
+            argument.strip_prefix("-D")
+        }
+    });
+    let texts = files
+        .into_iter()
+        .map(|file| std::fs::read(file).ok())
+        .chain(definitions.map(|definition| Some(definition.as_bytes().to_vec())));
     let mut names = HashSet::new();
-    for file in files {
-        let text = std::fs::read(file).ok()?;
+    for text in texts {
+        let text = text?;
         if text.windows(3).any(|window| window == b"??/") || has_bare_carriage_return(&text) {
             return None;
         }
@@ -669,8 +688,8 @@ impl<'tu> MacroHistory<'tu, '_> {
 mod tests {
     use super::popped_names;
 
-    /// Pop pragmas name what they restore, also inside `_Pragma`; any other mention of
-    /// the pragma name leaves every name unproved.
+    /// Pop pragmas name what they restore, also inside `_Pragma` and in a `-D` definition;
+    /// any other mention of the pragma name leaves every name unproved.
     #[test]
     fn pop_pragmas_name_restored_macros() {
         let directory = tempfile::tempdir().unwrap();
@@ -684,11 +703,22 @@ mod tests {
             "#pragma pop_macro(\"A\")\n#pragma pop_macro ( \"B_1\" )\n_Pragma(\"pop_macro(\\\"C\\\")\")\n",
         );
         let plain = file("plain.h", "#pragma push_macro(\"D\")\n");
-        let names = popped_names([pragmas.clone(), plain]).unwrap();
+        let names = popped_names([pragmas.clone(), plain.clone()], &[]).unwrap();
         assert_eq!(names, ["A", "B_1", "C"].map(String::from).into());
+        // Only `-D` operands, joined or separate, reach the predefines text.
+        let arguments = [
+            "-DE=_Pragma(\"pop_macro(\\\"E\\\")\")",
+            "-D",
+            "F=_Pragma(\"pop_macro(\\\"F\\\")\")",
+            "-Ipop_macro",
+        ]
+        .map(String::from);
+        let names = popped_names([plain], &arguments).unwrap();
+        assert_eq!(names, ["E", "F"].map(String::from).into());
         let comment = file("comment.h", "/* see pop_macro */\n");
-        assert_eq!(popped_names([pragmas.clone(), comment]), None);
-        assert_eq!(popped_names([pragmas, directory.path().join("missing.h")]), None);
+        assert_eq!(popped_names([pragmas.clone(), comment], &[]), None);
+        assert_eq!(popped_names([pragmas.clone()], &["-DG=pop_macro".into()]), None);
+        assert_eq!(popped_names([pragmas, directory.path().join("missing.h")], &[]), None);
     }
 
     /// Line splices are removed before the search, in the pragma's name and its operand.
@@ -706,11 +736,11 @@ mod tests {
             "spliced.h",
             "#pragma pop_mac\\\nro(\"A\")\r\n#pragma pop_ma\\ \t\r\ncro(\"B\\\n_1\")\r\n",
         );
-        let names = popped_names([spliced.clone()]).unwrap();
+        let names = popped_names([spliced.clone()], &[]).unwrap();
         assert_eq!(names, ["A", "B_1"].map(String::from).into());
         let trigraph = file("trigraph.h", "/* ??/ */\n");
-        assert_eq!(popped_names([spliced.clone(), trigraph]), None);
+        assert_eq!(popped_names([spliced.clone(), trigraph], &[]), None);
         let carriage = file("carriage.h", "#define X 1\r#define Y 2\n");
-        assert_eq!(popped_names([spliced, carriage]), None);
+        assert_eq!(popped_names([spliced, carriage], &[]), None);
     }
 }

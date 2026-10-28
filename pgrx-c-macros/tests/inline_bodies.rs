@@ -279,6 +279,42 @@ fn unmodeled_line_ends_leave_no_macro_bodies() {
     }
 }
 
+/// A `-D` definition can pop a macro through `_Pragma` wherever a header expands it. A body
+/// that reaches the popped name is not retained, whether the definition is joined to the
+/// option or follows it, while a body that names another macro is.
+#[test]
+fn command_line_pop_pragmas_leave_no_body() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().unwrap();
+    let header = directory.path().join("defined_pop.h");
+    std::fs::write(
+        &header,
+        "#define BODY_POP_VALUE 1000\n\
+#pragma push_macro(\"BODY_POP_VALUE\")\n\
+#undef BODY_POP_VALUE\n\
+typedef enum BodyPopEnum { BODY_POP_VALUE = 5 } BodyPopEnum;\n\
+#define BODY_POP_SCALE BODY_POP_VALUE\n\
+static inline int BODY_DEFINED_POP(int value) { return value + BODY_POP_SCALE; }\n\
+#define BODY_POP_OFFSET 1\n\
+static inline int BODY_DEFINED_PLAIN(int value) { return value + BODY_POP_OFFSET; }\n\
+BODY_POP\n",
+    )
+    .unwrap();
+    let definition = r#"BODY_POP=_Pragma("pop_macro(\"BODY_POP_VALUE\")")"#;
+    for operand in [vec![format!("-D{definition}")], vec!["-D".into(), definition.into()]] {
+        let mut arguments = oracle::native_arguments();
+        arguments.extend(operand);
+        let frontend = inspect(&scanner, &header, &arguments, None).expect("inspect definitions");
+        let retained = |name: &str| {
+            let function = &frontend.declarations().function_signatures[name];
+            function.definition.as_ref().expect("proved definition").body.is_some()
+        };
+        assert!(retained("BODY_DEFINED_PLAIN"));
+        assert!(!retained("BODY_DEFINED_POP"));
+    }
+}
+
 /// A header need not be UTF-8 and may hold a NUL byte. A definition keeps its body when
 /// only another part of its header, here a comment, has a Latin-1 byte. A definition with
 /// one in its own text keeps neither text nor body, since its text is retained as a string.

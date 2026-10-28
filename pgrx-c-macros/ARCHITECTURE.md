@@ -329,10 +329,12 @@ cannot be inferred from a declaration's name or broad type category:
    end-of-unit expansion identical, unless a `pop_macro` pragma restored a
    definition that was undefined or replaced at the body. libclang records no
    pragmas, so the text of every file in the unit is searched after removing its
-   line splices: a name that a pop pragma names leaves no body. A pop whose
-   operand is not a plain string leaves no body that names a macro, and so does
-   a `??/` trigraph or a carriage return outside a CR-LF line end in any file,
-   since either could splice a pragma's name in a way the search does not model.
+   line splices, and so is every command-line `-D` definition, since a
+   `_Pragma` in one pops wherever it is expanded. A name that a pop pragma names
+   leaves no body. A pop whose operand is not a plain string leaves no body that
+   names a macro, and so does a `??/` trigraph or a carriage return outside a
+   CR-LF line end in any of that text, since either could splice a pragma's name
+   in a way the search does not model.
    A pop whose name token pasting forms has no such text, so the active
    definition must also be that last definition, by location, and a name the
    body expands must have used it. That check does not reach a name that only
