@@ -517,7 +517,8 @@ impl<'tu> MacroHistory<'tu, '_> {
     /// A name expanded in the definition, and every macro it reaches, must be unchanged since.
     /// A name active at the end but not expanded must lie in the arguments of an expanded
     /// function-like invocation, which dropped or stringified it, and be unchanged since that
-    /// invocation; the unchanged invocation treats it the same way at the end.
+    /// invocation; the unchanged invocation treats it the same way at the end. Any other name
+    /// must never have been defined as a macro.
     fn expands_unchanged(&self, file: File<'tu>, tokens: &[(u32, crate::Token)]) -> bool {
         let expansions = self.expansions.get(&file);
         // Each open invocation records the parenthesis depth that closes it and its position.
@@ -571,6 +572,9 @@ impl<'tu> MacroHistory<'tu, '_> {
                         return false;
                     }
                 }
+                // Nested expansions are not recorded, so a name that was ever a macro
+                // could have been expanded when a macro's result was rescanned.
+                None if self.last_definition.contains_key(name) => return false,
                 None => {}
             }
         }

@@ -127,6 +127,15 @@ static inline int BODY_DROPPED_LATER(int value) { return value + BODY_DROP(BODY_
 enum { BODY_ARGUMENT = 5 };
 static inline int BODY_ARGUMENT_LATE(int value) { return BODY_ID(BODY_ARGUMENT) + value; }
 #define BODY_ARGUMENT 7
+/* A function-like macro that only rescanning a macro's result expands has no expansion
+ * record. It is undefined afterwards, and a function has its name. */
+static inline int BODY_RESCAN_TARGET(int value) { return value + 1; }
+#define BODY_RESCAN_TARGET(value) ((value) * 100)
+#define BODY_RESCAN_SELECT(name) name
+#define BODY_RESCAN_APPLY(name, value) name(value)
+static inline int BODY_RESCAN(int value) { return BODY_RESCAN_SELECT(BODY_RESCAN_TARGET)(value); }
+static inline int BODY_RESCAN_ARGUMENT(int value) { return BODY_RESCAN_APPLY(BODY_RESCAN_TARGET, value); }
+#undef BODY_RESCAN_TARGET
 #define BODY_TEMPLATE_VALUE_NAME BODY_FIRST_VALUE
 #define BODY_TEMPLATE_BRANCH_NAME BODY_FIRST_BRANCH
 #define BODY_TEMPLATE_VALUE 1

@@ -88,6 +88,12 @@ fn main() {
         println!("dropped later\t{}", BODY_DROPPED_LATER!(1_i32).get());
         println!("argument late\t{}", BODY_ARGUMENT_LATE!(1_i32).get());
         println!(
+            "rescan\t{}\t{}\t{}",
+            BODY_RESCAN!(3_i32).get(),
+            BODY_RESCAN_ARGUMENT!(3_i32).get(),
+            BODY_RESCAN_TARGET!(3_i32).get()
+        );
+        println!(
             "template\t{}\t{}\t{}\t{}",
             BODY_FIRST_VALUE!().get(),
             BODY_SECOND_VALUE!().get(),

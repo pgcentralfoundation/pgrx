@@ -333,7 +333,8 @@ cannot be inferred from a declaration's name or broad type category:
    location, and a name the body expands must have used it. A macro name without
    a record is admitted only inside the arguments of such an expanded
    function-like invocation, which dropped or stringified it, and only when it
-   is unchanged since that invocation.
+   is unchanged since that invocation. Nested expansions are not recorded, so a
+   name inactive at the end must never have been defined as a macro.
    Token pasting and invocation-dependent builtins such as `__LINE__` leave no
    body. A file and offset name a place in the file's first entry, and libclang
    reports skipped ranges for that entry only. Expansion records from a later
