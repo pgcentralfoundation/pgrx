@@ -22,6 +22,16 @@ const WIDTH: usize = 100;
 /// Other Rust source is left as emitted; the binding build runs rustfmt over it only for
 /// documentation snapshots.
 pub fn format_rust_macros(source: &str) -> Result<String, String> {
+    // proc-macro2 keeps every parsed source, plus an offset map for each queried
+    // span, in a thread-local table that only thread exit or a thread-wide span
+    // invalidation releases. Lay out on a private thread so a long-lived caller
+    // retains nothing and its own spans stay valid.
+    std::thread::scope(|scope| scope.spawn(|| layout(source)).join())
+        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+}
+
+/// Lay out macro definitions using source spans registered on the current thread.
+fn layout(source: &str) -> Result<String, String> {
     let tokens: TokenStream =
         source.parse().map_err(|error| format!("invalid generated Rust: {error}"))?;
     let mut bodies = Vec::new();

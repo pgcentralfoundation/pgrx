@@ -390,3 +390,28 @@ fn files_without_definitions_are_untouched_and_malformed_tokens_are_errors() {
         assert!(!error.is_empty());
     }
 }
+
+/// Checks that formatting leaves nothing in the caller's proc-macro2 source map, which keeps
+/// every parsed source until thread exit or a thread-wide span invalidation.
+#[test]
+fn formatting_retains_no_source_on_the_calling_thread() {
+    // With span locations, a span prints its absolute position in this thread's map,
+    // so the gap between two fresh parses shows what was registered between them.
+    let next_position = || {
+        let tokens = "marker".parse::<TokenStream>().unwrap();
+        let span = format!("{:?}", tokens.into_iter().next().unwrap().span());
+        span.strip_prefix("bytes(")
+            .and_then(|range| range.split_once(".."))
+            .and_then(|(start, _)| start.parse::<usize>().ok())
+            .unwrap_or_else(|| panic!("span {span} has no source-map position"))
+    };
+    let source = format!("macro_rules! retained {{ () => {{ {}1 }}; }}\n", "1 + ".repeat(4096));
+    let before = next_position();
+    format_rust_macros(&source).unwrap();
+    let after = next_position();
+    assert!(
+        after - before < source.len(),
+        "formatting registered {} bytes on the calling thread",
+        after - before
+    );
+}
