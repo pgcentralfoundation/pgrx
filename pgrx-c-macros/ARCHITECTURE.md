@@ -945,8 +945,10 @@ A macro that both multiplies and adds checks every value against the composed
 profile, so a floating argument fails to compile when contraction is not
 disabled. A translated inline function's own types do not depend on its caller:
 a body with a floating local or value under that profile keeps the native call.
-Its arguments are converted to the parameter types as a call converts them, so
-they use the native value profile.
+That includes a floating object read or written through a member, an index or
+a dereference, and such an access or a call whose type analysis leaves
+unestablished. Its arguments are converted to the parameter types as a call
+converts them, so they use the native value profile.
 
 Verified byte-swap builtins lower to Rust operations with the C result identity.
 Branch hints lower to Rust support with cold paths while preserving C operand

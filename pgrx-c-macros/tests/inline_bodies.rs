@@ -64,6 +64,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_RESCAN_TARGET",
     // A floating argument converts to an integer parameter.
     "BODY_ORDER",
+    // Only the conversion of its integer result is floating.
+    "BODY_RETURN_FMA",
 ];
 
 /// Macros that call translated inline functions.
@@ -105,6 +107,13 @@ const NATIVE: &[&str] = &[
     // Their own floating values need a floating profile for their arithmetic.
     "BODY_FMA",
     "BODY_INT_FMA",
+    // So do floating objects they reach through a pointer, and a call through a member,
+    // whose result type analysis does not establish.
+    "BODY_FIELD_FMA",
+    "BODY_INDEX_FMA",
+    "BODY_DEREF_FMA",
+    "BODY_STORE_FMA",
+    "BODY_CALL_FMA",
     // Their header is entered twice, with different macros and conditionals. The first
     // entry's macro is redefined before the second; the others are in the second entry.
     "BODY_FIRST_VALUE",
@@ -210,7 +219,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 28;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 33;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

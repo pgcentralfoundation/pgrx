@@ -142,6 +142,19 @@ static inline int BODY_RESCAN_ARGUMENT(int value) { return BODY_RESCAN_APPLY(BOD
 static inline double BODY_FMA(double a, double b, double c) { return a * b + c; }
 static inline int BODY_INT_FMA(int a, double unused) { return a * 2 + 1; }
 static inline int BODY_ORDER(int a, int b, int c) { return a * 100 + b * 10 + c; }
+/* Floating objects reached through a member, an index or a dereference, one written
+ * from integer arithmetic, and a call's result also need that profile. A floating
+ * result converted from integer arithmetic does not, as the conversion is not part of
+ * the arithmetic. */
+typedef struct BodyScaled { double scale; int count; } BodyScaled;
+static inline int BODY_FIELD_FMA(const BodyScaled *record, int value) { return value * 2 + (int) record->scale; }
+static inline int BODY_INDEX_FMA(const double *values, int value) { return value * 2 + (int) values[1]; }
+static inline int BODY_DEREF_FMA(const double *value, int count) { return count * 2 + (int) *value; }
+static inline void BODY_STORE_FMA(BodyScaled *record, int value) { record->scale = value * 2 + 1; }
+/* Analysis does not establish the result type of a call through a member. */
+typedef struct BodyScaler { double (*scale)(void); } BodyScaler;
+static inline int BODY_CALL_FMA(const BodyScaler *scaler, int value) { return value * 2 + (int) scaler->scale(); }
+static inline double BODY_RETURN_FMA(int value) { return value * 2 + 1; }
 /* Stringification spells its argument with the body's original spacing. */
 #define BODY_STRING(text) #text
 #define BODY_STRING_OF(text) BODY_STRING(text)

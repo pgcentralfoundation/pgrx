@@ -39,6 +39,11 @@ impl Drop for Witness {
     }
 }
 
+/// The function BODY_CALL_FMA calls through its record.
+unsafe extern "C" fn body_quarter() -> f64 {
+    4.25
+}
+
 /// Print the same lines as the C oracle through the generated macros.
 fn main() {
     let mut value = 0_i32;
@@ -110,6 +115,19 @@ fn main() {
             BODY_FMA!(2.0_f64, 3.0_f64, 1.0_f64).get(),
             BODY_INT_FMA!(2_i32, 3.0_f64).get(),
             BODY_ORDER!(1.5_f64, 2_i32, 3_i32).get()
+        );
+        let mut scaled = BodyScaled { scale: 3.5, count: 0 };
+        let scales = [1.0_f64, 4.25];
+        BODY_STORE_FMA!(&raw mut scaled, 5_i32).get();
+        let scaler = BodyScaler { scale: Some(body_quarter) };
+        println!(
+            "floating objects\t{}\t{}\t{}\t{}\t{}\t{}",
+            BODY_FIELD_FMA!(&raw const scaled, 5_i32).get(),
+            BODY_INDEX_FMA!(scales.as_ptr(), 5_i32).get(),
+            BODY_DEREF_FMA!(&raw const scales[1], 5_i32).get(),
+            scaled.scale,
+            BODY_CALL_FMA!(&raw const scaler, 5_i32).get(),
+            BODY_RETURN_FMA!(5_i32).get()
         );
         println!(
             "template\t{}\t{}\t{}\t{}",

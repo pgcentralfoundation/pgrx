@@ -1,6 +1,7 @@
 /* LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org> */
 /* LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. */
 #include <stdio.h>
+static double body_quarter(void) { return 4.25; }
 int main(void)
 {
     int value = 0;
@@ -34,6 +35,13 @@ int main(void)
     printf("rescan\t%d\t%d\t%d\n", BODY_RESCAN(3), BODY_RESCAN_ARGUMENT(3), BODY_RESCAN_TARGET(3));
     printf("string\t%d\t%d\n", BODY_STRING_SIZE(0), BODY_STRING_CHAR(0));
     printf("floats\t%g\t%d\t%d\n", BODY_FMA(2.0, 3.0, 1.0), BODY_INT_FMA(2, 3.0), BODY_ORDER(1.5, 2, 3));
+    BodyScaled scaled = {3.5, 0};
+    double scales[] = {1.0, 4.25};
+    BODY_STORE_FMA(&scaled, 5);
+    BodyScaler scaler = {body_quarter};
+    printf("floating objects\t%d\t%d\t%d\t%g\t%d\t%g\n", BODY_FIELD_FMA(&scaled, 5),
+           BODY_INDEX_FMA(scales, 5), BODY_DEREF_FMA(&scales[1], 5), scaled.scale,
+           BODY_CALL_FMA(&scaler, 5), BODY_RETURN_FMA(5));
     printf("template\t%d\t%d\t%d\t%d\n", BODY_FIRST_VALUE(), BODY_SECOND_VALUE(),
            BODY_FIRST_BRANCH(10), BODY_SECOND_BRANCH(10));
     printf("guarded\t%d\t%d\n", BODY_GUARDED_FIRST(), BODY_GUARDED_SECOND());

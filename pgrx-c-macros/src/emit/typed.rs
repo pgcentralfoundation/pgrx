@@ -272,17 +272,37 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    /// Refuse a body that declares or computes a floating value the profile for its
-    /// composed arithmetic rejects. Each value use checks that profile, and the types of a
-    /// translated function's body do not depend on its caller, so no call would compile.
+    /// Refuse a body that declares, computes or accesses a floating value the profile for
+    /// its composed arithmetic rejects. Each value use checks that profile, and the types of
+    /// a translated function's body do not depend on its caller, so no call would compile.
+    ///
+    /// Every floating value starts at a node of floating type: a local, a declaration, a
+    /// literal, a cast, a call, or an object reached through a member, an index or a
+    /// dereference. Analysis defers the type of such an access, and of a call through a
+    /// pointer it cannot resolve, so the compiler-proved object type of that node must be
+    /// established, and not floating, for the body to be translated.
     pub(super) fn check_own_floats(&self) -> Result<(), SkipReason> {
+        use crate::analysis::TypeExpression;
+        if self.floats {
+            return Ok(());
+        }
         let expression = self.analysis.expression.as_ref().expect("candidate expression");
         let floating = |ty: &TypeInfo| ty.category == TypeCategory::Floating;
-        if self.floats
-            || !(self.locals.values().any(|local| floating(&local.ty))
-                || expression.types.iter().any(|ty| {
-                    matches!(ty, crate::analysis::TypeExpression::External { ty } if floating(ty))
-                }))
+        let mut nodes = expression.syntax.nodes.iter().zip(&expression.types).zip(&self.objects);
+        if !(self.locals.values().any(|local| floating(&local.ty))
+            || nodes.any(|((node, ty), object)| match (object, ty) {
+                (Some(object), _) => floating(object),
+                (None, TypeExpression::External { ty }) => floating(ty),
+                (None, TypeExpression::Deferred) => matches!(
+                    node.kind,
+                    ExpressionKind::Member { .. }
+                        | ExpressionKind::Index { .. }
+                        | ExpressionKind::Dereference { .. }
+                        | ExpressionKind::Call { .. }
+                        | ExpressionKind::TypeParameterCast { .. }
+                ),
+                (None, _) => false,
+            }))
         {
             return Ok(());
         }
