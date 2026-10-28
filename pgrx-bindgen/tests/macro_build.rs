@@ -12,12 +12,15 @@
 //! must refuse generated macro callers. A complete target bundle also links original native
 //! wrappers without inspecting unavailable headers.
 //!
-//! Generation is required. A missing or incompatible Clang, a signed-overflow policy runtime
-//! support does not model, or a server header Clang rejects fails the build, and the error
-//! names the cause. A `PGRX_INCLUDEDIR_SERVER` override owns the macros its headers define.
-//! A cross build for a target whose standard library is installed accepts only server headers
-//! configured for that target, compiles native support for it, and applies only PostgreSQL's
-//! functional CFLAGS from a host `pg_config`.
+//! Generation is required. A missing or incompatible Clang, a driver that loads a configuration
+//! file, a signed-overflow policy runtime support does not model, or a server header Clang
+//! rejects fails the build, and the error names the cause. A `PGRX_INCLUDEDIR_SERVER` override
+//! owns the macros its headers define, and a missing one is named with its target. A cross
+//! build for a target whose standard library is installed accepts only server headers
+//! configured for that target, compiles native support for it, applies only PostgreSQL's
+//! functional CFLAGS from a host `pg_config`, and asks Clang for the target's system include
+//! directories under the recorded sysroot. On macOS, a universal installation such as
+//! Postgres.app builds both of its slices.
 
 #![cfg(unix)]
 
@@ -526,8 +529,9 @@ fn refused(output: Output, expected: &[&str]) -> String {
 }
 
 /// Every generation failure stops the build and names its cause: a missing or incompatible
-/// Clang, a signed-overflow policy runtime support does not model, and a server header that
-/// Clang rejects. No native support is published by a refused build.
+/// Clang, a signed-overflow policy runtime support does not model, a server header that Clang
+/// rejects, and a driver that loads a configuration file. No native support is published by a
+/// refused build, while the repaired fixture builds.
 #[test]
 #[ignore = "compiles an isolated binding build repeatedly; requires native Clang and cached dependencies"]
 fn refused_generation_fails_and_names_the_cause() {
@@ -586,10 +590,51 @@ fn refused_generation_fails_and_names_the_cause() {
             }
         }
     }
+    fs::write(source.join("server/server.h"), server).unwrap();
+    assert_eq!(successful(fixture.build(flags, &include_flags)), "11\n");
+    // A distribution's default configuration file adds flags no profile records. The working
+    // driver loads one here through an explicit --config.
+    let compiler = fixture.report()["profile"]["compiler"]["executable"].clone();
+    let configured = fixture.0.join("configured");
+    fs::create_dir(&configured).unwrap();
+    let configuration = configured.join("distribution.cfg");
+    fs::write(&configuration, "-DDISTRIBUTION_DEFAULT=1\n").unwrap();
+    script(
+        &configured.join("clang"),
+        &format!(
+            "exec '{}' --config '{}' \"$@\"",
+            compiler.as_str().unwrap(),
+            configuration.display()
+        ),
+    );
+    refused(
+        fixture
+            .command(flags, &include_flags)
+            .env("CLANG_PATH", configured.join("clang"))
+            .output()
+            .unwrap(),
+        &[
+            requirement,
+            &format!("Configuration file: {}", configuration.display()),
+            "set CLANG_NO_DEFAULT_CONFIG=1 or pass --no-default-config",
+        ],
+    );
+}
+
+/// The host's Cargo target, which a build without `--target` uses.
+fn host_target() -> String {
+    let output = Command::new("rustc").arg("-vV").output().expect("run rustc");
+    String::from_utf8(output.stdout)
+        .unwrap()
+        .lines()
+        .find_map(|line| line.strip_prefix("host: "))
+        .expect("rustc names its host")
+        .to_owned()
 }
 
 /// A `PGRX_INCLUDEDIR_SERVER` override owns the macros its headers define, even though the
-/// installation's own server directory is an empty decoy.
+/// installation's own server directory is an empty decoy. A missing override directory fails
+/// the build naming the variable that set it and the target.
 #[test]
 #[ignore = "compiles an isolated binding build; requires native Clang and cached dependencies"]
 fn include_server_override_owns_macros() {
@@ -599,6 +644,21 @@ fn include_server_override_owns_macros() {
     fixture.macro_server();
     let decoy = source.join("decoy");
     fs::create_dir(&decoy).unwrap();
+    let target = host_target();
+    let variable = format!("PGRX_INCLUDEDIR_SERVER_PG18_{}", target.replace('-', "_"));
+    let missing = source.join("mistyped-server");
+    refused(
+        fixture
+            .command("-fwrapv", "")
+            .env("PGRX_PG_CONFIG_INCLUDEDIR-SERVER", &decoy)
+            .env(&variable, &missing)
+            .output()
+            .unwrap(),
+        &[
+            &format!("pg18: could not select PostgreSQL server headers for {target}"),
+            &format!("cannot find {:?} for C header files, from {variable}", missing),
+        ],
+    );
     let output = fixture
         .command("-fwrapv", &format!("-I{}", source.join("server/fallback").display()))
         .env("PGRX_PG_CONFIG_INCLUDEDIR-SERVER", &decoy)
@@ -621,6 +681,8 @@ fn include_server_override_owns_macros() {
 struct Cross {
     /// Cargo's target.
     target: &'static str,
+    /// The target as pgrx spells it for Clang.
+    clang_target: &'static str,
     /// The architecture that begins Clang's triple for the target.
     clang_arch: &'static str,
     /// The target's machine as configure records it.
@@ -642,6 +704,7 @@ fn cross() -> Cross {
     let cross = match (std::env::consts::ARCH, std::env::consts::OS) {
         ("aarch64", "macos") => Cross {
             target: "x86_64-apple-darwin",
+            clang_target: "x86_64-apple-darwin",
             clang_arch: "x86_64",
             target_machine: "x86_64-apple-darwin24.0.0",
             host_machine: "aarch64-apple-darwin24.0.0",
@@ -650,6 +713,7 @@ fn cross() -> Cross {
         },
         ("x86_64", "macos") => Cross {
             target: "aarch64-apple-darwin",
+            clang_target: "arm64-apple-darwin",
             clang_arch: "arm64",
             target_machine: "aarch64-apple-darwin24.0.0",
             host_machine: "x86_64-apple-darwin24.0.0",
@@ -658,6 +722,7 @@ fn cross() -> Cross {
         },
         ("x86_64", "linux") => Cross {
             target: "aarch64-unknown-linux-gnu",
+            clang_target: "aarch64-unknown-linux-gnu",
             clang_arch: "aarch64",
             target_machine: "aarch64-unknown-linux-gnu",
             host_machine: "x86_64-pc-linux-gnu",
@@ -666,6 +731,7 @@ fn cross() -> Cross {
         },
         ("aarch64", "linux") => Cross {
             target: "x86_64-unknown-linux-gnu",
+            clang_target: "x86_64-unknown-linux-gnu",
             clang_arch: "x86_64",
             target_machine: "x86_64-pc-linux-gnu",
             host_machine: "aarch64-unknown-linux-gnu",
@@ -734,19 +800,8 @@ static inline int native_from_header(int value) { return FROM_HEADER(value); }
     .unwrap();
 }
 
-/// A cross build with a host `pg_config` refuses the host's server headers and names the
-/// target-scoped override. With target headers it compiles native support for the target and
-/// applies only PostgreSQL's functional flags from the host's CFLAGS.
-#[test]
-#[ignore = "cross-compiles an isolated binding build; requires Clang and the cross target's standard library"]
-fn cross_builds_accept_only_target_headers() {
-    let cross = cross();
-    let fixture = Fixture::new();
-    let source = fixture.source();
-    fixture.consumer();
-    fs::write(
-        source.join("src/main.rs"),
-        r#"use macro_build_consumer as renamed;
+/// Print the generated macro's value and the native inline function's value.
+const CROSS_MAIN: &str = r#"use macro_build_consumer as renamed;
 fn main() {
     let value = renamed::FROM_HEADER!(1_i32).get();
     // SAFETY: The original native inline function accepts and returns only C
@@ -754,29 +809,57 @@ fn main() {
     let native = unsafe { renamed::FROM_HEADER_NATIVE!(1_i32).get() };
     println!("{value} {native}");
 }
-"#,
-    )
-    .unwrap();
+"#;
+
+/// Write a `pg_config` program for `server` that records `cppflags` and `cflags`.
+fn pg_config_script(path: &Path, server: &Path, cppflags: &str, cflags: &str) {
+    script(
+        path,
+        &format!(
+            r#"case "$1" in
+    --version) echo 'PostgreSQL 18.4' ;;
+    --includedir-server|--libdir) echo '{}' ;;
+    --cppflags) echo '{cppflags}' ;;
+    --configure) echo ;;
+    --cflags) echo '{cflags}' ;;
+    *) echo "unsupported pg_config option $1" >&2; exit 1 ;;
+esac"#,
+            server.display(),
+        ),
+    );
+}
+
+/// The string elements of a report array.
+fn strings(value: &serde_json::Value) -> Vec<&str> {
+    value.as_array().unwrap().iter().map(|value| value.as_str().unwrap()).collect()
+}
+
+/// A cross build with a host `pg_config` refuses the host's server headers and names the
+/// target-scoped override. With target headers, named in the underscored spelling shells
+/// export, it compiles native support for the target and applies only PostgreSQL's functional
+/// flags from the host's CFLAGS. Clang reports the system include directories for the target
+/// under the sysroot the recorded CPPFLAGS select, rather than the driver's defaults.
+#[test]
+#[ignore = "cross-compiles an isolated binding build; requires Clang and the cross target's standard library"]
+fn cross_builds_accept_only_target_headers() {
+    let cross = cross();
+    let fixture = Fixture::new();
+    let source = fixture.source();
+    fixture.consumer();
+    fs::write(source.join("src/main.rs"), CROSS_MAIN).unwrap();
     let host_server = source.join("host-server");
     let target_server = source.join("target-server");
     lp64_server(&host_server, cross.host_machine);
     lp64_server(&target_server, cross.target_machine);
+    // The freestanding fixture includes no system header, so an empty sysroot suffices.
+    let sysroot = fixture.0.join("sysroot");
+    fs::create_dir_all(sysroot.join("usr/include")).unwrap();
     let pg_config = fixture.0.join("pg_config");
-    script(
+    pg_config_script(
         &pg_config,
-        &format!(
-            r#"case "$1" in
-    --version) echo 'PostgreSQL 18.4' ;;
-    --includedir-server) echo '{}' ;;
-    --libdir) echo '{}' ;;
-    --cppflags|--configure) echo ;;
-    --cflags) echo '{} -fwrapv -fno-strict-aliasing' ;;
-    *) echo "unsupported pg_config option $1" >&2; exit 1 ;;
-esac"#,
-            host_server.display(),
-            host_server.display(),
-            cross.host_only_flag,
-        ),
+        &host_server,
+        &format!("--sysroot={}", sysroot.display()),
+        &format!("{} -fwrapv -fno-strict-aliasing", cross.host_only_flag),
     );
     // Checking expands the generated macros in the binary for the target without linking it,
     // while the build script still compiles and archives native support.
@@ -795,7 +878,8 @@ esac"#,
             "PGRX_TARGET_INFO_PATH_PG18",
         ],
     );
-    let output = build().env(&override_variable, &target_server).output().unwrap();
+    let underscored = override_variable.replace('-', "_");
+    let output = build().env(&underscored, &target_server).output().unwrap();
     assert!(
         output.status.success(),
         "target headers must build:\n{}",
@@ -809,4 +893,72 @@ esac"#,
     let triple = report["profile"]["target"]["triple"].as_str().unwrap();
     assert!(triple.starts_with(cross.clang_arch), "Clang target {triple} is not {}", cross.target);
     assert_eq!(object_machine(&out_dir.join("pgrx_c_macros_pg18.o")), cross.object_machine);
+    // Clang reported its search list for the target under the recorded sysroot, and bindgen
+    // and inspection both received that list.
+    let detection = &report["include_detection"];
+    let arguments = strings(&detection["arguments"]);
+    let sysroot_argument = format!("--sysroot={}", sysroot.display());
+    for expected in [format!("--target={}", cross.clang_target), sysroot_argument] {
+        assert!(arguments.contains(&expected.as_str()), "{expected} is not in {arguments:?}");
+    }
+    let includes = strings(&detection["include_arguments"]);
+    let sysroot_include = format!("-isystem{}", sysroot.join("usr/include").display());
+    assert!(includes.contains(&sysroot_include.as_str()), "{includes:?}");
+    assert!(
+        !includes.iter().any(|include| include.starts_with("-isystem/usr/include")),
+        "the host's headers shadow the sysroot: {includes:?}"
+    );
+    let profile = strings(&report["profile"]["arguments"]);
+    assert!(includes.iter().all(|include| profile.contains(include)), "{profile:?}");
+}
+
+/// Postgres.app configures PostgreSQL once with `-arch arm64 -arch x86_64` and records the
+/// machine configure ran on. Both slices build from its headers: natively, where the slices
+/// leave the profile, and for the other slice. An installation built only for this machine's
+/// slice is refused for the other one.
+#[cfg(target_os = "macos")]
+#[test]
+#[ignore = "cross-compiles an isolated binding build; requires Clang and the other slice's standard library"]
+fn universal_macos_installations_build_both_slices() {
+    let cross = cross();
+    let fixture = Fixture::new();
+    let source = fixture.source();
+    fixture.consumer();
+    fs::write(source.join("src/main.rs"), CROSS_MAIN).unwrap();
+    let server = source.join("server");
+    lp64_server(&server, cross.host_machine);
+    let universal = fixture.0.join("universal-pg_config");
+    let slices = ["-arch", "arm64", "-arch", "x86_64"];
+    pg_config_script(
+        &universal,
+        &server,
+        "",
+        &format!("-fwrapv -fno-strict-aliasing -Os -mmacosx-version-min=11.0 {}", slices.join(" ")),
+    );
+    let native = fixture.cargo("run").env("PGRX_PG_CONFIG_PATH", &universal).output().unwrap();
+    assert_eq!(successful(native), "19 19\n");
+    assert_eq!(fixture.report()["cflags_dropped"], serde_json::json!(slices));
+    let other = || {
+        let mut command = fixture.cargo("check");
+        command.args(["--target", cross.target]);
+        command
+    };
+    let output = other().env("PGRX_PG_CONFIG_PATH", &universal).output().unwrap();
+    assert!(
+        output.status.success(),
+        "the other slice must build:\n{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let out_dir = fixture.out_dir_in(&format!("{}/debug", cross.target));
+    assert_eq!(object_machine(&out_dir.join("pgrx_c_macros_pg18.o")), cross.object_machine);
+    let host_slice = if cfg!(target_arch = "aarch64") { "arm64" } else { "x86_64" };
+    let single = fixture.0.join("single-pg_config");
+    pg_config_script(&single, &server, "", &format!("-fwrapv -arch {host_slice}"));
+    refused(
+        other().env("PGRX_PG_CONFIG_PATH", &single).output().unwrap(),
+        &[&format!(
+            "PostgreSQL was compiled from these headers for -arch {host_slice} (CFLAGS), but Clang targets {}",
+            cross.clang_arch
+        )],
+    );
 }
