@@ -1126,15 +1126,19 @@ fn get_bindings(
         )?
     } else {
         let target = env_tracked("TARGET").ok_or_else(|| eyre!("Cargo did not set TARGET"))?;
-        let pg_target_includes = pg_target_includes(major_version, pg_config)?;
+        let metadata = pg_config
+            .path()
+            .map_or_else(|| "PGRX_PG_CONFIG_AS_ENV".to_owned(), |path| path.display().to_string());
+        let pg_target_includes =
+            pg_target_includes(major_version, pg_config).wrap_err_with(|| {
+                format!(
+                    "pg{major_version}: could not select PostgreSQL server headers for {target} (PostgreSQL metadata {metadata})"
+                )
+            })?;
         eprintln!("pg_target_includes = {pg_target_includes:?}");
         let (bindings, macros) =
             run_bindgen(major_version, pg_config, include_h, &target, &pg_target_includes, native)
                 .wrap_err_with(|| {
-                    let metadata = pg_config.path().map_or_else(
-                        || "PGRX_PG_CONFIG_AS_ENV".to_owned(),
-                        |path| path.display().to_string(),
-                    );
                     format!(
                         "pg{major_version}: pgrx-pg-sys requires generated C macros for {target} (server headers {}, PostgreSQL metadata {metadata})",
                         pg_target_includes[0]
@@ -1926,36 +1930,37 @@ fn add_derives(bind: bindgen::Builder) -> bindgen::Builder {
 }
 
 fn target_env_tracked(s: &str) -> Option<String> {
-    target_env_lookup(s, env_tracked)
+    target_env_lookup(s, env_tracked).map(|(_, value)| value)
 }
 
 /// Prefer the variable suffixed with Cargo's TARGET, then the underscore spelling that shells
-/// can export, then the unsuffixed variable.
-fn target_env_lookup(s: &str, lookup: impl Fn(&str) -> Option<String>) -> Option<String> {
+/// can export, then the unsuffixed variable. Returns the name that was set with its value.
+fn target_env_lookup(s: &str, lookup: impl Fn(&str) -> Option<String>) -> Option<(String, String)> {
     let target = lookup("TARGET").expect("Cargo sets TARGET for every build script");
     let underscored = target.replace('-', "_");
-    lookup(&format!("{s}_{target}"))
-        .or_else(|| {
-            (underscored != target).then(|| lookup(&format!("{s}_{underscored}"))).flatten()
-        })
-        .or_else(|| lookup(s))
+    let mut names = vec![format!("{s}_{target}")];
+    if underscored != target {
+        names.push(format!("{s}_{underscored}"));
+    }
+    names.push(s.to_owned());
+    names.into_iter().find_map(|name| lookup(&name).map(|value| (name, value)))
 }
 
+/// Resolve an include directory from the first set spelling of `{var}_PG{N}` or `{var}`, or
+/// from `default`, the PostgreSQL metadata. A missing directory names the variable that set it.
 fn find_include(
     pg_version: u16,
     var: &str,
     default: impl Fn() -> eyre::Result<PathBuf>,
 ) -> eyre::Result<String> {
-    let value =
-        target_env_tracked(&format!("{var}_PG{pg_version}")).or_else(|| target_env_tracked(var));
-    let path = match value {
-        // No configured value: ask `pg_config`.
-        None => default()?,
-        // Configured to non-empty string: pass to bindgen
-        Some(overridden) => Path::new(&overridden).to_path_buf(),
+    let value = target_env_lookup(&format!("{var}_PG{pg_version}"), env_tracked)
+        .or_else(|| target_env_lookup(var, env_tracked));
+    let (path, source) = match value {
+        None => (default()?, "the PostgreSQL metadata".to_owned()),
+        Some((name, overridden)) => (PathBuf::from(overridden), name),
     };
     let path = std::fs::canonicalize(&path)
-        .wrap_err(format!("cannot find {path:?} for C header files"))?
+        .wrap_err_with(|| format!("cannot find {path:?} for C header files, from {source}"))?
         .join("") // returning a `/`-ending path
         .display()
         .to_string();
@@ -2389,11 +2394,18 @@ macro_rules! EXAMPLE {
                 values.get(name).map(|value| (*value).to_owned())
             })
         };
-        assert_eq!(resolve(&values).as_deref(), Some("/hyphenated/server"));
+        let found = |name: &str, value: &str| Some((name.to_owned(), value.to_owned()));
+        assert_eq!(
+            resolve(&values),
+            found("PGRX_INCLUDEDIR_SERVER_aarch64-unknown-linux-gnu", "/hyphenated/server")
+        );
         values.remove("PGRX_INCLUDEDIR_SERVER_aarch64-unknown-linux-gnu");
-        assert_eq!(resolve(&values).as_deref(), Some("/underscored/server"));
+        assert_eq!(
+            resolve(&values),
+            found("PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu", "/underscored/server")
+        );
         values.remove("PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu");
-        assert_eq!(resolve(&values).as_deref(), Some("/host/server"));
+        assert_eq!(resolve(&values), found("PGRX_INCLUDEDIR_SERVER", "/host/server"));
         values.remove("PGRX_INCLUDEDIR_SERVER");
         assert_eq!(resolve(&values), None);
     }
