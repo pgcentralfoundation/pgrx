@@ -99,7 +99,11 @@ pub(super) fn prove(
         match entity.get_kind() {
             EntityKind::MacroDefinition => {
                 if let Some(name) = entity.get_name() {
-                    history.last_definition.insert(name, position);
+                    let location = entity.get_location().and_then(|at| {
+                        let location = at.get_spelling_location();
+                        Some((location.file?, location.offset))
+                    });
+                    history.last_definition.insert(name, Recorded { position, location });
                 }
                 return EntityVisitResult::Continue;
             }
@@ -107,7 +111,20 @@ pub(super) fn prove(
                 if let Some(location) = entity.get_location().map(|at| at.get_spelling_location())
                     && let Some(file) = location.file
                 {
-                    history.expansions.entry(file).or_default().insert(location.offset, position);
+                    // The definition this expansion used, which push and pop pragmas can
+                    // make differ from the last one recorded.
+                    let definition = entity
+                        .get_reference()
+                        .and_then(|definition| definition.get_location())
+                        .and_then(|at| {
+                            let location = at.get_spelling_location();
+                            Some((location.file?, location.offset))
+                        });
+                    history
+                        .expansions
+                        .entry(file)
+                        .or_default()
+                        .insert(location.offset, Recorded { position, location: definition });
                 }
                 return EntityVisitResult::Continue;
             }
@@ -403,10 +420,21 @@ fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
 struct MacroHistory<'tu, 'a> {
     /// Final active definitions, which later expansion of a retained body uses.
     active: &'a BTreeMap<String, ActiveMacro>,
-    /// Position of the last definition of each macro name.
-    last_definition: HashMap<String, usize>,
-    /// Position of each top-level macro expansion, by file and offset of its name.
-    expansions: HashMap<File<'tu>, HashMap<u32, usize>>,
+    /// The last definition of each macro name, at its own location.
+    last_definition: HashMap<String, Recorded<'tu>>,
+    /// Each top-level macro expansion, by file and offset of its name, with the location
+    /// of the definition it used.
+    expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
+}
+
+/// A preprocessing record's position in the translation unit and a macro definition's
+/// physical location: the record's own for a definition, and the definition used by an
+/// expansion.
+struct Recorded<'tu> {
+    /// Order among preprocessing records.
+    position: usize,
+    /// File and offset of the definition's name, when it has a physical source.
+    location: Option<(File<'tu>, u32)>,
 }
 
 /// Prove that body macros keep their meaning at the end of the translation unit.
@@ -450,8 +478,14 @@ impl<'tu> MacroHistory<'tu, '_> {
                 return false;
             }
             match expansions.and_then(|expansions| expansions.get(offset)) {
-                Some(&position) => {
-                    if !self.unchanged(name, position, &mut HashSet::new()) {
+                Some(expansion) => {
+                    let position = expansion.position;
+                    // `unchanged` ties the active definition to the last one recorded; the
+                    // expansion must have used that same definition.
+                    if !self.unchanged(name, position, &mut HashSet::new())
+                        || expansion.location.is_none()
+                        || expansion.location != self.last_definition[name].location
+                    {
                         return false;
                     }
                     if self.active[name].definition.kind == MacroKind::FunctionLike {
@@ -473,18 +507,25 @@ impl<'tu> MacroHistory<'tu, '_> {
     /// Whether `name` and each macro its replacement list names have the definition at
     /// `position` that is active at the end of the translation unit.
     ///
-    /// Undefinitions are not recorded. A macro that is active at the end and has no
-    /// definition after `position` was therefore defined by its last definition at
-    /// `position` too. Token pasting can form names this check cannot see.
+    /// Undefinitions are not recorded. A macro whose active definition at the end is its
+    /// last recorded definition, made before `position`, had that definition at `position`
+    /// too. Pushed and popped definitions are not recorded either, so the active definition
+    /// must be that last definition by location. Token pasting can form names this check
+    /// cannot see.
     fn unchanged(&self, name: &str, position: usize, visited: &mut HashSet<String>) -> bool {
         if !visited.insert(name.to_owned()) {
             return true;
         }
-        let (Some(&last), Some(active)) = (self.last_definition.get(name), self.active.get(name))
+        let (Some(last), Some(active)) = (self.last_definition.get(name), self.active.get(name))
         else {
             return false;
         };
-        if last >= position || active.definition.builtin {
+        let defined_last = last.location.is_some_and(|(file, offset)| {
+            active.definition.location.as_ref().is_some_and(|location| {
+                location.offset == offset && location.file == file.get_path()
+            })
+        });
+        if last.position >= position || active.definition.builtin || !defined_last {
             return false;
         }
         let tokens = &active.definition.tokens;

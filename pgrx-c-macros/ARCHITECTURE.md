@@ -322,7 +322,9 @@ cannot be inferred from a declaration's name or broad type category:
    record at that position; that macro, and every macro its replacement list
    names, must have its last definition before the expansion and still be active
    at the end of the unit. Undefinitions are not recorded, so this is what proves
-   the end-of-unit expansion identical. A macro name without a record is admitted
+   the end-of-unit expansion identical. Push and pop pragmas are not recorded
+   either, so the active definition must be that last definition, by location,
+   and the expansion must have used it. A macro name without a record is admitted
    only inside the arguments of such an expanded function-like invocation, which
    dropped or stringified it, and only when it is unchanged since that invocation.
    Token pasting and invocation-dependent builtins such as `__LINE__` leave no

@@ -74,6 +74,8 @@ const NATIVE: &[&str] = &[
     "BODY_LINE",
     // The statement ends inside a macro argument, so its extent omits the closing `)`.
     "BODY_MACRO_ARG",
+    // A popped definition, not the last one, is active at the end.
+    "BODY_PUSHED",
 ];
 
 /// Compare translated and native inline roots with the original compiler's results.
@@ -157,7 +159,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 8;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 9;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

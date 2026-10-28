@@ -78,6 +78,7 @@ fn main() {
             BODY_DIRECTIVE_COMMENT!(10_i32).get(),
             BODY_DIRECTIVE_SPLICE!(10_i32).get()
         );
+        println!("pushed\t{}", BODY_PUSHED!(2_i32).get());
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

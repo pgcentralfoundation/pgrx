@@ -88,3 +88,9 @@ static inline int BODY_DIRECTIVE_SPLICE(int value)
 		- 1
 		);
 }
+#define BODY_PUSHED_SCALE 1
+#pragma push_macro("BODY_PUSHED_SCALE")
+#undef BODY_PUSHED_SCALE
+#define BODY_PUSHED_SCALE 1000
+static inline int BODY_PUSHED(int value) { return value * BODY_PUSHED_SCALE; }
+#pragma pop_macro("BODY_PUSHED_SCALE")
