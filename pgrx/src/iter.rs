@@ -407,7 +407,11 @@ macro_rules! impl_table_iter {
                 unsafe {
                     let fcx = pg_sys::SRF_PERCALL_SETUP!(fcinfo).get();
                     let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
-                    pg_sys::Datum::from(pg_sys::HeapTupleGetDatum!(heap_tuple).get() as usize)
+                    // C return conversion keeps the tuple pointer's provenance;
+                    // `Datum::from(.get() as usize)` would rebuild it from an integer.
+                    pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::Datum, _>(
+                        pg_sys::HeapTupleGetDatum!(heap_tuple).into_value(),
+                    )
                 }
             }
 
