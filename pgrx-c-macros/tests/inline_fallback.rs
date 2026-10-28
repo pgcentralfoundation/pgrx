@@ -137,6 +137,8 @@ fn fallback_calls_keep_their_generated_support(scanner: &MacroScanner) {
                         assert!(definition.contains("Typed call adapter for C inline function"));
                         let reason = emission.fallback.as_ref().expect("translation refusal");
                         assert!(reason.message.contains("FALLBACK_HELPER"), "{reason:?}");
+                        // Token ranges index the translated body, which the report omits.
+                        assert_eq!(reason.tokens, None);
                     }
                     rust.push_str(definition);
                 }

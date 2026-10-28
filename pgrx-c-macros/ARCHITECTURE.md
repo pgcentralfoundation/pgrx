@@ -491,9 +491,10 @@ path must return, and `return` breaks out of a labeled block, converted to the
 result type; a void body has no `return` and evaluates to `()`. Rust hygiene keeps
 caller tokens from seeing the locals, so no local-name guard applies. A body the
 analyzer or renderer refuses falls back to the call root. A renderer refusal is
-kept as the emission's `fallback` reason in the report. Demand planning covers
-the call root of every translated function, since rendering may fall back to it;
-the final support is planned from the roots actually emitted.
+kept as the emission's `fallback` reason in the report, without the token range
+that would index the translated body. Demand planning covers the call root of
+every translated function, since rendering may fall back to it; the final
+support is planned from the roots actually emitted.
 
 A generated call to a translated function expands its macro with compiled value
 operands instead of calling the native binding. Functions that reach themselves

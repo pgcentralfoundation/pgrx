@@ -212,7 +212,8 @@ pub struct MacroEmission {
     /// Lowering result under the binding catalog and C profile used for this generation.
     pub status: EmissionStatus,
     /// Why a static inline function's translated definition was not emitted, when the
-    /// emitted macro calls the original function instead.
+    /// emitted macro calls the original function instead. It has no token range: that
+    /// would index the translated body, while `analysis` is the call's.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fallback: Option<SkipReason>,
 }
@@ -294,7 +295,7 @@ fn emit_with_lowering<'a>(
     {
         let call_lowered = lower(session, &call, bindings, adapters, lowering);
         if call_lowered.is_ok() {
-            fallback = Some(reason.clone());
+            fallback = Some(SkipReason { tokens: None, ..reason.clone() });
             analysis = call;
             lowered = call_lowered;
         }
