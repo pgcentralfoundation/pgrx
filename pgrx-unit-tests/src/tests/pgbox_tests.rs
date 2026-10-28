@@ -12,8 +12,11 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
+    use pgrx::datum::TryFromDatumError;
+    use pgrx::pg_sys::panic::CaughtError;
     use pgrx::prelude::*;
-    use pgrx::{AllocatedByRust, AnyArray, Array};
+    use pgrx::{AllocatedByRust, AnyArray, AnyElement, Array};
+    use std::num::NonZeroUsize;
 
     /// Reads each point after the array it came from has dropped.
     #[pg_extern]
@@ -81,6 +84,67 @@ mod tests {
             assert_eq!(points.iter().map(|point| **point).collect::<Vec<_>>(), expected);
         }
         Ok(())
+    }
+
+    /// A `PgBox<T>` read from a value copies `size_of::<T>()` bytes, so it must reject a type
+    /// whose values are not exactly that long or are passed by value. `path` is variable-length:
+    /// a copy would keep only its 16-byte header, and PostgreSQL would read past it.
+    #[pg_test]
+    fn test_pgbox_rejects_types_it_cannot_copy() -> spi::Result<()> {
+        fn rejected<T>(result: Result<Option<T>, TryFromDatumError>) -> bool {
+            matches!(result, Err(TryFromDatumError::IncompatibleTypes { .. }))
+        }
+        let path = "'((0,0),(1,1),(2,2),(3,3))'::path";
+
+        let read = Spi::get_one::<PgBox<pg_sys::PATH>>(&format!("SELECT {path}"));
+        assert!(matches!(
+            read,
+            Err(spi::Error::DatumError(TryFromDatumError::IncompatibleTypes { .. }))
+        ));
+        let element = Spi::get_one::<AnyElement>(&format!("SELECT {path}"))?.expect("NULL path");
+        assert!(rejected(element.value::<PgBox<pg_sys::PATH>>()));
+        let record = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(&format!("SELECT ROW({path})"))?
+            .expect("NULL record");
+        assert!(rejected(record.get_by_index::<PgBox<pg_sys::PATH>>(NonZeroUsize::MIN)));
+
+        // oid is passed by value, so the Datum holds the OID and does not point to it.
+        let oid = Spi::get_one::<AnyElement>("SELECT 1259::oid")?.expect("NULL oid");
+        assert!(rejected(oid.value::<PgBox<pg_sys::Oid>>()));
+
+        // A fixed-length, pass-by-reference type of the same size still reads.
+        let point =
+            Spi::get_one::<PgBox<pg_sys::Point>>("SELECT point(1, 2)")?.expect("NULL point");
+        assert_eq!((point.x, point.y), (1.0, 2.0));
+        Ok(())
+    }
+
+    /// Returns the message of the panic that `f` raises.
+    fn panic_message(f: impl FnOnce() + std::panic::UnwindSafe) -> String {
+        PgTryBuilder::new(|| {
+            f();
+            panic!("expected a panic")
+        })
+        .catch_others(|error| match error {
+            CaughtError::RustPanic { ereport, .. } => ereport.message().to_owned(),
+            other => panic!("expected a Rust panic, got {other:?}"),
+        })
+        .execute()
+    }
+
+    #[pg_test]
+    fn test_pgbox_array_rejects_elements_it_cannot_copy() {
+        let message = panic_message(|| {
+            let _ = Spi::get_one::<Vec<PgBox<pg_sys::PATH>>>(
+                "SELECT ARRAY['((0,0),(1,1),(2,2),(3,3))'::path]",
+            );
+        });
+        assert!(message.starts_with("cannot unbox elements of type path as "), "{message}");
+
+        let message = panic_message(|| {
+            let array = Spi::get_one::<AnyArray>("SELECT ARRAY[1259::oid]").unwrap().unwrap();
+            let _ = array.value::<Vec<PgBox<pg_sys::Oid>>>();
+        });
+        assert!(message.starts_with("cannot unbox elements of type oid as "), "{message}");
     }
 
     #[pg_test]

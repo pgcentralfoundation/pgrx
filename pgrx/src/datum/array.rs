@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::{UnboxDatum, unbox};
+use super::{UnboxDatum, lookup_type_name, unbox};
 use crate::array::{RawArray, Scalar};
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
@@ -177,9 +177,21 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
+    ///
+    /// # Panics
+    ///
+    /// Panics if [`UnboxDatum::can_unbox`] rejects the element type.
     pub(crate) unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
+        // Every element unboxes through `T::unbox`, which may rely on this check.
+        if !T::can_unbox(elem_layout.size.as_typlen(), elem_layout.pass == PassBy::Value) {
+            panic!(
+                "cannot unbox elements of type {} as {}",
+                lookup_type_name(oid),
+                core::any::type_name::<T>()
+            );
+        }
         let null_inner = raw
             .nulls_bitslice()
             .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });

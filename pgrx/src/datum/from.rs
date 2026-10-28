@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 #![allow(clippy::manual_map, clippy::map_clone, clippy::into_iter_on_ref)]
+use super::UnboxDatum;
 use crate::{
     AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts, pg_sys, varlena, varlena_to_byte_slice,
 };
@@ -133,16 +134,8 @@ pub trait FromDatum: Sized {
     where
         Self: IntoDatum,
     {
-        if !is_binary_coercible::<Self>(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes {
-                rust_type: std::any::type_name::<Self>(),
-                rust_oid: Self::type_oid(),
-                datum_type: lookup_type_name(type_oid),
-                datum_oid: type_oid,
-            })
-        } else {
-            Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
-        }
+        check_compatible::<Self>(type_oid)?;
+        Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
     }
 
     /// A version of `try_from_datum` that switches to the given context to convert from Datum
@@ -165,16 +158,23 @@ pub trait FromDatum: Sized {
     where
         Self: IntoDatum,
     {
-        if !is_binary_coercible::<Self>(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes {
-                rust_type: std::any::type_name::<Self>(),
-                rust_oid: Self::type_oid(),
-                datum_type: lookup_type_name(type_oid),
-                datum_oid: type_oid,
-            })
-        } else {
-            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
-        }
+        check_compatible::<Self>(type_oid)?;
+        Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
+    }
+}
+
+/// Returns [`TryFromDatumError::IncompatibleTypes`] unless `T` can read a value of type
+/// `type_oid`, as [`FromDatum::try_from_datum`] describes.
+fn check_compatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError> {
+    if is_binary_coercible::<T>(type_oid) { Ok(()) } else { Err(incompatible::<T>(type_oid)) }
+}
+
+fn incompatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> TryFromDatumError {
+    TryFromDatumError::IncompatibleTypes {
+        rust_type: std::any::type_name::<T>(),
+        rust_oid: T::type_oid(),
+        datum_type: lookup_type_name(type_oid),
+        datum_oid: type_oid,
     }
 }
 
@@ -691,6 +691,11 @@ impl FromDatum for () {
 /// `from_polymorphic_datum` boxes the Datum's pointer, which can refer to a PostgreSQL struct
 /// passed as `internal`. `from_datum_in_memory_context` copies `size_of::<T>()` bytes into the
 /// memory context instead.
+///
+/// `try_from_datum` and `try_from_datum_in_memory_context` also return
+/// [`TryFromDatumError::IncompatibleTypes`] for a type whose values a copy of `size_of::<T>()`
+/// bytes cannot hold, as [`UnboxDatum::can_unbox`] decides for array elements: a variable-length
+/// type, a type passed by value, or a fixed-length type of another size.
 impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     const POINTS_INTO_DATUM: bool = true;
 
@@ -716,17 +721,62 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     where
         Self: Sized,
     {
+        assert!(
+            align_of::<T>() <= pg_sys::MAXIMUM_ALIGNOF as usize,
+            "palloc cannot align a copy for {}",
+            std::any::type_name::<T>()
+        );
         memory_context.switch_to(|context| {
             if is_null || datum.is_null() {
                 None
             } else {
                 // SAFETY: the caller passes a Datum that points to a `T`, so its
                 // `size_of::<T>()` bytes are readable. The copy is a palloc chunk holding those
-                // bytes, aligned to MAXALIGN, at least as strictly as PostgreSQL aligned the
-                // source, and it does not point into the Datum, as `POINTS_INTO_DATUM` requires.
+                // bytes, which palloc aligns to MAXALIGN, enough for `T` as asserted above, and it
+                // does not point into the Datum, as `POINTS_INTO_DATUM` requires.
                 let copied = context.copy_ptr_into(datum.cast_mut_ptr(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })
+    }
+
+    unsafe fn try_from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: IntoDatum,
+    {
+        check_pgbox_layout::<T>(type_oid)?;
+        Ok(unsafe { Self::from_polymorphic_datum(datum, is_null, type_oid) })
+    }
+
+    unsafe fn try_from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: IntoDatum,
+    {
+        check_pgbox_layout::<T>(type_oid)?;
+        Ok(unsafe { Self::from_datum_in_memory_context(memory_context, datum, is_null, type_oid) })
+    }
+}
+
+/// Checks that `PgBox<T>` can read a value of type `type_oid`: that the types are compatible,
+/// and that [`UnboxDatum::can_unbox`] accepts the type's length and pass-by-value flag.
+fn check_pgbox_layout<T>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError> {
+    check_compatible::<PgBox<T>>(type_oid)?;
+    let (mut typlen, mut typbyval) = (0, false);
+    // SAFETY: get_typlenbyval takes the OID by value and writes both out-parameters. It raises
+    // an ERROR for an OID that names no type, which check_compatible has already rejected.
+    unsafe { pg_sys::get_typlenbyval(type_oid, &mut typlen, &mut typbyval) };
+    if <PgBox<T> as UnboxDatum>::can_unbox(typlen, typbyval) {
+        Ok(())
+    } else {
+        Err(incompatible::<PgBox<T>>(type_oid))
     }
 }
