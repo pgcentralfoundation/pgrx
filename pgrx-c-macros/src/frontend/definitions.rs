@@ -79,7 +79,16 @@ pub(super) fn prove(
     let mut definitions = BTreeMap::new();
     let mut files = BTreeMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
-    let directory = profile.header.parent().unwrap_or_else(|| Path::new("."));
+    // Clang names a file found through a relative search path relative to the
+    // process working directory, which inspection recorded with the profile.
+    let directory = std::env::current_dir().map_err(|error| {
+        FrontendError::Environment(format!("could not check working directory: {error}"))
+    })?;
+    if directory != profile.inputs.current_directory {
+        return Err(FrontendError::Environment(
+            "working directory changed after inspection".into(),
+        ));
+    }
     unit.get_entity().visit_children(|entity, _| {
         if entity.get_kind() != EntityKind::FunctionDecl {
             return EntityVisitResult::Continue;
@@ -115,7 +124,7 @@ pub(super) fn prove(
                 == expected.calling_convention
         {
             let definition = entity.get_definition().unwrap_or(entity);
-            definitions.insert(name, source(definition, directory, &mut files, &mut remaining));
+            definitions.insert(name, source(definition, &directory, &mut files, &mut remaining));
         }
         EntityVisitResult::Continue
     });

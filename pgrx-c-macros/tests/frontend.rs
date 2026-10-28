@@ -85,6 +85,31 @@ fn repeated_inline_declarations_retain_definition_source_once_within_budget() {
     }
 }
 
+/// Clang names a header found through a relative `-I` relative to the working
+/// directory, not to the directory of the header being inspected.
+#[test]
+fn inline_definitions_found_through_relative_search_paths_keep_their_file() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().expect("own a temporary header directory");
+    let header = directory.path().join("relative_search.h");
+    std::fs::write(&header, "#include <relative_inline.h>\n").unwrap();
+    // Cargo runs integration tests from the package root.
+    let included = PathBuf::from("tests/fixtures/relative_include");
+    assert!(included.join("relative_inline.h").is_file(), "run from the package root");
+    let mut arguments = oracle::native_arguments();
+    arguments.push(format!("-I{}", included.display()));
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    let definition = frontend.declarations().function_signatures["relative_inline"]
+        .definition
+        .as_ref()
+        .expect("retain the compiler-proven definition");
+    assert_eq!(
+        definition.provenance.file,
+        std::env::current_dir().unwrap().join(included).join("relative_inline.h")
+    );
+}
+
 /// Checks that protection codegen profiles preserve macro values and original arguments.
 #[test]
 fn protection_codegen_profiles_preserve_macro_values_and_original_arguments() {
