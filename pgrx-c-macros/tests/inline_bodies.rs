@@ -370,6 +370,37 @@ static inline int BODY_LATIN_INSIDE(int value) { return value; /* na\xefve */ }\
     }
 }
 
+/// Preprocessed compiler output is read as UTF-8 and never converted, which could change a
+/// literal that analysis compares. A string literal that is not UTF-8, here in a function
+/// that is not a root, fails the preparation of a root's macro expansion with an error
+/// rather than changing the literal.
+#[test]
+fn latin1_literals_fail_preparation() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().unwrap();
+    let header = directory.path().join("latin1_literal.h");
+    std::fs::write(
+        &header,
+        b"#define BODY_LATIN_ONE 1\n\
+static inline int BODY_LATIN_ROOT(int value) { return value + BODY_LATIN_ONE; }\n\
+static inline int BODY_LATIN_LITERAL(int value) { return value + (int) sizeof(\"caf\xe9\"); }\n",
+    )
+    .unwrap();
+    let frontend =
+        inspect(&scanner, &header, &oracle::native_arguments(), None).expect("inspect definitions");
+    let Err(error) = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &[] as &[String],
+        &[] as &[String],
+        &["BODY_LATIN_ROOT"],
+    ) else {
+        panic!("a literal that is not UTF-8 must fail preparation");
+    };
+    assert!(error.to_string().contains("non-UTF-8 output"), "{error}");
+}
+
 /// Clang names a header it finds through a relative include directory by a path relative to
 /// the working directory. A header with the same relative path beside the main header is
 /// another file, so each definition is read from its own file. Both headers have the same

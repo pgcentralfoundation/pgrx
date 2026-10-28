@@ -220,6 +220,14 @@ declaration shapes such as `pg_popcount32`; the layout check separates ABIs
 that share a machine name. Headers without `PG_VERSION_NUM`, such as synthetic
 fixtures, are not checked.
 
+Preprocessed output and macro dumps are read from the compiler as UTF-8 and are
+never converted, since a replacement character would change a literal that
+analysis compares or compiles. A macro definition that is not UTF-8 fails inspection with
+an error. A string or character literal that is not fails, with an error, the
+symbolic expansion and the native support compilation, which preprocess the
+whole unit. Comments and skipped text are not part of that output, so they may
+hold any bytes.
+
 ### Compiler agreement
 
 Select a Clang executable compatible with the loaded libclang. Explicit hints,
@@ -313,9 +321,9 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans and original formals from that same parse, and bounded
    definition text from the header's file, read once per physical source rather
-   than once per function. A header need not be UTF-8. Definition text that is
-   not is documented lossily, and since libclang spells tokens lossily, the
-   function keeps only its native call. The body's tokens are also
+   than once per function. Definition text whose comments or skipped text are
+   not UTF-8 is documented lossily, and since libclang spells tokens lossily,
+   the function keeps only its native call. The body's tokens are also
    retained without conditional directives and the branches they skipped. A
    directive extends to the end of its logical line, after line splices and
    comments, including a closing directive at the end of a skipped range. Token
