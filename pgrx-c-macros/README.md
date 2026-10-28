@@ -511,6 +511,12 @@ the record. The argument must therefore be a Rust place expression. C also
 accepts a function result or another macro's record value there, but those
 arguments fail to compile here; bind the record to a local first.
 
+A Rust array argument is evaluated as an array value and does not decay to a
+pointer to the caller's array. A macro that subscripts its parameter, such as
+`lengthof`, therefore does not compile with an array argument. Pass a pointer
+where C would decay the array. `sizeof` then measures that pointer, as it would
+in C, so `lengthof!` has no array form; use the array's `len()` instead.
+
 An ungrouped C parameter accepts only an atomic token tree or an explicitly
 parenthesized argument. If the original replacement is itself unparenthesized,
 the generated documentation requires
