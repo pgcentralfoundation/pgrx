@@ -11,7 +11,7 @@
 
 use crate::{
     ActiveProvenance, Error, FrontendError, FrontendOutput, MacroDefinition, MacroInventory,
-    MacroKind, MacroScanner, postgres_clang_flags,
+    MacroKind, MacroScanner, SystemIncludes, postgres_clang_flags,
 };
 use pgrx_pg_config::{PgConfig, Pgrx};
 use sha2::{Digest, Sha256};
@@ -178,18 +178,7 @@ impl PostgresConfig {
         arguments: &[String],
         compiler: Option<&Path>,
     ) -> Result<FrontendOutput, PostgresError> {
-        let configured_compiler = if compiler.is_none()
-            && std::env::var_os("CLANG_PATH").is_none()
-            && self.pg_config.is_real()
-        {
-            self.pg_config
-                .configure()?
-                .get("CLANG")
-                .filter(|value| !value.is_empty())
-                .map(PathBuf::from)
-        } else {
-            None
-        };
+        let configured_compiler = self.configured_compiler(compiler)?;
         let mut inspected = crate::frontend::inspect_with_compiler_hint(
             scanner,
             header,
@@ -250,6 +239,44 @@ impl PostgresConfig {
         inspected.profile.inputs.file_identities.extend(identities);
         inspected.profile.inputs.fingerprints.extend(fingerprints);
         Ok(inspected)
+    }
+
+    /// Select the Clang driver that [`Self::inspect_with_arguments`] selects for `compiler`, and
+    /// report the system include directories it searches under `arguments`.
+    ///
+    /// `arguments` select the target, sysroot and toolchain; leave include directories out, or
+    /// the driver reports them back as system directories. A binding generator passes the result
+    /// ahead of its own include directories so that libclang searches the driver's system and
+    /// builtin headers for that target. The scanner supplies the loaded libclang release the
+    /// driver must match.
+    pub fn system_includes(
+        &self,
+        _scanner: &MacroScanner,
+        arguments: &[String],
+        compiler: Option<&Path>,
+    ) -> Result<SystemIncludes, PostgresError> {
+        let configured_compiler = self.configured_compiler(compiler)?;
+        Ok(crate::frontend::system_includes(arguments, compiler, configured_compiler.as_deref())?)
+    }
+
+    /// The `CLANG` that configure recorded, consulted only when neither the caller nor
+    /// `CLANG_PATH` chose a driver and the metadata comes from a `pg_config` program.
+    fn configured_compiler(
+        &self,
+        compiler: Option<&Path>,
+    ) -> Result<Option<PathBuf>, PostgresError> {
+        if compiler.is_some()
+            || std::env::var_os("CLANG_PATH").is_some()
+            || !self.pg_config.is_real()
+        {
+            return Ok(None);
+        }
+        Ok(self
+            .pg_config
+            .configure()?
+            .get("CLANG")
+            .filter(|value| !value.is_empty())
+            .map(PathBuf::from))
     }
 
     /// The physical server header tree that owns PostgreSQL macro candidates.
@@ -628,6 +655,61 @@ mod tests {
         assert_eq!(
             postgres_object_macro_names(&inspected, &root).unwrap(),
             ["OWNED_OBJECT", "OWNED_REDEFINED"]
+        );
+    }
+
+    /// Include detection asks the driver inspection selects, here named by its file path, for
+    /// the target's search list. A binding generator previously handed such a path to a lookup
+    /// that treated it as a directory, so the driver was used only when `CLANG_PATH` named it.
+    #[cfg(unix)]
+    #[test]
+    fn system_includes_query_the_selected_driver_for_the_target() {
+        use std::os::unix::fs::PermissionsExt;
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().expect("libclang must be available");
+        let major = crate::frontend::version_major(&clang::get_version()).unwrap();
+        let directory = tempfile::tempdir().unwrap();
+        let executable = |path: &Path, body: String| {
+            std::fs::write(path, format!("#!/bin/sh\n{body}\n")).unwrap();
+            std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        };
+        let driver = directory.path().join("clang-driver");
+        executable(
+            &driver,
+            format!(
+                r#"for argument; do
+    case "$argument" in
+        --version) echo 'clang version {major}.0.0'; exit 0 ;;
+        --target=*) target=${{argument#--target=}} ;;
+    esac
+done
+cat >/dev/null
+printf '%s\n' '#include <...> search starts here:' " /fake/$target/include" 'End of search list.' >&2"#
+            ),
+        );
+        let pg_config = directory.path().join("pg_config");
+        executable(
+            &pg_config,
+            r#"case "$1" in
+    --includedir-server) echo /fake/server ;;
+    --version) echo 'PostgreSQL 18.4' ;;
+    --cppflags) echo ;;
+    *) exit 1 ;;
+esac"#
+                .into(),
+        );
+        let postgres =
+            PostgresConfig::from_pg_config(PgConfig::new_with_defaults(pg_config)).unwrap();
+        let includes = postgres
+            .system_includes(&scanner, &["--target=x86_64-unknown-linux-gnu".into()], Some(&driver))
+            .unwrap();
+        assert_eq!(includes.compiler, driver);
+        assert_eq!(
+            includes.directories,
+            [crate::SystemIncludeDirectory {
+                path: "/fake/x86_64-unknown-linux-gnu/include".into(),
+                framework: false
+            }]
         );
     }
 

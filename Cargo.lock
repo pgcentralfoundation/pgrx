@@ -2255,7 +2255,6 @@ name = "pgrx-bindgen"
 version = "0.19.3"
 dependencies = [
  "bindgen",
- "clang-sys",
  "eyre",
  "pgrx-c-macros",
  "pgrx-pg-config",

@@ -269,14 +269,7 @@ fn inspect_selected(
     // The supplied spelling determines quoted-include lookup, including through
     // symlink wrappers. Canonical paths are only identities for comparison/tracking.
     let header = requested_header.clone();
-    let version = run_compiler(&compiler, &["--version".into()])?.stdout;
-    let version = version.lines().next().unwrap_or_default().to_owned();
-    if version_major(&version) != version_major(&libclang_version) {
-        return Err(FrontendError::Environment(format!(
-            "{} is {version}; the loaded library is {libclang_version}",
-            compiler.display()
-        )));
-    }
+    let version = compatible_version(&compiler, &libclang_version)?;
     let mut arguments = arguments;
     if !arguments.iter().any(|arg| arg == "-resource-dir" || arg.starts_with("-resource-dir=")) {
         let resource = run_compiler(&compiler, &["-print-resource-dir".into()])?;
@@ -387,6 +380,90 @@ fn inspect_selected(
         inventory,
         dependencies: macro_dependencies,
     })
+}
+
+/// Return the driver's version line, refusing a release other than the loaded libclang's.
+fn compatible_version(compiler: &Path, libclang_version: &str) -> Result<String, FrontendError> {
+    let version = run_compiler(compiler, &["--version".into()])?.stdout;
+    let version = version.lines().next().unwrap_or_default().to_owned();
+    if version_major(&version) != version_major(libclang_version) {
+        return Err(FrontendError::Environment(format!(
+            "{} is {version}; the loaded library is {libclang_version}",
+            compiler.display()
+        )));
+    }
+    Ok(version)
+}
+
+/// One directory of a Clang driver's `#include <...>` search list.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SystemIncludeDirectory {
+    /// The directory as the driver reported it.
+    pub path: PathBuf,
+    /// Whether the driver searches the directory for frameworks rather than headers.
+    pub framework: bool,
+}
+
+/// The Clang driver that inspection selects, with the system include directories it searches for
+/// one target.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SystemIncludes {
+    /// The selected driver, whose release matches the loaded libclang.
+    pub compiler: PathBuf,
+    /// The driver's `#include <...>` search list, in search order.
+    pub directories: Vec<SystemIncludeDirectory>,
+}
+
+/// Select the driver that [`inspect_with_compiler_hint`] selects for the same preferences and
+/// report the system include directories it searches under `arguments`.
+pub(crate) fn system_includes(
+    arguments: &[String],
+    preferred_compiler: Option<&Path>,
+    configured_compiler: Option<&Path>,
+) -> Result<SystemIncludes, FrontendError> {
+    let arguments = prepare_arguments(arguments)?;
+    validate_arguments(&arguments)?;
+    let libclang_version = clang::get_version();
+    let CompilerSelection { executable, .. } =
+        find_compiler(preferred_compiler, configured_compiler, &libclang_version)?;
+    compatible_version(&executable, &libclang_version)?;
+    let directories = driver_system_includes(&executable, &arguments)?;
+    Ok(SystemIncludes { compiler: executable, directories })
+}
+
+/// Preprocess an empty C input verbosely and read the driver's `#include <...>` search list.
+fn driver_system_includes(
+    compiler: &Path,
+    arguments: &[String],
+) -> Result<Vec<SystemIncludeDirectory>, FrontendError> {
+    let output = run_compiler_with_input(
+        compiler,
+        &driver_arguments(arguments, &["-E", "-v", "-"], None),
+        Some(String::new()),
+        None,
+    )?;
+    validate_driver_configuration(&output.stderr)?;
+    let lines = output
+        .stderr
+        .lines()
+        .skip_while(|line| !line.starts_with("#include <...> search starts here:"))
+        .skip(1);
+    let mut directories = Vec::new();
+    for line in lines {
+        let line = line.trim();
+        if line == "End of search list." {
+            return Ok(directories);
+        }
+        let (path, framework) = match line.strip_suffix(" (framework directory)") {
+            Some(path) => (path, true),
+            None => (line, false),
+        };
+        directories.push(SystemIncludeDirectory { path: path.into(), framework });
+    }
+    Err(FrontendError::Output(format!(
+        "{} did not report a complete #include <...> search list",
+        compiler.display()
+    )))
 }
 
 /// Prove facts that need the complete frontend snapshot: local inline definitions, bitfield
@@ -3897,6 +3974,49 @@ mod tests {
                     if matches!(*error, FrontendError::CompilerUnavailable(_))
             ));
         }
+
+        /// The search list comes from the driver given, under the caller's target arguments.
+        /// Quoted-include directories are not system directories, framework directories keep
+        /// their kind, and a driver that reports no complete list or loads a configuration file
+        /// is refused.
+        #[test]
+        fn system_includes_come_from_the_given_driver_and_target() {
+            let fixture = Fixture::new();
+            let driver = fixture.0.join("clang");
+            script(&driver, SEARCH_LIST_DRIVER);
+            let directories =
+                driver_system_includes(&driver, &["--target=aarch64-unknown-linux-gnu".into()])
+                    .unwrap();
+            assert_eq!(
+                directories,
+                [
+                    SystemIncludeDirectory {
+                        path: "/fake/aarch64-unknown-linux-gnu/include".into(),
+                        framework: false
+                    },
+                    SystemIncludeDirectory { path: "/fake/Frameworks".into(), framework: true },
+                ]
+            );
+            script(&driver, "printf '%s\\n' '#include <...> search starts here:' ' /fake' >&2");
+            assert!(matches!(
+                driver_system_includes(&driver, &[]),
+                Err(FrontendError::Output(message)) if message.contains("search list")
+            ));
+            script(&driver, "echo 'Configuration file: /etc/clang/clang.cfg' >&2");
+            assert!(matches!(
+                driver_system_includes(&driver, &[]),
+                Err(FrontendError::Environment(message)) if message.contains("clang.cfg")
+            ));
+        }
+
+        /// A synthetic driver body that reports its search list for the `--target` it receives.
+        const SEARCH_LIST_DRIVER: &str = r#"for argument; do
+    case "$argument" in --target=*) target=${argument#--target=} ;; esac
+done
+cat >/dev/null
+printf '%s\n' '#include "..." search starts here:' ' /fake/quoted' \
+    '#include <...> search starts here:' " /fake/${target:-host}/include" \
+    ' /fake/Frameworks (framework directory)' 'End of search list.' >&2"#;
 
         /// A refused lookup retains the candidates it examined. Builds cache the refusal, so the
         /// later creation of a missing compiler must remain observable.

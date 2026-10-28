@@ -14,9 +14,9 @@ use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
     IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, PostgresError,
-    generate_with_bindings, lower_msvc_runtime_flags, pg_sys_integer_bridges,
-    postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
-    probe_integer_object_constants,
+    SystemIncludeDirectory, SystemIncludes, generate_with_bindings, lower_msvc_runtime_flags,
+    pg_sys_integer_bridges, postgres_function_macro_names, postgres_inline_function_names,
+    postgres_object_macro_names, probe_integer_object_constants,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx};
 use quote::{ToTokens, quote};
@@ -66,7 +66,6 @@ mod metadata_support;
 mod target_artifacts;
 use macro_files::MacroFiles;
 use macro_support::{NativeBuild, compile_macro_support, link_macro_support};
-pub(super) mod clang;
 
 #[derive(Debug)]
 struct BindingOverride {
@@ -1126,7 +1125,21 @@ fn get_bindings(
             native.active,
         )?
     } else {
-        let (bindings, macros) = run_bindgen(major_version, pg_config, include_h, native)?;
+        let target = env_tracked("TARGET").ok_or_else(|| eyre!("Cargo did not set TARGET"))?;
+        let pg_target_includes = pg_target_includes(major_version, pg_config)?;
+        eprintln!("pg_target_includes = {pg_target_includes:?}");
+        let (bindings, macros) =
+            run_bindgen(major_version, pg_config, include_h, &target, &pg_target_includes, native)
+                .wrap_err_with(|| {
+                    let metadata = pg_config.path().map_or_else(
+                        || "PGRX_PG_CONFIG_AS_ENV".to_owned(),
+                        |path| path.display().to_string(),
+                    );
+                    format!(
+                        "pg{major_version}: pgrx-pg-sys requires generated C macros for {target} (server headers {}, PostgreSQL metadata {metadata})",
+                        pg_target_includes[0]
+                    )
+                })?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
             std::fs::write(path, &bindings)?;
         }
@@ -1168,42 +1181,49 @@ fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
+    target: &str,
+    pg_target_includes: &[String],
     native: NativeBuild<'_>,
 ) -> eyre::Result<(String, MacroOutput)> {
     eprintln!("Generating bindings for pg{major_version}");
-    let target = env_tracked("TARGET").ok_or_else(|| eyre!("Cargo did not set TARGET"))?;
-    let configure = pg_config.configure()?;
+    let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
+    let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
+    let postgres = macro_postgres_config(pg_config, &pg_target_includes[0])?;
     let explicit_clang = env_tracked("CLANG_PATH").map(PathBuf::from);
-    let configured_clang =
-        configure.get("CLANG").filter(|value| !value.is_empty()).map(PathBuf::from);
-    let preferred_clang = explicit_clang.as_deref().or(configured_clang.as_deref());
-    eprintln!("Preferred Clang = {preferred_clang:?}");
-    let pg_target_includes = pg_target_includes(major_version, pg_config)?;
-    eprintln!("pg_target_includes = {pg_target_includes:?}");
     let environment_arguments = bindgen_environment_arguments(env_tracked);
-    let (autodetect, includes) = clang::detect_include_paths_for(
-        preferred_clang,
-        &include_search_arguments(&target, &environment_arguments),
-    );
+    // Bindgen's own include detection asks whichever clang clang-sys finds, which need not
+    // match the loaded libclang; PostgreSQL 16's `#include <emmintrin.h>` then reaches builtin
+    // headers of another Clang release. Ask the driver macro inspection selects instead, for
+    // the Cargo target, and give its search list to bindgen and inspection alike.
+    let system_includes = if target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_some() {
+        None
+    } else {
+        let includes = postgres
+            .system_includes(
+                &scanner,
+                &include_search_arguments(target, &environment_arguments),
+                explicit_clang.as_deref(),
+            )
+            .wrap_err("could not detect the Clang driver's include directories for the target")?;
+        eprintln!(
+            "Clang include directories from {}: {:?}",
+            includes.compiler.display(),
+            includes.directories
+        );
+        Some(includes)
+    };
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder, major_version);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
     binder = add_derives(binder);
     let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let mut arguments = Vec::new();
-    if !autodetect {
-        for include in includes {
-            arguments.push(format!(
-                "-I{}",
-                include.to_str().ok_or_else(|| eyre!("Clang include directory is not UTF-8"))?
-            ));
-        }
-    }
+    let mut arguments =
+        system_includes.as_ref().map(system_include_arguments).transpose()?.unwrap_or_default();
     arguments.extend(extra_bindgen_clang_args(pg_config)?);
     arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
     // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
     if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments)) {
-        arguments.insert(0, format!("--target={}", clang_target(&target)));
+        arguments.insert(0, format!("--target={}", clang_target(target)));
     }
     let cflags = macro_cflags(pg_config, env_tracked)?;
     let mut macro_arguments = cflags.applied.clone();
@@ -1224,7 +1244,7 @@ fn run_bindgen(
         let bindings = binder
             .header(include_h.display().to_string())
             .clang_args(arguments)
-            .detect_include_paths(autodetect)
+            .detect_include_paths(false)
             .parse_callbacks(Box::new(overrides))
             .default_enum_style(bindgen::EnumVariation::ModuleConsts)
             // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
@@ -1250,26 +1270,18 @@ fn run_bindgen(
         Ok(bindings.to_string())
     };
     generate_macros(
-        pg_config,
+        &scanner,
+        &postgres,
         include_h,
         macro_arguments,
         &environment_arguments,
         explicit_clang.as_deref(),
-        &pg_target_includes[0],
+        system_includes.as_ref().map(|includes| includes.compiler.as_path()),
         native,
         &cflags,
-        &target,
+        target,
         generate,
     )
-    .wrap_err_with(|| {
-        let metadata = pg_config
-            .path()
-            .map_or_else(|| "PGRX_PG_CONFIG_AS_ENV".to_owned(), |path| path.display().to_string());
-        format!(
-            "pg{major_version}: pgrx-pg-sys requires generated C macros for {target} (server headers {}, PostgreSQL metadata {metadata})",
-            pg_target_includes[0]
-        )
-    })
 }
 
 /// Give macro ownership to the server headers that bindgen and inspection include, the first
@@ -1278,6 +1290,35 @@ fn run_bindgen(
 fn macro_postgres_config(pg_config: &PgConfig, server_root: &str) -> eyre::Result<PostgresConfig> {
     Ok(PostgresConfig::from_pg_config(pg_config.clone())?
         .with_server_include_dir(server_root.into()))
+}
+
+/// Search the driver's system directories ahead of every other include directory, in the
+/// driver's order and with each directory's kind, so libclang finds the same headers.
+fn system_include_arguments(includes: &SystemIncludes) -> eyre::Result<Vec<String>> {
+    includes
+        .directories
+        .iter()
+        .map(|SystemIncludeDirectory { path, framework }| {
+            let path = path
+                .to_str()
+                .ok_or_else(|| eyre!("Clang include directory {} is not UTF-8", path.display()))?;
+            Ok(if *framework { format!("-iframework{path}") } else { format!("-I{path}") })
+        })
+        .collect()
+}
+
+/// Require macro inspection to have used the driver whose search list the arguments contain.
+/// Both select through the same lookup, so they differ only if the lookup's inputs changed in
+/// between.
+fn require_include_driver(include_driver: Option<&Path>, inspected: &Path) -> eyre::Result<()> {
+    match include_driver {
+        Some(driver) if driver != inspected => Err(eyre!(
+            "include directories came from {} but C macro inspection selected {}",
+            driver.display(),
+            inspected.display()
+        )),
+        _ => Ok(()),
+    }
 }
 
 /// Name the supported ways to supply target headers when the selected headers were configured
@@ -1345,21 +1386,19 @@ struct MacroReport<'a> {
 /// macros and native adapters, verify unchanged C inputs, and serialize structured skips.
 #[allow(clippy::too_many_arguments)] // One inspection owns compiler inputs, binding storage and native publication.
 fn generate_macros(
-    pg_config: &PgConfig,
+    scanner: &MacroScanner,
+    postgres: &PostgresConfig,
     header: &Path,
     binder_arguments: Vec<String>,
     environment_arguments: &[String],
     preferred_clang: Option<&Path>,
-    server_root: &str,
+    include_driver: Option<&Path>,
     native: NativeBuild<'_>,
     cflags: &MacroCflags,
     target: &str,
     generate_bindings: impl FnOnce() -> eyre::Result<String>,
 ) -> eyre::Result<(String, MacroOutput)> {
-    let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
-    let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
-    let postgres = macro_postgres_config(pg_config, server_root)?;
-    let major_version = pg_config.major_version()?;
+    let major_version = postgres.pg_config().major_version()?;
     let msvc = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc");
     // Bindgen appends its original environment tail itself. A CRT selection
     // there cannot be lowered without changing the tail seen by libclang;
@@ -1375,8 +1414,9 @@ fn generate_macros(
     // A failed build script always reruns, so only a successful inspection
     // needs its inputs tracked.
     let frontend = postgres
-        .inspect_with_arguments(&scanner, header, &effective_arguments, preferred_clang)
+        .inspect_with_arguments(scanner, header, &effective_arguments, preferred_clang)
         .map_err(|error| inspection_error(error, major_version, target))?;
+    require_include_driver(include_driver, &frontend.profile().compiler.executable)?;
     emit_macro_rerun_inputs(&frontend.profile().inputs, native.out_dir)?;
     let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
     let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
@@ -1420,7 +1460,7 @@ fn generate_macros(
         .collect::<Vec<_>>();
     let inline_names = postgres_inline_function_names(&frontend, postgres.server_include_dir())?;
     let session = AnalysisSession::prepare_with_inline_functions(
-        &scanner,
+        scanner,
         &frontend,
         &names,
         &object_names,
@@ -1475,7 +1515,7 @@ fn generate_macros(
             .then_some(name.clone())
         })
         .collect::<Vec<_>>();
-    let objects = probe_integer_object_constants(&scanner, &frontend, &missing_objects)?;
+    let objects = probe_integer_object_constants(scanner, &frontend, &missing_objects)?;
     for (name, constant) in &objects.constants {
         let pgrx_c_macros::TypeCategory::Integer(kind) = constant.ty.category else { continue };
         let layout = &frontend.profile().target.integers[&kind];
@@ -2454,6 +2494,50 @@ macro_rules! EXAMPLE {
             let explicit = arguments(explicit);
             assert_eq!(include_search_arguments("aarch64-unknown-linux-gnu", &explicit), explicit);
         }
+    }
+
+    /// The driver's search list precedes other include directories in its own order, and
+    /// framework directories stay framework directories.
+    #[test]
+    fn system_includes_become_ordered_include_arguments() {
+        let includes = SystemIncludes {
+            compiler: "/usr/bin/clang-14".into(),
+            directories: vec![
+                SystemIncludeDirectory {
+                    path: "/usr/lib/llvm-14/lib/clang/14/include".into(),
+                    framework: false,
+                },
+                SystemIncludeDirectory {
+                    path: "/usr/include/aarch64-linux-gnu".into(),
+                    framework: false,
+                },
+                SystemIncludeDirectory {
+                    path: "/System/Library/Frameworks".into(),
+                    framework: true,
+                },
+            ],
+        };
+        assert_eq!(
+            system_include_arguments(&includes).unwrap(),
+            [
+                "-I/usr/lib/llvm-14/lib/clang/14/include",
+                "-I/usr/include/aarch64-linux-gnu",
+                "-iframework/System/Library/Frameworks",
+            ]
+        );
+    }
+
+    /// Inspection must have used the driver that reported the include directories.
+    #[test]
+    fn inspection_must_use_the_include_driver() {
+        let driver = Path::new("/usr/bin/clang-14");
+        require_include_driver(None, driver).unwrap();
+        require_include_driver(Some(driver), driver).unwrap();
+        let error = require_include_driver(Some(driver), Path::new("/usr/bin/clang")).unwrap_err();
+        assert_eq!(
+            error.to_string(),
+            "include directories came from /usr/bin/clang-14 but C macro inspection selected /usr/bin/clang"
+        );
     }
 
     /// Headers configured for another machine name the variables that supply target headers,
