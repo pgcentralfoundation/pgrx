@@ -1,0 +1,49 @@
+error[E0521]: borrowed data escapes outside of function
+  --> tests/compile-fail/borrowed-postgres-types-dont-outlive-calls.rs:12:53
+   |
+11 |   #[pg_extern]
+   |   ------------
+   |   |
+   |   lifetime `'fcx` defined here
+   |   in this attribute macro expansion
+12 |   fn static_word(part: Part<'static>) -> &'static str {
+   |  _____________________________________________________^
+13 | |     part.word
+14 | | }
+   | | ^
+   | | |
+   | | `fcinfo` is a reference that is only valid in the function body
+   | |_`fcinfo` escapes the function body here
+   |   argument requires that `'fcx` must outlive `'static`
+   |
+   = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0515]: cannot return value referencing function parameter `parts`
+  --> tests/compile-fail/borrowed-postgres-types-dont-outlive-calls.rs:18:5
+   |
+18 |     parts.iter_deny_null().collect()
+   |     -----^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |     |
+   |     returns a value referencing data owned by the current function
+   |     `parts` is borrowed here
+
+error: implementation of `Deserialize` is not general enough
+  --> tests/compile-fail/borrowed-postgres-types-dont-outlive-calls.rs:23:10
+   |
+23 | #[derive(PostgresType, Serialize, Deserialize)]
+   |          ^^^^^^^^^^^^ implementation of `Deserialize` is not general enough
+   |
+   = note: `std::option::Option<StaticWord>` must implement `Deserialize<'0>`, for any lifetime `'0`...
+   = note: ...but it actually implements `Deserialize<'1>`, for some specific lifetime `'1`
+   = note: this error originates in the derive macro `PostgresType` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: lifetime may not live long enough
+  --> tests/compile-fail/borrowed-postgres-types-dont-outlive-calls.rs:39:10
+   |
+39 | #[derive(PostgresType, Serialize, Deserialize)]
+   |          ^^^^^^^^^^^^ requires that `'a` must outlive `'static`
+40 | #[inoutfuncs]
+41 | pub struct TaggedWord<'a> {
+   |                       -- lifetime `'a` defined here
+   |
+   = note: this error originates in the derive macro `PostgresType` (in Nightly builds, run with -Z macro-backtrace for more info)

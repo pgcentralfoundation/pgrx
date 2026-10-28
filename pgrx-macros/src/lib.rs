@@ -867,6 +867,12 @@ enum Animal {
 }
 ```
 
+A type with a lifetime parameter borrows from the Datum it is read from, as `&str` does, and
+each of its lifetimes is the Datum's. An argument borrows for the call, and `Array::iter` returns
+values that borrow the array, so `Vec<T>` and `Array::into_iter` are not available for it. Its
+fields may borrow only for its first lifetime, and a type without one must implement
+`serde::de::DeserializeOwned`.
+
 Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
@@ -932,6 +938,30 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         None => quote! {'_},
     };
 
+    // A decoded value can borrow from the varlena, and `cbor_decode` lets the caller pick the
+    // lifetime of that borrow. Pick the type's first lifetime, or require a type that borrows
+    // nothing, so that a field that can only borrow for 'static fails to compile.
+    let cbor_decode = match has_lifetimes {
+        Some(param) => {
+            let lt = &param.lifetime;
+            quote! { ::pgrx::datum::cbor_decode::<#lt, _> }
+        }
+        None => quote! { ::pgrx::datum::cbor_decode_owned },
+    };
+
+    // A value unboxed from a `Datum<'dat>` borrows for 'dat, so `Vec<T>` and `Array::into_iter`,
+    // which need `As<'dat> = T` for every 'dat, cannot keep it after freeing the array.
+    let unboxed = if has_lifetimes.is_some() {
+        let args = generics.params.iter().map(|param| match param {
+            syn::GenericParam::Lifetime(_) => quote! { 'dat },
+            syn::GenericParam::Type(param) => param.ident.to_token_stream(),
+            syn::GenericParam::Const(param) => param.ident.to_token_stream(),
+        });
+        quote! { #name<#(#args),*> }
+    } else {
+        quote! { Self }
+    };
+
     // We need another variant of the params for the ArgAbi impl
     let fcx_lt = syn::Lifetime::new("'fcx", proc_macro2::Span::mixed_site());
     let mut generics_with_fcx = generics.clone();
@@ -944,6 +974,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             bounds: syn::parse_quote! { #fcx_lt },
         },
     ));
+    // and on 'fcx outliving each lifetime, so that an argument borrows for the call, not 'static
+    for param in generics.lifetimes() {
+        let lt = &param.lifetime;
+        generics_with_fcx.make_where_clause().predicates.push(syn::parse_quote! { #fcx_lt: #lt });
+    }
     let (impl_gens, ty_gens, where_clause) = generics_with_fcx.split_for_impl();
     let mut impl_gens: syn::Generics = syn::parse_quote! { #impl_gens };
     impl_gens
@@ -988,8 +1023,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         if is_null {
                             None
                         } else {
-                            #[allow(deprecated)]
-                            ::pgrx::datum::cbor_decode(datum.cast_mut_ptr())
+                            #cbor_decode(datum.cast_mut_ptr())
                         }
                     }
 
@@ -1011,10 +1045,12 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
+                // SAFETY: `As<'dat>` borrows only for 'dat. `unbox` is for detoasted Datums, such
+                // as array elements, and `cbor_decode` reads those in place.
                 unsafe impl #generics ::pgrx::datum::UnboxDatum for #name #generics {
-                    type As<'dat> = Self where Self: 'dat;
+                    type As<'dat> = #unboxed where Self: 'dat;
                     unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
-                        <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
+                        <#unboxed as ::pgrx::datum::FromDatum>::from_datum(datum.sans_lifetime(), false).unwrap()
                     }
                 }
 
@@ -1128,7 +1164,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 unsafe{
                     ::pgrx::pg_sys::SET_VARSIZE_4B!(varlena as *mut ::pgrx::pg_sys::varlena, size as i32).get();
                     buf.cursor = buf.len;
-                    ::pgrx::datum::cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
+                    #cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
                 }
             }
             #[doc(hidden)]

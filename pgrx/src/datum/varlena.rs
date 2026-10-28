@@ -12,6 +12,7 @@ use crate::{FromDatum, IntoDatum, PgMemoryContexts, StringInfo, pg_sys, rust_reg
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
@@ -449,6 +450,13 @@ where
     varlena as *const pg_sys::varlena
 }
 
+/// Decodes a value that [`cbor_encode`] wrote. Panics if the payload is not a CBOR `T`.
+///
+/// # Safety
+///
+/// `input` must point to a live varlena, which may be toasted. The returned value may borrow from
+/// `input`, or from a detoasted copy allocated in `CurrentMemoryContext`, for `'de`, so both must
+/// stay allocated for `'de`.
 #[doc(hidden)]
 pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
@@ -462,6 +470,20 @@ where
     };
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_cbor::from_slice(slice).expect("failed to decode CBOR")
+}
+
+/// [`cbor_decode`] for a `T` that borrows nothing from `input`.
+///
+/// # Safety
+///
+/// `input` must point to a live varlena, which may be toasted.
+#[doc(hidden)]
+pub unsafe fn cbor_decode_owned<T>(input: *mut pg_sys::varlena) -> T
+where
+    T: DeserializeOwned,
+{
+    // SAFETY: the caller passes a live varlena, and a `T` that borrows nothing cannot outlive it.
+    unsafe { cbor_decode(input) }
 }
 
 #[doc(hidden)]
