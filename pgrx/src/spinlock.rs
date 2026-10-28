@@ -71,7 +71,9 @@ impl<T: PGRXSharedMemory> PgSpinLock<T> {
         // unlocked `S_LOCK_FREE` reads of a lock other backends may be changing. PG15–17
         // builds without native spinlocks make this a guarded native call instead, which must
         // run on the backend thread; the guard panics on any other thread.
-        unsafe { pg_sys::SpinLockFree!(lock).get() == 0 }
+        // `S_LOCK_FREE` is C `int` with native spinlocks and the `bool` result of
+        // `s_lock_free_sema` without them, so test it with C's zero rule.
+        unsafe { !pg_sys::SpinLockFree!(lock).is_true() }
     }
 
     /// Returns a lock guard for the spinlock. See the [`PgSpinLockGuard`]
