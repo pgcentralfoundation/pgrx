@@ -8,17 +8,23 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
-use crate::{
-    FromDatum, IntoDatum, PgBox, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys,
-};
+use crate::{FromDatum, IntoDatum, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys};
+use core::ffi::CStr;
+use core::ptr::NonNull;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
-use std::ops::Deref;
 use std::os::raw::c_char;
 
+/// A relation open in the relcache.
+///
+/// While a relation is open, PostgreSQL rebuilds its relcache entry in place whenever it processes
+/// an invalidation for it, overwriting the `RelationData` and the `pg_class` row in `rd_rel`. That
+/// can happen inside any call into PostgreSQL, including a statement this backend runs on the open
+/// relation, such as `ALTER TABLE ... RENAME`. So `PgRelation` returns copies of what it reads,
+/// never references into the entry.
 pub struct PgRelation {
-    boxed: PgBox<pg_sys::RelationData>,
+    ptr: NonNull<pg_sys::RelationData>,
     need_close: bool,
     lockmode: Option<pg_sys::LOCKMODE>,
 }
@@ -31,16 +37,34 @@ impl PgRelation {
     ///
     /// ## Safety
     ///
-    /// This method is unsafe as we cannot ensure that this relation will later be closed by Postgres
+    /// `ptr` must be a relation that Postgres keeps open for as long as this instance exists.
+    ///
+    /// ## Panics
+    ///
+    /// Panics if `ptr` is NULL.
     pub unsafe fn from_pg(ptr: pg_sys::Relation) -> Self {
-        PgRelation { boxed: PgBox::from_pg(ptr), need_close: false, lockmode: None }
+        PgRelation::new(ptr, false, None)
     }
 
     /// Wrap a Postgres-provided `pg_sys::Relation`.
     ///
     /// The provided `Relation` will be closed via `pg_sys::RelationClose` when this instance is dropped
+    ///
+    /// ## Safety
+    ///
+    /// `ptr` must be an open relation whose relcache reference this instance takes over, such as
+    /// one returned by `pg_sys::RelationIdGetRelation`.
+    ///
+    /// ## Panics
+    ///
+    /// Panics if `ptr` is NULL.
     pub unsafe fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
-        PgRelation { boxed: PgBox::from_pg(ptr), need_close: true, lockmode: None }
+        PgRelation::new(ptr, true, None)
+    }
+
+    fn new(ptr: pg_sys::Relation, need_close: bool, lockmode: Option<pg_sys::LOCKMODE>) -> Self {
+        let ptr = NonNull::new(ptr).expect("relation pointer is NULL");
+        PgRelation { ptr, need_close, lockmode }
     }
 
     /// Given a relation oid, use `pg_sys::RelationIdGetRelation()` to open the relation
@@ -63,7 +87,7 @@ impl PgRelation {
             panic!("Cannot open relation with oid={oid:?}");
         }
 
-        PgRelation { boxed: PgBox::from_pg(rel), need_close: true, lockmode: None }
+        PgRelation::new(rel, true, None)
     }
 
     /// relation_open - open any relation by relation OID
@@ -85,13 +109,7 @@ impl PgRelation {
     /// when this instance is dropped
     #[deny(unsafe_op_in_unsafe_fn)]
     pub unsafe fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> Self {
-        unsafe {
-            PgRelation {
-                boxed: PgBox::from_pg(pg_sys::relation_open(oid, lockmode)),
-                need_close: true,
-                lockmode: Some(lockmode),
-            }
-        }
+        PgRelation::new(unsafe { pg_sys::relation_open(oid, lockmode) }, true, Some(lockmode))
     }
 
     /// Given a relation name, use `pg_sys::to_regclass` to look up its oid, and then
@@ -138,12 +156,24 @@ impl PgRelation {
         }
     }
 
+    /// The relcache entry, for passing to PostgreSQL functions.
+    ///
+    /// PostgreSQL can rewrite what this points to, as described on [`PgRelation`]. Copy fields
+    /// out of it rather than holding references to them across calls into PostgreSQL.
+    #[inline]
+    pub fn as_ptr(&self) -> pg_sys::Relation {
+        self.ptr.as_ptr()
+    }
+
     /// RelationGetRelationName
-    ///            Returns the rel's name.
+    ///            Returns a copy of the rel's name.
     ///
     /// Note that the name is only unique within the containing namespace.
-    pub fn name(&self) -> &str {
-        name_data_to_str(&self.class_form().relname)
+    pub fn name(&self) -> String {
+        // SAFETY: class_form points to this open relation's pg_class row; relname is copied
+        // out before PostgreSQL can rewrite it.
+        let relname = unsafe { (*self.class_form()).relname };
+        name_data_to_str(&relname).to_owned()
     }
 
     /// RelationGetRelid
@@ -151,20 +181,30 @@ impl PgRelation {
     #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
         // SAFETY: the relation stays open and initialized for this access.
-        pg_sys::Oid::from(unsafe { pg_sys::RelationGetRelid!(self.boxed.as_ptr()).get() })
+        pg_sys::Oid::from(unsafe { pg_sys::RelationGetRelid!(self.as_ptr()).get() })
     }
 
     /// RelationGetNamespace
     ///            Returns the rel's namespace OID.
     pub fn namespace_oid(&self) -> pg_sys::Oid {
-        self.class_form().relnamespace
+        // SAFETY: class_form points to this open relation's pg_class row.
+        unsafe { (*self.class_form()).relnamespace }
     }
 
     /// What is the name of the namespace in which this relation is located?
-    pub fn namespace(&self) -> &str {
-        unsafe { core::ffi::CStr::from_ptr(pg_sys::get_namespace_name(self.namespace_oid())) }
-            .to_str()
-            .expect("unable to convert namespace name to UTF8")
+    pub fn namespace(&self) -> String {
+        let nspid = self.namespace_oid();
+        // SAFETY: get_namespace_name accepts any OID. It returns NULL or a NUL-terminated copy
+        // palloc'd in CurrentMemoryContext that nothing else references.
+        let name = unsafe { pg_sys::get_namespace_name(nspid) };
+        assert!(!name.is_null(), "namespace {nspid:?} does not exist");
+        // SAFETY: name is live until the pfree, which comes after the copy.
+        unsafe {
+            let copy = CStr::from_ptr(name).to_str().map(str::to_owned);
+            pg_sys::pfree(name.cast());
+            copy
+        }
+        .expect("unable to convert namespace name to UTF8")
     }
 
     /// If this `PgRelation` represents an index, return the `PgRelation` for the heap
@@ -175,10 +215,13 @@ impl PgRelation {
     /// This does not perform locking, even though Postgres requires it.
     /// Callers must first call `with_lock` before calling this.
     pub unsafe fn heap_relation(&self) -> Option<PgRelation> {
-        // SAFETY: we know self.boxed and its members are correct as we created it
-        let rd_index: PgBox<pg_sys::FormData_pg_index> =
-            unsafe { PgBox::from_pg(self.boxed.rd_index) };
-        if rd_index.is_null() { None } else { Some(unsafe { PgRelation::open(rd_index.indrelid) }) }
+        // SAFETY: the relation is open, so its RelationData is live.
+        let rd_index = unsafe { (*self.as_ptr()).rd_index };
+        if rd_index.is_null() {
+            return None;
+        }
+        // SAFETY: a non-NULL rd_index points to this open index's pg_index row.
+        Some(unsafe { PgRelation::open((*rd_index).indrelid) })
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
@@ -188,10 +231,9 @@ impl PgRelation {
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {
         use crate::PgList;
-        // SAFETY: we know self.boxed is a valid pointer as we created it
-        let list = unsafe {
-            PgList::<pg_sys::Oid>::from_pg(pg_sys::RelationGetIndexList(self.boxed.as_ptr()))
-        };
+        // SAFETY: we know self.ptr is a valid pointer as we created it
+        let list =
+            unsafe { PgList::<pg_sys::Oid>::from_pg(pg_sys::RelationGetIndexList(self.as_ptr())) };
 
         list.iter_oid()
             .filter(|oid| *oid != pg_sys::Oid::INVALID)
@@ -218,66 +260,62 @@ impl PgRelation {
         PgTupleDesc::from_relation(self)
     }
 
-    /// Borrow the catalog row for as long as this relation keeps its storage live.
-    fn class_form(&self) -> &pg_sys::FormData_pg_class {
-        // SAFETY: Construction requires an open Relation with an aligned initialized
-        // rd_rel catalog row. Borrowing self keeps that resource live and permits a
-        // shared read; the raw projection transfers no ownership. NULL remains an error.
-        unsafe {
-            pg_sys::RelationGetForm!(self.boxed.as_ptr()).get().as_ref().expect("rd_rel is NULL")
-        }
+    /// Point at the cached pg_class row, which callers must copy fields out of rather than
+    /// borrow; see [`PgRelation`].
+    fn class_form(&self) -> *const pg_sys::FormData_pg_class {
+        // SAFETY: the relation is open, so its RelationData is live.
+        let form = unsafe { pg_sys::RelationGetForm!(self.as_ptr()).get() };
+        assert!(!form.is_null(), "rd_rel is NULL");
+        form
+    }
+
+    fn relkind(&self) -> c_char {
+        // SAFETY: class_form points to this open relation's pg_class row.
+        unsafe { (*self.class_form()).relkind }
     }
 
     /// Number of tuples in this relation (not always up-to-date)
     pub fn reltuples(&self) -> Option<f32> {
-        let reltuples = self.class_form().reltuples;
+        // SAFETY: class_form points to this open relation's pg_class row.
+        let reltuples = unsafe { (*self.class_form()).reltuples };
 
         if reltuples == 0f32 { None } else { Some(reltuples) }
     }
 
     pub fn is_table(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_RELATION as c_char
+        self.relkind() == pg_sys::RELKIND_RELATION as c_char
     }
 
     pub fn is_matview(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_MATVIEW as c_char
+        self.relkind() == pg_sys::RELKIND_MATVIEW as c_char
     }
 
     pub fn is_index(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_INDEX as c_char
+        self.relkind() == pg_sys::RELKIND_INDEX as c_char
     }
 
     pub fn is_view(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_VIEW as c_char
+        self.relkind() == pg_sys::RELKIND_VIEW as c_char
     }
 
     pub fn is_sequence(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_SEQUENCE as c_char
+        self.relkind() == pg_sys::RELKIND_SEQUENCE as c_char
     }
 
     pub fn is_composite_type(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_COMPOSITE_TYPE as c_char
+        self.relkind() == pg_sys::RELKIND_COMPOSITE_TYPE as c_char
     }
 
     pub fn is_foreign_table(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_FOREIGN_TABLE as c_char
+        self.relkind() == pg_sys::RELKIND_FOREIGN_TABLE as c_char
     }
 
     pub fn is_partitioned_table(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_PARTITIONED_TABLE as c_char
+        self.relkind() == pg_sys::RELKIND_PARTITIONED_TABLE as c_char
     }
 
     pub fn is_toast_value(&self) -> bool {
-        let rd_rel = self.class_form();
-        rd_rel.relkind == pg_sys::RELKIND_TOASTVALUE as c_char
+        self.relkind() == pg_sys::RELKIND_TOASTVALUE as c_char
     }
 
     /// ensures that the returned `PgRelation` is closed by Rust when it is dropped
@@ -289,37 +327,37 @@ impl PgRelation {
     /// Record a heap scan in this relation's PostgreSQL statistics.
     pub fn count_heap_scan(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_heap_scan!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_heap_scan!(self.as_ptr()) }
     }
 
     /// Record a heap getnext in this relation's PostgreSQL statistics.
     pub fn count_heap_getnext(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_heap_getnext!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_heap_getnext!(self.as_ptr()) }
     }
 
     /// Record a heap fetch in this relation's PostgreSQL statistics.
     pub fn count_heap_fetch(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_heap_fetch!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_heap_fetch!(self.as_ptr()) }
     }
 
     /// Record an index scan in this relation's PostgreSQL statistics.
     pub fn count_index_scan(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_index_scan!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_index_scan!(self.as_ptr()) }
     }
 
     /// Record a buffer read in this relation's PostgreSQL statistics.
     pub fn count_buffer_read(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_buffer_read!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_buffer_read!(self.as_ptr()) }
     }
 
     /// Record a buffer hit in this relation's PostgreSQL statistics.
     pub fn count_buffer_hit(&mut self) {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
-        unsafe { pg_sys::pgstat_count_buffer_hit!(self.boxed.as_ptr()) }
+        unsafe { pg_sys::pgstat_count_buffer_hit!(self.as_ptr()) }
     }
 
     /// Add returned index tuples to this relation's PostgreSQL statistics.
@@ -327,7 +365,7 @@ impl PgRelation {
         // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
         unsafe {
             pg_sys::pgstat_count_index_tuples!(
-                self.boxed.as_ptr(),
+                self.as_ptr(),
                 pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::int64>::new(n as _)
             )
         }
@@ -368,20 +406,12 @@ impl IntoDatum for PgRelation {
     }
 }
 
-impl Deref for PgRelation {
-    type Target = PgBox<pg_sys::RelationData>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.boxed
-    }
-}
-
 impl Drop for PgRelation {
     fn drop(&mut self) {
-        if !self.boxed.is_null() && self.need_close {
+        if self.need_close {
             match self.lockmode {
-                None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
-                Some(lockmode) => unsafe { pg_sys::relation_close(self.boxed.as_ptr(), lockmode) },
+                None => unsafe { pg_sys::RelationClose(self.as_ptr()) },
+                Some(lockmode) => unsafe { pg_sys::relation_close(self.as_ptr(), lockmode) },
             }
         }
     }
