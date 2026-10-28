@@ -229,7 +229,8 @@ fn configured_machine(version: &str) -> (&str, MachineFamily) {
 /// Every property known on both sides must be equal. Without a recognized architecture and OS
 /// on both sides, only the host's own target is accepted: native builds keep working with
 /// vendor-patched strings, while cross builds must supply evidence. A macOS machine's
-/// architecture is replaced by the `compiled` slices when there are any.
+/// architecture is replaced by the `compiled` slices when there are any, and a meson system
+/// also matches the system meson renames to it.
 fn check_machine(
     version: Option<&str>,
     compiled: &[String],
@@ -250,6 +251,9 @@ fn check_machine(
                 });
             }
             family.arch = target_family.arch;
+        }
+        if target_family.os.is_some() && meson_renamed_system(machine) == target_family.os {
+            family.os = target_family.os;
         }
         if known_and_different(family.arch, target_family.arch)
             || known_and_different(family.os.map(os_family), target_family.os.map(os_family))
@@ -278,6 +282,19 @@ fn check_machine(
         recorded: recorded.map(|(machine, _)| machine.into()),
         target: target.into(),
     })
+}
+
+/// The system that meson builds of PostgreSQL record under another name.
+///
+/// PostgreSQL's `meson.build` rewrites `host_system` before formatting `PG_VERSION_STR` as
+/// `<cpu family>-<system>`: DragonFly becomes `netbsd` (PostgreSQL 16 and later) and Android
+/// becomes `linux` (17 and later). Autoconf machines carry a vendor and keep the real system.
+fn meson_renamed_system(machine: &str) -> Option<&'static str> {
+    match machine.split_once('-')?.1 {
+        "netbsd" => Some("dragonfly"),
+        "linux" => Some("android"),
+        _ => None,
+    }
 }
 
 /// Whether both sides name a property and the names differ.
@@ -607,6 +624,41 @@ mod tests {
             check_machine(Some(legacy), &[], "x86_64-unknown-linux-gnu", ("x86_64", "linux")),
             Err(ConfigurationError::Machine { .. })
         ));
+    }
+
+    /// meson records DragonFly as `netbsd` and Android as `linux`, so its two-part machines also
+    /// describe those systems. Autoconf names the real system.
+    #[test]
+    fn meson_renamed_systems_match_their_targets() {
+        let host = ("aarch64", "macos");
+        let meson =
+            |machine: &str| format!("PostgreSQL 17.0 on {machine}, compiled by gcc-14.2.0, 64-bit");
+        let machine =
+            |machine: &str, target| check_machine(Some(&meson(machine)), &[], target, host);
+        for target in ["x86_64-unknown-dragonfly", "x86_64-unknown-netbsd"] {
+            assert!(machine("x86_64-netbsd", target).is_ok(), "{target}");
+        }
+        for target in ["aarch64-unknown-linux-android", "aarch64-unknown-linux-gnu"] {
+            assert!(machine("aarch64-linux", target).is_ok(), "{target}");
+        }
+        assert!(matches!(
+            machine("x86_64-netbsd", "x86_64-unknown-freebsd"),
+            Err(ConfigurationError::Machine { .. })
+        ));
+        assert!(matches!(
+            machine("aarch64-linux", "x86_64-unknown-linux-android"),
+            Err(ConfigurationError::Machine { .. })
+        ));
+        for (autoconf, target) in [
+            ("x86_64-unknown-netbsd10.0", "x86_64-unknown-dragonfly"),
+            ("aarch64-unknown-linux-gnu", "aarch64-unknown-linux-android"),
+        ] {
+            assert!(
+                matches!(machine(autoconf, target), Err(ConfigurationError::Machine { .. })),
+                "{autoconf}"
+            );
+        }
+        assert!(machine("x86_64-unknown-dragonfly6.4", "x86_64-unknown-dragonfly").is_ok());
     }
 
     /// A universal macOS server compiles every `-arch` slice from headers whose `PG_VERSION_STR`
