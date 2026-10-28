@@ -951,6 +951,32 @@ impl<'a> Renderer<'a> {
                             };
                             let direct_place = self.places[*base];
                             if !*indirect && !direct_place && matches!(context, Context::Value) {
+                                // The record is copied, so an array member would decay into a
+                                // pointer into that copy, and the runtime admits no such member.
+                                // A translated body's types do not depend on its caller, so an
+                                // unproved member type would fail every call.
+                                match &self.objects[index] {
+                                    Some(object)
+                                        if !matches!(
+                                            object.category,
+                                            TypeCategory::Integer(_)
+                                                | TypeCategory::Floating
+                                                | TypeCategory::Pointer
+                                                | TypeCategory::Record
+                                                | TypeCategory::Enum
+                                        ) =>
+                                    {
+                                        return Err(failure(format!(
+                                            "{field}: an array member of a record value would decay into a pointer into a copy"
+                                        )));
+                                    }
+                                    None if self.inline_body => {
+                                        return Err(failure(format!(
+                                            "{field}: the type of a record value's member is not established, so it may be an array"
+                                        )));
+                                    }
+                                    _ => {}
+                                }
                                 write!(rust, "{EXPRESSION}::member::<{marker}, _>(")
                                     .expect("String output");
                                 tasks.extend([text(")"), value(*base)]);

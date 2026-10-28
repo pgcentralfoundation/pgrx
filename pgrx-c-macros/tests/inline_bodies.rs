@@ -71,6 +71,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_ORDER",
     // Only the conversion of its integer result is floating.
     "BODY_RETURN_FMA",
+    // A scalar member of a record value.
+    "BODY_ARRAY_COUNT",
 ];
 
 /// Macros that call translated inline functions.
@@ -82,6 +84,13 @@ const NATIVE: &[&str] = &[
     "BODY_EARLY",
     // A record cannot leave a translation by value.
     "BODY_PAIR",
+    "BODY_ARRAY",
+    // An array member of a record value would decay into a pointer into a copy.
+    "BODY_ARRAY_INDEX",
+    "BODY_ARRAY_DECAY",
+    "BODY_ARRAY_SELECT",
+    // The type of a member of a call's result through a pointer is not established.
+    "BODY_MADE_COUNT",
     // The macro is defined only after the function, which used the enum constant.
     "BODY_LATE_USE",
     // The macro is redefined after the function.
@@ -222,9 +231,10 @@ fn translated_bodies_match_their_original_definitions() {
         "{rust}\n{prelude}\nconst EXPECTED_GUARDS: usize = 0;\nfn main() {{ let mut value = 0_i32; BODY_STORE!(&raw mut value, 7_i32).get(); }}\n"
     ));
     assert!(error.contains("unsafe"), "{error}");
-    // BODY_EARLY is called twice; each other native root, and the native self-call inside
-    // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 32;\n");
+    // BODY_EARLY and BODY_ARRAY_SELECT are called twice and each other native root once,
+    // BODY_ARRAY only by the translated BODY_ARRAY_COUNT. The translated BODY_RECURSIVE
+    // calls itself natively once.
+    rust.push_str("const EXPECTED_GUARDS: usize = 38;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

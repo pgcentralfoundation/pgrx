@@ -41,6 +41,25 @@ static inline BodyPair BODY_PAIR(int value)
 	pair.right = value + 1;
 	return pair;
 }
+/* A translation copies a record value, so an array member of one would decay into a
+ * pointer into that copy. The type of a call's result through a pointer, and so of its
+ * members, is not established. */
+typedef struct BodyArray { int values[2]; int count; } BodyArray;
+static inline BodyArray BODY_ARRAY(int value)
+{
+	BodyArray array;
+
+	array.values[0] = value;
+	array.values[1] = value + 1;
+	array.count = 2;
+	return array;
+}
+static inline int BODY_ARRAY_COUNT(int value) { return value + BODY_ARRAY(value).count; }
+static inline int BODY_ARRAY_INDEX(int value) { return value + BODY_ARRAY(value).values[1]; }
+static inline int BODY_ARRAY_DECAY(int value) { return value + *BODY_ARRAY(value).values; }
+static inline int BODY_ARRAY_SELECT(const BodyArray *left, const BodyArray *right, int value) { return value + (value ? *left : *right).values[1]; }
+typedef struct BodyArrayMaker { BodyArray (*make)(int); } BodyArrayMaker;
+static inline int BODY_MADE_COUNT(const BodyArrayMaker *maker, int value) { return value + maker->make(value).count; }
 static inline int BODY_LEAF(int value) { return value + 10; }
 static inline int BODY_CALLER(int value) { return BODY_LEAF(value) * 2; }
 static inline int BODY_RECURSIVE(int value) { return value <= 0 ? 0 : BODY_RECURSIVE(value - 1) + 1; }

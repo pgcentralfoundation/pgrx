@@ -1324,6 +1324,11 @@ relationships require structural validation, not name-based guesses.
 Member markers are shared by name, so a rejected projection is recorded under its
 `record::member` key. When analysis knows the owner record, emission reports that
 rejection instead of borrowing the marker another record's accepted member supplies.
+A member of a record value, such as a call's result, is read from a copy of the
+record. An array member would decay into a pointer into that copy, so emission
+refuses one. A translated inline function's own types do not depend on its
+caller, so its body also keeps the native call when such a member's type is not
+established.
 
 Generate a bitfield capability with this sequence:
 

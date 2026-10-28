@@ -44,6 +44,11 @@ unsafe extern "C" fn body_quarter() -> f64 {
     4.25
 }
 
+/// The function BODY_MADE_COUNT calls through its record.
+unsafe extern "C" fn body_array_of(value: i32) -> BodyArray {
+    BodyArray { values: [value, value + 1], count: 2 }
+}
+
 /// Print the same lines as the C oracle through the generated macros.
 fn main() {
     let mut value = 0_i32;
@@ -62,6 +67,18 @@ fn main() {
         println!("color\t{}\t{}", BODY_COLOR!(0_i32).get(), BODY_COLOR!(5_i32).get());
         // The native call returns the record the C function initialized.
         println!("pair\t{}", BODY_PAIR!(4_i32).get().assume_init().right);
+        let first = BodyArray { values: [1, 2], count: 2 };
+        let second = BodyArray { values: [5, 6], count: 2 };
+        let maker = BodyArrayMaker { make: Some(body_array_of) };
+        println!(
+            "array\t{}\t{}\t{}\t{}\t{}\t{}",
+            BODY_ARRAY_COUNT!(3_i32).get(),
+            BODY_ARRAY_INDEX!(3_i32).get(),
+            BODY_ARRAY_DECAY!(3_i32).get(),
+            BODY_ARRAY_SELECT!(&raw const first, &raw const second, 1_i32).get(),
+            BODY_ARRAY_SELECT!(&raw const first, &raw const second, 0_i32).get(),
+            BODY_MADE_COUNT!(&raw const maker, 3_i32).get()
+        );
         println!("caller\t{}", BODY_CALLER!(1_i32).get());
         println!("recursive\t{}", BODY_RECURSIVE!(3_i32).get());
         println!("late\t{}", BODY_LATE_USE!(1_i32).get());

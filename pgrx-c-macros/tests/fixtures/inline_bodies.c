@@ -2,6 +2,7 @@
 /* LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. */
 #include <stdio.h>
 static double body_quarter(void) { return 4.25; }
+static BodyArray body_array_of(int value) { return BODY_ARRAY(value); }
 int main(void)
 {
     int value = 0;
@@ -16,6 +17,11 @@ int main(void)
     printf("early\t%d\n", value);
     printf("color\t%d\t%d\n", (int) BODY_COLOR(0), (int) BODY_COLOR(5));
     printf("pair\t%d\n", BODY_PAIR(4).right);
+    BodyArray first = BODY_ARRAY(1), second = BODY_ARRAY(5);
+    BodyArrayMaker maker = {body_array_of};
+    printf("array\t%d\t%d\t%d\t%d\t%d\t%d\n", BODY_ARRAY_COUNT(3), BODY_ARRAY_INDEX(3),
+           BODY_ARRAY_DECAY(3), BODY_ARRAY_SELECT(&first, &second, 1),
+           BODY_ARRAY_SELECT(&first, &second, 0), BODY_MADE_COUNT(&maker, 3));
     printf("caller\t%d\n", BODY_CALLER(1));
     printf("recursive\t%d\n", BODY_RECURSIVE(3));
     printf("late\t%d\n", BODY_LATE_USE(1));
