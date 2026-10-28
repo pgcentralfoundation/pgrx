@@ -109,6 +109,11 @@ impl PgRelation {
     /// when this instance is dropped
     #[deny(unsafe_op_in_unsafe_fn)]
     pub unsafe fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> Self {
+        // SAFETY: the caller passes a `lockmode` that is enough for how the relation is used,
+        // and NoLock only for a relation it has already locked. relation_open raises an ERROR if
+        // the relation does not exist. Otherwise it returns the relation open with one relcache
+        // reference and, unless `lockmode` is NoLock, that lock taken. This value owns both, and
+        // Drop releases them with relation_close.
         PgRelation::new(unsafe { pg_sys::relation_open(oid, lockmode) }, true, Some(lockmode))
     }
 
@@ -409,6 +414,12 @@ impl IntoDatum for PgRelation {
 impl Drop for PgRelation {
     fn drop(&mut self) {
         if self.need_close {
+            // SAFETY: `open`, `from_pg_owned` and `with_lock` set need_close, and each gives this
+            // value one relcache reference to the open relation, which RelationClose releases.
+            // `with_lock` also records in `lockmode` the lock it took, which relation_close
+            // releases with the reference. Safe `to_owned` can set need_close on a relation
+            // that this value does not own; that is a known soundness bug, because Drop then
+            // releases a reference that belongs to someone else.
             match self.lockmode {
                 None => unsafe { pg_sys::RelationClose(self.as_ptr()) },
                 Some(lockmode) => unsafe { pg_sys::relation_close(self.as_ptr(), lockmode) },

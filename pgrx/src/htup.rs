@@ -104,6 +104,10 @@ pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     // length, alignment, and pass-by-value flag, and holds no reference to its attribute
     // entries. The lookup above bounds `attno` and copies the attribute it reads.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) }?;
+    // SAFETY: the datum is the non-NULL value of attribute `attno` of the caller's live tuple,
+    // and `typoid` is that attribute's type in `tupdesc`. The caller guarantees that `T` can
+    // read that type and that `T` does not outlive the tuple, the descriptor, or
+    // CurrentMemoryContext.
     unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
 }
 
