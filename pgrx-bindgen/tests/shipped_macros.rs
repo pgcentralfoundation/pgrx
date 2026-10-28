@@ -812,6 +812,28 @@ fn main() {
         "// ordinary builds must preserve this snapshot\n"
     );
     assert!(!fixture.0.join("src/include/pg18.rs").exists());
+    // A target bundle carries no documentation, so a release refuses to import one
+    // before generating anything, and names the target-suffixed spelling that set it.
+    let import = format!("PGRX_TARGET_INFO_PATH_PG18_{}", host_target().replace('-', "_"));
+    let refused = fixture
+        .command()
+        .env("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE", "1")
+        .env(&import, fixture.0.join("unread-target-info"))
+        .output()
+        .unwrap();
+    assert!(!refused.status.success(), "a release cannot import a target bundle");
+    assert!(
+        String::from_utf8_lossy(&refused.stderr).contains(&format!(
+            "release generation documents the C macros of pg18, but {import} imports them from a target bundle, which has no documentation"
+        )),
+        "{}",
+        String::from_utf8_lossy(&refused.stderr)
+    );
+    assert_eq!(
+        fs::read_to_string(snapshot.join("mod.rs")).unwrap(),
+        "// ordinary builds must preserve this snapshot\n"
+    );
+    assert!(!fixture.0.join("src/include/pg18.rs").exists());
     fixture.run(
         fixture
             .command()

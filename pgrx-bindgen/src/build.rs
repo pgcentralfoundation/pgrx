@@ -238,6 +238,11 @@ pub fn main() -> eyre::Result<()> {
                 "release generation configures {configured:?} from PGRX_HOME, but this build compiles the active feature pg{major}; configure pg{major} as well; nothing was published"
             ));
         }
+        if let Some((major, variable)) = release_import(&configured, env_tracked) {
+            return Err(eyre!(
+                "release generation documents the C macros of pg{major}, but {variable} imports them from a target bundle, which has no documentation; unset it; nothing was published"
+            ));
+        }
     }
 
     let releases = std::thread::scope(|scope| {
@@ -421,11 +426,10 @@ fn generate_bindings(
     if !is_for_release {
         return Ok(None);
     }
-    // Only an imported target bundle lacks the documentation; it carries no shells.
+    // Only an imported target bundle lacks the documentation, and `main` refuses
+    // imports during release generation.
     let mut snapshot = macros.snapshot.ok_or_else(|| {
-        eyre!(
-            "release generation documents the C macros of pg{major_version}, but PGRX_TARGET_INFO_PATH_PG{major_version} imports them without their documentation"
-        )
+        eyre!("release generation collected no C macro documentation for pg{major_version}")
     })?;
     snapshot.generated_by(generation);
     Ok(Some(ReleaseVersion { major: major_version, bindings, oids, snapshot }))
@@ -475,6 +479,22 @@ fn unconfigured_active_version(
 ) -> Option<u16> {
     SUPPORTED_VERSIONS().iter().map(|version| version.major).find(|major| {
         lookup(&format!("CARGO_FEATURE_PG{major}")).is_some() && !configured.contains(major)
+    })
+}
+
+/// Name a configured version that a target bundle import would supply, and the variable
+/// spelling that selects the bundle.
+///
+/// A bundle carries the bindings and macros of a build that already ran, but not their
+/// documentation, which release generation publishes. Checking before generating keeps
+/// such a run from failing only after every version was inspected.
+fn release_import(
+    configured: &[u16],
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Option<(u16, String)> {
+    configured.iter().find_map(|major| {
+        target_env_lookup(&format!("PGRX_TARGET_INFO_PATH_PG{major}"), &lookup)
+            .map(|(variable, _)| (*major, variable))
     })
 }
 
@@ -2833,6 +2853,28 @@ mod macro_build_tests {
         assert_eq!(unconfigured_active_version(&[15, 16], active("16")), None);
         assert_eq!(unconfigured_active_version(&[15, 16], active("17")), Some(17));
         assert_eq!(unconfigured_active_version(&[], |_| None), None);
+    }
+
+    /// Release generation refuses a target bundle import of a configured version and
+    /// names the spelling that selected it.
+    #[test]
+    fn release_refuses_target_bundle_imports() {
+        let lookup = |variables: &'static [&'static str]| {
+            move |name: &str| match name {
+                "TARGET" => Some("x86_64-unknown-linux-gnu".to_owned()),
+                _ => variables.contains(&name).then(String::new),
+            }
+        };
+        const SUFFIXED: &str = "PGRX_TARGET_INFO_PATH_PG16_x86_64_unknown_linux_gnu";
+        assert_eq!(
+            release_import(&[15, 16], lookup(&[SUFFIXED, "PGRX_TARGET_INFO_PATH_PG16"])),
+            Some((16, SUFFIXED.to_owned()))
+        );
+        assert_eq!(
+            release_import(&[15, 16], lookup(&["PGRX_TARGET_INFO_PATH_PG15"])),
+            Some((15, "PGRX_TARGET_INFO_PATH_PG15".to_owned()))
+        );
+        assert_eq!(release_import(&[15], lookup(&["PGRX_TARGET_INFO_PATH_PG16"])), None);
     }
 
     /// A release is merged, verified and formatted before anything is written to

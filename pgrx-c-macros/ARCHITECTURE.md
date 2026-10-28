@@ -1727,9 +1727,10 @@ Release generation keeps the committed bindings and snapshot coherent:
   changes, so a failure up to then leaves the committed tree unchanged.
   Publication rewrites only changed files; an I/O error while publishing can
   leave the tree partly rewritten.
-- Every version is inspected from its headers. A version imported with
-  `PGRX_TARGET_INFO_PATH_PGNN` fails the run, since a target bundle carries no
-  macro documentation.
+- Every version is inspected from its headers. A configured version that
+  `PGRX_TARGET_INFO_PATH_PGNN`, or its target-suffixed spelling, would import fails
+  the run before anything is generated, since a target bundle carries no macro
+  documentation. The error names the spelling that was set.
 - A run that configures only some supported versions still publishes unless
   `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1`, which `prepare-release.sh` sets,
   makes it fail first. A partial snapshot gates a `compile_error!` to each missing
