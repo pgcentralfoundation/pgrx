@@ -207,6 +207,29 @@ fn files_without_gates_need_no_understood_cfgs() {
     assert!(gates("#![cfg(target_family = \"unix\")]\n", &build).is_empty());
 }
 
+/// Only the attribute lines directly above a gate apply to it. A cfg on an earlier one-line
+/// item belongs to that item, so it must not compile the gate out.
+#[test]
+fn cfgs_of_preceding_items_do_not_apply_to_a_gate() {
+    let unrelated = format!(
+        "#[cfg(feature = \"pg19\")]\n#[allow(dead_code)] fn helper() {{}}\n{}",
+        gate("FOO")
+    );
+    let direct =
+        format!("#[cfg(feature = \"pg19\")]\n// Only PostgreSQL 19 has FOO.\n{}", gate("FOO"));
+    for major in [18, 19] {
+        let build = Build { major, target_os: "linux" };
+        assert_eq!(gates(&unrelated, &build), [("FOO", true)], "PG{major}");
+        assert_eq!(gates(&direct, &build), [("FOO", major == 19)], "PG{major}");
+    }
+}
+
+/// Spell an availability gate for `name` as test input, without writing one in this file that
+/// the guard's own scan would collect.
+fn gate(name: &str) -> String {
+    format!("pg::__pgrx_c_classify! {{ {} {name} {{\n}} }}\n", "@if_available")
+}
+
 /// The configuration that decides which gates compile: the `pg<major>` feature and the target
 /// operating system, spelled as Rust's `target_os` cfg spells it.
 struct Build {
@@ -308,14 +331,18 @@ fn file_cfgs(source: &str) -> impl Iterator<Item = &str> {
 }
 
 /// Return the predicates of the single-line `#[cfg(...)]` attributes directly above a gate,
-/// given the source before the gate's line. A cfg spelled any other way is not seen, so the
-/// gate stays collected and the guard can only become stricter.
+/// given the source before the gate's line. The walk crosses only comments and lines that end
+/// with their attribute, so a line that also holds an item ends it and that item's cfg is not
+/// taken for the gate's. A cfg spelled any other way is not seen, so the gate stays collected
+/// and the guard can only become stricter.
 fn gate_cfgs(before: &str) -> impl Iterator<Item = &str> {
     before
         .lines()
         .rev()
         .map(str::trim)
-        .take_while(|line| line.starts_with("#[") || line.starts_with("//"))
+        .take_while(|line| {
+            (line.starts_with("#[") && line.ends_with(']')) || line.starts_with("//")
+        })
         .filter_map(|line| line.strip_prefix("#[cfg(")?.strip_suffix(")]"))
 }
 
