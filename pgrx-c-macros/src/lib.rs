@@ -278,7 +278,9 @@ pub enum Error {
         source: clang::SourceError,
     },
     /// Clang reported errors, with owned diagnostics retained for the caller.
-    #[error("Clang reported errors while processing the input")]
+    ///
+    /// The message names the first error and fatal diagnostics with their locations.
+    #[error("Clang reported errors while processing the input{}", DiagnosticSummary(.0))]
     Diagnostics(
         /// Owned Clang diagnostics retained instead of exposing a partial inventory.
         Vec<Diagnostic>,
@@ -289,6 +291,43 @@ pub enum Error {
         /// The missing source/token fact that prevented a complete macro record.
         String,
     ),
+}
+
+/// The error and fatal diagnostics of a failed parse, rendered as `file:line:column: message`.
+///
+/// A build log otherwise shows only that Clang failed. Warnings and notes are omitted, and at
+/// most [`Self::SHOWN`] errors are listed so a cascade cannot flood the log.
+struct DiagnosticSummary<'a>(&'a [Diagnostic]);
+
+impl DiagnosticSummary<'_> {
+    /// Errors listed before the remainder is counted.
+    const SHOWN: usize = 8;
+}
+
+impl fmt::Display for DiagnosticSummary<'_> {
+    /// Write ": " and the listed errors, or nothing when no error diagnostic was retained.
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut errors = self.0.iter().filter(|diagnostic| {
+            matches!(diagnostic.severity, DiagnosticSeverity::Error | DiagnosticSeverity::Fatal)
+        });
+        for (index, diagnostic) in errors.by_ref().take(Self::SHOWN).enumerate() {
+            formatter.write_str(if index == 0 { ": " } else { "; " })?;
+            if let Some(location) = &diagnostic.location {
+                write!(
+                    formatter,
+                    "{}:{}:{}: ",
+                    location.file.display(),
+                    location.line,
+                    location.column
+                )?;
+            }
+            formatter.write_str(&diagnostic.message)?;
+        }
+        match errors.count() {
+            0 => Ok(()),
+            remaining => write!(formatter, "; and {remaining} more"),
+        }
+    }
 }
 
 /// A reusable scanner that owns Clang's runtime handle.
@@ -611,5 +650,49 @@ impl fmt::Display for MacroDefinition {
             formatter.write_str(&token.spelling)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A parse failure names its errors with their locations, skips warnings and notes, and
+    /// counts errors beyond the listed ones instead of printing a cascade.
+    #[test]
+    fn diagnostics_error_names_the_first_errors_and_counts_the_rest() {
+        let diagnostic = |severity, message: &str, line| Diagnostic {
+            severity,
+            message: message.into(),
+            location: Some(SourceLocation {
+                file: "/server/c.h".into(),
+                line,
+                column: 7,
+                offset: 0,
+            }),
+        };
+        let mut diagnostics = vec![
+            diagnostic(DiagnosticSeverity::Warning, "unused macro", 1),
+            diagnostic(DiagnosticSeverity::Error, "unknown type name '__int128'", 2),
+            Diagnostic {
+                severity: DiagnosticSeverity::Fatal,
+                message: "'stdint.h' file not found".into(),
+                location: None,
+            },
+        ];
+        diagnostics
+            .extend((10..19).map(|line| diagnostic(DiagnosticSeverity::Error, "cascade", line)));
+        diagnostics.push(diagnostic(DiagnosticSeverity::Note, "expanded from here", 30));
+        let message = Error::Diagnostics(diagnostics).to_string();
+        assert_eq!(
+            message,
+            "Clang reported errors while processing the input: \
+             /server/c.h:2:7: unknown type name '__int128'; 'stdint.h' file not found; \
+             /server/c.h:10:7: cascade; /server/c.h:11:7: cascade; /server/c.h:12:7: cascade; \
+             /server/c.h:13:7: cascade; /server/c.h:14:7: cascade; /server/c.h:15:7: cascade; \
+             and 3 more"
+        );
+        let warning = Error::Diagnostics(vec![diagnostic(DiagnosticSeverity::Warning, "w", 1)]);
+        assert_eq!(warning.to_string(), "Clang reported errors while processing the input");
     }
 }

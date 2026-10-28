@@ -116,8 +116,8 @@ pub enum FrontendError {
         /// The unsupported option or argument detail that prevented a reproducible compiler phase.
         String,
     ),
-    /// The selected compiler could not be executed or its owned streams could not be read.
-    #[error("could not run Clang at {}: {source}", compiler.display())]
+    /// The selected tool could not be executed or its owned streams could not be read.
+    #[error("could not run {}: {source}", compiler.display())]
     CompilerIo {
         /// The selected executable whose invocation failed or whose target facts are being recorded.
         compiler: PathBuf,
@@ -133,7 +133,7 @@ pub enum FrontendError {
         source: io::Error,
     },
     /// A tool phase exited unsuccessfully, with status and diagnostics retained.
-    #[error("Clang at {} failed ({status}): {diagnostics}", compiler.display())]
+    #[error("{} failed ({status}): {diagnostics}", compiler.display())]
     CompilerFailed {
         /// The selected executable whose invocation failed or whose target facts are being recorded.
         compiler: PathBuf,
@@ -143,13 +143,13 @@ pub enum FrontendError {
         diagnostics: String,
     },
     /// A compiler output pipe exceeded the bounded capture budget.
-    #[error("Clang at {} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
+    #[error("{} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
     OutputLimit(
         /// The tool executable whose captured output exceeded its byte budget.
         PathBuf,
     ),
     /// The tool invocation exceeded its finite time budget and is reaped.
-    #[error("Clang at {} exceeded the 60-second time limit", .0.display())]
+    #[error("{} exceeded the 60-second time limit", .0.display())]
     Timeout(
         /// The tool executable whose invocation exceeded its time budget.
         PathBuf,
@@ -3255,6 +3255,41 @@ mod tests {
             owners(FrontendError::Timeout("clang".into())),
             Err(FrontendError::Timeout(_))
         ));
+    }
+
+    /// Tool failures name the tool that failed: the archiver runs through the same invocation
+    /// path as Clang, and a build log must not blame Clang for an llvm-ar failure.
+    #[cfg(unix)]
+    #[test]
+    fn tool_failures_name_the_tool_path() {
+        use std::os::unix::process::ExitStatusExt;
+        let tool = PathBuf::from("/usr/lib/llvm-14/bin/llvm-ar");
+        let messages = [
+            FrontendError::CompilerIo {
+                compiler: tool.clone(),
+                source: io::Error::from(io::ErrorKind::NotFound),
+            },
+            FrontendError::CompilerFailed {
+                compiler: tool.clone(),
+                status: ExitStatus::from_raw(1 << 8),
+                diagnostics: "llvm-ar: error: unknown format".into(),
+            },
+            FrontendError::OutputLimit(tool.clone()),
+            FrontendError::Timeout(tool),
+        ]
+        .map(|error| error.to_string());
+        let [io, failed, limit, timeout] = &messages;
+        assert!(io.starts_with("could not run /usr/lib/llvm-14/bin/llvm-ar: "), "{io}");
+        assert!(
+            failed.starts_with("/usr/lib/llvm-14/bin/llvm-ar failed (")
+                && failed.ends_with("): llvm-ar: error: unknown format"),
+            "{failed}"
+        );
+        assert!(limit.starts_with("/usr/lib/llvm-14/bin/llvm-ar exceeded the "), "{limit}");
+        assert_eq!(timeout, "/usr/lib/llvm-14/bin/llvm-ar exceeded the 60-second time limit");
+        for message in &messages {
+            assert!(!message.contains("Clang"), "{message}");
+        }
     }
 
     /// Stop a still-running writer when its witness exceeds the shared output budget.
