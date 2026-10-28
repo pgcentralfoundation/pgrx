@@ -199,6 +199,14 @@ fn unknown_gate_cfgs_fail() {
     cfg_holds("feature = \"cshim\"", &Build { major: 18, target_os: "linux" });
 }
 
+/// A file without gates hides no test, so its cfgs need not be ones the guard understands.
+#[test]
+fn files_without_gates_need_no_understood_cfgs() {
+    let build = Build { major: 18, target_os: "linux" };
+    assert!(gates("#![cfg(unix)]\nfn helper() {}\n", &build).is_empty());
+    assert!(gates("#![cfg(target_family = \"unix\")]\n", &build).is_empty());
+}
+
 /// The configuration that decides which gates compile: the `pg<major>` feature and the target
 /// operating system, spelled as Rust's `target_os` cfg spells it.
 struct Build {
@@ -216,17 +224,13 @@ fn gated_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
     for root in ["pgrx-pg-sys/tests", "pgrx-unit-tests/src/tests"] {
         let mut files = Vec::new();
         collect_sources(&workspace.join(root), &mut files);
-        let mut gates = 0;
+        let mut gates_found = 0;
         for file in files {
             let source = std::fs::read_to_string(&file).expect("read gated test source");
-            let gates_in_file = gate_names(&source);
-            gates += gates_in_file.len();
-            if !file_cfgs(&source).all(|predicate| cfg_holds(predicate, build)) {
-                continue;
-            }
             let relative = file.strip_prefix(workspace).unwrap().to_owned();
-            for (name, line_start) in gates_in_file {
-                if !gate_cfgs(&source[..line_start]).all(|predicate| cfg_holds(predicate, build)) {
+            for (name, compiled) in gates(&source, build) {
+                gates_found += 1;
+                if !compiled {
                     continue;
                 }
                 let users = gated.entry(name.to_owned()).or_default();
@@ -236,7 +240,7 @@ fn gated_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
             }
         }
         // An empty scan would make this guard pass vacuously after tests move.
-        assert_ne!(gates, 0, "found no availability gates below {root}");
+        assert_ne!(gates_found, 0, "found no availability gates below {root}");
     }
     gated
 }
@@ -251,6 +255,21 @@ fn collect_sources(directory: &Path, files: &mut Vec<PathBuf>) {
             files.push(path);
         }
     }
+}
+
+/// Return each availability gate in `source` with whether `build` compiles it.
+fn gates<'a>(source: &'a str, build: &Build) -> Vec<(&'a str, bool)> {
+    let names = gate_names(source);
+    // A file without gates hides no test, so its cfgs are not evaluated.
+    let file = !names.is_empty() && file_cfgs(source).all(|predicate| cfg_holds(predicate, build));
+    names
+        .into_iter()
+        .map(|(name, line_start)| {
+            let gate =
+                gate_cfgs(&source[..line_start]).all(|predicate| cfg_holds(predicate, build));
+            (name, file && gate)
+        })
+        .collect()
 }
 
 /// Return each macro name gated by a classifier availability arm or an `if_c_macro!`

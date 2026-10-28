@@ -695,7 +695,10 @@ therefore requires each name gated in `pgrx-pg-sys/tests` and
 assertion-profile differences it lists. It skips a gate that the build compiles
 out through a file-level `#![cfg]` or a single-line `#[cfg]` written directly
 on the gate, so put a platform or version cfg there rather than inside the
-gate. Its report must also record a completed generation.
+gate. The guard evaluates only `target_os = "..."`, `feature = "pgNN"`, `docsrs`
+and `all`, `any` or `not` of them: write `target_os` rather than `unix` or
+`windows`, because any other predicate on a gate, or on a file that has gates,
+fails the test. Its report must also record a completed generation.
 
 ## Generation in extension builds
 
