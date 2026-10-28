@@ -307,3 +307,65 @@ static inline int BODY_LATIN_INSIDE(int value) { return value; /* na\xefve */ }\
     let inside = definition("BODY_LATIN_INSIDE");
     assert!(inside.source.is_none() && inside.body.is_none());
 }
+
+/// Clang names a header it finds through a relative include directory by a path relative to
+/// the working directory. A header with the same relative path beside the main header is
+/// another file, so each definition is read from its own file. Both headers have the same
+/// layout, but only the first splices its directive over the line that adds 1.
+#[test]
+fn headers_with_one_relative_path_keep_their_own_text() {
+    /// The main header's directory, set only in the subprocess that runs in another one.
+    const CHILD: &str = "PGRX_C_MACROS_RELATIVE_PATH_TEST_CHILD";
+    let Some(directory) = std::env::var_os(CHILD) else {
+        let root = tempfile::tempdir().unwrap();
+        let (directory, working) = (root.path().join("main"), root.path().join("working"));
+        for (parent, name, splice) in
+            [(&directory, "BODY_SPAN_A", '\\'), (&working, "BODY_SPAN_B", ' ')]
+        {
+            std::fs::create_dir_all(parent.join("relative")).unwrap();
+            std::fs::write(
+                parent.join("relative/span.h"),
+                format!(
+                    "static inline int {name}(int value)\n{{\n\treturn value\n#if 1 {splice}\n\t+ 1\n#endif\n\t;\n}}\n"
+                ),
+            )
+            .unwrap();
+        }
+        std::fs::write(
+            directory.join("span.h"),
+            "#include \"relative/span.h\"\n#include <span.h>\n",
+        )
+        .unwrap();
+        let output = std::process::Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "headers_with_one_relative_path_keep_their_own_text", "--nocapture"])
+            .env(CHILD, &directory)
+            .current_dir(&working)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        return;
+    };
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-Irelative".into());
+    let header = PathBuf::from(directory).join("span.h");
+    let frontend = inspect(&scanner, &header, &arguments, None).expect("inspect definitions");
+    for (name, body) in [
+        ("BODY_SPAN_A", &["return", "value", ";"][..]),
+        ("BODY_SPAN_B", &["return", "value", "+", "1", ";"][..]),
+    ] {
+        let function = &frontend.declarations().function_signatures[name];
+        let definition = function.definition.clone().expect("proved definition");
+        assert!(definition.source.is_some_and(|source| source.contains(name)), "{name}");
+        let tokens = definition.body.expect("retained body");
+        assert!(
+            tokens.iter().map(|token| token.spelling.as_str()).eq(body.iter().copied()),
+            "{name}"
+        );
+    }
+}

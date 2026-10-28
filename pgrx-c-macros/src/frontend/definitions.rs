@@ -181,7 +181,7 @@ pub(super) fn prove(
     });
     history.popped = popped_names(files.iter().map(|file| file.get_path()));
     let mut definitions = BTreeMap::new();
-    let mut sources = BTreeMap::new();
+    let mut sources = HashMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
     // Clang names a file found through a relative search path relative to the
     // process working directory, which inspection recorded with the profile.
@@ -245,10 +245,13 @@ fn popped_names(files: impl IntoIterator<Item = PathBuf>) -> Option<HashSet<Stri
 /// bytes. Definition text is retained only when it is UTF-8: it is kept as a string, and
 /// libclang spells the body's tokens lossily, which could change a literal. Without that
 /// text, the function gets neither a body nor a native call adapter.
+///
+/// Headers are cached by Clang's file identity, so a definition is read from the file Clang
+/// parsed however its span spells that file's path.
 fn source<'tu>(
     definition: Entity<'tu>,
     directory: &Path,
-    files: &mut BTreeMap<PathBuf, Option<Vec<u8>>>,
+    files: &mut HashMap<File<'tu>, Option<Vec<u8>>>,
     remaining: &mut usize,
     history: &MacroHistory<'tu, '_>,
 ) -> Option<InlineFunctionDefinition> {
@@ -259,10 +262,7 @@ fn source<'tu>(
     let file = start.file?;
     let size = usize::try_from(end.offset.checked_sub(start.offset)?).ok()?;
     let contents = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
-        files
-            .entry(provenance.file.clone())
-            .or_insert_with(|| std::fs::read(file.get_path()).ok())
-            .as_deref()
+        files.entry(file).or_insert_with(|| std::fs::read(file.get_path()).ok()).as_deref()
     } else {
         None
     };
