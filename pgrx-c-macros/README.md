@@ -687,8 +687,10 @@ Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
 when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
 therefore requires each name gated in `pgrx-pg-sys/tests` and
 `pgrx-unit-tests/src/tests` to be emitted, apart from the version and
-assertion-profile differences it lists. Its report must also record a completed
-generation.
+assertion-profile differences it lists. It skips a gate that the build compiles
+out through a file-level `#![cfg]` or a single-line `#[cfg]` written directly
+on the gate, so put a platform or version cfg there rather than inside the
+gate. Its report must also record a completed generation.
 
 ## Generation in extension builds
 
