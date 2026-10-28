@@ -107,11 +107,17 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!(*name) }"),
     ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!((*name)) }"),
     ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!((*holder).name) }"),
+    // Every spelling of a `*const` pointer's dereference reads it as `ReadOnly`.
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!(*cname) }"),
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!((*cname)) }"),
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!(*(cname)) }"),
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!(((*cname))) }"),
     ("DOC_NAME_OF", Kind::Value, "unsafe { DOC_NAME_OF!(holder) }"),
     ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!((*holder).name) }"),
     ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!(*name) }"),
     ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!((*name)) }"),
     ("DOC_PICK", Kind::Value, "unsafe { DOC_PICK!(flag, (*holder).name, (*holder).name) }"),
+    ("DOC_PICK", Kind::Value, "unsafe { DOC_PICK!(flag, *cname, *cname) }"),
     ("DOC_SET", Kind::Value, "unsafe { DOC_SET!(*pointer, value) }"),
     ("DOC_POSTINC", Kind::Value, "unsafe { DOC_POSTINC!(*pointer) }"),
     ("DOC_ACCUM", Kind::Value, "unsafe { DOC_ACCUM!(*counter, *counter) }"),
@@ -158,6 +164,8 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
     ("nested null", "unsafe { DOC_SET!(*slot, DOC_NOTHING!()) };", "E0277"),
     // A nested generated macro where the C macro needs its operand's place.
     ("nested place", "unsafe { DOC_SET!(DOC_FIELD!(record), value) };", "E0745"),
+    ("nested increment", "unsafe { DOC_POSTINC!(DOC_FIELD!(record)) };", "E0745"),
+    ("nested address", "unsafe { DOC_ADDRESS_OF!(DOC_FIELD!(record)) };", "E0745"),
     ("nested read place", "unsafe { DOC_NAME!(DOC_NAME_OF!(holder)) };", "E0745"),
     // The internal native operand form.
     (
@@ -168,7 +176,7 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
 ];
 
 /// Parameters of the functions holding compared invocations.
-const OPERANDS: &str = "record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, name: *mut DocName, holder: *mut DocHolder, counter: *mut DocCounter, bits: *mut DocBits, slot: *mut *mut DocRecord, value: i32, word: u32, flag: i32";
+const OPERANDS: &str = "record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, name: *mut DocName, cname: *const DocName, holder: *mut DocHolder, counter: *mut DocCounter, bits: *mut DocBits, slot: *mut *mut DocRecord, value: i32, word: u32, flag: i32";
 
 /// Rename every fixture macro invoked in `invocation` to its shell.
 fn shell_invocation(invocation: &str) -> String {
