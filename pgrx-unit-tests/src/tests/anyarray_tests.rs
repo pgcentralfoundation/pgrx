@@ -230,6 +230,12 @@ mod tests {
                 array.value::<Vec<String>>(),
                 Err(TryFromDatumError::IncompatibleTypes { .. })
             ));
+            // Each element has the domain's element type.
+            let elements = (&array)
+                .into_iter()
+                .map(|element| element.expect("element is NULL").value::<i32>())
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+            assert_eq!(elements, vec![Some(4), Some(5)]);
             Ok(())
         })
     }

@@ -187,13 +187,13 @@ where
         };
         // SAFETY: `datum` is the handle's array or an untoasted copy of it, so Array does not
         // copy it again, and Array takes the element layout from the array header.
-        // get_element_type takes the OID by value and returns InvalidOid for an OID that names no
-        // array type.
+        // get_base_element_type takes the OID by value, looks through a domain over an array
+        // type, and returns InvalidOid for an OID that names no array type.
         unsafe {
             AnyArrayIterator {
                 inner: Array::<pg_sys::Datum>::from_polymorphic_datum(datum, false, self.typoid)
                     .map(|a| a.into_iter()),
-                typelem: pg_sys::get_element_type(self.typoid),
+                typelem: pg_sys::get_base_element_type(self.typoid),
             }
         }
     }
