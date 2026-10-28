@@ -522,9 +522,10 @@ impl<'a> Fragments<'a> {
 /// One complete item of generated support, with the text before it.
 ///
 /// Text runs from the previous item's end, so each item keeps its `// SAFETY:` and
-/// other comments. Concatenating the texts of a source's items reproduces it.
+/// other comments. Concatenating the texts of a source's items and the root's
+/// trailing text reproduces it.
 pub(super) enum SupportItem<'a> {
-    /// Any item other than an inline module, or the text after a scope's last item.
+    /// Any item other than an inline module.
     Item {
         /// The item's source, including leading comments and attributes.
         text: &'a str,
@@ -558,21 +559,21 @@ impl<'a> SupportItem<'a> {
     }
 }
 
-/// Split generated support into its items, recursively through inline modules.
+/// Split generated support into its items, recursively through inline modules, and
+/// the text after the last root item.
 ///
-/// Inner attributes are rejected: support is published in fragments included into
-/// the defining crate, and an inner attribute cannot follow other items there.
-pub(super) fn support_items(source: &str) -> eyre::Result<Vec<SupportItem<'_>>> {
+/// That trailing text holds only whitespace and comments, so it declares nothing; a
+/// module's trailing text is part of its `close`. Inner attributes are rejected:
+/// support is published in fragments included into the defining crate, and an inner
+/// attribute cannot follow other items there.
+pub(super) fn support_items(source: &str) -> eyre::Result<(Vec<SupportItem<'_>>, &str)> {
     let parsed = syn::parse_file(source).wrap_err("generated C macro support is invalid Rust")?;
     if !parsed.attrs.is_empty() {
         return Err(eyre!("generated C macro support must not contain inner attributes"));
     }
     let offsets = SourceOffsets::new(source);
-    let (mut items, end) = scope_items(&offsets, &parsed.items, 0)?;
-    if end < source.len() {
-        items.push(SupportItem::Item { text: &source[end..], name: None, macro_name: None });
-    }
-    Ok(items)
+    let (items, end) = scope_items(&offsets, &parsed.items, 0)?;
+    Ok((items, &source[end..]))
 }
 
 /// Split one scope's items starting at `cursor`, returning them and the last item's end.
@@ -653,9 +654,19 @@ pub(super) fn partition_support(
     if source.is_empty() {
         return Ok(Vec::new());
     }
+    let (items, trailing) = support_items(source)?;
+    partition_items(&items, trailing, files)
+}
+
+/// Write already split support as [`partition_support`] does.
+pub(super) fn partition_items(
+    items: &[SupportItem<'_>],
+    trailing: &str,
+    files: &mut BTreeMap<PathBuf, String>,
+) -> eyre::Result<Vec<PathBuf>> {
     let mut pieces = Vec::new();
     let mut native_seen = false;
-    for item in support_items(source)? {
+    for item in items {
         match item {
             SupportItem::Module { name, open, items, close, .. }
                 if name == "__pgrx_c_generated" =>
@@ -665,7 +676,7 @@ pub(super) fn partition_support(
                 }
                 native_seen = true;
                 let mut native = Fragments::new("native", files);
-                for item in &items {
+                for item in items {
                     native.push(item.text())?;
                 }
                 // The module's closing brace stays with its declaration.
@@ -673,7 +684,7 @@ pub(super) fn partition_support(
                     .strip_suffix('}')
                     .ok_or_else(|| eyre!("native support module has no closing brace"))?;
                 native.push(trailing)?;
-                let mut shell = open.to_owned();
+                let mut shell = (*open).to_owned();
                 shell.push('\n');
                 for fragment in native.finish()? {
                     let filename = fragment
@@ -690,6 +701,9 @@ pub(super) fn partition_support(
             }
             item => pieces.push(item.text().to_owned()),
         }
+    }
+    if !trailing.is_empty() {
+        pieces.push(trailing.to_owned());
     }
     let mut shared = Fragments::new("shared", files);
     for piece in pieces {

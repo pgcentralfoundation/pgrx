@@ -1698,14 +1698,18 @@ The snapshot merges versions:
 4. Support is split into items at every inline module, each keeping its leading
    comments. Items merge per module by their text and their occurrence number in
    the version, so an item a version repeats is kept, and an item in only some
-   versions is gated to them. A module must be declared identically in every
-   version. Each version's own `__pgrx_c_classify` is dropped; the snapshot root
-   writes one merged availability classifier for `if_c_macro!`.
+   versions is gated to them. Comments after the last root item declare nothing
+   and are dropped, since a gate before them would apply to the next item. A
+   module must be declared identically in every version. Each version's own
+   `__pgrx_c_classify` is dropped; the snapshot root writes one merged
+   availability classifier for `if_c_macro!`.
 5. Selecting each version from the merged tree must reproduce exactly that
    version's macros, locations and support items in each module, and one macro's
    gates must be disjoint and cover the versions defining it. Every
    `$crate::__pgrx_c_generated::X`, `$crate::__pgrx_c_types::X` and `$crate::X!`
    a shell names must be defined by the support of each version it is gated to.
+   The rendered support must split back into exactly the merged items, each
+   preceded by its own gate.
 
 Release generation keeps the committed bindings and snapshot coherent:
 

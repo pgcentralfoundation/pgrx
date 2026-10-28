@@ -15,11 +15,11 @@
 //! macro sit next to each other in its header's module. Before rendering, selecting
 //! each version from the merged snapshot must reproduce exactly that version's macros
 //! and support items, and every support item a shell names must be defined by each
-//! version the shell is gated to.
+//! version the shell is gated to. After rendering, the support source must split into
+//! exactly the merged items, each preceded by its own gate.
 
 use super::macro_files::{
-    Directory, HeaderPaths, MacroFiles, SupportItem, cfg_attribute, partition_support,
-    support_items,
+    Directory, HeaderPaths, MacroFiles, SupportItem, cfg_attribute, partition_items, support_items,
 };
 use eyre::eyre;
 use pgrx_c_macros::{DocumentedResult, EmissionStatus, MacroDocumentation, MacroEmission};
@@ -225,7 +225,7 @@ impl<'a> SupportModule<'a> {
             match item {
                 SupportItem::Item { text, macro_name, .. } => {
                     let text = text.trim();
-                    if text.is_empty() || (root && macro_name.as_deref() == Some(CLASSIFIER)) {
+                    if root && macro_name.as_deref() == Some(CLASSIFIER) {
                         continue;
                     }
                     let occurrence = occurrences.entry(text).or_default();
@@ -307,6 +307,29 @@ impl<'a> SupportModule<'a> {
         }
     }
 
+    /// Whether `rendered`, this module's rendered source split again, holds exactly its
+    /// entries in order, each preceded by its own gate within `scope`.
+    ///
+    /// A gate is an outer attribute, which applies to the next item in the source. A
+    /// gate followed by text without an item would gate the following entry instead.
+    fn renders_as(&self, scope: &BTreeSet<u16>, rendered: &[SupportItem<'_>]) -> bool {
+        self.entries.len() == rendered.len()
+            && self.entries.iter().zip(rendered).all(|(entry, rendered)| match (entry, rendered) {
+                (SupportEntry::Item { text, versions }, SupportItem::Item { text: actual, .. }) => {
+                    actual.trim() == format!("{}{text}", cfg_attribute(versions, scope))
+                }
+                (
+                    SupportEntry::Module { open, close, versions, module, .. },
+                    SupportItem::Module { open: actual_open, items, close: actual_close, .. },
+                ) => {
+                    actual_open.trim() == format!("{}{open}", cfg_attribute(versions, scope))
+                        && actual_close.trim() == *close
+                        && module.renders_as(versions, items)
+                }
+                _ => false,
+            })
+    }
+
     /// Record the items `major` selects from this module, per module path.
     fn project(&self, major: u16, path: &mut Vec<&'a str>, inventory: &mut Inventory<'a>) {
         inventory.entry(path.clone()).or_default();
@@ -342,8 +365,7 @@ fn inventory<'a>(
         match item {
             SupportItem::Item { text, macro_name, .. } => {
                 let text = text.trim();
-                if text.is_empty() || (path.is_empty() && macro_name.as_deref() == Some(CLASSIFIER))
-                {
+                if path.is_empty() && macro_name.as_deref() == Some(CLASSIFIER) {
                     continue;
                 }
                 *counts.entry(path.clone()).or_default().entry(text).or_default() += 1;
@@ -533,9 +555,11 @@ pub(super) fn snapshot_files(
     versions: &[SnapshotVersion],
     supported: &[u16],
 ) -> eyre::Result<MacroFiles> {
+    // Text after a version's last root item is whitespace and comments. It declares
+    // nothing, and a gate written before it would apply to the next merged item.
     let support = versions
         .iter()
-        .map(|version| support_items(&version.support))
+        .map(|version| support_items(&version.support).map(|(items, _)| items))
         .collect::<eyre::Result<Vec<_>>>()?;
     let merged = merge(versions, &support)?;
     verify(versions, &support, &merged)?;
@@ -579,8 +603,12 @@ pub(super) fn snapshot_files(
     }
     let mut source = String::new();
     merged.support.render(all, &mut source);
+    let (rendered, trailing) = support_items(&source)?;
+    if !trailing.trim().is_empty() || !merged.support.renders_as(all, &rendered) {
+        return Err(eyre!("the rendered snapshot support does not reproduce its merged items"));
+    }
     let mut files = BTreeMap::new();
-    for fragment in partition_support(&source, &mut files)? {
+    for fragment in partition_items(&rendered, trailing, &mut files)? {
         writeln!(
             index,
             "include!({:?});",
@@ -869,7 +897,7 @@ mod tests {
             [version(15, &[], support("pub enum Field_old {}\n")), version(16, &[], support(""))];
         let support = versions
             .iter()
-            .map(|version| support_items(&version.support).unwrap())
+            .map(|version| support_items(&version.support).unwrap().0)
             .collect::<Vec<_>>();
         // Set the gate of pg15's Field_old item in the merged `__pgrx_c_generated`.
         fn gate(merged: &mut Merged<'_>, versions: &[u16]) {
@@ -901,6 +929,59 @@ mod tests {
         gate(&mut merged, &[]);
         let error = verify(&versions, &support, &merged).err().unwrap().to_string();
         assert!(error.contains("pg15's support items in __pgrx_c_generated"), "{error}");
+    }
+
+    /// Checks that text after a version's last root item is dropped rather than gated.
+    /// A gate written before a comment applies to the next merged item, which would
+    /// gate pg16's `B` to pg15 as well and remove it from every build.
+    #[test]
+    fn trailing_root_comments_are_not_gated() {
+        let versions = [
+            version(15, &[], "pub const A: u8 = 1;\n// trailing note\n".into()),
+            version(16, &[], "pub const A: u8 = 1;\npub const B: u8 = 2;\n".into()),
+        ];
+        let support = support_source(&snapshot_files(&versions, &[15, 16]).unwrap());
+        assert!(!support.contains("// trailing note"), "{support}");
+        let gates = syn::parse_file(&support)
+            .unwrap()
+            .items
+            .iter()
+            .map(|item| match item {
+                syn::Item::Const(item) => (item.ident.to_string(), item.attrs.len()),
+                item => panic!("unexpected support item {item:?}"),
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(gates, [("A".to_owned(), 0), ("B".to_owned(), 1)]);
+        assert!(support.contains("#[cfg(feature = \"pg16\")]\npub const B: u8 = 2;"));
+    }
+
+    /// Checks that the rendered support must split into the merged entries, so a gate
+    /// that would apply to another item is rejected.
+    #[test]
+    fn rendering_check_rejects_a_gate_reaching_another_item() {
+        let versions = [
+            version(15, &[], "pub const A: u8 = 1;\n".into()),
+            version(16, &[], "pub const A: u8 = 1;\npub const B: u8 = 2;\n".into()),
+        ];
+        let support = versions
+            .iter()
+            .map(|version| support_items(&version.support).unwrap().0)
+            .collect::<Vec<_>>();
+        let mut merged = merge(&versions, &support).unwrap();
+        let render = |merged: &Merged<'_>| {
+            let mut source = String::new();
+            merged.support.render(&merged.all, &mut source);
+            source
+        };
+        let source = render(&merged);
+        assert!(merged.support.renders_as(&merged.all, &support_items(&source).unwrap().0));
+        // An entry without an item passes its gate to `B`.
+        merged
+            .support
+            .entries
+            .insert(1, SupportEntry::Item { text: "// note", versions: BTreeSet::from([15]) });
+        let source = render(&merged);
+        assert!(!merged.support.renders_as(&merged.all, &support_items(&source).unwrap().0));
     }
 
     /// Checks that a shell may not name support its gated versions lack.
