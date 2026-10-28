@@ -2886,8 +2886,13 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
             | "__riscv_float_abi_soft"
             | "__riscv_float_abi_single"
             | "__riscv_float_abi_double"
+            | "__FAST_MATH__"
+            | "__FINITE_MATH_ONLY__"
     ) || name.starts_with("__SIZEOF_")
         || name.starts_with("__pgrx_c_")
+        // Floating representation macros and __FLT_EVAL_METHOD__, the only witness of excess
+        // precision, decide whether float values and arithmetic can lower to Rust.
+        || ["__FLT_", "__DBL_", "__LDBL_"].into_iter().any(|prefix| name.starts_with(prefix))
         || (name.ends_with("_TYPE__") && (name.starts_with("__INT") || name.starts_with("__UINT")));
     if protected {
         return Err(FrontendError::Arguments(format!(
@@ -3947,6 +3952,14 @@ mod tests {
             vec!["-D__INT_MAX__(x)=x"],
             vec!["-D__UINT64_TYPE__=unsigned_char"],
             vec!["-D__pgrx_c_int=forged"],
+            vec!["-D__FLT_EVAL_METHOD__=0"],
+            vec!["-U__FLT_EVAL_METHOD__"],
+            vec!["-D__FLT_RADIX__=10"],
+            vec!["-D__DBL_MANT_DIG__=64"],
+            vec!["-U__LDBL_HAS_INFINITY__"],
+            vec!["-D__FAST_MATH__"],
+            vec!["-D__FINITE_MATH_ONLY__=0"],
+            vec!["-Wp,-D__FLT_EVAL_METHOD__=0"],
             vec!["-Wp,-D__STDC_VERSION__=202311L"],
             vec!["-Wp,-D__BYTE_ORDER__=__ORDER_BIG_ENDIAN__"],
             vec!["-Xclang=-D", "-Xclang=__STDC_VERSION__=202311L"],

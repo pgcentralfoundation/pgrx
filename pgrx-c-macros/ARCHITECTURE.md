@@ -818,7 +818,9 @@ Composed floating arithmetic has stricter requirements for contraction,
 evaluation precision, and recorded floating modes. A changed runtime rounding
 or exception environment and overriding source pragmas are outside that
 contract. Floating literals are not implied to be supported by support for
-native float values.
+native float values. `__FLT_EVAL_METHOD__` is the only excess-precision witness,
+so caller `-D`/`-U` options cannot name it, the other `__FLT_*`, `__DBL_*` or
+`__LDBL_*` facts, `__FAST_MATH__`, or `__FINITE_MATH_ONLY__`.
 
 Verified byte-swap builtins lower to Rust operations with the C result identity.
 Branch hints lower to Rust support with cold paths while preserving C operand
