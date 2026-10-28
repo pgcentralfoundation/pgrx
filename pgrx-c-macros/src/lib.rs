@@ -575,16 +575,9 @@ fn collect_macro_inventory(
             .tokenize()
             .into_iter()
             .map(|token| {
-                let spelling = token.get_spelling();
                 // Some Clang token spellings retain physical line continuations, including
                 // a continuation between a macro name and its opening parenthesis.
-                let spelling = if spelling.contains('\\')
-                    && (spelling.contains('\n') || spelling.contains('\r'))
-                {
-                    spelling.replace("\\\r\n", "").replace("\\\n", "").replace("\\\r", "")
-                } else {
-                    spelling
-                };
+                let spelling = unspliced(token.get_spelling());
                 Token {
                     kind: match token.get_kind() {
                         clang::token::TokenKind::Comment => TokenKind::Comment,
@@ -625,6 +618,35 @@ fn collect_macro_inventory(
     Ok(MacroInventory { macros, diagnostics })
 }
 
+/// A token's spelling without line splices.
+///
+/// libclang spells punctuation, literals and comments from the source buffer, so they keep a
+/// splice inside them, and a token that follows a splice begins at its backslash. As in Clang,
+/// a backslash followed by optional blanks (space, tab, vertical tab, form feed) and a line
+/// end (LF, CR, CR-LF or LF-CR) is removed. Removal is one pass, so a backslash that precedes
+/// a removed splice is kept.
+fn unspliced(spelling: String) -> String {
+    if !spelling.contains('\\') {
+        return spelling;
+    }
+    let mut result = String::with_capacity(spelling.len());
+    let mut rest = spelling.as_str();
+    while let Some(at) = rest.find('\\') {
+        result.push_str(&rest[..at]);
+        let after = &rest[at + 1..];
+        let line = after.trim_start_matches([' ', '\t', '\x0b', '\x0c']);
+        match ["\r\n", "\n\r", "\n", "\r"].into_iter().find_map(|end| line.strip_prefix(end)) {
+            Some(next) => rest = next,
+            None => {
+                result.push('\\');
+                rest = after;
+            }
+        }
+    }
+    result.push_str(rest);
+    result
+}
+
 /// Copy the physical spelling location used for diagnostics and provenance ownership checks.
 fn source_location(location: clang::source::SourceLocation<'_>) -> Option<SourceLocation> {
     let location = location.get_spelling_location();
@@ -660,6 +682,32 @@ impl fmt::Display for MacroDefinition {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Splices follow Clang: blanks may separate the backslash from any line end, and other
+    /// backslashes, including one before a removed splice, remain.
+    #[test]
+    fn unspliced_removes_backslash_blanks_and_any_line_end() {
+        for (raw, clean) in [
+            ("{", "{"),
+            ("\\\n{", "{"),
+            ("\\\r\n{", "{"),
+            ("\\\r{", "{"),
+            ("\\\n\r{", "{"),
+            ("\\  \n{", "{"),
+            ("\\\t\r\n{", "{"),
+            ("\\\x0b\x0c\n{", "{"),
+            ("1\\ \n2\\\t\n3", "123"),
+            ("<\\ \t\n<", "<<"),
+            ("'\\\\'", "'\\\\'"),
+            ("\"a\\n\"", "\"a\\n\""),
+            ("\\ x", "\\ x"),
+            ("\\", "\\"),
+            ("\\\\\n\n", "\\\n"),
+            ("\\\n\\\n#", "#"),
+        ] {
+            assert_eq!(unspliced(raw.into()), clean, "{raw:?}");
+        }
+    }
 
     /// A parse failure names its errors with their locations, skips warnings and notes, and
     /// counts errors beyond the listed ones instead of printing a cascade.

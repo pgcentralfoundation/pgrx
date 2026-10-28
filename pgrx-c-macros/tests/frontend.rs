@@ -277,6 +277,74 @@ fn final_environment_tracks_undefinition_redefinition_restoration_and_ambiguity(
     assert!(output.environment().active.contains_key("FRONT_RESTORED"));
 }
 
+/// Clang splices a backslash followed by blanks and a line end, with only a warning. Token
+/// spellings must lose those splices too, or a definition no longer matches the compiler's
+/// final macro dump and loses its source identity.
+#[test]
+fn line_splices_after_trailing_blanks_keep_definition_identity() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().expect("own a temporary header directory");
+    let header = directory.path().join("splices.h");
+    // Byte escapes keep the blanks after each backslash out of reach of editors and
+    // whitespace checks.
+    std::fs::write(
+        &header,
+        b"#define SPLICE_PLAIN(x) ((x) +\\\n1)\n\
+          #define SPLICE_SPACES(x) ((x) +\\  \n2)\n\
+          #define SPLICE_TAB_CRLF(x) ((x) -\\\t\r\n3)\n\
+          #define SPLICE_FORM_FEED(x) ((x) *\\\x0b\x0c\n4)\n\
+          #define SPLICE_LITERAL(x) ((x) + 1\\ \n2)\n\
+          #define SPLICE_PUNCTUATION(x) ((x) <\\ \t\n< 1)\n",
+    )
+    .unwrap();
+    let spellings = [
+        ("SPLICE_PLAIN", "1"),
+        ("SPLICE_SPACES", "2"),
+        ("SPLICE_TAB_CRLF", "3"),
+        ("SPLICE_FORM_FEED", "4"),
+        ("SPLICE_LITERAL", "12"),
+        ("SPLICE_PUNCTUATION", "<<"),
+    ];
+    let inventory = scanner.scan(&header, &[]).unwrap();
+    for (name, spelling) in spellings {
+        let definition =
+            inventory.macros.iter().find(|definition| definition.name == name).unwrap();
+        assert!(
+            definition.tokens.iter().all(|token| !token.spelling.contains(['\\', '\r', '\n'])),
+            "{name}: {:?}",
+            definition.tokens
+        );
+        assert!(definition.tokens.iter().any(|token| token.spelling == spelling), "{name}");
+    }
+    let output = inspect(&scanner, &header, &[], None).expect("inspect spliced header");
+    let names = spellings.map(|(name, _)| name);
+    for name in names {
+        let active = &output.environment().active[name];
+        assert!(matches!(active.provenance, ActiveProvenance::Resolved), "{name}");
+        assert!(active.definition.provenance.is_some(), "{name}");
+    }
+    let session = AnalysisSession::prepare(&scanner, &output, &names).unwrap();
+    for name in names {
+        let analysis = session.analyze(name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Emitted { .. }), "{name}");
+    }
+    let values = oracle::run_c(
+        &output.profile().compiler.executable,
+        &header,
+        "_Static_assert(SPLICE_PLAIN(10) == 11, \"plain splice\");\n\
+         _Static_assert(SPLICE_SPACES(10) == 12, \"splice after spaces\");\n\
+         _Static_assert(SPLICE_TAB_CRLF(10) == 7, \"splice after a tab and CR-LF\");\n\
+         _Static_assert(SPLICE_FORM_FEED(10) == 40, \"splice after vertical tab and form feed\");\n\
+         _Static_assert(SPLICE_LITERAL(10) == 22, \"splice inside a literal\");\n\
+         _Static_assert(SPLICE_PUNCTUATION(1) == 2, \"splice inside a punctuator\");\n",
+        &output.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(values.is_empty(), "{values}");
+}
+
 /// Identical command-line replacement observations share one source-less context, while
 /// the final driver state still controls later undefinition and override values.
 #[test]

@@ -355,11 +355,13 @@ origin or record unresolved/ambiguous provenance. Logical `#line` locations do
 not establish physical file ownership. Keep the main file's original spelling:
 canonicalizing it for invocation could change symlink-relative quoted includes.
 Ignore comment tokens in matching and deduplicate repeated observations of the
-same physical `(file, offset)` definition. Within one exact signature, repeated
-definitions without a physical location describe one compiler or command-line
-context; they do not create competing header origins. A source-less match remains
-distinct from every physical match, so mixed origins still require an ambiguity
-report. Tokenize the driver dump through a
+same physical `(file, offset)` definition. Discovered token spellings drop line
+splices as Clang does, including a backslash followed by blanks before the line
+end, so they compare equal to the dump's spellings. Within one exact signature,
+repeated definitions without a physical location describe one compiler or
+command-line context; they do not create competing header origins. A source-less
+match remains distinct from every physical match, so mixed origins still require
+an ambiguity report. Tokenize the driver dump through a
 protected replay with terminal markers so one literal trailing backslash cannot
 splice the next dumped definition.
 
