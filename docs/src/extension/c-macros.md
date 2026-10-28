@@ -27,9 +27,15 @@ Keep the caller's length checks, resource lifetimes, and backend-thread
 restrictions. For example, `VARSIZE_ANY!` reads raw storage, and
 `CHECK_FOR_INTERRUPTS!` accesses backend state and can raise a PostgreSQL error.
 A generated macro that reads storage or backend state needs an `unsafe` block
-even where the helper it replaces was safe. In particular, `check_for_interrupts!()`
-and `pg_sys::elog::interrupt_pending()` were safe, while `CHECK_FOR_INTERRUPTS!`
-and `INTERRUPTS_PENDING_CONDITION!` are not. On Windows,
+even where the helper it replaces was safe. In particular, `check_for_interrupts!()`,
+`pg_sys::elog::interrupt_pending()`, `pgrx::htup::heap_tuple_header_get_datum_length`,
+`pgrx::itemptr::item_pointer_set_all`, and `FcInfo::srf_is_initialized` were safe,
+while `CHECK_FOR_INTERRUPTS!`, `INTERRUPTS_PENDING_CONDITION!`,
+`HeapTupleHeaderGetDatumLength!`, `ItemPointerSet!`, and `SRF_IS_FIRSTCALL!` are
+not. `ItemPointerSet!` can also be a native call that panics off the backend
+thread, depending on the version, the build and libclang; the safe
+`u64_to_item_pointer` and `new_item_pointer` build an item pointer in Rust instead.
+On Windows,
 `INTERRUPTS_PENDING_CONDITION!` also dispatches queued signals through
 `pgwin32_dispatch_queued_signals`, where `interrupt_pending()` only read
 `InterruptPending`.
@@ -102,13 +108,13 @@ yourself where the input is not already known to be valid.
 
 | Removed | Generated replacement | Check the removed helper made |
 | --- | --- | --- |
-| The other `pgrx` varlena helpers: `set_varsize_4b`, `set_varsize_1b`, `set_varsize_short`, `varsize`, `varsize_4b`, `varsize_1b`, `varsize_any_exhdr`, `varsize_external`, `vardata_1b`, `vardata_4b`, `vardata_4b_c`, `vardata_1b_e`, `varatt_is_1b`, `varatt_is_1b_e`, `varatt_is_4b`, `varatt_is_4b_u`, `varatt_is_4b_c`, `varatt_not_pad_byte`, `vartag_1b_e`, `vartag_external`, `vartag_is_expanded`, `vartag_size` | The upper-case macro, such as `VARSIZE_ANY_EXHDR!` | `vartag_size` panicked on an unknown tag; `VARTAG_SIZE!` returns 0 |
+| The other `pgrx` varlena helpers: `set_varsize_4b`, `set_varsize_1b`, `set_varsize_short`, `varsize`, `varsize_4b`, `varsize_1b`, `varsize_any_exhdr`, `varsize_external`, `vardata_1b`, `vardata_4b`, `vardata_4b_c`, `vardata_1b_e`, `varatt_is_1b`, `varatt_is_1b_e`, `varatt_is_4b`, `varatt_is_4b_u`, `varatt_is_4b_c`, `varatt_not_pad_byte`, `vartag_1b_e`, `vartag_external`, `vartag_is_expanded`, `vartag_size` | The upper-case macro, such as `VARSIZE_ANY_EXHDR!` | `vartag_size` panicked on an unknown tag. Given one, `VARTAG_SIZE!` aborts an assert-enabled server and otherwise returns 1 on PG15 and 0 on PG16–19, so check the tag first |
 | `pgrx::pg_arg_is_null`, `pg_getarg_datum`, `pg_getarg_datum_raw` | `PG_ARGISNULL!(n, fcinfo)`, `PG_GETARG_DATUM!(n, fcinfo)`, or the checked `pgrx::fcinfo::pg_get_nullable_datum(fcinfo, n)` | Non-NULL `fcinfo` and `n < nargs` |
 | `pgrx::pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` | `pg_get_collation` and `pg_return_null` required a non-NULL `fcinfo` |
-| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` | None |
-| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()` | None |
+| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` | None. The removed `srf_return_next` and `srf_return_done` only updated the call state; `SRF_RETURN_NEXT!(funcctx, result, fcinfo)` and `SRF_RETURN_DONE!` also return from the calling function |
+| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()`. `srf_is_initialized` is the negation of `SRF_IS_FIRSTCALL!`, so replace `fcinfo.srf_is_initialized()` with `!SRF_IS_FIRSTCALL!(fcinfo.as_mut_ptr()).is_true()` | None; the return macros return as in the row above |
 | `RetAbi::finish_call_fcinfo` | None. pgrx never called it; remove overrides | — |
-| `pgrx::htup::heap_tuple_header_get_datum_length`, `heap_tuple_get_datum`, `heap_tuple_header_get_type_id`, `heap_tuple_header_get_typmod` | `HeapTupleHeaderGetDatumLength!`, `HeapTupleGetDatum!`, `HeapTupleHeaderGetTypeId!`, `HeapTupleHeaderGetTypMod!` | Non-NULL header |
+| `pgrx::htup::heap_tuple_header_get_datum_length`, `heap_tuple_get_datum`, `heap_tuple_header_get_type_id`, `heap_tuple_header_get_typmod` | `HeapTupleHeaderGetDatumLength!`, `HeapTupleGetDatum!` or the guarded `pg_sys::HeapTupleHeaderGetDatum((*tuple).t_data)`, which returns a `pg_sys::Datum`, `HeapTupleHeaderGetTypeId!`, `HeapTupleHeaderGetTypMod!` | Non-NULL header, except `heap_tuple_get_datum`, which checked nothing |
 | `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
 | `pgrx::itemptr::item_pointer_get_block_number_no_check`, `item_pointer_get_offset_number_no_check`, `item_pointer_set_all`, `item_pointer_is_valid` | `ItemPointerGetBlockNumberNoCheck!`, `ItemPointerGetOffsetNumberNoCheck!`, `ItemPointerSet!`, `ItemPointerIsValid!`; or the safe `item_pointer_get_both`, `u64_to_item_pointer`, and `new_item_pointer` | None |
 | `pgrx::trigger_support::called_as_trigger`, `trigger_fired_by_insert` and the other `trigger_fired_*` helpers | `CALLED_AS_TRIGGER!`, `TRIGGER_FIRED_BY_INSERT!`, and so on | `called_as_trigger` required a non-NULL `fcinfo` |
@@ -162,9 +168,10 @@ PG15 and PG16, because later PostgreSQL headers no longer define it.
 
 ### Other API changes
 
-`IntoDatum for i8` widens SQL `"char"` the way PostgreSQL's `CharGetDatum` does.
-On targets where C `char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()`
-now holds `0xFF` instead of all one bits. `FromDatum for i8` reads both as `-1`.
+`IntoDatum for i8` widens SQL `"char"` the way PostgreSQL's `CharGetDatum` does,
+and so does an `i8` returned from a `#[pg_extern]` function. On targets where C
+`char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()` now holds `0xFF`
+instead of all one bits. `FromDatum for i8` reads both as `-1`.
 
 `pg_sys::Datum`'s integer conversions now follow Rust's exposed-provenance
 rules. `Datum::value()` and `usize::from(datum)` expose a pointer's provenance,
