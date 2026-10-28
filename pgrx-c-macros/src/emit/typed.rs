@@ -101,6 +101,8 @@ pub(super) struct Renderer<'a> {
     lowering: &'a Lowering<'a>,
     /// Whether the selected profile permits the floating expression combinations in this macro.
     floats: bool,
+    /// Whether the selected profile permits floating values outside composed arithmetic.
+    float_values: bool,
     /// Arena-indexed addressability facts propagated once through groups and member chains.
     places: Vec<bool>,
     /// Compiler-proved object types; unresolved caller families intentionally remain None.
@@ -170,7 +172,8 @@ impl<'a> Renderer<'a> {
                 }
             )
         });
-        let floats = frontend.profile().supports_float_values().is_ok()
+        let float_values = frontend.profile().supports_float_values().is_ok();
+        let floats = float_values
             && (!(multiplication && addition)
                 || frontend.profile().supports_float_expressions().is_ok());
         // Children precede their parents in the expression arena. One pass
@@ -208,6 +211,7 @@ impl<'a> Renderer<'a> {
             constants,
             lowering,
             floats,
+            float_values,
             places,
             objects,
             locals,
@@ -247,6 +251,47 @@ impl<'a> Renderer<'a> {
             .filter(|marker| lowered == format!("{SUPPORT}::{marker}"))
             .and_then(|_| super::rust_identifier(spelling))
             .map_or_else(|| lowered.to_owned(), |name| format!("$crate::__pgrx_c_types::{name}"))
+    }
+
+    /// Refuse a body that declares or computes a floating value the profile for its
+    /// composed arithmetic rejects. Each value use checks that profile, and the types of a
+    /// translated function's body do not depend on its caller, so no call would compile.
+    pub(super) fn check_own_floats(&self) -> Result<(), SkipReason> {
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        let floating = |ty: &TypeInfo| ty.category == TypeCategory::Floating;
+        if self.floats
+            || !(self.locals.values().any(|local| floating(&local.ty))
+                || expression.types.iter().any(|ty| {
+                    matches!(ty, crate::analysis::TypeExpression::External { ty } if floating(ty))
+                }))
+        {
+            return Ok(());
+        }
+        let profile = self.frontend.profile();
+        let reason = profile
+            .supports_float_values()
+            .and_then(|()| profile.supports_float_expressions())
+            .err()
+            .unwrap_or_default();
+        Err(skip(
+            self.analysis,
+            SkipReasonCode::UnsupportedProfile,
+            format!("floating values in this body's arithmetic are not supported: {reason}"),
+            None,
+        ))
+    }
+
+    /// Lower a translated function's argument for its parameter's initialization.
+    ///
+    /// Converting the argument to its parameter type is a call boundary, not part of the
+    /// body's composed arithmetic, so it uses the profile for single floating values that a
+    /// native call's arguments use.
+    pub(super) fn render_argument(
+        &self,
+        root: NodeId,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        self.render_profiled(root, Context::Value, self.float_values, rust)
     }
 
     /// Allocate hygienic local storage and apply the declared C conversion when an initializer is present.
@@ -363,14 +408,19 @@ impl<'a> Renderer<'a> {
         context: Context,
         rust: &mut String,
     ) -> Result<(), SkipReason> {
-        let (frontend, analysis, bindings, constants, lowering, floats) = (
-            self.frontend,
-            self.analysis,
-            self.bindings,
-            self.constants,
-            self.lowering,
-            self.floats,
-        );
+        self.render_profiled(root, context, self.floats, rust)
+    }
+
+    /// Lower one arena root under an explicit floating-point profile.
+    fn render_profiled(
+        &self,
+        root: NodeId,
+        context: Context,
+        floats: bool,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        let (frontend, analysis, bindings, constants, lowering) =
+            (self.frontend, self.analysis, self.bindings, self.constants, self.lowering);
         let expression = analysis.expression.as_ref().expect("candidate expression");
         let policy = match analysis.signed_overflow {
             SignedOverflow::Undefined => "Undefined",

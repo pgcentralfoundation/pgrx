@@ -32,6 +32,7 @@ int main(void)
     printf("argument late\t%d\n", BODY_ARGUMENT_LATE(1));
     printf("rescan\t%d\t%d\t%d\n", BODY_RESCAN(3), BODY_RESCAN_ARGUMENT(3), BODY_RESCAN_TARGET(3));
     printf("string\t%d\t%d\n", BODY_STRING_SIZE(0), BODY_STRING_CHAR(0));
+    printf("floats\t%g\t%d\t%d\n", BODY_FMA(2.0, 3.0, 1.0), BODY_INT_FMA(2, 3.0), BODY_ORDER(1.5, 2, 3));
     printf("template\t%d\t%d\t%d\t%d\n", BODY_FIRST_VALUE(), BODY_SECOND_VALUE(),
            BODY_FIRST_BRANCH(10), BODY_SECOND_BRANCH(10));
     printf("guarded\t%d\t%d\n", BODY_GUARDED_FIRST(), BODY_GUARDED_SECOND());

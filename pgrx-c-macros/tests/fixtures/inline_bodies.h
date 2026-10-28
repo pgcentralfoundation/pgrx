@@ -136,6 +136,12 @@ static inline int BODY_RESCAN_TARGET(int value) { return value + 1; }
 static inline int BODY_RESCAN(int value) { return BODY_RESCAN_SELECT(BODY_RESCAN_TARGET)(value); }
 static inline int BODY_RESCAN_ARGUMENT(int value) { return BODY_RESCAN_APPLY(BODY_RESCAN_TARGET, value); }
 #undef BODY_RESCAN_TARGET
+/* Without -ffp-contract=off, a body that multiplies and adds has no floating profile, so
+ * its own floating values keep the native call. Arguments still convert to their
+ * integer parameters as in a call. */
+static inline double BODY_FMA(double a, double b, double c) { return a * b + c; }
+static inline int BODY_INT_FMA(int a, double unused) { return a * 2 + 1; }
+static inline int BODY_ORDER(int a, int b, int c) { return a * 100 + b * 10 + c; }
 /* Stringification spells its argument with the body's original spacing. */
 #define BODY_STRING(text) #text
 #define BODY_STRING_OF(text) BODY_STRING(text)

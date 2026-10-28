@@ -99,6 +99,12 @@ fn main() {
             BODY_STRING_CHAR!(0_i32).get()
         );
         println!(
+            "floats\t{}\t{}\t{}",
+            BODY_FMA!(2.0_f64, 3.0_f64, 1.0_f64).get(),
+            BODY_INT_FMA!(2_i32, 3.0_f64).get(),
+            BODY_ORDER!(1.5_f64, 2_i32, 3_i32).get()
+        );
+        println!(
             "template\t{}\t{}\t{}\t{}",
             BODY_FIRST_VALUE!().get(),
             BODY_SECOND_VALUE!().get(),

@@ -89,6 +89,7 @@ pub(super) fn render_inline(
     if marker.is_none() && body.return_tokens.is_some() {
         return refuse("a translated void function cannot return", body.return_tokens);
     }
+    renderer.check_own_floats()?;
     let count = analysis.parameters.len();
     let Some((parameters, statements)) = body.statements.split_at_checked(count) else {
         return refuse("a translated function body lacks its parameter declarations", None);
@@ -113,7 +114,7 @@ pub(super) fn render_inline(
                 Some(*tokens),
             );
         }
-        renderer.render(*initializer, typed::Context::Value, &mut rust)?;
+        renderer.render_argument(*initializer, &mut rust)?;
         rust.push_str(", ");
     }
     if count != 0 {

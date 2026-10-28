@@ -940,6 +940,13 @@ native float values. `__FLT_EVAL_METHOD__` is the only excess-precision witness,
 so caller `-D`/`-U` options cannot name it, the other `__FLT_*`, `__DBL_*` or
 `__LDBL_*` facts, `__FAST_MATH__`, or `__FINITE_MATH_ONLY__`.
 
+A macro that both multiplies and adds checks every value against the composed
+profile, so a floating argument fails to compile when contraction is not
+disabled. A translated inline function's own types do not depend on its caller:
+a body with a floating local or value under that profile keeps the native call.
+Its arguments are converted to the parameter types as a call converts them, so
+they use the native value profile.
+
 Verified byte-swap builtins lower to Rust operations with the C result identity.
 Branch hints lower to Rust support with cold paths while preserving C operand
 evaluation and result identity. Compute fixed-value and projected-expectation
