@@ -24,8 +24,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, IntegerBinding,
-    IntegerBindingRepresentation, IntegerValue, MacroScanner, SkipReasonCode,
+    AnalysisSession, AnalysisStatus, BindingCatalog, EmissionStatus, FrontendOutput,
+    IntegerBinding, IntegerBindingRepresentation, IntegerValue, MacroScanner, SkipReasonCode,
     emit_batch_with_bindings, generate_with_bindings, inspect,
 };
 use std::fmt::Write;
@@ -130,6 +130,8 @@ fn fallback_calls_keep_their_generated_support(scanner: &MacroScanner) {
             let name = emission.analysis.name.as_str();
             match (name, &emission.status) {
                 ("FALLBACK_REFUSED", EmissionStatus::Skipped { reason }) => {
+                    // Demand planning covers only candidate analyses.
+                    assert!(matches!(emission.analysis.status, AnalysisStatus::Candidate));
                     assert!(reason.message.contains("FALLBACK_HELPER"), "{reason:?}");
                 }
                 (_, EmissionStatus::Emitted { rust: definition, .. }) => {
