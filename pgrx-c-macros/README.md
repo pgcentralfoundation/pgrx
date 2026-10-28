@@ -156,6 +156,9 @@ cargo run -p pgrx-c-macros -- emit pg18 --name TYPEALIGN
 cargo run -p pgrx-c-macros -- emit pg18 --format json
 ```
 
+Unlike the `list` filter, `analyze` and `emit` fail when a `--name` selects no
+PostgreSQL-owned function-like macro or inline function.
+
 `analyze` and `emit` use the final active macro map, declaration catalog and target
 facts. They expand nested macros with Clang while retaining the original main-file
 preprocessing context. PostgreSQL owns the primary macros; external headers and

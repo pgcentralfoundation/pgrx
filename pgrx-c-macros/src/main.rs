@@ -16,7 +16,7 @@ use pgrx_c_macros::{
     postgres_function_macro_names, postgres_inline_function_names,
 };
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::io::{self, BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -67,7 +67,8 @@ struct AnalyzeArgs {
     #[arg(long, value_enum, default_value_t = AnalysisFormat::Human)]
     format: AnalysisFormat,
 
-    /// Select an exact macro name; may be repeated.
+    /// Select an exact PostgreSQL function-like macro or inline function name; may be repeated.
+    /// A name that selects neither is an error.
     #[arg(long)]
     name: Vec<String>,
 
@@ -91,7 +92,8 @@ struct EmitArgs {
     /// Output Rust source or a JSON report including source and skip reasons.
     #[arg(long, value_enum, default_value_t = EmissionFormat::Rust)]
     format: EmissionFormat,
-    /// Select an exact macro name; may be repeated.
+    /// Select an exact PostgreSQL function-like macro or inline function name; may be repeated.
+    /// A name that selects neither is an error.
     #[arg(long)]
     name: Vec<String>,
     /// Compatible Clang executable to use for final preprocessing state.
@@ -219,6 +221,12 @@ enum CliError {
         /// Original serialization error, including possible broken-pipe context.
         #[from]
         serde_json::Error,
+    ),
+    /// Explicit analyze/emit names selected no PostgreSQL-owned function macro or inline function.
+    #[error("no PostgreSQL-owned function-like macro or inline function is named {}", .0.join(", "))]
+    UnmatchedNames(
+        /// Requested names that matched no owned root, in sorted order.
+        Vec<String>,
     ),
 }
 
@@ -456,20 +464,29 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
 }
 
 /// Apply exact CLI name filters after authoritative PostgreSQL source ownership filtering.
+/// A requested name that selects no owned root is an error rather than an empty report.
 fn selected_invocation_names(
     inspected: &FrontendOutput,
     root: &Path,
     selected: &[String],
-) -> Result<(Vec<String>, Vec<String>), PostgresError> {
-    let selected: HashSet<_> = selected.iter().map(String::as_str).collect();
+) -> Result<(Vec<String>, Vec<String>), CliError> {
+    let selected: BTreeSet<_> = selected.iter().map(String::as_str).collect();
     let macros = postgres_function_macro_names(inspected, root)?
         .into_iter()
         .filter(|name| selected.is_empty() || selected.contains(name.as_str()))
-        .collect();
+        .collect::<Vec<_>>();
     let inlines = postgres_inline_function_names(inspected, root)?
         .into_iter()
         .filter(|name| selected.is_empty() || selected.contains(name.as_str()))
-        .collect();
+        .collect::<Vec<_>>();
+    let unmatched = selected
+        .into_iter()
+        .filter(|name| !macros.iter().chain(&inlines).any(|owned| owned == name))
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    if !unmatched.is_empty() {
+        return Err(CliError::UnmatchedNames(unmatched));
+    }
     Ok((macros, inlines))
 }
 

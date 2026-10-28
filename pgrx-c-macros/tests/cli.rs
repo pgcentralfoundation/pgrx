@@ -335,6 +335,24 @@ fn analyzes_final_postgres_functions_with_profile_and_explicit_skips() {
     assert!(String::from_utf8_lossy(&missing.stderr).contains("<PG_VERSION>"));
 }
 
+/// A misspelled or non-PostgreSQL `--name` fails analyze and emit instead of producing an empty
+/// successful run; matched names do not hide the unmatched one.
+#[test]
+fn analyze_and_emit_refuse_names_that_select_no_postgres_root() {
+    let config = TestConfig::new();
+    for command in ["analyze", "emit"] {
+        let output = config
+            .command()
+            .args([command, "pg18", "--name", "LATE_WRAPPER_FUNCTION", "--name", "LATE_WRAPPER"])
+            .output()
+            .unwrap();
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(!output.status.success(), "{command}: {stderr}");
+        assert!(output.stdout.is_empty(), "{command}");
+        assert!(stderr.contains("is named LATE_WRAPPER\n"), "{command}: {stderr}");
+    }
+}
+
 /// Checks that analysis uses recorded cflags and explicit overrides.
 #[test]
 fn analysis_uses_recorded_cflags_and_explicit_overrides() {
