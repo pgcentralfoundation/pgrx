@@ -595,6 +595,43 @@ fn optional_integer_zero_probe_budget_preserves_proved_facts() {
     }
 }
 
+/// Witnesses that only libclang rejects have no owner, so isolation bisects them and can run out
+/// of its finite budget. Candidates proved before then keep their identities, and candidates it
+/// never visits receive none: an unproved zero identity would admit null-pointer conversions.
+#[test]
+fn exhausted_integer_zero_probe_budget_admits_no_unvisited_candidates() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("zero-exhaustion.h");
+    // The driver witness compiles at -O1 and divides by one. Analysis and the libclang
+    // witness divide by zero, which is not an integer constant expression.
+    let mut source = String::from(
+        "#ifdef __OPTIMIZE__\nenum { BUDGET_DIVISOR = 1 };\n#else\nenum { BUDGET_DIVISOR = 0 };\n#endif\n",
+    );
+    let mut names = Vec::new();
+    for index in 0..100 {
+        let name = format!("BAD_ZERO_{index:03}");
+        source.push_str(&format!("#define {name}(value) (1 / BUDGET_DIVISOR - 1)\n"));
+        names.push(name);
+    }
+    // Candidates follow name order, and bisection visits the last range first: it proves
+    // Z_VALID_ZERO early and runs out of budget among the failures before A_VALID_ZERO.
+    for name in ["A_VALID_ZERO", "Z_VALID_ZERO"] {
+        source.push_str(&format!("#define {name}(value) (1 - 1)\n"));
+        names.push(name.into());
+    }
+    std::fs::write(&header, source).unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let zeros = |name: &str| session.analyze(name).expression.unwrap().integer_zero_constants;
+    assert!(!zeros("Z_VALID_ZERO").is_empty(), "a proved candidate keeps its identity");
+    assert!(zeros("A_VALID_ZERO").is_empty(), "an unvisited candidate has no proof");
+    for name in &names[..100] {
+        assert!(zeros(name).is_empty(), "{name}");
+    }
+}
+
 /// PostgreSQL coverage flags affect original preprocessing but must not introduce a gcov runtime
 /// dependency into the helper archive linked by Rust extensions.
 #[test]
@@ -699,6 +736,41 @@ fn oversized_bitfield_diagnostics_preserve_proved_fields() {
     assert_eq!(
         frontend.declarations().bitfields.keys().collect::<Vec<_>>(),
         ["struct NoisyBudget::leading", "struct NoisyBudget::proven"]
+    );
+}
+
+/// Bitfield witnesses that only libclang rejects have no owner either. Fields proved before
+/// isolation runs out of budget keep their facts, and fields it never visits receive none.
+#[test]
+fn exhausted_bitfield_probe_budget_admits_no_unvisited_fields() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("bitfield-exhaustion.h");
+    // The driver reads each probe from standard input, while libclang parses it under a
+    // temporary file name, so this constant is one only for the driver.
+    let mut source = String::from(
+        "enum { BUDGET_FROM_STDIN = sizeof(__BASE_FILE__) == sizeof(\"<stdin>\") };\n\
+         struct ExhaustedBudget {\nunsigned int leading : 1;\n",
+    );
+    for index in 0..100 {
+        source.push_str(&format!("const unsigned int flag_{index} : 1;\n"));
+    }
+    source.push_str("unsigned int proven : 1;\n};\n");
+    // Each flag witness then declares an array of negative size for libclang only. The flags
+    // are const, so no assignment witness needs this expansion to remain an lvalue.
+    for index in 0..100 {
+        source.push_str(&format!(
+            "#define flag_{index} flag_{index} + 0 * sizeof(char[2 * BUDGET_FROM_STDIN - 1])\n"
+        ));
+    }
+    std::fs::write(&header, source).unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    // Candidates follow declaration order, and bisection visits the last range first: it
+    // proves `proven` early and runs out of budget among the flags before `leading`.
+    assert_eq!(
+        frontend.declarations().bitfields.keys().collect::<Vec<_>>(),
+        ["struct ExhaustedBudget::proven"]
     );
 }
 
