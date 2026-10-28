@@ -324,13 +324,11 @@ fn emit_rerun_if_changed() {
 
 /// One version's release artifacts, held until the whole release verifies.
 struct ReleaseVersion {
-    /// PostgreSQL major version.
-    major: u16,
     /// Source of `pgNN.rs`, including its generation id.
     bindings: String,
     /// Source of `pgNN_oids.rs`.
     oids: String,
-    /// The version's documentation.
+    /// The version's documentation, which also names its major version.
     snapshot: SnapshotVersion,
 }
 
@@ -432,7 +430,7 @@ fn generate_bindings(
         eyre!("release generation collected no C macro documentation for pg{major_version}")
     })?;
     snapshot.generated_by(generation);
-    Ok(Some(ReleaseVersion { major: major_version, bindings, oids, snapshot }))
+    Ok(Some(ReleaseVersion { bindings, oids, snapshot }))
 }
 
 /// Require release generation to run on the single target docs.rs documents.
@@ -523,7 +521,8 @@ fn publish_release(
     }
     let (snapshots, releases): (Vec<_>, Vec<_>) = releases
         .into_iter()
-        .map(|ReleaseVersion { major, bindings, oids, snapshot }| {
+        .map(|ReleaseVersion { bindings, oids, snapshot }| {
+            let major = snapshot.major();
             (snapshot, (major, bindings, oids))
         })
         .unzip();
@@ -2890,7 +2889,6 @@ mod macro_build_tests {
                 SnapshotVersion::new(major, &[], Path::new("/not/used"), support.into()).unwrap();
             snapshot.generated_by(format!("{major:064x}"));
             ReleaseVersion {
-                major,
                 bindings: "pub const BINDING: u32 = 1;".into(),
                 oids: String::new(),
                 snapshot,
