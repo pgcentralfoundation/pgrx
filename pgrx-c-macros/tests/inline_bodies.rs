@@ -28,6 +28,11 @@ use pgrx_c_macros::{
     emit_support_artifact_with_bindings, inspect,
 };
 use std::path::PathBuf;
+use std::sync::Mutex;
+
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 /// Preserve the production OID classification boundary in the shared fixture collector.
 fn is_builtin_oid(name: &str) -> bool {
@@ -87,8 +92,9 @@ const NATIVE: &[&str] = &[
     "BODY_MACRO_ARG",
     // A popped definition, not the last one, is active at the end.
     "BODY_PUSHED",
-    // A macro its body reaches is the subject of a pop pragma.
+    // A macro its body reaches is the subject of a pop pragma, also one a splice divides.
     "BODY_POPPED",
+    "BODY_SPLICED_POP",
     // Its expansion used a definition other than the last one.
     "BODY_HIDDEN",
     // A macro reached through another macro is redefined after the function.
@@ -121,15 +127,14 @@ const NATIVE: &[&str] = &[
     "BODY_SECOND_BRANCH",
     "BODY_GUARDED_FIRST",
     "BODY_GUARDED_SECOND",
-    // Trigraphs and bare carriage returns are not modeled.
-    "BODY_TRIGRAPH_SPLICE",
+    // Trigraphs are not modeled.
     "BODY_TRIGRAPH_HASH",
-    "BODY_CR_STORE",
 ];
 
 /// Compare translated and native inline roots with the original compiler's results.
 #[test]
 fn translated_bodies_match_their_original_definitions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/inline_bodies.h");
     let mut arguments = oracle::native_arguments();
@@ -219,7 +224,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 33;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 32;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();
@@ -240,4 +245,26 @@ fn translated_bodies_match_their_original_definitions() {
     );
     assert_eq!(generated, original);
     session.verify_inputs().expect("original profile stayed unchanged");
+}
+
+/// A trigraph that spells a backslash, or a bare carriage return, could divide the name of
+/// a pop pragma in a way the search for those pragmas does not model. In a unit with
+/// either, as when a pop's operand cannot be read, no body that names a macro is retained.
+#[test]
+fn unmodeled_line_ends_leave_no_macro_bodies() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/inline_bodies_phases.h");
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-std=c17".into());
+    let frontend = inspect(&scanner, &header, &arguments, None).expect("inspect definitions");
+    let retained = |name: &str| {
+        let function = &frontend.declarations().function_signatures[name];
+        function.definition.as_ref().expect("proved definition").body.is_some()
+    };
+    assert!(retained("BODY_PHASE_PLAIN"));
+    for name in ["BODY_PHASE_MACRO", "BODY_TRIGRAPH_SPLICE", "BODY_CR_STORE"] {
+        assert!(!retained(name), "{name}");
+    }
 }

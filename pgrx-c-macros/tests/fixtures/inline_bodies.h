@@ -102,6 +102,15 @@ typedef enum BodyPoppedEnum { BODY_POPPED_VALUE = 5 } BodyPoppedEnum;
 #define BODY_POPPED_SCALE BODY_POPPED_VALUE
 static inline int BODY_POPPED(int value) { return value + BODY_POPPED_SCALE; }
 #pragma pop_macro("BODY_POPPED_VALUE")
+/* The same, with a pop pragma whose name a line splice divides. */
+#define BODY_SPLICED_POP_VALUE 1000
+#pragma push_macro("BODY_SPLICED_POP_VALUE")
+#undef BODY_SPLICED_POP_VALUE
+typedef enum BodySplicedPopEnum { BODY_SPLICED_POP_VALUE = 5 } BodySplicedPopEnum;
+#define BODY_SPLICED_POP_SCALE BODY_SPLICED_POP_VALUE
+static inline int BODY_SPLICED_POP(int value) { return value + BODY_SPLICED_POP_SCALE; }
+#pragma pop_mac\
+ro("BODY_SPLICED_POP_VALUE")
 /* Pasting forms the names of these pop pragmas, which their text therefore lacks. The
  * body uses a pushed definition that is neither the last one nor active at the end. */
 #define BODY_PRAGMA(text) _Pragma(#text)
@@ -210,16 +219,7 @@ static inline int BODY_SPLICED_DIGRAPH(int value)
 		- 1
 		);
 }
-/* With -std=c17, trigraphs spell the splice or the directive's `#`. */
-static inline int BODY_TRIGRAPH_SPLICE(int value)
-{
-	return (value
-#if 0
-		* 100
-#endif ??/
-		- 1
-		);
-}
+/* With -std=c17, a trigraph spells the directive's `#`. */
 static inline int BODY_TRIGRAPH_HASH(int value)
 {
 	return (value
@@ -229,6 +229,3 @@ static inline int BODY_TRIGRAPH_HASH(int value)
 		- 1
 		);
 }
-/* Its body's lines end with a bare carriage return, as on classic Mac OS. */
-static inline void BODY_CR_STORE(int *where, int value)
-{	if (value)		*where = 1;#if 0		*where = 3;#endif	else		*where = 2;}

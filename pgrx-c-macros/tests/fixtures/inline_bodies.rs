@@ -91,9 +91,10 @@ fn main() {
             BODY_DIRECTIVE_SPLICE!(10_i32).get()
         );
         println!(
-            "pushed\t{}\t{}\t{}",
+            "pushed\t{}\t{}\t{}\t{}",
             BODY_PUSHED!(2_i32).get(),
             BODY_POPPED!(1_i32).get(),
+            BODY_SPLICED_POP!(1_i32).get(),
             BODY_HIDDEN!(2_i32).get()
         );
         println!("transitive\t{}", BODY_TRANSITIVE_USE!(1_i32).get());
@@ -137,14 +138,11 @@ fn main() {
             BODY_SECOND_BRANCH!(10_i32).get()
         );
         println!("guarded\t{}\t{}", BODY_GUARDED_FIRST!().get(), BODY_GUARDED_SECOND!().get());
-        let mut carriage = 0_i32;
-        BODY_CR_STORE!(&raw mut carriage, 0_i32).get();
         println!(
-            "spliced\t{}\t{}\t{}\t{}\t{}\t{carriage}",
+            "spliced\t{}\t{}\t{}\t{}",
             BODY_BRACE_SPLICE!(1_i32).get(),
             BODY_SPLICED_HASH!(10_i32).get(),
             BODY_SPLICED_DIGRAPH!(10_i32).get(),
-            BODY_TRIGRAPH_SPLICE!(10_i32).get(),
             BODY_TRIGRAPH_HASH!(10_i32).get()
         );
     }

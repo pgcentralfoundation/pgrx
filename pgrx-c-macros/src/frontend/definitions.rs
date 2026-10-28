@@ -16,7 +16,7 @@
 use super::{FrontendError, type_info};
 use crate::{
     ActiveMacro, DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroKind,
-    MacroScanner, SourceSpan, TokenKind, unspliced,
+    MacroScanner, SourceSpan, TokenKind, splice_length, unspliced, without_splices,
 };
 use clang::source::File;
 use clang::{Entity, EntityKind, EntityVisitResult, Index, Linkage, StorageClass, TypeKind};
@@ -201,17 +201,25 @@ pub(super) fn prove(
 }
 
 /// The names that `pop_macro` pragmas in these files restore, or `None` when a file cannot
-/// be read or a pragma's operand is not a plain string literal.
+/// be read, a pragma's operand is not a plain string literal, or a file has a `??/`
+/// trigraph or a carriage return outside a CR-LF line end.
 ///
 /// libclang records neither pragma, so the files' text is searched, including text the
-/// preprocessor skipped, comments and `_Pragma` strings. A pragma whose name is formed
-/// by token pasting cannot be seen.
+/// preprocessor skipped, comments and `_Pragma` strings. Line splices are removed first, as
+/// Clang removes them before it reads a pragma. With trigraphs enabled, `??/` is a
+/// backslash, and Clang also ends a line at a bare carriage return, so such a file could
+/// splice a name in a way the search does not model. A pragma whose name is formed by
+/// token pasting cannot be seen.
 fn popped_names(files: impl IntoIterator<Item = PathBuf>) -> Option<HashSet<String>> {
     const POP: &[u8] = b"pop_macro";
     let mut names = HashSet::new();
     for file in files {
         let text = std::fs::read(file).ok()?;
-        let mut rest = text.as_slice();
+        if text.windows(3).any(|window| window == b"??/") || has_bare_carriage_return(&text) {
+            return None;
+        }
+        let text = without_splices(&text);
+        let mut rest = text.as_ref();
         while let Some(at) = rest.windows(POP.len()).position(|window| window == POP) {
             rest = &rest[at + POP.len()..];
             // `("NAME")`, or `(\"NAME\")` inside a `_Pragma` string.
@@ -314,10 +322,7 @@ fn body_tokens<'tu>(
     let bytes = contents.as_bytes();
     let text = bytes.get(start..end)?;
     if text.windows(3).any(|window| window[..2] == *b"??" && b"=(/)'<!>-".contains(&window[2]))
-        || text
-            .iter()
-            .enumerate()
-            .any(|(index, &byte)| byte == b'\r' && bytes.get(start + index + 1) != Some(&b'\n'))
+        || has_bare_carriage_return(text)
     {
         return None;
     }
@@ -422,32 +427,30 @@ fn starts_line(contents: &[u8], offset: usize) -> bool {
     !before.ends_with(b"\\") || newlines.next().is_some()
 }
 
+/// Whether `text` has a carriage return that does not start a CR-LF line end. Clang ends a
+/// line there, but line handling here ends lines only at newlines.
+fn has_bare_carriage_return(text: &[u8]) -> bool {
+    text.iter()
+        .enumerate()
+        .any(|(index, &byte)| byte == b'\r' && text.get(index + 1) != Some(&b'\n'))
+}
+
 /// The offset of the newline that ends the logical line containing `start`, or the end
 /// of the file.
 ///
-/// Translation phases 2 and 3 run before directives: a backslash-newline joins lines, and
-/// a comment, which can span lines, is one space. Clang also splices a backslash followed
-/// by blanks and a newline. A literal ends at its closing quote or at the end of the line.
-/// An unterminated comment has no end.
+/// Translation phases 2 and 3 run before directives: a line splice joins lines, and a
+/// comment, which can span lines, is one space. A literal ends at its closing quote or at
+/// the end of the line. An unterminated comment has no end.
 fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
     let mut at = start;
     // The bytes from `start` and their offsets, without line splices.
     let mut bytes = std::iter::from_fn(|| {
-        loop {
-            let byte = *contents.get(at)?;
-            if byte == b'\\' {
-                let blanks = contents[at + 1..]
-                    .iter()
-                    .take_while(|&&byte| matches!(byte, b' ' | b'\t' | b'\x0b' | b'\x0c' | b'\r'))
-                    .count();
-                if contents.get(at + 1 + blanks) == Some(&b'\n') {
-                    at += blanks + 2;
-                    continue;
-                }
-            }
-            at += 1;
-            return Some((at - 1, byte));
+        while let Some(length) = contents.get(at..).and_then(splice_length) {
+            at += length;
         }
+        let byte = *contents.get(at)?;
+        at += 1;
+        Some((at - 1, byte))
     })
     .peekable();
     while let Some((offset, byte)) = bytes.next() {
@@ -674,5 +677,28 @@ mod tests {
         let comment = file("comment.h", "/* see pop_macro */\n");
         assert_eq!(popped_names([pragmas.clone(), comment]), None);
         assert_eq!(popped_names([pragmas, directory.path().join("missing.h")]), None);
+    }
+
+    /// Line splices are removed before the search, in the pragma's name and its operand.
+    /// A `??/` trigraph or a bare carriage return could splice in ways the search does not
+    /// model, so it leaves every name unproved.
+    #[test]
+    fn pop_pragmas_are_found_across_splices() {
+        let directory = tempfile::tempdir().unwrap();
+        let file = |name: &str, text: &str| {
+            let path = directory.path().join(name);
+            std::fs::write(&path, text).unwrap();
+            path
+        };
+        let spliced = file(
+            "spliced.h",
+            "#pragma pop_mac\\\nro(\"A\")\r\n#pragma pop_ma\\ \t\r\ncro(\"B\\\n_1\")\r\n",
+        );
+        let names = popped_names([spliced.clone()]).unwrap();
+        assert_eq!(names, ["A", "B_1"].map(String::from).into());
+        let trigraph = file("trigraph.h", "/* ??/ */\n");
+        assert_eq!(popped_names([spliced.clone(), trigraph]), None);
+        let carriage = file("carriage.h", "#define X 1\r#define Y 2\n");
+        assert_eq!(popped_names([spliced, carriage]), None);
     }
 }

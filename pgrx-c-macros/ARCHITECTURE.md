@@ -326,15 +326,20 @@ cannot be inferred from a declaration's name or broad type category:
    the unit. Undefinitions are not recorded, so this is what proves the
    end-of-unit expansion identical, unless a `pop_macro` pragma restored a
    definition that was undefined or replaced at the body. libclang records no
-   pragmas, so the text of every file in the unit is searched: a name that a pop
-   pragma names leaves no body, and a pop whose operand is not a plain string
-   leaves no bodies at all. A pop whose name token pasting forms has no such
-   text, so the active definition must also be that last definition, by
-   location, and a name the body expands must have used it. A macro name without
-   a record is admitted only inside the arguments of such an expanded
-   function-like invocation, which dropped or stringified it, and only when it
-   is unchanged since that invocation. Nested expansions are not recorded, so a
-   name inactive at the end must never have been defined as a macro.
+   pragmas, so the text of every file in the unit is searched after removing its
+   line splices: a name that a pop pragma names leaves no body. A pop whose
+   operand is not a plain string leaves no body that names a macro, and so does
+   a `??/` trigraph or a carriage return outside a CR-LF line end in any file,
+   since either could splice a pragma's name in a way the search does not model.
+   A pop whose name token pasting forms has no such text, so the active
+   definition must also be that last definition, by location, and a name the
+   body expands must have used it. That check does not reach a name that only
+   another macro's replacement names and that was not a macro at the body, so
+   such a pasted pop is not detected. A macro name without a record is admitted
+   only inside the arguments of an expanded function-like invocation, which
+   dropped or stringified it, and only when it is unchanged since that
+   invocation. Nested expansions are not recorded, so a name inactive at the end
+   must never have been defined as a macro.
    Token pasting and invocation-dependent builtins such as `__LINE__` leave no
    body. A file and offset name a place in the file's first entry, and libclang
    reports skipped ranges for that entry only. Expansion records from a later
